@@ -17,7 +17,7 @@ builder.Services.Configure<JwtOptions>(
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
-    var configuration = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis") ?? throw new NullReferenceException());
+    var configuration = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("RedisLocalDevRiten") ?? throw new NullReferenceException());
     return ConnectionMultiplexer.Connect(configuration);
 });
 
