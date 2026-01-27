@@ -1,5 +1,9 @@
+using Application.Intarfaces;
+using Domain.Models;
 using Infrastructure.Repositoryes.DataBase;
 using Infrastructure.Repositoryes.Redis;
+using Infrastructure.Services;
+using Infrastructure.Utils;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 
@@ -7,17 +11,23 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
+builder.Services.Configure<JwtOptions>(
+    builder.Configuration.GetSection("Jwt")
+);
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
-    var configuration = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis"));
+    var configuration = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("Redis") ?? throw new NullReferenceException());
     return ConnectionMultiplexer.Connect(configuration);
 });
 
 builder.Services.AddScoped<UserRedisRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITokenCacheRepository, TokenCacheRepository>();
+builder.Services.AddScoped<IJwtHelper, JwtHelper>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
 
-
-var connectionString = builder.Configuration.GetConnectionString("MySqlLocalDevRiten");
+var connectionString = builder.Configuration.GetConnectionString("MySqlLocalDevRiten") ?? throw new NullReferenceException();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {

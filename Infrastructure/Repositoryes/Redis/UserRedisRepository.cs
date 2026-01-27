@@ -3,16 +3,7 @@ using StackExchange.Redis;
 
 namespace Infrastructure.Repositoryes.Redis
 {
-    public class UserRedisRepository : RedisRepository<UserRedisEntity>
+    public class UserRedisRepository(IConnectionMultiplexer redis) : RedisRepository<UserRedisEntity>(redis, "User:")
     {
-        public UserRedisRepository(IConnectionMultiplexer redis)
-            : base(redis, "User:") { }
-    }
-
-    public class UserRedisEntity : RedisEntity
-    {
-        public string Login { get; set; } = default!;
-        public string? RefreshToken { get; set; }
-        public DateTime LastLogin { get; set; }
     }
 }
