@@ -1,11 +1,17 @@
+﻿using System.Text;
 using Application.Intarfaces;
 using Domain.Models;
 using Infrastructure.Repositoryes.DataBase;
 using Infrastructure.Repositoryes.Redis;
 using Infrastructure.Services;
 using Infrastructure.Utils;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
+using ViaTradeBackend.Middleware;
+using ViaTradeBackend.OptionsSetup;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,14 +43,21 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     );
 });
 
+builder.Services.AddSingleton<
+    IConfigureOptions<JwtBearerOptions>,
+    JwtBearerOptionsSetup>();
+
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
+app.UseMiddleware<ExceptionHandlingMiddleware>();
+
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

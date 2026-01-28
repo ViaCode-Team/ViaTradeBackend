@@ -52,13 +52,12 @@ namespace Infrastructure.Services
             };
 
             await _userRepository.AddAsync(user);
+            await _userRepository.SaveChangesAsync();
 
             var accessToken = _jwtHelper.GenerateAccessToken(user);
             var refreshToken = _jwtHelper.GenerateRefreshToken();
 
-            user.RefreshToken = refreshToken;
-            await _userRepository.UpdateAsync(user);
-
+            await _userRepository.UpdateRefreshTokenAsync(user.Id, refreshToken);
             await _tokenCache.SetAccessTokenAsync(user.Id, accessToken, _accessTokenTtl);
 
             return new AuthResult
@@ -67,5 +66,27 @@ namespace Infrastructure.Services
                 RefreshToken = refreshToken
             };
         }
+
+        public async Task<AuthResult> RefreshTokenAsync(string refreshToken)
+        {
+            var user = await _userRepository.GetByRefreshTokenAsync(refreshToken) 
+                ?? throw new UnauthorizedAccessException("Invalid refresh token");
+            
+            var newAccessToken = _jwtHelper.GenerateAccessToken(user);
+            var newRefreshToken = _jwtHelper.GenerateRefreshToken();
+
+            user.RefreshToken = newRefreshToken;
+            user.LastLoginDate = DateTime.UtcNow;
+            await _userRepository.UpdateAsync(user);
+
+            await _tokenCache.SetAccessTokenAsync(user.Id, newAccessToken, _accessTokenTtl);
+
+            return new AuthResult
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken
+            };
+        }
+
     }
 }

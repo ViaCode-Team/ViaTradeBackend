@@ -1,0 +1,125 @@
+openapi: 3.0.3
+info:
+  title: ViaTrade Auth API
+  version: 1.1.0
+  description: Authentication and authorization API using HttpOnly cookies
+
+paths:
+  /api/auth/login:
+    post:
+      summary: User login
+      operationId: login
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '204':
+          description: Login successful. Access and refresh tokens are set in HttpOnly cookies.
+          headers:
+            Set-Cookie:
+              description: access_token and refresh_token cookies
+              schema:
+                type: string
+        '401':
+          description: Invalid login or password
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /api/auth/register:
+    post:
+      summary: User registration
+      operationId: register
+      tags:
+        - Auth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '204':
+          description: Registration successful. Access and refresh tokens are set in HttpOnly cookies.
+          headers:
+            Set-Cookie:
+              description: access_token and refresh_token cookies
+              schema:
+                type: string
+        '400':
+          description: User already exists
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+  /api/auth/refresh:
+    post:
+      summary: Refresh access token
+      operationId: refresh
+      tags:
+        - Auth
+      responses:
+        '204':
+          description: Tokens refreshed successfully. New cookies are set.
+          headers:
+            Set-Cookie:
+              description: renewed access_token and refresh_token cookies
+              schema:
+                type: string
+        '401':
+          description: Refresh token is missing or invalid
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+
+components:
+  schemas:
+    LoginRequest:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+          example: user1
+        password:
+          type: string
+          example: password123
+
+    RegisterRequest:
+      type: object
+      required:
+        - login
+        - password
+      properties:
+        login:
+          type: string
+          example: user1
+        password:
+          type: string
+          example: password123
+
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          example: https://httpstatuses.com/401
+        title:
+          type: string
+          example: Unauthorized
+        status:
+          type: integer
+          example: 401
+        detail:
+          type: string
+          example: Invalid credentials

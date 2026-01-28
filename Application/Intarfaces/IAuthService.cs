@@ -6,5 +6,6 @@ namespace Application.Intarfaces
     {
         Task<AuthResult> LoginAsync(string login, string password);
         Task<AuthResult> RegisterAsync(string login, string password);
+        Task<AuthResult> RefreshTokenAsync(string refreshToken);
     }
 }

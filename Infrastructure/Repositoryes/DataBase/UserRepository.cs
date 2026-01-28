@@ -8,12 +8,27 @@ namespace Infrastructure.Repositoryes.DataBase
     {
         public async Task<User?> GetByLoginAsync(string login)
         {
-            return await _dbSet.FirstOrDefaultAsync(u => u.Login == login);
+            return await _dbSet
+                .FirstOrDefaultAsync(u => u.Login == login);
         }
 
-        public Task UpdateAsync(User user)
+        public async Task<User?> GetByRefreshTokenAsync(string refreshToken)
         {
-            throw new NotImplementedException();
+            return await _dbSet.FirstOrDefaultAsync(u => u.RefreshToken == refreshToken);
+        }
+
+        public async Task UpdateAsync(User user)
+        {
+            _dbSet.Update(user);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task UpdateRefreshTokenAsync(int userId, string refreshToken)
+        {
+            await _dbSet
+                .Where(u => u.Id == userId)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(u => u.RefreshToken, refreshToken));
         }
     }
 }
