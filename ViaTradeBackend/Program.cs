@@ -1,5 +1,4 @@
-﻿using System.Text;
-using Application.Intarfaces;
+﻿using Application.Intarfaces;
 using Domain.Models;
 using Infrastructure.Repositoryes.DataBase;
 using Infrastructure.Repositoryes.Redis;
@@ -8,7 +7,6 @@ using Infrastructure.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
 using ViaTradeBackend.Middleware;
 using ViaTradeBackend.OptionsSetup;

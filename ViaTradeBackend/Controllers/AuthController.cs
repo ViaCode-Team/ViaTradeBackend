@@ -44,6 +44,32 @@ namespace ViaTradeBackend.Controllers
             return NoContent();
         }
 
+        [HttpPost("logout")]
+        public async Task<IActionResult> Logout()
+        {
+            if (Request.Cookies.TryGetValue("refresh_token", out var refreshToken))
+                await _authService.LogoutAsync(refreshToken);
+
+            Response.Cookies.Delete("access_token", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Path = "/"
+            });
+
+            Response.Cookies.Delete("refresh_token", new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = true,
+                SameSite = SameSiteMode.Strict,
+                Path = "/"
+            });
+
+            return NoContent();
+        }
+
+
         private void SetAuthCookies(AuthResult result)
         {
             Response.Cookies.Append(

@@ -3,14 +3,9 @@ using StackExchange.Redis;
 
 namespace Infrastructure.Repositoryes.Redis
 {
-    public class TokenCacheRepository : ITokenCacheRepository
+    public class TokenCacheRepository(IConnectionMultiplexer redis) : ITokenCacheRepository
     {
-        private readonly IDatabase _db;
-
-        public TokenCacheRepository(IConnectionMultiplexer redis)
-        {
-            _db = redis.GetDatabase();
-        }
+        private readonly IDatabase _db = redis.GetDatabase();
 
         public async Task SetAccessTokenAsync(int userId, string token, TimeSpan ttl)
         {

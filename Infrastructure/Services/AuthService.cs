@@ -38,6 +38,18 @@ namespace Infrastructure.Services
             };
         }
 
+        public async Task LogoutAsync(string refreshToken)
+        {
+            var user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
+            if (user == null)
+                return;
+
+            user.RefreshToken = null;
+            await _userRepository.UpdateAsync(user);
+
+            await _tokenCache.RemoveAccessTokenAsync(user.Id);
+        }
+
         public async Task<AuthResult> RegisterAsync(string login, string password)
         {
             var existingUser = await _userRepository.GetByLoginAsync(login);
