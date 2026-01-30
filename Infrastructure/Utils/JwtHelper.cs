@@ -41,5 +41,14 @@ namespace Infrastructure.Utils
             var bytes = RandomNumberGenerator.GetBytes(64);
             return Convert.ToBase64String(bytes);
         }
+
+        public int GetUserIdFromClaims(ClaimsPrincipal user)
+        {
+            var subClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier); // Fuck this auto-mapper from ASP
+            if (subClaim == null)
+                throw new InvalidOperationException("User claims do not contain 'sub'.");
+
+            return int.Parse(subClaim.Value);
+        }
     }
 }

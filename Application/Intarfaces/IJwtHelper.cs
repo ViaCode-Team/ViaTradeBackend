@@ -1,4 +1,5 @@
-﻿using Domain.Entities.DataBase;
+﻿using System.Security.Claims;
+using Domain.Entities.DataBase;
 
 namespace Application.Intarfaces
 {
@@ -6,5 +7,6 @@ namespace Application.Intarfaces
     {
         string GenerateAccessToken(User user);
         string GenerateRefreshToken();
+        int GetUserIdFromClaims(ClaimsPrincipal user);
     }
 }

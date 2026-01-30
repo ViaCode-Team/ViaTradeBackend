@@ -45,6 +45,15 @@ builder.Services.AddSingleton<
     IConfigureOptions<JwtBearerOptions>,
     JwtBearerOptionsSetup>();
 
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer();
+
+builder.Services.AddAuthorization();
+
 builder.Services.AddControllers();
 
 var app = builder.Build();

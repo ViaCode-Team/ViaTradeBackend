@@ -1,7 +1,7 @@
 ﻿using Application.Intarfaces;
 using Domain.Entities.DataBase;
 using Domain.Models;
-
+    
 namespace Infrastructure.Services
 {
     public class AuthService(
