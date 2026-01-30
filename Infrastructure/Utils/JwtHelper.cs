@@ -14,11 +14,12 @@ namespace Infrastructure.Utils
     {
         private readonly JwtOptions _options = options.Value;
 
-        public string GenerateAccessToken(User user)
+        public string GenerateAccessToken(User user, string sessionId)
         {
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.Jti, sessionId),
                 new Claim(JwtRegisteredClaimNames.UniqueName, user.Login)
             };
 
@@ -36,10 +37,20 @@ namespace Infrastructure.Utils
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+
         public string GenerateRefreshToken()
         {
             var bytes = RandomNumberGenerator.GetBytes(64);
             return Convert.ToBase64String(bytes);
+        }
+
+        public string GetSessionId(ClaimsPrincipal user)
+        {
+            var jtiClaim = user.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti);
+            if (jtiClaim == null)
+                throw new InvalidOperationException("User claims do not contain 'jti'.");
+
+            return jtiClaim.Value;
         }
 
         public int GetUserIdFromClaims(ClaimsPrincipal user)

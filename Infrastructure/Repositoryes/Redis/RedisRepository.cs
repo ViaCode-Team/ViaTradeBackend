@@ -5,16 +5,10 @@ using StackExchange.Redis;
 
 namespace Infrastructure.Repositoryes.Redis
 {
-    public class RedisRepository<T> : IRedisRepository<T> where T : RedisEntity
+    public class RedisRepository<T>(IConnectionMultiplexer redis, string prefix) : IRedisRepository<T> where T : RedisEntity
     {
-        protected readonly StackExchange.Redis.IDatabase _db;
-        protected readonly string _prefix;
-
-        public RedisRepository(IConnectionMultiplexer redis, string prefix)
-        {
-            _db = redis.GetDatabase();
-            _prefix = prefix;
-        }
+        protected readonly StackExchange.Redis.IDatabase _db = redis.GetDatabase();
+        protected readonly string _prefix = prefix;
 
         protected string GetKey(string id) => $"{_prefix}{id}";
 

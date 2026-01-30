@@ -7,29 +7,44 @@ namespace Infrastructure.Services
     public class AuthService(
         IUserRepository userRepository,
         IJwtHelper jwtHelper,
-        ITokenCacheRepository tokenCache) : IAuthService
+        ISessionRepository sessionRepository,
+        IRefreshTokenRepository refreshTokenRepository) : IAuthService
     {
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IJwtHelper _jwtHelper = jwtHelper;
-        private readonly ITokenCacheRepository _tokenCache = tokenCache;
+        private readonly ISessionRepository _sessionRepository = sessionRepository;
+        private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
 
-        private readonly TimeSpan _accessTokenTtl = TimeSpan.FromHours(1);
+        private readonly TimeSpan _sessionTtl = TimeSpan.FromDays(7);
 
-        public async Task<AuthResult> LoginAsync(string login, string password)
+        public async Task<AuthResult> LoginAsync(
+            string login,
+            string password,
+            string clientId,
+            string userAgent)
         {
             var user = await _userRepository.GetByLoginAsync(login);
-
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.HashPassword))
                 throw new UnauthorizedAccessException();
 
-            var accessToken = _jwtHelper.GenerateAccessToken(user);
+            var sessionId = Guid.NewGuid().ToString();
+
+            var session = new UserSession
+            {
+                Id = sessionId,
+                UserId = user.Id,
+                ClientId = clientId,
+                UserAgent = userAgent,
+                CreatedAt = DateTime.UtcNow,
+                LastSeen = DateTime.UtcNow
+            };
+
+            await _sessionRepository.CreateAsync(session, _sessionTtl);
+
+            var accessToken = _jwtHelper.GenerateAccessToken(user, sessionId);
             var refreshToken = _jwtHelper.GenerateRefreshToken();
 
-            user.RefreshToken = refreshToken;
-            user.LastLoginDate = DateTime.UtcNow;
-
-            await _userRepository.UpdateAsync(user);
-            await _tokenCache.SetAccessTokenAsync(user.Id, accessToken, _accessTokenTtl);
+            await _refreshTokenRepository.StoreAsync(sessionId, refreshToken);
 
             return new AuthResult
             {
@@ -38,16 +53,54 @@ namespace Infrastructure.Services
             };
         }
 
-        public async Task LogoutAsync(string refreshToken)
+        public async Task<AuthResult> RefreshTokenAsync(string refreshToken, string clientId)
         {
-            var user = await _userRepository.GetByRefreshTokenAsync(refreshToken);
+            var sessionId = await _refreshTokenRepository.GetSessionIdAsync(refreshToken);
+            if (sessionId == null)
+                throw new UnauthorizedAccessException();
+
+            var session = await _sessionRepository.GetAsync(sessionId);
+            if (session == null || session.ClientId != clientId)
+                throw new UnauthorizedAccessException();
+
+            var user = await _userRepository.GetByIdAsync(session.UserId);
             if (user == null)
+                throw new UnauthorizedAccessException();
+
+            session.LastSeen = DateTime.UtcNow;
+            await _sessionRepository.CreateAsync(session, _sessionTtl);
+
+            var newAccessToken = _jwtHelper.GenerateAccessToken(user, sessionId);
+            var newRefreshToken = _jwtHelper.GenerateRefreshToken();
+
+            await _refreshTokenRepository.RotateAsync(sessionId, newRefreshToken);
+
+            return new AuthResult
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken
+            };
+        }
+
+        public async Task LogoutSessionAsync(string refreshToken)
+        {
+            var sessionId = await _refreshTokenRepository.GetSessionIdAsync(refreshToken);
+            if (sessionId == null)
                 return;
 
-            user.RefreshToken = null;
-            await _userRepository.UpdateAsync(user);
+            await _refreshTokenRepository.RemoveAsync(sessionId);
+            await _sessionRepository.RemoveAsync(sessionId);
+        }
 
-            await _tokenCache.RemoveAccessTokenAsync(user.Id);
+        public async Task LogoutAllAsync(int userId)
+        {
+            var sessions = await _sessionRepository.GetUserSessionsAsync(userId);
+
+            foreach (var session in sessions)
+            {
+                await _refreshTokenRepository.RemoveAsync(session.Id);
+                await _sessionRepository.RemoveAsync(session.Id);
+            }
         }
 
         public async Task<AuthResult> RegisterAsync(string login, string password)
@@ -66,38 +119,12 @@ namespace Infrastructure.Services
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
 
-            var accessToken = _jwtHelper.GenerateAccessToken(user);
-            var refreshToken = _jwtHelper.GenerateRefreshToken();
-
-            await _userRepository.UpdateRefreshTokenAsync(user.Id, refreshToken);
-            await _tokenCache.SetAccessTokenAsync(user.Id, accessToken, _accessTokenTtl);
-
-            return new AuthResult
-            {
-                AccessToken = accessToken,
-                RefreshToken = refreshToken
-            };
+            return await LoginAsync(login, password, "initial", "initial");
         }
 
-        public async Task<AuthResult> RefreshTokenAsync(string refreshToken)
+        public async Task<IEnumerable<UserSession>> GetUserSessionsAsync(int userId)
         {
-            var user = await _userRepository.GetByRefreshTokenAsync(refreshToken) 
-                ?? throw new UnauthorizedAccessException("Invalid refresh token");
-            
-            var newAccessToken = _jwtHelper.GenerateAccessToken(user);
-            var newRefreshToken = _jwtHelper.GenerateRefreshToken();
-
-            user.RefreshToken = newRefreshToken;
-            user.LastLoginDate = DateTime.UtcNow;
-            await _userRepository.UpdateAsync(user);
-
-            await _tokenCache.SetAccessTokenAsync(user.Id, newAccessToken, _accessTokenTtl);
-
-            return new AuthResult
-            {
-                AccessToken = newAccessToken,
-                RefreshToken = newRefreshToken
-            };
+            return await _sessionRepository.GetUserSessionsAsync(userId);
         }
 
     }
