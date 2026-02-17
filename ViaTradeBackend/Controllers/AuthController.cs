@@ -1,7 +1,5 @@
-﻿using System.Security.Claims;
-using Application.Intarfaces;
+﻿using Application.Intarfaces;
 using Domain.Models;
-using Infrastructure.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Models.Auth;
@@ -91,14 +89,13 @@ namespace ViaTradeBackend.Controllers
 
             var sessions = await _authService.GetUserSessionsAsync(userId);
 
-            // Формируем DTO для фронта (можно убрать лишние данные, например session token)
-            var result = sessions.Select(s => new
+            var result = sessions.Select(s => new UserSessionDto
             {
-                s.Id,
-                s.ClientId,
-                s.UserAgent,
-                s.CreatedAt,
-                s.LastSeen
+                Id = s.Id,
+                ClientId = s.ClientId,
+                UserAgent = s.UserAgent,
+                CreatedAt = s.CreatedAt,
+                LastSeen = s.LastSeen
             });
 
             return Ok(result);
