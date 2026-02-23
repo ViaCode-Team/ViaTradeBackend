@@ -82,7 +82,7 @@ namespace ViaTradeBackend.Controllers
         }
 
         [HttpGet("sessions")]
-        [Authorize]
+        [Authorize(Policy = "ActiveSession")]
         public async Task<IActionResult> GetSessions()
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);

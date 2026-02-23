@@ -5,15 +5,27 @@ using Infrastructure.Repositoryes.Redis;
 using Infrastructure.Services;
 using Infrastructure.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
+using ViaTradeBackend.Handler;
 using ViaTradeBackend.Middleware;
 using ViaTradeBackend.OptionsSetup;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+// Custom auth service handler
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("ActiveSession", policy =>
+    {
+        policy.RequireAuthenticatedUser();
+        policy.AddRequirements(new ActiveSessionRequirement());
+    });
+
+builder.Services.AddScoped<IAuthorizationHandler, ActiveSessionHandler>();
 
 builder.Services.Configure<JwtOptions>(
     builder.Configuration.GetSection("Jwt")
