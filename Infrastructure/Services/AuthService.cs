@@ -20,7 +20,6 @@ namespace Infrastructure.Services
         public async Task<AuthResult> LoginAsync(
             string login,
             string password,
-            string clientId,
             string userAgent)
         {
             var user = await _userRepository.GetByLoginAsync(login);
@@ -33,7 +32,6 @@ namespace Infrastructure.Services
             {
                 Id = sessionId,
                 UserId = user.Id,
-                ClientId = clientId,
                 UserAgent = userAgent,
                 CreatedAt = DateTime.UtcNow,
                 LastSeen = DateTime.UtcNow
@@ -53,14 +51,14 @@ namespace Infrastructure.Services
             };
         }
 
-        public async Task<AuthResult> RefreshTokenAsync(string refreshToken, string clientId)
+        public async Task<AuthResult> RefreshTokenAsync(string refreshToken)
         {
             var sessionId = await _refreshTokenRepository.GetSessionIdAsync(refreshToken);
             if (sessionId == null)
                 throw new UnauthorizedAccessException();
 
             var session = await _sessionRepository.GetAsync(sessionId);
-            if (session == null || session.ClientId != clientId)
+            if (session == null)
                 throw new UnauthorizedAccessException();
 
             var user = await _userRepository.GetByIdAsync(session.UserId);
@@ -119,7 +117,7 @@ namespace Infrastructure.Services
             await _userRepository.AddAsync(user);
             await _userRepository.SaveChangesAsync();
 
-            return await LoginAsync(login, password, "initial", "initial");
+            return await LoginAsync(login, password, "initial");
         }
 
         public async Task<IEnumerable<UserSession>> GetUserSessionsAsync(int userId)

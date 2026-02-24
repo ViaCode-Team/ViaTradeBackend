@@ -16,13 +16,11 @@ namespace ViaTradeBackend.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest request)
         {
-            var clientId = GetClientId();
             var userAgent = Request.Headers.UserAgent.ToString();
 
             var result = await _authService.LoginAsync(
                 request.Login,
                 request.Password,
-                clientId,
                 userAgent);
 
             SetAuthCookies(result);
@@ -46,9 +44,8 @@ namespace ViaTradeBackend.Controllers
             if (!Request.Cookies.TryGetValue("refresh_token", out var refreshToken))
                 throw new UnauthorizedAccessException();
 
-            var clientId = GetClientId();
 
-            var result = await _authService.RefreshTokenAsync(refreshToken, clientId);
+            var result = await _authService.RefreshTokenAsync(refreshToken);
 
             SetAuthCookies(result);
             return NoContent();
@@ -92,36 +89,12 @@ namespace ViaTradeBackend.Controllers
             var result = sessions.Select(s => new UserSessionDto
             {
                 Id = s.Id,
-                ClientId = s.ClientId,
                 UserAgent = s.UserAgent,
                 CreatedAt = s.CreatedAt,
                 LastSeen = s.LastSeen
             });
 
             return Ok(result);
-        }
-
-
-        private string GetClientId()
-        {
-            if (Request.Cookies.TryGetValue("client_id", out var clientId))
-                return clientId;
-
-            clientId = Guid.NewGuid().ToString();
-
-            Response.Cookies.Append(
-                "client_id",
-                clientId,
-                new CookieOptions
-                {
-                    HttpOnly = true,
-                    Secure = true,
-                    SameSite = SameSiteMode.Strict,
-                    Expires = DateTimeOffset.UtcNow.AddYears(1),
-                    Path = "/"
-                });
-
-            return clientId;
         }
 
         private void SetAuthCookies(AuthResult result)
