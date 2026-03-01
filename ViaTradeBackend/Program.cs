@@ -1,5 +1,6 @@
-﻿using System.Reflection;
-using Application.Intarfaces;
+﻿using Application.Intarfaces.Auth;
+using Application.Intarfaces.Database;
+using Application.Intarfaces.Redis;
 using Domain.Models;
 using Infrastructure.Repositories.Redis;
 using Infrastructure.Repositoryes.DataBase;
@@ -10,18 +11,17 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Microsoft.OpenApi;
 using StackExchange.Redis;
 using ViaTradeBackend.BackgroundServices;
 using ViaTradeBackend.Handler;
 using ViaTradeBackend.Middleware;
 using ViaTradeBackend.OptionsSetup;
+using ViaTradeBackend.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-// Custom auth service handler
+// AUTHORIZATION & POLICIES
+// Custom policy for active session validation
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("ActiveSession", policy =>
     {
@@ -31,6 +31,8 @@ builder.Services.AddAuthorizationBuilder()
 
 builder.Services.AddScoped<IAuthorizationHandler, ActiveSessionHandler>();
 
+// OPTIONS CONFIGURATION
+// Bind configuration sections to strongly-typed options
 builder.Services.Configure<JwtOptions>(
     builder.Configuration.GetSection("Jwt")
 );
@@ -39,23 +41,33 @@ builder.Services.Configure<AuthCookiOptions>(
     builder.Configuration.GetSection("AuthCookies")
 );
 
+// REDIS SETUP
+// Register Redis connection as singleton (shared across the app)
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
-    var configuration = ConfigurationOptions.Parse(builder.Configuration.GetConnectionString("RedisLocalDevRiten") ?? throw new NullReferenceException());
+    var configuration = ConfigurationOptions.Parse(
+        builder.Configuration.GetConnectionString("RedisLocalDevRiten")
+        ?? throw new NullReferenceException("Redis connection string is missing"));
+
     return ConnectionMultiplexer.Connect(configuration);
 });
 
+// Background service for expired sessions cleanup
 builder.Services.AddHostedService<SessionCleanupService>();
 
+// SERVICES REGISTRATION
+// Repositories
 builder.Services.AddScoped<UserRedisRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<ITokenCacheRepository, TokenCacheRepository>();
-builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+// Application services
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 
-var connectionString = builder.Configuration.GetConnectionString("MySqlLocalDevRiten") ?? throw new NullReferenceException();
+// DATABASE SETUP (MySQL)
+var connectionString = builder.Configuration.GetConnectionString("MySqlLocalDevRiten")
+    ?? throw new NullReferenceException("MySQL connection string is missing");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
@@ -65,9 +77,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     );
 });
 
-builder.Services.AddSingleton<
-    IConfigureOptions<JwtBearerOptions>,
-    JwtBearerOptionsSetup>();
+// AUTHENTICATION (JWT)
+// Configure JwtBearer options via dedicated setup class
+builder.Services.AddSingleton<IConfigureOptions<JwtBearerOptions>, JwtBearerOptionsSetup>();
 
 builder.Services.AddAuthentication(options =>
 {
@@ -76,57 +88,34 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer();
 
+// Enable authorization services
 builder.Services.AddAuthorization();
 
+// API CONTROLLERS & SWAGGER
 builder.Services.AddControllers();
-
-// === SWAGGER CONFIGURATION START ===
 builder.Services.AddEndpointsApiExplorer();
 
-builder.Services.AddSwaggerGen(options =>
-{
-    options.SwaggerDoc("v1", new OpenApiInfo
-    {
-        Title = "ViaTrade API",
-        Version = "v1",
-        Description = "API для торговой платформы ViaTrade"
-    });
+// Custom Swagger configuration (see Swagger/ folder)
+builder.Services.AddViaTradeSwagger();
 
-    // * Опционально: XML-комментарии
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    if (File.Exists(xmlPath))
-        options.IncludeXmlComments(xmlPath);
-
-});
-// === SWAGGER CONFIGURATION END ===
-
+// BUILD & MIDDLEWARE PIPELINE
 var app = builder.Build();
 
-// === SWAGGER MIDDLEWARE START ===
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "ViaTrade API v1");
-        options.RoutePrefix = string.Empty;
+// Swagger UI (Development only, configured in SwaggerMiddlewareExtensions)
+app.UseViaTradeSwagger();
 
-        // Включаем отправку Cookie
-        options.ConfigObject.AdditionalItems.Add("withCredentials", true);
-    });
-}
-// === SWAGGER MIDDLEWARE END ===
-
-// Configure the HTTP request pipeline.
-
+// Global exception handling middleware
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+// HTTPS redirection
 app.UseHttpsRedirection();
 
+// Authentication & Authorization middleware (order matters!)
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Map controller endpoints
 app.MapControllers();
 
+// APPLICATION STARTUP
 app.Run();

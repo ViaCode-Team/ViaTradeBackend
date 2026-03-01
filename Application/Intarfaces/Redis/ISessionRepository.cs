@@ -1,6 +1,6 @@
 ﻿using Domain.Models;
 
-namespace Application.Intarfaces
+namespace Application.Intarfaces.Redis
 {
     public interface ISessionRepository
     {

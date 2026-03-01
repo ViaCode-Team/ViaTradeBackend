@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.DataBase;
 
-namespace Application.Intarfaces
+namespace Application.Intarfaces.Database
 {
     public interface IUserRepository : IRepository<User>
     {

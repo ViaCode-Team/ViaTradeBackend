@@ -1,4 +1,4 @@
-﻿using Application.Intarfaces;
+﻿using Application.Intarfaces.Auth;
 using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +16,7 @@ namespace ViaTradeBackend.Controllers
         private readonly AuthCookiOptions _authCookiOptions = authOptions.Value;
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(
+        public async Task<ActionResult> Login(
             [FromBody] LoginRequest request,
             CancellationToken cancellationToken)
         {
@@ -33,7 +33,8 @@ namespace ViaTradeBackend.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<ActionResult> Register(
             [FromBody] RegisterRequest request,
             CancellationToken cancellationToken)
         {
@@ -47,7 +48,7 @@ namespace ViaTradeBackend.Controllers
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh(
+        public async Task<ActionResult> Refresh(
             CancellationToken cancellationToken)
         {
             if (!Request.Cookies.TryGetValue(_authCookiOptions.RefreshTokenCookie, out var refreshToken))
@@ -63,7 +64,7 @@ namespace ViaTradeBackend.Controllers
 
         [HttpPost("logout")]
         [Authorize(Policy = "ActiveSession")]
-        public async Task<IActionResult> Logout()
+        public async Task<ActionResult> Logout()
         {
             if (Request.Cookies.TryGetValue(_authCookiOptions.RefreshTokenCookie, out var refreshToken))
                 await _authService.LogoutSessionAsync(refreshToken);
@@ -76,7 +77,7 @@ namespace ViaTradeBackend.Controllers
 
         [HttpPost("logout-all")]
         [Authorize(Policy = "ActiveSession")]
-        public async Task<IActionResult> LogoutAll()
+        public async Task<ActionResult> LogoutAll()
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
 
@@ -90,8 +91,8 @@ namespace ViaTradeBackend.Controllers
 
         [HttpGet("sessions")]
         [Authorize(Policy = "ActiveSession")]
-        [ProducesResponseType(typeof(IEnumerable<UserSessionDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetSessions()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<UserSessionDto>> GetSessions()
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
 

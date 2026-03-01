@@ -1,4 +1,5 @@
-﻿using Application.Intarfaces;
+﻿using Application.Intarfaces.Auth;
+using Application.Intarfaces.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Models.User;
@@ -14,7 +15,7 @@ namespace ViaTradeBackend.Controllers
         private readonly IJwtHelper _jwtHelper = jwtHelper;
 
         [HttpGet("me")]
-        [ProducesResponseType(typeof(IEnumerable<MeDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<MeDto>> GetMe(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
