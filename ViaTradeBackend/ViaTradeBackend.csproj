@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.12" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.12">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -18,6 +19,7 @@
     </PackageReference>
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
     <PackageReference Include="StackExchange.Redis" Version="2.10.1" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,5 +27,20 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
+
+	<!-- Генерация Swagger при сборке -->
+	<Target Name="GenerateSwagger" AfterTargets="Build" Condition="'$(GenerateSwaggerFile)' == 'true'">
+		<!-- Создаём папку для вывода -->
+		<MakeDir Directories="$(OutDir)swagger\v1" />
+
+		<!-- Формируем абсолютный путь к выходному файлу -->
+		<PropertyGroup>
+			<SwaggerOutputPath>$(OutDir)swagger\v1\swagger.json</SwaggerOutputPath>
+		</PropertyGroup>
+		<Exec Command="dotnet tool run swagger tofile --output &quot;$(SwaggerOutputPath)&quot; --openapiversion 3.0 &quot;$(TargetPath)&quot; v1"
+			  WorkingDirectory="$(ProjectDir)" />
+
+		<Message Text="Swagger generated at $(SwaggerOutputPath)" Importance="high" />
+	</Target>
 
 </Project>
