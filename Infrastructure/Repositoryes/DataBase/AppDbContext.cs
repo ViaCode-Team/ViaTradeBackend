@@ -12,6 +12,8 @@ namespace Infrastructure.Repositoryes.DataBase
         public DbSet<TradeStrategy> TradeStrategies { get; set; }
         public DbSet<UserTradeCode> UserTradeCodes { get; set; }
         public DbSet<UserTradeStrategy> UserTradeStrategies { get; set; }
+        public DbSet<UserTradeNote> UserTradeNotes { get; set; }
+        public DbSet<UserStrategyNote> UserStrategyNotes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -33,6 +35,14 @@ namespace Infrastructure.Repositoryes.DataBase
 
             modelBuilder.Entity<UserTradeStrategy>()
                 .HasIndex(x => new { x.UserId, x.TradeStrategyId })
+                .IsUnique();
+
+            modelBuilder.Entity<UserStrategyNote>()
+                .HasIndex(x => new { x.UserId, x.StratageId })
+                .IsUnique();
+
+            modelBuilder.Entity<UserTradeNote>()
+                .HasIndex(x => new { x.UserId, x.TadeCodeId})
                 .IsUnique();
         }
     }

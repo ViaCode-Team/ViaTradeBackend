@@ -7,17 +7,19 @@ namespace ViaTradeBackend.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class UserController(IUserRepository userRepository, IJwtHelper jwtHelper) : ControllerBase
+    public class UserController(IUserRepository userRepository, IJwtHelper jwtHelper, 
+        IUserService userService) : ControllerBase
     {
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IJwtHelper _jwtHelper = jwtHelper;
+        private readonly IUserService _userService = userService;
 
         [HttpGet("me")]
         public async Task<IActionResult> GetMe()
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
 
-            var user = await _userRepository.GetByIdAsync(userId);
+            var user = await _userService.EnsureUser(userId);
             if (user == null) return NotFound();
 
             return Ok(new

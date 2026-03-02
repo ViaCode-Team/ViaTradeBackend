@@ -14,9 +14,6 @@ namespace Domain.Entities.DataBase
         public DateTime LastLoginDate { get; set; } = DateTime.UtcNow;
 
         [MaxLength(512)]
-        public string? RefreshToken { get; set; }
-
-        [MaxLength(512)]
         public string? TgId { get; set; }
 
         public ICollection<Trade>? Trades { get; set; }
