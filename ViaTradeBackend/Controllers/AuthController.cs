@@ -1,86 +1,98 @@
-﻿using Application.Intarfaces;
+﻿using Application.Intarfaces.Auth;
 using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using ViaTradeBackend.Models.Auth;
 
 namespace ViaTradeBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController(IAuthService authService, IJwtHelper jwtHelper) : ControllerBase
+    public class AuthController(IAuthService authService, IJwtHelper jwtHelper, IOptions<AuthCookiOptions> authOptions) : ControllerBase
     {
         private readonly IAuthService _authService = authService;
         private readonly IJwtHelper _jwtHelper = jwtHelper;
+        private readonly AuthCookiOptions _authCookiOptions = authOptions.Value;
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginRequest request)
+        public async Task<ActionResult> Login(
+            [FromBody] LoginRequest request,
+            CancellationToken cancellationToken)
         {
             var userAgent = Request.Headers.UserAgent.ToString();
 
             var result = await _authService.LoginAsync(
                 request.Login,
                 request.Password,
-                userAgent);
+                userAgent,
+                cancellationToken);
 
             SetAuthCookies(result);
             return NoContent();
         }
 
-
         [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] RegisterRequest request)
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        public async Task<ActionResult> Register(
+            [FromBody] RegisterRequest request,
+            CancellationToken cancellationToken)
         {
-            var result = await _authService.RegisterAsync(request.Login, request.Password);
+            var result = await _authService.RegisterAsync(
+                request.Login,
+                request.Password,
+                cancellationToken);
 
             SetAuthCookies(result);
-
-            return NoContent();
+            return Created();
         }
 
         [HttpPost("refresh")]
-        public async Task<IActionResult> Refresh()
+        public async Task<ActionResult> Refresh(
+            CancellationToken cancellationToken)
         {
-            if (!Request.Cookies.TryGetValue("refresh_token", out var refreshToken))
+            if (!Request.Cookies.TryGetValue(_authCookiOptions.RefreshTokenCookie, out var refreshToken))
                 throw new UnauthorizedAccessException();
 
-
-            var result = await _authService.RefreshTokenAsync(refreshToken);
+            var result = await _authService.RefreshTokenAsync(
+                refreshToken,
+                cancellationToken);
 
             SetAuthCookies(result);
             return NoContent();
         }
 
-
         [HttpPost("logout")]
-        public async Task<IActionResult> Logout()
+        [Authorize(Policy = "ActiveSession")]
+        public async Task<ActionResult> Logout()
         {
-            if (Request.Cookies.TryGetValue("refresh_token", out var refreshToken))
+            if (Request.Cookies.TryGetValue(_authCookiOptions.RefreshTokenCookie, out var refreshToken))
                 await _authService.LogoutSessionAsync(refreshToken);
 
-            Response.Cookies.Delete("access_token");
-            Response.Cookies.Delete("refresh_token");
+            Response.Cookies.Delete(_authCookiOptions.AccessTokenCookie);
+            Response.Cookies.Delete(_authCookiOptions.RefreshTokenCookie);
 
             return NoContent();
         }
 
         [HttpPost("logout-all")]
-        [Authorize]
-        public async Task<IActionResult> LogoutAll()
+        [Authorize(Policy = "ActiveSession")]
+        public async Task<ActionResult> LogoutAll()
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
 
             await _authService.LogoutAllAsync(userId);
 
-            Response.Cookies.Delete("access_token");
-            Response.Cookies.Delete("refresh_token");
+            Response.Cookies.Delete(_authCookiOptions.AccessTokenCookie);
+            Response.Cookies.Delete(_authCookiOptions.RefreshTokenCookie);
 
             return NoContent();
         }
 
         [HttpGet("sessions")]
         [Authorize(Policy = "ActiveSession")]
-        public async Task<IActionResult> GetSessions()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<UserSessionDto>> GetSessions()
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
 
@@ -100,7 +112,7 @@ namespace ViaTradeBackend.Controllers
         private void SetAuthCookies(AuthResult result)
         {
             Response.Cookies.Append(
-                "access_token",
+                _authCookiOptions.AccessTokenCookie,
                 result.AccessToken,
                 new CookieOptions
                 {
@@ -112,7 +124,7 @@ namespace ViaTradeBackend.Controllers
                 });
 
             Response.Cookies.Append(
-                "refresh_token",
+                _authCookiOptions.RefreshTokenCookie,
                 result.RefreshToken,
                 new CookieOptions
                 {

@@ -1,7 +1,9 @@
-﻿using Application.Intarfaces;
+﻿using Application.Intarfaces.Auth;
+using Application.Intarfaces.Database;
+using Application.Intarfaces.Redis;
 using Domain.Entities.DataBase;
 using Domain.Models;
-    
+
 namespace Infrastructure.Services
 {
     public class AuthService(
@@ -20,9 +22,11 @@ namespace Infrastructure.Services
         public async Task<AuthResult> LoginAsync(
             string login,
             string password,
-            string userAgent)
+            string userAgent,
+            CancellationToken cancellationToken = default)
         {
-            var user = await _userRepository.GetByLoginAsync(login);
+            var user = await _userRepository.GetByLoginAsync(login, cancellationToken);
+
             if (user == null || !BCrypt.Net.BCrypt.Verify(password, user.HashPassword))
                 throw new UnauthorizedAccessException();
 
@@ -42,7 +46,7 @@ namespace Infrastructure.Services
             var accessToken = _jwtHelper.GenerateAccessToken(user, sessionId);
             var refreshToken = _jwtHelper.GenerateRefreshToken();
 
-            await _refreshTokenRepository.StoreAsync(sessionId, refreshToken);
+            await _refreshTokenRepository.StoreAsync(sessionId, refreshToken, _sessionTtl);
 
             return new AuthResult
             {
@@ -51,19 +55,18 @@ namespace Infrastructure.Services
             };
         }
 
-        public async Task<AuthResult> RefreshTokenAsync(string refreshToken)
+        public async Task<AuthResult> RefreshTokenAsync(
+            string refreshToken,
+            CancellationToken cancellationToken = default)
         {
-            var sessionId = await _refreshTokenRepository.GetSessionIdAsync(refreshToken);
-            if (sessionId == null)
-                throw new UnauthorizedAccessException();
+            var sessionId = await _refreshTokenRepository.GetSessionIdAsync(refreshToken)
+                ?? throw new UnauthorizedAccessException();
 
-            var session = await _sessionRepository.GetAsync(sessionId);
-            if (session == null)
-                throw new UnauthorizedAccessException();
+            var session = await _sessionRepository.GetAsync(sessionId)
+                ?? throw new UnauthorizedAccessException();
 
-            var user = await _userRepository.GetByIdAsync(session.UserId);
-            if (user == null)
-                throw new UnauthorizedAccessException();
+            var user = await _userRepository.GetByIdAsync(session.UserId, cancellationToken)
+                ?? throw new UnauthorizedAccessException();
 
             session.LastSeen = DateTime.UtcNow;
             await _sessionRepository.CreateAsync(session, _sessionTtl);
@@ -71,7 +74,7 @@ namespace Infrastructure.Services
             var newAccessToken = _jwtHelper.GenerateAccessToken(user, sessionId);
             var newRefreshToken = _jwtHelper.GenerateRefreshToken();
 
-            await _refreshTokenRepository.RotateAsync(sessionId, newRefreshToken);
+            await _refreshTokenRepository.RotateAsync(sessionId, newRefreshToken, _sessionTtl);
 
             return new AuthResult
             {
@@ -101,9 +104,12 @@ namespace Infrastructure.Services
             }
         }
 
-        public async Task<AuthResult> RegisterAsync(string login, string password)
+        public async Task<AuthResult> RegisterAsync(
+            string login,
+            string password,
+            CancellationToken cancellationToken = default)
         {
-            var existingUser = await _userRepository.GetByLoginAsync(login);
+            var existingUser = await _userRepository.GetByLoginAsync(login, cancellationToken);
             if (existingUser != null)
                 throw new InvalidOperationException();
 
@@ -114,16 +120,15 @@ namespace Infrastructure.Services
                 LastLoginDate = DateTime.UtcNow
             };
 
-            await _userRepository.AddAsync(user);
-            await _userRepository.SaveChangesAsync();
+            await _userRepository.AddAsync(user, cancellationToken);
+            await _userRepository.SaveChangesAsync(cancellationToken);
 
-            return await LoginAsync(login, password, "initial");
+            return await LoginAsync(login, password, "initial", cancellationToken);
         }
 
         public async Task<IEnumerable<UserSession>> GetUserSessionsAsync(int userId)
         {
             return await _sessionRepository.GetUserSessionsAsync(userId);
         }
-
     }
 }

@@ -1,19 +1,14 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using Application.Intarfaces;
+using Application.Intarfaces.Redis;
 using Microsoft.AspNetCore.Authorization;
 
 namespace ViaTradeBackend.Handler
 {
     public class ActiveSessionRequirement : IAuthorizationRequirement { }
 
-    public class ActiveSessionHandler : AuthorizationHandler<ActiveSessionRequirement>
+    public class ActiveSessionHandler(ISessionRepository sessionRepository) : AuthorizationHandler<ActiveSessionRequirement>
     {
-        private readonly ISessionRepository _sessionRepository;
-
-        public ActiveSessionHandler(ISessionRepository sessionRepository)
-        {
-            _sessionRepository = sessionRepository;
-        }
+        private readonly ISessionRepository _sessionRepository = sessionRepository;
 
         protected override async Task HandleRequirementAsync(
             AuthorizationHandlerContext context,

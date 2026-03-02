@@ -1,6 +1,8 @@
-﻿using Application.Intarfaces;
+﻿using Application.Intarfaces.Auth;
+using Application.Intarfaces.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ViaTradeBackend.Models.User;
 
 namespace ViaTradeBackend.Controllers
 {
@@ -15,18 +17,20 @@ namespace ViaTradeBackend.Controllers
         private readonly IUserService _userService = userService;
 
         [HttpGet("me")]
-        public async Task<IActionResult> GetMe()
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<MeDto>> GetMe(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
 
-            var user = await _userService.EnsureUser(userId);
+            var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
             if (user == null) return NotFound();
 
-            return Ok(new
+            return Ok(new MeDto
             {
-                user.Login,
-                user.LastLoginDate,
-                user.TgId
+                Id = user.Id,
+                Login = user.Login,
+                LastLoginDate = user.LastLoginDate,
+                TgId = user.TgId
             });
         }
     }

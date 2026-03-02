@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using Application.Intarfaces;
+using Application.Intarfaces.Redis;
 using Domain.Entities.Redis;
 using StackExchange.Redis;
 
@@ -22,7 +22,7 @@ namespace Infrastructure.Repositoryes.Redis
         public async Task SetAsync(T entity, TimeSpan? expiry = null)
         {
             var json = JsonSerializer.Serialize(entity);
-            await _db.StringSetAsync(GetKey(entity.Id), json, (Expiration)expiry);
+            await _db.StringSetAsync(GetKey(entity.Id), json, (Expiration)expiry!);
         }
 
         public async Task RemoveAsync(string id)
@@ -40,7 +40,7 @@ namespace Infrastructure.Repositoryes.Redis
             {
                 var value = await _db.StringGetAsync(key);
                 if (!value.IsNullOrEmpty)
-                    result.Add(JsonSerializer.Deserialize<T>(value)!);
+                    result.Add(JsonSerializer.Deserialize<T>(value!)!);
             }
 
             return result;

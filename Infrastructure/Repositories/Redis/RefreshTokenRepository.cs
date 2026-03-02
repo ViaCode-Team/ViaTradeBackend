@@ -1,7 +1,7 @@
-﻿using Application.Intarfaces;
+﻿using Application.Intarfaces.Redis;
 using StackExchange.Redis;
 
-namespace Infrastructure.Repositoryes.Redis
+namespace Infrastructure.Repositories.Redis
 {
     public class RefreshTokenRepository(IConnectionMultiplexer redis) : IRefreshTokenRepository
     {
@@ -10,17 +10,17 @@ namespace Infrastructure.Repositoryes.Redis
         private static string TokenKey(string sessionId) => $"refresh:{sessionId}";
         private static string IndexKey(string token) => $"refresh:idx:{token}";
 
-        public async Task StoreAsync(string sessionId, string refreshToken)
+        public async Task StoreAsync(string sessionId, string refreshToken, TimeSpan ttl)
         {
             var tran = _db.CreateTransaction();
-            var setToken = tran.StringSetAsync(TokenKey(sessionId), refreshToken);
-            var setIndex = tran.StringSetAsync(IndexKey(refreshToken), sessionId);
+
+            // Set TTL for both keys to prevent memory leaks
+            var setToken = tran.StringSetAsync(TokenKey(sessionId), refreshToken, ttl);
+            var setIndex = tran.StringSetAsync(IndexKey(refreshToken), sessionId, ttl);
 
             bool committed = await tran.ExecuteAsync();
             if (!committed)
                 throw new Exception("Failed to store refresh token in Redis.");
-
-            await Task.WhenAll(setToken, setIndex);
         }
 
         public async Task<string?> GetSessionIdAsync(string refreshToken)
@@ -28,21 +28,21 @@ namespace Infrastructure.Repositoryes.Redis
             return await _db.StringGetAsync(IndexKey(refreshToken));
         }
 
-        public async Task RotateAsync(string sessionId, string newRefreshToken)
+        public async Task RotateAsync(string sessionId, string newRefreshToken, TimeSpan ttl)
         {
             var oldToken = await _db.StringGetAsync(TokenKey(sessionId));
+
+            // Cleanup old index key
             if (!oldToken.IsNullOrEmpty)
                 await _db.KeyDeleteAsync(IndexKey(oldToken!));
 
             var tran = _db.CreateTransaction();
-            var setToken = tran.StringSetAsync(TokenKey(sessionId), newRefreshToken);
-            var setIndex = tran.StringSetAsync(IndexKey(newRefreshToken), sessionId);
+            var setToken = tran.StringSetAsync(TokenKey(sessionId), newRefreshToken, ttl);
+            var setIndex = tran.StringSetAsync(IndexKey(newRefreshToken), sessionId, ttl);
 
             bool committed = await tran.ExecuteAsync();
             if (!committed)
                 throw new Exception("Failed to rotate refresh token in Redis.");
-
-            await Task.WhenAll(setToken, setIndex);
         }
 
         public async Task RemoveAsync(string sessionId)

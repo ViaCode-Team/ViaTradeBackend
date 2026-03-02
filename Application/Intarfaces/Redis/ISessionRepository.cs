@@ -1,6 +1,6 @@
 ﻿using Domain.Models;
 
-namespace Application.Intarfaces
+namespace Application.Intarfaces.Redis
 {
     public interface ISessionRepository
     {
@@ -8,6 +8,8 @@ namespace Application.Intarfaces
         Task<UserSession?> GetAsync(string sessionId);
         Task RemoveAsync(string sessionId);
         Task<IEnumerable<UserSession>> GetUserSessionsAsync(int userId);
+        IEnumerable<int> GetAllUserIdsWithSessions();
+        Task<int> CleanupExpiredSessionsAsync(DateTime threshold);
     }
 
 }

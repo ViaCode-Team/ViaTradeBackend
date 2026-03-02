@@ -6,10 +6,11 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace ViaTradeBackend.OptionsSetup
 {
-    public class JwtBearerOptionsSetup(IOptions<JwtOptions> jwtOptions)
+    public class JwtBearerOptionsSetup(IOptions<JwtOptions> jwtOptions, IOptions<AuthCookiOptions> cookiOptions)
                 : IConfigureNamedOptions<JwtBearerOptions>
     {
         private readonly JwtOptions _jwt = jwtOptions.Value;
+        private readonly AuthCookiOptions _authCooki = cookiOptions.Value;
 
         public void Configure(JwtBearerOptions options)
         {
@@ -35,7 +36,7 @@ namespace ViaTradeBackend.OptionsSetup
             {
                 OnMessageReceived = context =>
                 {
-                    if (context.Request.Cookies.TryGetValue("access_token", out var token))
+                    if (context.Request.Cookies.TryGetValue(_authCooki.AccessTokenCookie, out var token))
                         context.Token = token;
 
                     return Task.CompletedTask;
