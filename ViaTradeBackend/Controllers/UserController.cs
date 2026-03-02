@@ -1,4 +1,5 @@
-﻿using Application.Intarfaces.Auth;
+﻿using Application.Intarfaces;
+using Application.Intarfaces.Auth;
 using Application.Intarfaces.Database;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

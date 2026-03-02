@@ -3,7 +3,7 @@
     public class UserTradeNote : BaseEntity
     {
         public int UserId { get; set; }
-        public int TadeCodeId { get; set; }
+        public int TradeCodeId { get; set; }
 
         public string? NoteText { get; set; }
 
