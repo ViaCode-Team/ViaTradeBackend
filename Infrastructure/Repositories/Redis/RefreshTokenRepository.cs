@@ -14,7 +14,6 @@ namespace Infrastructure.Repositories.Redis
         {
             var tran = _db.CreateTransaction();
 
-            // Set TTL for both keys to prevent memory leaks
             var setToken = tran.StringSetAsync(TokenKey(sessionId), refreshToken, ttl);
             var setIndex = tran.StringSetAsync(IndexKey(refreshToken), sessionId, ttl);
 

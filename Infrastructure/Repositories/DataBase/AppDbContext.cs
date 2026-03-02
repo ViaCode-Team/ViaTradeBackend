@@ -42,7 +42,7 @@ namespace Infrastructure.Repositoryes.DataBase
                 .IsUnique();
 
             modelBuilder.Entity<UserTradeNote>()
-                .HasIndex(x => new { x.UserId, x.TadeCodeId})
+                .HasIndex(x => new { x.UserId, x.TradeCodeId})
                 .IsUnique();
         }
     }
