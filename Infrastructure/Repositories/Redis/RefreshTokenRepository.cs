@@ -1,4 +1,4 @@
-﻿using Application.Intarfaces.Redis;
+﻿using Application.Interfaces.Redis;
 using StackExchange.Redis;
 
 namespace Infrastructure.Repositories.Redis

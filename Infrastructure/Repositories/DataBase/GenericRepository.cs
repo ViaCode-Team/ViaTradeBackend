@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Application.Intarfaces.Database;
+using Application.Interfaces.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositoryes.DataBase

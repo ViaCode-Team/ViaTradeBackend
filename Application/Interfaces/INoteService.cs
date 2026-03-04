@@ -1,4 +1,4 @@
-﻿namespace Application.Intarfaces
+﻿namespace Application.Interfaces
 {
     public interface INoteService
     {

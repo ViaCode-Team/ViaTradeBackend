@@ -1,6 +1,7 @@
-﻿using Application.Intarfaces.Auth;
-using Application.Intarfaces.Database;
-using Application.Intarfaces.Redis;
+﻿using Application.Interfaces;
+using Application.Interfaces.Auth;
+using Application.Interfaces.Database;
+using Application.Interfaces.Redis;
 using Domain.Models;
 using Infrastructure.Repositories.Redis;
 using Infrastructure.Repositoryes.DataBase;
@@ -63,6 +64,7 @@ builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 // Application services
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 
 // DATABASE SETUP (MySQL)

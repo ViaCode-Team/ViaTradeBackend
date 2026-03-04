@@ -1,6 +1,6 @@
-﻿using Application.Intarfaces.Auth;
-using Application.Intarfaces.Database;
-using Application.Intarfaces.Redis;
+﻿using Application.Interfaces.Auth;
+using Application.Interfaces.Database;
+using Application.Interfaces.Redis;
 using Domain.Entities.DataBase;
 using Domain.Models;
 

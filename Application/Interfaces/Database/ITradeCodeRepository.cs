@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.DataBase;
 
-namespace Application.Intarfaces.Database
+namespace Application.Interfaces.Database
 {
     public interface ITradeCodeRepository : IRepository<TradeCode>
     {

@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.Redis;
 
-namespace Application.Intarfaces.Redis
+namespace Application.Interfaces.Redis
 {
     public interface IRedisRepository<T> where T : RedisEntity
     {

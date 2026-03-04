@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.DataBase;
 
-namespace Application.Intarfaces
+namespace Application.Interfaces
 {
     public interface IUserService
     {

@@ -1,4 +1,4 @@
-﻿namespace Application.Intarfaces.Redis
+﻿namespace Application.Interfaces.Redis
 {
     public interface IRefreshTokenRepository
     {

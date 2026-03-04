@@ -1,5 +1,5 @@
 ﻿using System.Text.Json;
-using Application.Intarfaces.Redis;
+using Application.Interfaces.Redis;
 using Domain.Entities.Redis;
 using StackExchange.Redis;
 

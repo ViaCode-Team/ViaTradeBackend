@@ -3,9 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ViaTradeBackend.Middleware
 {
-    public class ExceptionHandlingMiddleware(RequestDelegate next)
+    public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
     {
         private readonly RequestDelegate _next = next;
+        private readonly ILogger<ExceptionHandlingMiddleware> _logger = logger;
 
         public async Task Invoke(HttpContext context)
         {
@@ -29,20 +30,17 @@ namespace ViaTradeBackend.Middleware
                     "https://httpstatuses.com/401",
                     "Invalid login or password"
                 ),
-
                 ArgumentException => CreateProblem(
                     StatusCodes.Status400BadRequest,
                     "Bad Request",
                     "https://httpstatuses.com/400",
                     exception.Message
                 ),
-
-                _ => CreateProblem(
-                    StatusCodes.Status500InternalServerError,
-                    "Internal Server Error",
-                    "https://httpstatuses.com/500",
-                    "Unexpected server error"
-                )
+#if !DEBUG
+                _ => HandleAll(),
+#else
+                _ => throw exception // В DEBUG пробрасываем исключение для отладки
+#endif
             };
 
             context.Response.StatusCode = problem.Status!.Value;
@@ -50,6 +48,16 @@ namespace ViaTradeBackend.Middleware
 
             await context.Response.WriteAsync(
                 JsonSerializer.Serialize(problem)
+            );
+        }
+
+        private static ProblemDetails HandleAll()
+        {
+            return CreateProblem(
+                StatusCodes.Status500InternalServerError,
+                "Internal Server Error",
+                "https://httpstatuses.com/500",
+                "Unexpected server error"
             );
         }
 

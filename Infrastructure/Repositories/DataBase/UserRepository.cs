@@ -1,4 +1,4 @@
-﻿using Application.Intarfaces.Database;
+﻿using Application.Interfaces.Database;
 using Domain.Entities.DataBase;
 using Microsoft.EntityFrameworkCore;
 

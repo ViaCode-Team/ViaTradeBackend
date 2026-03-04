@@ -1,7 +1,7 @@
 ﻿using System.Security.Claims;
 using Domain.Entities.DataBase;
 
-namespace Application.Intarfaces.Auth
+namespace Application.Interfaces.Auth
 {
     public interface IJwtHelper
     {
