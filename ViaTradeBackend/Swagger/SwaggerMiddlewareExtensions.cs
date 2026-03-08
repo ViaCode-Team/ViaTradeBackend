@@ -4,12 +4,11 @@
     {
         public static IApplicationBuilder UseViaTradeSwagger(this IApplicationBuilder app)
         {
-            // Получаем окружение из DI-контейнера
             var env = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
 
             if (env.IsDevelopment())
             {
-                app.UseSwagger();
+                app.UseSwagger(); // Только JSON для SwaggerUI
                 app.UseSwaggerUI(options =>
                 {
                     options.SwaggerEndpoint("/swagger/v1/swagger.json", "ViaTrade API v1");
@@ -17,7 +16,6 @@
                     options.ConfigObject.AdditionalItems.Add("withCredentials", true);
                 });
             }
-
             return app;
         }
     }

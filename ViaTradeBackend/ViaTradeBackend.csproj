@@ -32,11 +32,12 @@
 		<MakeDir Directories="$(OutDir)swagger\v1" />
 
 		<PropertyGroup>
-			<SwaggerOutputPath>$(OutDir)swagger\v1\swagger.json</SwaggerOutputPath>
+			<SwaggerOutputPath>$(OutDir)swagger\v1\swagger.yaml</SwaggerOutputPath>
 		</PropertyGroup>
-		<Exec Command="dotnet tool run swagger tofile --output &quot;$(SwaggerOutputPath)&quot; --openapiversion 3.0 &quot;$(TargetPath)&quot; v1" WorkingDirectory="$(ProjectDir)" />
 
-		<Message Text="Swagger generated at $(SwaggerOutputPath)" Importance="high" />
+		<Exec Command="dotnet tool run swagger tofile --yaml --output &quot;$(SwaggerOutputPath)&quot; --openapiversion 3.0 &quot;$(TargetPath)&quot; v1" WorkingDirectory="$(ProjectDir)" />
+
+		<Message Text="Swagger YAML generated at $(SwaggerOutputPath)" Importance="high" />
 	</Target>
 
 </Project>
