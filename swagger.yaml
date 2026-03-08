@@ -1,0 +1,170 @@
+openapi: 3.0.4
+info:
+  title: ViaTrade API
+  description: API для платформы инвестиционного анализа ViaTrade
+  version: v1
+paths:
+  /api/Auth/login:
+    post:
+      tags:
+        - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+      responses:
+        '200':
+          description: OK
+  /api/Auth/register:
+    post:
+      tags:
+        - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: Created
+  /api/Auth/refresh:
+    post:
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: OK
+  /api/Auth/logout:
+    post:
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: OK
+  /api/Auth/logout-all:
+    post:
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: OK
+  /api/Auth/sessions:
+    get:
+      tags:
+        - Auth
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/UserSessionDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserSessionDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/UserSessionDto'
+  /api/Note/test:
+    get:
+      tags:
+        - Note
+      responses:
+        '200':
+          description: OK
+  /api/User/me:
+    get:
+      tags:
+        - User
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/MeDto'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MeDto'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/MeDto'
+components:
+  schemas:
+    LoginRequest:
+      required:
+        - login
+        - password
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+      additionalProperties: false
+    MeDto:
+      required:
+        - id
+        - lastLoginDate
+        - login
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        login:
+          type: string
+        lastLoginDate:
+          type: string
+          format: date-time
+        tgId:
+          type: string
+          nullable: true
+      additionalProperties: false
+    RegisterRequest:
+      required:
+        - login
+        - password
+      type: object
+      properties:
+        login:
+          type: string
+        password:
+          type: string
+      additionalProperties: false
+    UserSessionDto:
+      required:
+        - createdAt
+        - id
+        - lastSeen
+        - userAgent
+      type: object
+      properties:
+        id:
+          type: string
+        userAgent:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        lastSeen:
+          type: string
+          format: date-time
+      additionalProperties: false
+tags:
+  - name: Auth
+  - name: Note
+  - name: User
