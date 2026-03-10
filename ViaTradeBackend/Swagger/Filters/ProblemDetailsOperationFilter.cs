@@ -20,6 +20,7 @@ namespace ViaTradeBackend.Swagger.Filters
                 { 401, "Unauthorized - Invalid credentials" },
                 { 403, "Forbidden - Access denied" },
                 { 404, "Not Found - Resource does not exist" },
+                { 408, "Timeout - Server timeout" },
                 { 500, "Internal Server Error - Unexpected error" }
             };
 
