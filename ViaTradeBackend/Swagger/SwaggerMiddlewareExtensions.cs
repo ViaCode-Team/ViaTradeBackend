@@ -8,7 +8,7 @@
 
             if (env.IsDevelopment())
             {
-                app.UseSwagger(); // Только JSON для SwaggerUI
+                app.UseSwagger();
                 app.UseSwaggerUI(options =>
                 {
                     options.SwaggerEndpoint("/swagger/v1/swagger.json", "ViaTrade API v1");

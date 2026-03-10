@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using ViaTradeBackend.Models.Exceptions;
 
 namespace ViaTradeBackend.Middleware
 {
@@ -30,16 +31,34 @@ namespace ViaTradeBackend.Middleware
                     "https://httpstatuses.com/401",
                     "Invalid login or password"
                 ),
+
+                // 403 Forbidden - requires custom exception or policy-based check
+                ForbiddenException => CreateProblem(
+                    StatusCodes.Status403Forbidden,
+                    "Forbidden",
+                    "https://httpstatuses.com/403",
+                    "Access denied to the requested resource"
+                ),
+
+                // 404 Not Found - standard .NET exception
+                KeyNotFoundException => CreateProblem(
+                    StatusCodes.Status404NotFound,
+                    "Not Found",
+                    "https://httpstatuses.com/404",
+                    "The requested resource does not exist"
+                ),
+
                 ArgumentException => CreateProblem(
                     StatusCodes.Status400BadRequest,
                     "Bad Request",
                     "https://httpstatuses.com/400",
                     exception.Message
                 ),
+
 #if !DEBUG
-                _ => HandleAll(),
+        _ => HandleAll(),
 #else
-                _ => throw exception // В DEBUG пробрасываем исключение для отладки
+                _ => throw exception // In DEBUG mode, propagate exception for debugging
 #endif
             };
 

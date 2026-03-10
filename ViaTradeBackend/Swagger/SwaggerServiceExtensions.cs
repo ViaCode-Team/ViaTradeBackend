@@ -1,7 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc.Controllers;
+﻿using System.Reflection;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Reflection;
+using ViaTradeBackend.Swagger.Filters;
 
 namespace ViaTradeBackend.Swagger
 {
@@ -20,20 +20,17 @@ namespace ViaTradeBackend.Swagger
                     Description = "API для платформы инвестиционного анализа ViaTrade"
                 });
 
-                // Включает учет C# Nullable Reference Types
-                // string? -> nullable: true, string -> без флага
                 options.SupportNonNullableReferenceTypes();
 
                 options.CustomOperationIds(apiDesc =>
-                {
-                    return apiDesc.TryGetMethodInfo(out var methodInfo)
-                        ? methodInfo.Name
-                        : null;
-                });
+                    apiDesc.TryGetMethodInfo(out var methodInfo) ? methodInfo.Name : null);
+
+                options.DocumentFilter<ProblemDetailsDocumentFilter>();
+
+                options.OperationFilter<ProblemDetailsOperationFilter>();
 
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-
                 if (File.Exists(xmlPath))
                     options.IncludeXmlComments(xmlPath);
             });
