@@ -1,5 +1,7 @@
-﻿using System.Reflection;
+﻿using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.OpenApi;
+using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
 
 namespace ViaTradeBackend.Swagger
 {
@@ -21,6 +23,13 @@ namespace ViaTradeBackend.Swagger
                 // Включает учет C# Nullable Reference Types
                 // string? -> nullable: true, string -> без флага
                 options.SupportNonNullableReferenceTypes();
+
+                options.CustomOperationIds(apiDesc =>
+                {
+                    return apiDesc.TryGetMethodInfo(out var methodInfo)
+                        ? methodInfo.Name
+                        : null;
+                });
 
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);

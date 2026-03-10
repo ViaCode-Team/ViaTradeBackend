@@ -10,7 +10,7 @@ namespace ViaTradeBackend.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class UserController(IUserRepository userRepository, IJwtHelper jwtHelper, 
+    public class UserController(IUserRepository userRepository, IJwtHelper jwtHelper,
         IUserService userService) : ControllerBase
     {
         private readonly IUserRepository _userRepository = userRepository;

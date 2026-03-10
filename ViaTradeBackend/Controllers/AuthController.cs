@@ -3,6 +3,7 @@ using Domain.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using System.ComponentModel.DataAnnotations;
 using ViaTradeBackend.Models.Auth;
 
 namespace ViaTradeBackend.Controllers
@@ -17,7 +18,7 @@ namespace ViaTradeBackend.Controllers
 
         [HttpPost("login")]
         public async Task<ActionResult> Login(
-            [FromBody] LoginRequest request,
+            [FromBody, Required] LoginRequest request,
             CancellationToken cancellationToken)
         {
             var userAgent = Request.Headers.UserAgent.ToString();
@@ -35,7 +36,7 @@ namespace ViaTradeBackend.Controllers
         [HttpPost("register")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult> Register(
-            [FromBody] RegisterRequest request,
+            [FromBody, Required] RegisterRequest request,
             CancellationToken cancellationToken)
         {
             var result = await _authService.RegisterAsync(
