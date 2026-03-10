@@ -8,6 +8,7 @@ paths:
     post:
       tags:
         - Auth
+      operationId: Login
       requestBody:
         content:
           application/json:
@@ -19,6 +20,7 @@ paths:
           application/*+json:
             schema:
               $ref: '#/components/schemas/LoginRequest'
+        required: true
       responses:
         '200':
           description: OK
@@ -26,6 +28,7 @@ paths:
     post:
       tags:
         - Auth
+      operationId: Register
       requestBody:
         content:
           application/json:
@@ -37,6 +40,7 @@ paths:
           application/*+json:
             schema:
               $ref: '#/components/schemas/RegisterRequest'
+        required: true
       responses:
         '201':
           description: Created
@@ -44,6 +48,7 @@ paths:
     post:
       tags:
         - Auth
+      operationId: Refresh
       responses:
         '200':
           description: OK
@@ -51,6 +56,7 @@ paths:
     post:
       tags:
         - Auth
+      operationId: Logout
       responses:
         '200':
           description: OK
@@ -58,6 +64,7 @@ paths:
     post:
       tags:
         - Auth
+      operationId: LogoutAll
       responses:
         '200':
           description: OK
@@ -65,6 +72,7 @@ paths:
     get:
       tags:
         - Auth
+      operationId: GetSessions
       responses:
         '200':
           description: OK
@@ -82,6 +90,7 @@ paths:
     get:
       tags:
         - Note
+      operationId: test
       responses:
         '200':
           description: OK
@@ -89,6 +98,7 @@ paths:
     get:
       tags:
         - User
+      operationId: GetMe
       responses:
         '200':
           description: OK
