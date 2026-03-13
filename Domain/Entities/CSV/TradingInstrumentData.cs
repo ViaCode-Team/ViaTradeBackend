@@ -9,4 +9,3 @@
         public List<ScreenerData>? ScreenerData { get; set; }
     }
 }
-}

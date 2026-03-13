@@ -66,6 +66,8 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
+builder.Services.AddScoped<IFileReader, TradeFileReader>();
+builder.Services.AddScoped<CsvHelper>();
 
 // DATABASE SETUP (MySQL)
 var connectionString = builder.Configuration.GetConnectionString("MySqlLocalDevRiten")
