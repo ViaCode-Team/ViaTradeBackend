@@ -1,5 +1,6 @@
 ﻿using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
+using ViaTradeBackend.Models.Exceptions;
 
 namespace ViaTradeBackend.Middleware
 {
@@ -20,31 +21,62 @@ namespace ViaTradeBackend.Middleware
             }
         }
 
-        private static async Task HandleException(HttpContext context, Exception exception)
+        private async Task HandleException(HttpContext context, Exception exception)
         {
             var problem = exception switch
             {
                 UnauthorizedAccessException => CreateProblem(
                     StatusCodes.Status401Unauthorized,
                     "Unauthorized",
-                    "https://httpstatuses.com/401",
+                    "https://httpstatuses.com/401  ",
                     "Invalid login or password"
                 ),
+
+                ForbiddenException => CreateProblem(
+                    StatusCodes.Status403Forbidden,
+                    "Forbidden",
+                    "https://httpstatuses.com/403  ",
+                    "Access denied to the requested resource"
+                ),
+
+                KeyNotFoundException => CreateProblem(
+                    StatusCodes.Status404NotFound,
+                    "Not Found",
+                    "https://httpstatuses.com/404  ",
+                    "The requested resource does not exist"
+                ),
+
                 ArgumentException => CreateProblem(
                     StatusCodes.Status400BadRequest,
                     "Bad Request",
-                    "https://httpstatuses.com/400",
+                    "https://httpstatuses.com/400  ",
                     exception.Message
                 ),
+
+                // 408 Canceled or server timeout
+                OperationCanceledException or TaskCanceledException => CreateProblem(
+                    StatusCodes.Status408RequestTimeout,
+                    "Request Cancelled",
+                    "https://httpstatuses.com/408  ",
+                    "Client closed the request or the server timeout has expired"
+                ),
+
 #if !DEBUG
                 _ => HandleAll(),
 #else
-                _ => throw exception // В DEBUG пробрасываем исключение для отладки
+        _ => throw exception // In DEBUG mode, propagate exception for debugging
 #endif
             };
 
             context.Response.StatusCode = problem.Status!.Value;
             context.Response.ContentType = "application/problem+json";
+
+            _logger.LogInformation(
+                "Exception handled: Status={Status}, Path={Path}, Type={ExceptionType}",
+                problem.Status,
+                context.Request.Path,
+                exception.GetType().Name
+            );
 
             await context.Response.WriteAsync(
                 JsonSerializer.Serialize(problem)

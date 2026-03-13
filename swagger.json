@@ -1,4 +1,4 @@
-﻿{
+{
   "openapi": "3.0.4",
   "info": {
     "title": "ViaTrade API",
@@ -133,6 +133,18 @@
         }
       }
     },
+    "/api/Note/test": {
+      "get": {
+        "tags": [
+          "Note"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
     "/api/User/me": {
       "get": {
         "tags": [
@@ -185,6 +197,8 @@
       },
       "MeDto": {
         "required": [
+          "id",
+          "lastLoginDate",
           "login"
         ],
         "type": "object",
@@ -227,6 +241,12 @@
         "additionalProperties": false
       },
       "UserSessionDto": {
+        "required": [
+          "createdAt",
+          "id",
+          "lastSeen",
+          "userAgent"
+        ],
         "type": "object",
         "properties": {
           "id": {
@@ -253,6 +273,9 @@
   "tags": [
     {
       "name": "Auth"
+    },
+    {
+      "name": "Note"
     },
     {
       "name": "User"

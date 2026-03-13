@@ -4,7 +4,6 @@
     {
         public static IApplicationBuilder UseViaTradeSwagger(this IApplicationBuilder app)
         {
-            // Получаем окружение из DI-контейнера
             var env = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
 
             if (env.IsDevelopment())
@@ -17,7 +16,6 @@
                     options.ConfigObject.AdditionalItems.Add("withCredentials", true);
                 });
             }
-
             return app;
         }
     }
