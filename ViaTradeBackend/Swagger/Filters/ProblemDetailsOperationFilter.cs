@@ -21,6 +21,7 @@ namespace ViaTradeBackend.Swagger.Filters
                 { 403, "Forbidden - Access denied" },
                 { 404, "Not Found - Resource does not exist" },
                 { 408, "Timeout - Server timeout" },
+                { 409, "Conflict - Conflict operation" },
                 { 500, "Internal Server Error - Unexpected error" }
             };
 
