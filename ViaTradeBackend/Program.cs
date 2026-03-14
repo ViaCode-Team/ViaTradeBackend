@@ -114,9 +114,13 @@ app.UseMiddleware<ExceptionHandlingMiddleware>();
 // HTTPS redirection
 app.UseHttpsRedirection();
 
+
+app.UseMiddleware<ProblemDetailsStatusCodeMiddleware>();
+
 // Authentication & Authorization middleware (order matters!)
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 // Map controller endpoints
 app.MapControllers();
