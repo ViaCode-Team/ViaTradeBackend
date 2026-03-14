@@ -79,6 +79,17 @@ paths:
                 title: Timeout
                 status: 408
                 detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
+                detail: Specific error details here
         '500':
           description: Internal Server Error - Unexpected error
           content:
@@ -165,6 +176,17 @@ paths:
                 title: Timeout
                 status: 408
                 detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
+                detail: Specific error details here
         '500':
           description: Internal Server Error - Unexpected error
           content:
@@ -238,6 +260,17 @@ paths:
                 type: https://httpstatuses.com/408
                 title: Timeout
                 status: 408
+                detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
                 detail: Specific error details here
         '500':
           description: Internal Server Error - Unexpected error
@@ -313,6 +346,17 @@ paths:
                 title: Timeout
                 status: 408
                 detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
+                detail: Specific error details here
         '500':
           description: Internal Server Error - Unexpected error
           content:
@@ -386,6 +430,17 @@ paths:
                 type: https://httpstatuses.com/408
                 title: Timeout
                 status: 408
+                detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
                 detail: Specific error details here
         '500':
           description: Internal Server Error - Unexpected error
@@ -471,6 +526,17 @@ paths:
                 title: Timeout
                 status: 408
                 detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
+                detail: Specific error details here
         '500':
           description: Internal Server Error - Unexpected error
           content:
@@ -544,6 +610,17 @@ paths:
                 type: https://httpstatuses.com/408
                 title: Timeout
                 status: 408
+                detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
                 detail: Specific error details here
         '500':
           description: Internal Server Error - Unexpected error
@@ -628,6 +705,17 @@ paths:
                 type: https://httpstatuses.com/408
                 title: Timeout
                 status: 408
+                detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
                 detail: Specific error details here
         '500':
           description: Internal Server Error - Unexpected error
