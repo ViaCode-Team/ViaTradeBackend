@@ -42,6 +42,23 @@ builder.Services.Configure<AuthCookiOptions>(
     builder.Configuration.GetSection("AuthCookies")
 );
 
+builder.Services.AddOptions<AnalyzerDataOption>()
+    .Configure<IConfiguration>((options, config) =>
+    {
+        var section = config.GetSection("AnalyzerData");
+        var activeProfile = section["ActiveProfile"]
+            ?? throw new InvalidOperationException("AnalyzerData:ActiveProfile is not set");
+
+        var profileSection = section.GetSection($"Profiles:{activeProfile}");
+        if (!profileSection.Exists())
+        {
+            throw new InvalidOperationException($"Profile '{activeProfile}' not found in AnalyzerData:Profiles");
+        }
+
+        // Bind selected profile to options instance
+        profileSection.Bind(options);
+    });
+
 // REDIS SETUP
 // Register Redis connection as singleton (shared across the app)
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
@@ -67,8 +84,8 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 builder.Services.AddScoped<IFileReader, TradeFileReader>();
-builder.Services.AddScoped<CsvHelper>();
-
+//builder.Services.AddScoped<CsvHelper>();
+builder.Services.AddScoped<ITradeDataBuilder, TradeDataBuilder>();
 // DATABASE SETUP (MySQL)
 var connectionString = builder.Configuration.GetConnectionString("MySqlLocalDevRiten")
     ?? throw new NullReferenceException("MySQL connection string is missing");
@@ -104,6 +121,9 @@ builder.Services.AddViaTradeSwagger();
 
 // BUILD & MIDDLEWARE PIPELINE
 var app = builder.Build();
+
+// Register AnalyzerDataOptions with profile selection logic
+
 
 // Swagger UI (Development only, configured in SwaggerMiddlewareExtensions)
 app.UseViaTradeSwagger();

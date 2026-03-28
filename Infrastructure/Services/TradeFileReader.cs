@@ -2,40 +2,111 @@
 using Application.Interfaces;
 using Domain.Entities.CSV;
 using Domain.Models;
+using Domain.Models.TradeLogic;
 using Microsoft.Extensions.Options;
 
 namespace Infrastructure.Services
 {
     public class TradeFileReader : IFileReader
     {
-        private readonly Dictionary<DataType, string> _paths;
+        private readonly Dictionary<TradeDataType, string> _paths;
+        private readonly ITradeDataBuilder _tradeDataBuilder;
 
-        public TradeFileReader(IOptions<AnalyzerDataOption> options)
+        public TradeFileReader(IOptions<AnalyzerDataOption> options, ITradeDataBuilder tradeDataBuilder)
         {
             var basePath = options.Value.SourcePath;
-            _paths = new Dictionary<DataType, string>
+
+            _paths = new Dictionary<TradeDataType, string>
             {
-                [DataType.Futures] = Path.Combine(basePath, options.Value.FuturesDataDirectoryName),
-                [DataType.Stocks] = Path.Combine(basePath, options.Value.StocksDataDirectoryName),
-                [DataType.Strategy] = Path.Combine(basePath, options.Value.StrategyResultDirectoryName),
-                [DataType.Screener] = Path.Combine(basePath, options.Value.ScrennerResultDirectoryName)
+                [TradeDataType.Futures] = Path.Combine(basePath, options.Value.FuturesDataDirectoryName),
+                [TradeDataType.Stocks] = Path.Combine(basePath, options.Value.StocksDataDirectoryName),
+                [TradeDataType.Strategy] = Path.Combine(basePath, options.Value.StrategyResultDirectoryName),
+                [TradeDataType.Screener] = Path.Combine(basePath, options.Value.ScrennerResultDirectoryName)
             };
+
+            foreach (var key in _paths.Keys.ToList())
+            {
+                _paths[key] = Path.GetFullPath(_paths[key]);
+            }
+
+            _tradeDataBuilder = tradeDataBuilder;
         }
 
-        public IEnumerable<string> GetFileNames(DataType dataType)
+        public IEnumerable<TradeCodeResonse> GetTradeCodes(TradeDataType dataType, IEnumerable<string>? filterCodes = null)
         {
-            var path = GetPath(dataType);
-            return Directory.Exists(path)
-                ? Directory.GetFiles(path, "*.csv").Select(Path.GetFileName)
-                : Enumerable.Empty<string>();
+            var directory = GetPath(dataType);
+            if (!Directory.Exists(directory))
+                yield break;
+
+            var filterSet = filterCodes?
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Select(c => c.ToUpperInvariant())
+                .ToHashSet();
+
+            var hasFilter = filterSet != null && filterSet.Count > 0;
+
+            // Collect matching file names first
+            var matchingFiles = Directory.EnumerateFiles(directory, "*.csv")
+                .Select(Path.GetFileName)
+                .Where(fileName =>
+                {
+                    var code = ExtractTradeCode(fileName);
+                    if (code == null) return false;
+                    return !hasFilter || filterSet.Contains(code);
+                });
+
+            // Use builder to parse file names into response objects
+            foreach (var response in _tradeDataBuilder.BuildFileTradeResonse(matchingFiles))
+            {
+                yield return response;
+            }
         }
 
-        public IEnumerable<T> ReadData<T>(DataType dataType, string fileName, DateTime? startDate = null, DateTime? endDate = null) where T : class
+        public IEnumerable<T> ReadDataByCodes<T>(
+            TradeDataType dataType,
+            IEnumerable<string> tradeCodes,
+            DateTime? startDate = null,
+            DateTime? endDate = null) where T : class
         {
-            var filePath = Path.Combine(GetPath(dataType), fileName);
-            if (!File.Exists(filePath))
-                throw new FileNotFoundException($"File not found: {filePath}");
+            foreach (var code in tradeCodes)
+            {
+                var filePath = FindFilePathByCode(dataType, code);
+                if (filePath == null) continue;
 
+                foreach (var item in ReadFile<T>(filePath, startDate, endDate))
+                {
+                    yield return item;
+                }
+            }
+        }
+
+        private string GetPath(TradeDataType dataType)
+        {
+            if (!_paths.TryGetValue(dataType, out var path))
+                throw new ArgumentException($"Unknown data type: {dataType}", nameof(dataType));
+            return path;
+        }
+
+        private static string? ExtractTradeCode(string filePath)
+        {
+            var fileName = Path.GetFileNameWithoutExtension(filePath);
+            var code = fileName.Split('_').FirstOrDefault();
+            return string.IsNullOrWhiteSpace(code) ? null : code.ToUpperInvariant();
+        }
+
+        private string? FindFilePathByCode(TradeDataType dataType, string tradeCode)
+        {
+            var directory = GetPath(dataType);
+            if (!Directory.Exists(directory)) return null;
+
+            var prefix = $"{tradeCode.ToUpperInvariant()}_";
+
+            return Directory.EnumerateFiles(directory, "*.csv")
+                .FirstOrDefault(f => Path.GetFileName(f).StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private IEnumerable<T> ReadFile<T>(string filePath, DateTime? startDate, DateTime? endDate) where T : class
+        {
             return typeof(T) switch
             {
                 var t when t == typeof(TradeBar) => ReadTradeBars(filePath, startDate, endDate).Cast<T>(),
@@ -45,28 +116,16 @@ namespace Infrastructure.Services
             };
         }
 
-        private string GetPath(DataType dataType)
-        {
-            if (!_paths.TryGetValue(dataType, out var path))
-                throw new ArgumentException($"Unknown data type: {dataType}", nameof(dataType));
-            return path;
-        }
-
         private IEnumerable<TradeBar> ReadTradeBars(string filePath, DateTime? startDate, DateTime? endDate)
         {
             var lines = File.ReadAllLines(filePath);
-            if (lines.Length <= 1)
-                yield break;
-
             for (int i = 1; i < lines.Length; i++)
             {
                 var parts = lines[i].Split(',');
-                if (parts.Length < 6)
-                    continue;
+                if (parts.Length < 6) continue;
 
                 var begin = ParseDate(parts[0]);
-                if (!IsInRange(begin, startDate, endDate))
-                    continue;
+                if (!IsInRange(begin, startDate, endDate)) continue;
 
                 yield return new TradeBar
                 {
@@ -83,18 +142,13 @@ namespace Infrastructure.Services
         private IEnumerable<StrategyResult> ReadStrategyResults(string filePath, DateTime? startDate, DateTime? endDate)
         {
             var lines = File.ReadAllLines(filePath);
-            if (lines.Length <= 1)
-                yield break;
-
             for (int i = 1; i < lines.Length; i++)
             {
                 var parts = lines[i].Split(',');
-                if (parts.Length < 3)
-                    continue;
+                if (parts.Length < 3) continue;
 
                 var begin = ParseDate(parts[0]);
-                if (!IsInRange(begin, startDate, endDate))
-                    continue;
+                if (!IsInRange(begin, startDate, endDate)) continue;
 
                 yield return new StrategyResult
                 {
@@ -108,20 +162,17 @@ namespace Infrastructure.Services
         private IEnumerable<ScreenerData> ReadScreenerDataInternal(string filePath, DateTime? startDate, DateTime? endDate)
         {
             var lines = File.ReadAllLines(filePath);
-            if (lines.Length <= 1)
-                yield break;
+            if (lines.Length <= 1) yield break;
 
             var headers = lines[0].Split(',').Select(h => h.Trim().ToLower()).ToArray();
 
             for (int i = 1; i < lines.Length; i++)
             {
                 var parts = lines[i].Split(',');
-                if (parts.Length < 6)
-                    continue;
+                if (parts.Length < 6) continue;
 
                 var begin = ParseDate(parts[0]);
-                if (!IsInRange(begin, startDate, endDate))
-                    continue;
+                if (!IsInRange(begin, startDate, endDate)) continue;
 
                 var data = new ScreenerData
                 {
@@ -169,13 +220,10 @@ namespace Infrastructure.Services
         private static decimal? ParseNullableDecimal(string value)
         {
             if (string.IsNullOrWhiteSpace(value) || value == "null" || value == "NaN") return null;
-            return decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var r) ? r : (decimal?)null;
+            return decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var r) ? r : null;
         }
 
         private static long ParseLong(string value) =>
             long.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var r) ? r : 0;
-
-        private static int ParseInt(string value) =>
-            int.TryParse(value, NumberStyles.Integer, CultureInfo.InvariantCulture, out var r) ? r : 0;
     }
 }

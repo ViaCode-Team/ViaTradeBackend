@@ -1,6 +1,6 @@
 ﻿namespace Domain.Entities.CSV
 {
-    public enum DataType
+    public enum TradeDataType
     {
         Futures,
         Stocks,
