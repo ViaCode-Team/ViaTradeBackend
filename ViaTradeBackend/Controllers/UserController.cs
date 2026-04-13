@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces.Auth;
-using Application.Interfaces.Database;
+using Infrastructure.Repositoryes.DataBase;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +10,10 @@ namespace ViaTradeBackend.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class UserController(IUserRepository userRepository, IJwtHelper jwtHelper,
+    public class UserController(UserRepository userRepository, IJwtHelper jwtHelper,
         UserService userService) : ControllerBase
     {
-        private readonly IUserRepository _userRepository = userRepository;
+        private readonly UserRepository _userRepository = userRepository;
         private readonly IJwtHelper _jwtHelper = jwtHelper;
         private readonly UserService _userService = userService;
 
