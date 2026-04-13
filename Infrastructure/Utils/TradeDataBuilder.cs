@@ -10,7 +10,7 @@ namespace Infrastructure.Utils
         // Pattern: {TradeCode}_{TimeFrame}_{StartDate}_{EndDate}.csv
         // TimeFrame может содержать цифры (HOUR_1), поэтому используем нежадный захват .*?
         private static readonly Regex FileNameRegex = new(
-            @"^(?<TradeCode>[A-Z0-9]+)_(?<TimeFrame>.*?)_(?<Start>\d{4}-\d{2}-\d{2})_(?<End>\d{4}-\d{2}-\d{2})\.csv$",
+            @"^(?<TradeCode>[A-Z0-9]+)_(?<TimeFrame>.*?)_(?<Start>\d{4}-\d{2}-\d{2})_(?<End>\d{4}-\d{2}-\d{2})_?\.csv$",
             RegexOptions.Compiled | RegexOptions.IgnoreCase
         );
 

@@ -1,9 +1,10 @@
 ﻿using Domain.Entities.DataBase;
+using Domain.Models.Dto;
 
 namespace Application.Interfaces.Database
 {
-    public interface ITradeCodeRepository : IRepository<TradeCode>
+    public interface ITradeCodeRepository
     {
-        Task<TradeCode?> GetByExchangeIdAsync(string code, CancellationToken cancellationToken = default);
+        Task<TradeCodeDto?> GetByExchangeIdAsync(string code, CancellationToken cancellationToken = default);
     }
 }

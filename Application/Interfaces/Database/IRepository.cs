@@ -2,14 +2,17 @@
 
 namespace Application.Interfaces.Database
 {
-    public interface IRepository<T> where T : class
+    public interface IRepository<TEntity, TDto> where TEntity : class where TDto : class
     {
-        Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken = default);
-        Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default);
-        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> predicate, CancellationToken cancellationToken = default);
-        Task AddAsync(T entity, CancellationToken cancellationToken = default);
-        void Update(T entity);
-        void Remove(T entity);
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+        Task<TEntity?> GetByIdAsync(int id, CancellationToken ct = default);
+        Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken ct = default);
+        Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
+        Task AddAsync(TEntity entity, CancellationToken ct = default);
+        void Update(TEntity entity);
+        void Remove(TEntity entity);
+        Task<int> SaveChangesAsync(CancellationToken ct = default);
+
+        Task<IEnumerable<TDto>> GetProjectedAsync(Expression<Func<TEntity, TDto>> projection, CancellationToken ct = default);
+        Task<int> ExecuteDeleteAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
     }
 }

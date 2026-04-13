@@ -1,55 +1,75 @@
 ﻿using System.Linq.Expressions;
 using Application.Interfaces.Database;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace Infrastructure.Repositoryes.DataBase
 {
-    public class GenericRepository<T> : IRepository<T> where T : class
+    public class GenericRepository<TEntity, TDto> : IRepository<TEntity, TDto>
+        where TEntity : class
+        where TDto : class
     {
         protected readonly AppDbContext _context;
-        protected readonly DbSet<T> _dbSet;
+        protected readonly DbSet<TEntity> _dbSet;
 
         public GenericRepository(AppDbContext context)
         {
             _context = context;
-            _dbSet = _context.Set<T>();
+            _dbSet = _context.Set<TEntity>();
         }
 
-        public async Task<T?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<TEntity?> GetByIdAsync(int id, CancellationToken ct = default)
         {
-            return await _dbSet.FindAsync([id], cancellationToken);
+            return await _dbSet.FindAsync([id], ct);
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken ct = default)
         {
-            return await _dbSet.ToListAsync(cancellationToken);
+            return await _dbSet.ToListAsync(ct);
         }
 
-        public async Task<IEnumerable<T>> FindAsync(
-            Expression<Func<T, bool>> predicate,
-            CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<TEntity>> FindAsync(
+            Expression<Func<TEntity, bool>> predicate,
+            CancellationToken ct = default)
         {
-            return await _dbSet.Where(predicate).ToListAsync(cancellationToken);
+            return await _dbSet.Where(predicate).ToListAsync(ct);
         }
 
-        public async Task AddAsync(T entity, CancellationToken cancellationToken = default)
+        public async Task AddAsync(TEntity entity, CancellationToken ct = default)
         {
-            await _dbSet.AddAsync(entity, cancellationToken);
+            await _dbSet.AddAsync(entity, ct);
         }
 
-        public void Update(T entity)
+        public void Update(TEntity entity) => _dbSet.Update(entity);
+        public void Remove(TEntity entity) => _dbSet.Remove(entity);
+
+        public async Task<int> SaveChangesAsync(CancellationToken ct = default)
         {
-            _dbSet.Update(entity);
+            return await _context.SaveChangesAsync(ct);
         }
 
-        public void Remove(T entity)
+        public async Task<IEnumerable<TDto>> GetProjectedAsync(
+            Expression<Func<TEntity, TDto>> projection,
+            CancellationToken ct = default)
         {
-            _dbSet.Remove(entity);
+            return await _dbSet.AsNoTracking()
+                               .Select(projection)
+                               .ToListAsync(ct);
         }
 
-        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public async Task<int> ExecuteDeleteAsync(
+            Expression<Func<TEntity, bool>> predicate,
+            CancellationToken ct = default)
         {
-            return await _context.SaveChangesAsync(cancellationToken);
+            return await _dbSet.Where(predicate).ExecuteDeleteAsync(ct);
+        }
+
+        public async Task<int> ExecuteUpdateAsync(
+            Expression<Func<TEntity, bool>> predicate,
+            Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> updateExpression,
+            CancellationToken ct = default)
+        {
+            return await _dbSet.Where(predicate).ExecuteUpdateAsync(updateExpression, ct);
         }
     }
 }

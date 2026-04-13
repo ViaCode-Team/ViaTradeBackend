@@ -1,7 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Application.Interfaces;
+using Application.Interfaces.Auth;
 using Domain.Entities.CSV;
 using Domain.Models.TradeLogic;
+using Infrastructure.Repositories.DataBase;
+using Infrastructure.Repositoryes.DataBase;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,46 +14,54 @@ namespace ViaTradeBackend.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class TradeController(IFileReader tradefileReader, ITradeDataBuilder tradeDataBuilder) : ControllerBase
+    public class TradeController(IFileReader tradefileReader, ITradeResultsService tradeResultsService, UserTradeStrategyRepository userTradeStrategyRepository, TradeStrategyRepository tradeStrategyRepository,
+        IJwtHelper jwtHelper, UserService userService) : ControllerBase
     {
         private readonly IFileReader _tradefileReader = tradefileReader;
-        private readonly ITradeDataBuilder _tradeDataBuilder = tradeDataBuilder;
+        private readonly ITradeResultsService _tradeResultsService = tradeResultsService;
+        private readonly TradeStrategyRepository _tradeStrategyRepository = tradeStrategyRepository;
+        private readonly UserTradeStrategyRepository _userTradeStrategyRepository = userTradeStrategyRepository;
+        private readonly UserService _userService = userService;
+        private readonly IJwtHelper _jwtHelper = jwtHelper;
 
         /// <summary>
         /// Reads strategy results for a specific trade code with date filtering.
         /// </summary>
         [HttpGet("result/strategy")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public ActionResult<IEnumerable<StrategyResult>> GetResult(
-            [FromQuery, Required] string tradeCode,
-            [FromQuery] DateTime? startDate,
-            [FromQuery] DateTime? endTime)
+        public async Task<ActionResult<StrategyResultResponse>> GetResult(
+                [FromQuery] DateTime? startDate,
+                [FromQuery] DateTime? endTime,
+                CancellationToken cancellationToken)
         {
-            // Use new method: pass single code as collection
-            var result = _tradefileReader.ReadDataByCodes<StrategyResult>(
-                TradeDataType.Strategy,
-                new[] { tradeCode },
+            var userId = _jwtHelper.GetUserIdFromClaims(User);
+
+            // 1. Get user preferences: Strategy -> [Codes]
+            var preferences = await _userTradeStrategyRepository
+                .GetUserPreferencesAsync(userId, cancellationToken);
+
+            // 2. Fetch results
+            var response = await _tradeResultsService.GetStrategyResultAsync(
+                userId,
                 startDate,
-                endTime
+                endTime,
+                cancellationToken
             );
 
-            return Ok(result);
+            return Ok(response);
         }
 
         /// <summary>
         /// Returns available trade codes for the specified data type.
         /// Supports optional filtering by code list.
         /// </summary>
-        [HttpGet("code/{dataTypeId}")]
+        [HttpGet("code")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public ActionResult<IEnumerable<TradeCodeResonse>> GetCodes(
-            [Required] int dataTypeId,
+            [FromQuery, Required] TradeDataType dataType,
             [FromQuery] IEnumerable<string>? listCodes)
         {
-            var type = (TradeDataType)dataTypeId;
-
-            // Service handles file scanning and code extraction internally
-            var tradeCodes = _tradefileReader.GetTradeCodes(type, listCodes);
+            var tradeCodes = _tradefileReader.GetTradeCodes(dataType, listCodes);
 
             return Ok(tradeCodes);
         }

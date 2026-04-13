@@ -2,9 +2,8 @@
 
 namespace Application.Interfaces.Database
 {
-    public interface IUserRepository : IRepository<User>
+    public interface IUserRepository
     {
         Task<User?> GetByLoginAsync(string login, CancellationToken cancellationToken = default);
-        Task UpdateAsync(User user, CancellationToken cancellationToken = default);
     }
 }

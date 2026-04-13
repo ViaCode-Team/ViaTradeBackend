@@ -53,12 +53,12 @@ namespace ViaTradeBackend.Middleware
                     exception.Message
                 ),
 
-                InvalidOperationException => CreateProblem(
-                    StatusCodes.Status409Conflict,
-                    "Invalid/Conflict Operation",
-                    "https://httpstatuses.com/409",
-                    "Operation is not valid due to the current state of the object"
-                ),
+                //InvalidOperationException => CreateProblem(
+                //    StatusCodes.Status409Conflict,
+                //    "Invalid/Conflict Operation",
+                //    "https://httpstatuses.com/409",
+                //    "Operation is not valid due to the current state of the object"
+                //),
 
                 // 408 Canceled or server timeout
                 OperationCanceledException or TaskCanceledException => CreateProblem(

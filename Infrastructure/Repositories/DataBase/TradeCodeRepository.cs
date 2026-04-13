@@ -1,15 +1,18 @@
 ﻿using Application.Interfaces.Database;
 using Domain.Entities.DataBase;
+using Domain.Models.Dto;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositoryes.DataBase
 {
-    public class TradeCodeRepository(AppDbContext context) : GenericRepository<TradeCode>(context), ITradeCodeRepository
+    public class TradeCodeRepository(AppDbContext context) : GenericRepository<TradeCode, TradeCodeDto>(context), ITradeCodeRepository
     {
-        public async Task<TradeCode?> GetByExchangeIdAsync(string code, CancellationToken cancellationToken = default)
+        public async Task<TradeCodeDto?> GetByExchangeIdAsync(string code, CancellationToken cancellationToken = default)
         {
             return await _dbSet
-                .FirstOrDefaultAsync(tc => tc.ExchangeId == code, cancellationToken);
+                .Where(e => e.ExchangeId == code)
+                .Select(e => new TradeCodeDto(e.Id, e.ExchangeId, e.Description))
+                .FirstOrDefaultAsync(cancellationToken);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using System.Text.RegularExpressions;
 using Application.Interfaces;
 using Domain.Entities.CSV;
 using Domain.Models;
@@ -62,7 +63,7 @@ namespace Infrastructure.Services
             }
         }
 
-        public IEnumerable<T> ReadDataByCodes<T>(
+        public IEnumerable<(string TradeCode, T Item)> ReadDataByCodes<T>(
             TradeDataType dataType,
             IEnumerable<string> tradeCodes,
             DateTime? startDate = null,
@@ -75,9 +76,61 @@ namespace Infrastructure.Services
 
                 foreach (var item in ReadFile<T>(filePath, startDate, endDate))
                 {
-                    yield return item;
+                    // Return code context with each item
+                    yield return (code, item);
                 }
             }
+        }
+
+        public IEnumerable<(string TradeCode, string StrategyName, T Item)> ReadDataByCodesWithStrategy<T>(
+            TradeDataType dataType,
+            IEnumerable<string> tradeCodes,
+            DateTime? startDate = null,
+            DateTime? endDate = null) where T : class
+        {
+            var directory = GetPath(dataType);
+            if (!Directory.Exists(directory)) yield break;
+
+            var tradeCodesSet = tradeCodes
+                .Where(c => !string.IsNullOrWhiteSpace(c))
+                .Select(c => c.ToUpperInvariant())
+                .ToHashSet();
+
+            var matchingFiles = Directory.EnumerateFiles(directory, "*.csv")
+                .Select(filePath => new
+                {
+                    Path = filePath,
+                    Code = ExtractTradeCode(Path.GetFileName(filePath))
+                })
+                .Where(x => x.Code != null && tradeCodesSet.Contains(x.Code));
+
+            foreach (var file in matchingFiles)
+            {
+                var strategyName = ExtractStrategyNameFromPath(file.Path);
+                if (string.IsNullOrEmpty(strategyName)) continue;
+
+                foreach (var item in ReadFile<T>(file.Path, startDate, endDate))
+                {
+                    yield return (file.Code!, strategyName, item);
+                }
+            }
+        }
+
+        private string ExtractStrategyNameFromPath(string filePath)
+        {
+            var fileName = Path.GetFileNameWithoutExtension(filePath);
+            var parts = fileName.Split('_');
+
+            // Ищем последнюю дату в формате YYYY-MM-DD
+            var lastDateIndex = Array.FindLastIndex(parts, p =>
+                Regex.IsMatch(p, @"^\d{4}-\d{2}-\d{2}$"));
+
+            if (lastDateIndex >= 0 && lastDateIndex + 1 < parts.Length)
+            {
+                return string.Join("_", parts.Skip(lastDateIndex + 1));
+            }
+
+            return parts[^1];
         }
 
         private string GetPath(TradeDataType dataType)
@@ -87,10 +140,10 @@ namespace Infrastructure.Services
             return path;
         }
 
-        private static string? ExtractTradeCode(string filePath)
+        private static string? ExtractTradeCode(string fileName)
         {
-            var fileName = Path.GetFileNameWithoutExtension(filePath);
-            var code = fileName.Split('_').FirstOrDefault();
+            var name = Path.GetFileNameWithoutExtension(fileName);
+            var code = name.Split('_').FirstOrDefault();
             return string.IsNullOrWhiteSpace(code) ? null : code.ToUpperInvariant();
         }
 
@@ -152,9 +205,9 @@ namespace Infrastructure.Services
 
                 yield return new StrategyResult
                 {
-                    Begin = begin,
-                    Close = ParseDecimal(parts[1]),
-                    Signal = parts[2].Trim().ToUpperInvariant()
+                    Date = begin,
+                    ClosePrice = ParseDecimal(parts[1]),
+                    Signal = parts[2].Trim().ToUpperInvariant(),
                 };
             }
         }

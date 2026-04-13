@@ -15,7 +15,13 @@ namespace Application.Interfaces
         /// Reads data for multiple trade codes with optional date filtering.
         /// Files not found are skipped silently (logged if needed).
         /// </summary>
-        IEnumerable<T> ReadDataByCodes<T>(
+        IEnumerable<(string TradeCode, T Item)> ReadDataByCodes<T>(
+           TradeDataType dataType,
+           IEnumerable<string> tradeCodes,
+           DateTime? startDate = null,
+           DateTime? endDate = null) where T : class;
+
+        IEnumerable<(string TradeCode, string StrategyName, T Item)> ReadDataByCodesWithStrategy<T>(
             TradeDataType dataType,
             IEnumerable<string> tradeCodes,
             DateTime? startDate = null,

@@ -1,16 +1,20 @@
-﻿using Application.Interfaces;
-using Application.Interfaces.Database;
+﻿using Application.Interfaces.Database;
 using Domain.Entities.DataBase;
+using Domain.Models.Dto;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositoryes.DataBase
 {
-    public class TradeStrategyRepository(AppDbContext context) : GenericRepository<TradeStrategy>(context), ITradeStrategyRepository
+    public class TradeStrategyRepository(AppDbContext context) : GenericRepository<TradeStrategy, TradeStrategyDto>(context),
+        ITradeStrategyRepository
     {
-        public async Task<TradeStrategy?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
+        public async Task<TradeStrategyDto?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
         {
             return await _dbSet
-                .FirstOrDefaultAsync(ts => ts.Name == name, cancellationToken);
+                .AsNoTracking()
+                .Where(ts => ts.Name == name)
+                .Select(ts => new TradeStrategyDto(ts.Name, ts.Description))
+                .FirstOrDefaultAsync(cancellationToken);
         }
     }
 }

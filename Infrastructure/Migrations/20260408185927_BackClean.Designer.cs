@@ -4,6 +4,7 @@ using Infrastructure.Repositoryes.DataBase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260408185927_BackClean")]
+    partial class BackClean
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -202,31 +205,6 @@ namespace Infrastructure.Migrations
                     b.ToTable("UserStrategyNotes");
                 });
 
-            modelBuilder.Entity("Domain.Entities.DataBase.UserStrategyTradeCode", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("StrategyId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("TradeCodeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId", "TradeCodeId", "StrategyId")
-                        .IsUnique();
-
-                    b.ToTable("UserStrategyTradeCodes");
-                });
-
             modelBuilder.Entity("Domain.Entities.DataBase.UserTradeCode", b =>
                 {
                     b.Property<int>("Id")
@@ -248,7 +226,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId", "TradeCodeId")
                         .IsUnique();
 
-                    b.ToTable("UserTradeCode");
+                    b.ToTable("UserTradeCodes");
                 });
 
             modelBuilder.Entity("Domain.Entities.DataBase.UserTradeNote", b =>

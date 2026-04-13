@@ -1,6 +1,6 @@
-﻿using Application.Interfaces;
-using Application.Interfaces.Auth;
+﻿using Application.Interfaces.Auth;
 using Application.Interfaces.Database;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Models.User;
@@ -11,20 +11,18 @@ namespace ViaTradeBackend.Controllers
     [ApiController]
     [Authorize]
     public class UserController(IUserRepository userRepository, IJwtHelper jwtHelper,
-        IUserService userService) : ControllerBase
+        UserService userService) : ControllerBase
     {
         private readonly IUserRepository _userRepository = userRepository;
         private readonly IJwtHelper _jwtHelper = jwtHelper;
-        private readonly IUserService _userService = userService;
+        private readonly UserService _userService = userService;
 
         [HttpGet("me")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<MeDto>> GetMe(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-
-            var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
-            if (user == null) return NotFound();
+            var user = await _userService.EnsureUserAsunc(userId, cancellationToken);
 
             return Ok(new MeDto
             {
@@ -34,5 +32,6 @@ namespace ViaTradeBackend.Controllers
                 TgId = user.TgId
             });
         }
+
     }
 }

@@ -3,16 +3,17 @@ using Application.Interfaces.Database;
 using Application.Interfaces.Redis;
 using Domain.Entities.DataBase;
 using Domain.Models;
+using Infrastructure.Repositoryes.DataBase;
 
 namespace Infrastructure.Services
 {
     public class AuthService(
-        IUserRepository userRepository,
+        UserRepository userRepository,
         IJwtHelper jwtHelper,
         ISessionRepository sessionRepository,
         IRefreshTokenRepository refreshTokenRepository) : IAuthService
     {
-        private readonly IUserRepository _userRepository = userRepository;
+        private readonly UserRepository _userRepository = userRepository;
         private readonly IJwtHelper _jwtHelper = jwtHelper;
         private readonly ISessionRepository _sessionRepository = sessionRepository;
         private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;

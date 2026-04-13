@@ -1,18 +1,17 @@
 ﻿using Application.Interfaces;
-using Application.Interfaces.Auth;
-using Application.Interfaces.Database;
 using Domain.Entities.DataBase;
+using Infrastructure.Repositoryes.DataBase;
 
 namespace Infrastructure.Services
 {
-    public class UserService(IJwtHelper jwtHelper, IUserRepository userRepository) : IUserService
+    public class UserService(UserRepository userRepository) : IUserService
     {
-        private readonly IJwtHelper jwtHelper = jwtHelper;
-        private readonly IUserRepository _userRepository = userRepository;
+        private readonly UserRepository _userRepository = userRepository;
 
-        public async Task<User?> EnsureUser(int userId)
+        public async Task<User> EnsureUserAsunc(int userId, CancellationToken cancellationToken)
         {
-            return await _userRepository.GetByIdAsync(userId);
+            return await _userRepository.GetByIdAsync(userId, cancellationToken)
+                ?? throw new UnauthorizedAccessException();
         }
 
     }

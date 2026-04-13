@@ -1,9 +1,9 @@
-﻿using Domain.Entities.DataBase;
+﻿using Domain.Models.Dto;
 
 namespace Application.Interfaces.Database
 {
-    public interface ITradeStrategyRepository : IRepository<TradeStrategy>
+    public interface ITradeStrategyRepository
     {
-        Task<TradeStrategy?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
+        Task<TradeStrategyDto?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
     }
 }
