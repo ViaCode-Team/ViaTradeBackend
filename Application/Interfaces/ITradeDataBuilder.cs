@@ -4,6 +4,6 @@ namespace Application.Interfaces
 {
     public interface ITradeDataBuilder
     {
-        IEnumerable<TradeCodeResonse> BuildFileTradeResonse(IEnumerable<string>? fileNames);
+        IEnumerable<TradeCodeFile> BuildFileTradeResonse(IEnumerable<string>? fileNames);
     }
 }

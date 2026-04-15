@@ -33,7 +33,7 @@ namespace Infrastructure.Services
             _tradeDataBuilder = tradeDataBuilder;
         }
 
-        public IEnumerable<TradeCodeResonse> GetTradeCodes(TradeDataType dataType, IEnumerable<string>? filterCodes = null)
+        public IEnumerable<TradeCodeFile> GetTradeCodes(TradeDataType dataType, IEnumerable<string>? filterCodes = null)
         {
             var directory = GetPath(dataType);
             if (!Directory.Exists(directory))

@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using Application.Interfaces;
 using Application.Interfaces.Auth;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto;

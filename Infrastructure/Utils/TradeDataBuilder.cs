@@ -14,7 +14,7 @@ namespace Infrastructure.Utils
             RegexOptions.Compiled | RegexOptions.IgnoreCase
         );
 
-        public IEnumerable<TradeCodeResonse> BuildFileTradeResonse(IEnumerable<string>? fileNames)
+        public IEnumerable<TradeCodeFile> BuildFileTradeResonse(IEnumerable<string>? fileNames)
         {
             if (fileNames == null)
             {
@@ -31,7 +31,7 @@ namespace Infrastructure.Utils
             }
         }
 
-        private static bool TryParseFileName(string fileName, out TradeCodeResonse result)
+        private static bool TryParseFileName(string fileName, out TradeCodeFile result)
         {
             result = null!;
 
@@ -61,7 +61,7 @@ namespace Infrastructure.Utils
                 return false;
             }
 
-            result = new TradeCodeResonse
+            result = new TradeCodeFile
             {
                 TradeCode = match.Groups["TradeCode"].Value.ToUpperInvariant(),
                 TimeFrame = match.Groups["TimeFrame"].Value,

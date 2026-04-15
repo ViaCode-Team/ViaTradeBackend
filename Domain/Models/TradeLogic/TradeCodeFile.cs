@@ -1,6 +1,6 @@
 ﻿namespace Domain.Models.TradeLogic
 {
-    public class TradeCodeResonse
+    public class TradeCodeFile
     {
         public required string TradeCode { get; set; }
         public required string TimeFrame { get; set; }

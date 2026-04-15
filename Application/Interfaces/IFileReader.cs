@@ -9,7 +9,7 @@ namespace Application.Interfaces
         /// Returns available trade codes for the specified data type.
         /// If filterCodes is provided, returns only codes from that list.
         /// </summary>
-        IEnumerable<TradeCodeResonse> GetTradeCodes(TradeDataType dataType, IEnumerable<string>? filterCodes = null);
+        IEnumerable<TradeCodeFile> GetTradeCodes(TradeDataType dataType, IEnumerable<string>? filterCodes = null);
 
         /// <summary>
         /// Reads data for multiple trade codes with optional date filtering.
