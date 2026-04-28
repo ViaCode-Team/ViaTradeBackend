@@ -739,6 +739,122 @@ paths:
                 title: Internal Server Error
                 status: 500
                 detail: Specific error details here
+  '/api/Result/strategy/{strategyName}/{tradeCode}':
+    get:
+      tags:
+        - Result
+      operationId: GetResultByStrategyAndTradeCode
+      parameters:
+        - name: strategyName
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: tradeCode
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: endTime
+          in: query
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/StrategyResultResponse'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StrategyResultResponse'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/StrategyResultResponse'
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/400
+                title: Bad Request
+                status: 400
+                detail: Specific error details here
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/401
+                title: Unauthorized
+                status: 401
+                detail: Specific error details here
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/403
+                title: Forbidden
+                status: 403
+                detail: Specific error details here
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/404
+                title: Not Found
+                status: 404
+                detail: Specific error details here
+        '408':
+          description: Timeout - Server timeout
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/408
+                title: Timeout
+                status: 408
+                detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
+                detail: Specific error details here
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/500
+                title: Internal Server Error
+                status: 500
+                detail: Specific error details here
   /api/Strategy:
     get:
       tags:
@@ -2036,6 +2152,10 @@ components:
       properties:
         tradeCode:
           type: string
+        accuracy:
+          type: integer
+          format: int32
+          nullable: true
         results:
           type: array
           items:
@@ -2139,6 +2259,18 @@ components:
           type: string
         description:
           maxLength: 512
+          type: string
+          nullable: true
+        accuracy:
+          type: integer
+          format: int32
+          nullable: true
+        signalFrequency:
+          maxLength: 128
+          type: string
+          nullable: true
+        investmentHorizon:
+          maxLength: 128
           type: string
           nullable: true
       additionalProperties: false
