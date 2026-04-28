@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using System.ComponentModel.DataAnnotations;
+using Application.Interfaces;
 using Application.Interfaces.Auth;
 using Domain.Models.TradeLogic;
 using Microsoft.AspNetCore.Authorization;
@@ -24,6 +25,20 @@ namespace ViaTradeBackend.Controllers
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
             var response = await _tradeResultsService.GetStrategyResultAsync(userId, startDate, endTime, cancellationToken);
+            return Ok(response);
+        }
+
+        [HttpGet("strategy/{strategyName}/{tradeCode}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<StrategyResultResponse>> GetResultByStrategyAndTradeCode(
+            [FromRoute, Required] string strategyName,
+            [FromRoute, Required] string tradeCode,
+            [FromQuery] DateTime? startDate,
+            [FromQuery] DateTime? endTime,
+            CancellationToken cancellationToken)
+        {
+            var userId = _jwtHelper.GetUserIdFromClaims(User);
+            var response = await _tradeResultsService.GetStrategyResultByCodeAsync(userId, strategyName, tradeCode, startDate, endTime, cancellationToken);
             return Ok(response);
         }
     }

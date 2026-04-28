@@ -13,7 +13,7 @@ namespace Infrastructure.Repositoryes.DataBase
             return await _dbSet
                 .AsNoTracking()
                 .Where(ts => ts.Name == name)
-                .Select(ts => new TradeStrategyDto(ts.Name, ts.Description))
+                .Select(ts => new TradeStrategyDto(ts.Name, ts.Description, ts.Accuracy))
                 .FirstOrDefaultAsync(cancellationToken);
         }
     }

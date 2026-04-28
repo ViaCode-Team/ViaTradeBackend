@@ -4,6 +4,7 @@ using Infrastructure.Repositoryes.DataBase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260421024518_TradeStrategyUpdate")]
+    partial class TradeStrategyUpdate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -171,8 +174,8 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Login")
                         .IsRequired()
-                        .HasMaxLength(64)
-                        .HasColumnType("varchar(64)");
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
 
                     b.Property<string>("TgId")
                         .HasMaxLength(512)
@@ -227,17 +230,10 @@ namespace Infrastructure.Migrations
                     b.Property<int>("TradeCodeId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("TradeStrategyId")
-                        .HasColumnType("int");
-
                     b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("TradeCodeId");
-
-                    b.HasIndex("TradeStrategyId");
 
                     b.HasIndex("UserId", "TradeCodeId", "StrategyId")
                         .IsUnique();
@@ -362,31 +358,6 @@ namespace Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Trade");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Domain.Entities.DataBase.UserStrategyTradeCode", b =>
-                {
-                    b.HasOne("Domain.Entities.DataBase.TradeCode", "TradeCode")
-                        .WithMany()
-                        .HasForeignKey("TradeCodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.DataBase.TradeStrategy", "TradeStrategy")
-                        .WithMany()
-                        .HasForeignKey("TradeStrategyId");
-
-                    b.HasOne("Domain.Entities.DataBase.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TradeCode");
-
-                    b.Navigation("TradeStrategy");
 
                     b.Navigation("User");
                 });

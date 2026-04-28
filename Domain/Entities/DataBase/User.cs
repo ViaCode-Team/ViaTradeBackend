@@ -5,7 +5,7 @@ namespace Domain.Entities.DataBase
     public class User : BaseEntity
     {
         [Required]
-        [MaxLength(128)]
+        [MaxLength(64)]
         public required string Login { get; set; }
 
         [MaxLength(512)]
