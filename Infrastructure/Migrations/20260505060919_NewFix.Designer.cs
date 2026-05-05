@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20260408185927_BackClean")]
-    partial class BackClean
+    [Migration("20260505060919_NewFix")]
+    partial class NewFix
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,65 @@ namespace Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+
+            modelBuilder.Entity("Domain.Entities.DataBase.Note", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("NoteText")
+                        .IsRequired()
+                        .HasMaxLength(1024)
+                        .HasColumnType("varchar(1024)");
+
+                    b.Property<int?>("TradeCodeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TradeStrategyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("TypeId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TradeCodeId");
+
+                    b.HasIndex("TradeStrategyId");
+
+                    b.HasIndex("TypeId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notes", t =>
+                        {
+                            t.HasCheckConstraint("CK_Note_ExclusiveTarget", "(`TradeCodeId` IS NOT NULL AND `TradeStrategyId` IS NULL) OR (`TradeCodeId` IS NULL AND `TradeStrategyId` IS NOT NULL)");
+                        });
+                });
+
+            modelBuilder.Entity("Domain.Entities.DataBase.NoteType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("TypeName")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NoteTypes");
+                });
 
             modelBuilder.Entity("Domain.Entities.DataBase.Trade", b =>
                 {
@@ -97,6 +156,20 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("TradeCodes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Газпром",
+                            ExchangeId = "GAZP"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "Норникель",
+                            ExchangeId = "GMKN"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.DataBase.TradeStrategy", b =>
@@ -107,14 +180,37 @@ namespace Infrastructure.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<int?>("Accuracy")
+                        .HasColumnType("int");
+
                     b.Property<string>("Description")
-                        .HasMaxLength(512)
-                        .HasColumnType("varchar(512)");
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<string>("InvestmentHorizon")
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
+
+                    b.Property<string>("LimitDesc")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
+
+                    b.Property<string>("LogicDesc")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(128)
                         .HasColumnType("varchar(128)");
+
+                    b.Property<string>("SignalFrequency")
+                        .HasMaxLength(128)
+                        .HasColumnType("varchar(128)");
+
+                    b.Property<string>("UseDesc")
+                        .HasMaxLength(256)
+                        .HasColumnType("varchar(256)");
 
                     b.HasKey("Id");
 
@@ -122,6 +218,32 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("TradeStrategies");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Accuracy = 81,
+                            Description = "Базовая стратегия следования биржевому тренду инструмента. Минамальный риск, редкие сигналы.",
+                            InvestmentHorizon = "1-3 недели",
+                            LimitDesc = "Стратегия исключительно для слелования тренду",
+                            LogicDesc = "Анализ длительного времение гшрафика для подтвержеденгия движдениея",
+                            Name = "TrendFollowingStrategy",
+                            SignalFrequency = "1-2 раза в месяц",
+                            UseDesc = "Следовать основному тренду, при низкой или средней валотильности"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Accuracy = 99,
+                            Description = "Тестовая стратегия. 100000% прибыли в наносекунду",
+                            InvestmentHorizon = "до 1 недели",
+                            LimitDesc = "СуперСтарта",
+                            LogicDesc = "Ващё чётко",
+                            Name = "Test",
+                            SignalFrequency = "3 раза в месяц",
+                            UseDesc = "Как по кайфу так и используй"
+                        });
                 });
 
             modelBuilder.Entity("Domain.Entities.DataBase.TradeType", b =>
@@ -163,8 +285,8 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Login")
                         .IsRequired()
-                        .HasMaxLength(128)
-                        .HasColumnType("varchar(128)");
+                        .HasMaxLength(64)
+                        .HasColumnType("varchar(64)");
 
                     b.Property<string>("TgId")
                         .HasMaxLength(512)
@@ -175,7 +297,7 @@ namespace Infrastructure.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Domain.Entities.DataBase.UserStrategyNote", b =>
+            modelBuilder.Entity("Domain.Entities.DataBase.UserStrategyTradeCode", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -183,13 +305,13 @@ namespace Infrastructure.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("NoteText")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("StratageId")
+                    b.Property<int>("StrategyId")
                         .HasColumnType("int");
 
-                    b.Property<int>("TradeId")
+                    b.Property<int>("TradeCodeId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TradeStrategyId")
                         .HasColumnType("int");
 
                     b.Property<int>("UserId")
@@ -197,12 +319,14 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TradeId");
+                    b.HasIndex("TradeCodeId");
 
-                    b.HasIndex("UserId", "StratageId")
+                    b.HasIndex("TradeStrategyId");
+
+                    b.HasIndex("UserId", "TradeCodeId", "StrategyId")
                         .IsUnique();
 
-                    b.ToTable("UserStrategyNotes");
+                    b.ToTable("UserStrategyTradeCodes");
                 });
 
             modelBuilder.Entity("Domain.Entities.DataBase.UserTradeCode", b =>
@@ -226,34 +350,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId", "TradeCodeId")
                         .IsUnique();
 
-                    b.ToTable("UserTradeCodes");
-                });
-
-            modelBuilder.Entity("Domain.Entities.DataBase.UserTradeNote", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("NoteText")
-                        .HasColumnType("longtext");
-
-                    b.Property<int>("TradeCodeId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TradeCodeId");
-
-                    b.HasIndex("UserId", "TradeCodeId")
-                        .IsUnique();
-
-                    b.ToTable("UserTradeNotes");
+                    b.ToTable("UserTradeCode");
                 });
 
             modelBuilder.Entity("Domain.Entities.DataBase.UserTradeStrategy", b =>
@@ -278,6 +375,37 @@ namespace Infrastructure.Migrations
                         .IsUnique();
 
                     b.ToTable("UserTradeStrategies");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DataBase.Note", b =>
+                {
+                    b.HasOne("Domain.Entities.DataBase.TradeCode", "TradeCode")
+                        .WithMany()
+                        .HasForeignKey("TradeCodeId");
+
+                    b.HasOne("Domain.Entities.DataBase.TradeStrategy", "TradeStrategy")
+                        .WithMany()
+                        .HasForeignKey("TradeStrategyId");
+
+                    b.HasOne("Domain.Entities.DataBase.NoteType", "NoteType")
+                        .WithMany("Notes")
+                        .HasForeignKey("TypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.DataBase.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("NoteType");
+
+                    b.Navigation("TradeCode");
+
+                    b.Navigation("TradeStrategy");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Domain.Entities.DataBase.Trade", b =>
@@ -307,13 +435,17 @@ namespace Infrastructure.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Domain.Entities.DataBase.UserStrategyNote", b =>
+            modelBuilder.Entity("Domain.Entities.DataBase.UserStrategyTradeCode", b =>
                 {
-                    b.HasOne("Domain.Entities.DataBase.TradeStrategy", "Trade")
+                    b.HasOne("Domain.Entities.DataBase.TradeCode", "TradeCode")
                         .WithMany()
-                        .HasForeignKey("TradeId")
+                        .HasForeignKey("TradeCodeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("Domain.Entities.DataBase.TradeStrategy", "TradeStrategy")
+                        .WithMany()
+                        .HasForeignKey("TradeStrategyId");
 
                     b.HasOne("Domain.Entities.DataBase.User", "User")
                         .WithMany()
@@ -321,7 +453,9 @@ namespace Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Trade");
+                    b.Navigation("TradeCode");
+
+                    b.Navigation("TradeStrategy");
 
                     b.Navigation("User");
                 });
@@ -336,25 +470,6 @@ namespace Infrastructure.Migrations
 
                     b.HasOne("Domain.Entities.DataBase.User", "User")
                         .WithMany("UserTradeCodes")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("TradeCode");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Domain.Entities.DataBase.UserTradeNote", b =>
-                {
-                    b.HasOne("Domain.Entities.DataBase.TradeCode", "TradeCode")
-                        .WithMany()
-                        .HasForeignKey("TradeCodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Domain.Entities.DataBase.User", "User")
-                        .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -381,6 +496,11 @@ namespace Infrastructure.Migrations
                     b.Navigation("TradeStrategy");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.Entities.DataBase.NoteType", b =>
+                {
+                    b.Navigation("Notes");
                 });
 
             modelBuilder.Entity("Domain.Entities.DataBase.TradeCode", b =>

@@ -11,8 +11,8 @@ namespace Infrastructure.Repositoryes.DataBase
         public DbSet<TradeCode> TradeCodes { get; set; }
         public DbSet<TradeStrategy> TradeStrategies { get; set; }
         public DbSet<UserTradeStrategy> UserTradeStrategies { get; set; }
-        public DbSet<UserTradeNote> UserTradeNotes { get; set; }
-        public DbSet<UserStrategyNote> UserStrategyNotes { get; set; }
+        public DbSet<Note> Notes{ get; set; }
+        public DbSet<NoteType> NoteTypes { get; set; }
         public DbSet<UserStrategyTradeCode> UserStrategyTradeCodes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,17 +37,65 @@ namespace Infrastructure.Repositoryes.DataBase
                 .HasIndex(x => new { x.UserId, x.TradeStrategyId })
                 .IsUnique();
 
-            modelBuilder.Entity<UserStrategyNote>()
-                .HasIndex(x => new { x.UserId, x.StratageId })
-                .IsUnique();
-
-            modelBuilder.Entity<UserTradeNote>()
-                .HasIndex(x => new { x.UserId, x.TradeCodeId})
-                .IsUnique();
-
             modelBuilder.Entity<UserStrategyTradeCode>()
                 .HasIndex(x => new { x.UserId, x.TradeCodeId, x.StrategyId})
                 .IsUnique();
+
+            modelBuilder.Entity<NoteType>(entity =>
+            {
+                entity.HasMany(nt => nt.Notes)
+                      .WithOne(n => n.NoteType)
+                      .HasForeignKey(n => n.TypeId)
+                      .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            modelBuilder.Entity<Note>(entity =>
+            {
+                entity.HasOne(n => n.User).WithMany().HasForeignKey(n => n.UserId).IsRequired();
+                entity.HasOne(n => n.TradeCode).WithMany().HasForeignKey(n => n.TradeCodeId).IsRequired(false);
+                entity.HasOne(n => n.TradeStrategy).WithMany().HasForeignKey(n => n.TradeStrategyId).IsRequired(false);
+
+                entity.ToTable(t => t.HasCheckConstraint("CK_Note_ExclusiveTarget",
+                  "(`TradeCodeId` IS NOT NULL AND `TradeStrategyId` IS NULL) OR (`TradeCodeId` IS NULL AND `TradeStrategyId` IS NOT NULL)"));
+            });
+
+            // Base Data
+            modelBuilder.Entity<TradeStrategy>().HasData(
+                new TradeStrategy
+                {
+                    Id = 1,
+                    Name = "TrendFollowingStrategy",
+                    Description = "Базовая стратегия следования биржевому тренду инструмента. Минамальный риск, редкие сигналы.",
+                    Accuracy = 81,
+                    SignalFrequency = "1-2 раза в месяц",
+                    InvestmentHorizon = "1-3 недели",
+                    LogicDesc = "Анализ длительного времение гшрафика для подтвержеденгия движдениея",
+                    UseDesc = "Следовать основному тренду, при низкой или средней валотильности",
+                    LimitDesc = "Стратегия исключительно для слелования тренду"
+                },
+                new TradeStrategy
+                {
+                    Id = 2,
+                    Name = "Test",
+                    Description = "Тестовая стратегия. 100000% прибыли в наносекунду",
+                    Accuracy = 99,
+                    SignalFrequency = "3 раза в месяц",
+                    InvestmentHorizon = "до 1 недели",
+                    LogicDesc = "Ващё чётко",
+                    UseDesc = "Как по кайфу так и используй",
+                    LimitDesc = "СуперСтарта"
+                }
+            );
+
+            modelBuilder.Entity<TradeCode>().HasData(
+                new TradeCode { Id = 1, ExchangeId = "GAZP", Description = "Газпром" },
+                new TradeCode { Id = 2, ExchangeId = "GMKN", Description = "Норникель" }
+            );
+
+            modelBuilder.Entity<NoteType>().HasData(
+                new NoteType { Id = 1, TypeName = "Заметка на фин. инструмент" },
+                new NoteType { Id = 2, TypeName = "Заметка на статегию" }
+            );
         }
     }
 }
