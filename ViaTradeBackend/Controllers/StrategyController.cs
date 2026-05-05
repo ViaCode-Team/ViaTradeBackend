@@ -103,7 +103,7 @@ namespace ViaTradeBackend.Controllers
 
         [HttpGet("byuser")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<UserTradeStrategy>>> GetUsersStrategy(CancellationToken cancellationToken)
+        public async Task<ActionResult<IEnumerable<UserTradeStrategyDto>>> GetUsersStrategy(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
             var user = await _userService.EnsureUserAsunc(userId, cancellationToken);
