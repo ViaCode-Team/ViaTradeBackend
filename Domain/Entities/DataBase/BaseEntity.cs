@@ -7,7 +7,8 @@ namespace Domain.Entities.DataBase
     public abstract class BaseEntity
     {
         [Key]
+        [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int Id { get; set; }
+        public required int Id { get; set; }
     }
 }

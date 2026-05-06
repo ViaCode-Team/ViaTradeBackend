@@ -116,6 +116,7 @@ namespace Infrastructure.Services
 
             var user = new User
             {
+                Id = 0,
                 Login = login,
                 HashPassword = BCrypt.Net.BCrypt.HashPassword(password),
                 LastLoginDate = DateTime.UtcNow

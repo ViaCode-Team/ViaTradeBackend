@@ -92,10 +92,10 @@ namespace Infrastructure.Repositoryes.DataBase
                 new TradeCode { Id = 2, ExchangeId = "GMKN", Description = "Норникель" }
             );
 
-            modelBuilder.Entity<NoteType>().HasData(
-                new NoteType { Id = 1, TypeName = "Заметка на фин. инструмент" },
-                new NoteType { Id = 2, TypeName = "Заметка на статегию" }
-            );
+            //modelBuilder.Entity<NoteType>().HasData(
+            //    new NoteType { Id = 1, TypeName = "Заметка на фин. инструмент" },
+            //    new NoteType { Id = 2, TypeName = "Заметка на статегию" }
+            //);
         }
     }
 }
