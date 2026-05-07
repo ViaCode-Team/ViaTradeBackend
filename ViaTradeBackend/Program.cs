@@ -1,6 +1,5 @@
 ﻿using Application.Interfaces;
 using Application.Interfaces.Auth;
-using Application.Interfaces.Database;
 using Application.Interfaces.Redis;
 using Domain.Models;
 using Infrastructure.Repositories.DataBase;

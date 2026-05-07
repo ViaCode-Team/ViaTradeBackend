@@ -21,6 +21,8 @@ namespace ViaTradeBackend.Swagger
                 });
 
                 options.SupportNonNullableReferenceTypes();
+                options.NonNullableReferenceTypesAsRequired();
+
 
                 options.CustomOperationIds(apiDesc =>
                     apiDesc.TryGetMethodInfo(out var methodInfo) ? methodInfo.Name : null);

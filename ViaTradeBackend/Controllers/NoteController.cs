@@ -8,7 +8,13 @@ namespace ViaTradeBackend.Controllers
     [Authorize]
     public class NoteController() : ControllerBase
     {
-        [HttpGet("test")]
+        [HttpGet("byuser/instrument")]
+        public async Task<IActionResult> GetByUserInstrumentAll()
+        {
+            return Ok();
+        }
+
+        [HttpGet("byuser/instrument")]
         public async Task<IActionResult> test()
         {
             return Ok();
