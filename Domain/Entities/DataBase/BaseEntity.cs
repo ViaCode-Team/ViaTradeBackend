@@ -9,6 +9,6 @@ namespace Domain.Entities.DataBase
         [Key]
         [Required]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public required int Id { get; set; }
+        public int Id { get; set; }
     }
 }

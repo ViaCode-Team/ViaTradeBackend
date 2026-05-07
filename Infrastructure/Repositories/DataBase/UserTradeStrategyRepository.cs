@@ -13,7 +13,10 @@ namespace Infrastructure.Repositories.DataBase
         {
             return await _context.UserTradeStrategies
                 .Where(e => e.UserId == userId)
-                .Select(e => new UserTradeStrategyDto(e.Id, e.UserId, e.TradeStrategyId))
+                .Select(e => new UserTradeStrategyDto {
+                    Id = e.Id, 
+                    UserId = e.UserId,
+                    TradeStrategyId = e.TradeStrategyId })
                 .ToListAsync(cancellationToken);
         }
 

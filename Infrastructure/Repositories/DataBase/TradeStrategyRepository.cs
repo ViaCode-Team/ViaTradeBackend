@@ -12,8 +12,17 @@ namespace Infrastructure.Repositoryes.DataBase
         {
             return await _dbSet
                 .AsNoTracking()
-                .Where(ts => ts.Name == name)
-                .Select(ts => new TradeStrategyDto(ts.Name, ts.Description, ts.Accuracy, ts.SignalFrequency, ts.InvestmentHorizon, ts.LogicDesc, ts.UseDesc, ts.LimitDesc))
+                .Where(tradeStrategy => tradeStrategy.Name == name)
+                .Select(tradeStrategy => new TradeStrategyDto {
+                    Id = tradeStrategy.Id,
+                    Name = tradeStrategy.Name,
+                    Description = tradeStrategy.Description,
+                    Accuracy = tradeStrategy.Accuracy,
+                    SignalFrequency = tradeStrategy.SignalFrequency,
+                    InvestmentHorizon = tradeStrategy.InvestmentHorizon,
+                    LogicDesc = tradeStrategy.LogicDesc,
+                    UseDesc = tradeStrategy.UseDesc,
+                    LimitDesc = tradeStrategy.LimitDesc})
                 .FirstOrDefaultAsync(cancellationToken);
         }
     }

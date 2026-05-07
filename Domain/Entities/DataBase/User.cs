@@ -13,6 +13,9 @@ namespace Domain.Entities.DataBase
 
         public DateTime LastLoginDate { get; set; } = DateTime.UtcNow;
 
+        [Required]
+        public required DateTime RegisterDate {  get; set; }
+
         [MaxLength(512)]
         public string? TgId { get; set; }
 

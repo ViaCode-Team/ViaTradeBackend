@@ -67,7 +67,6 @@ namespace ViaTradeBackend.Controllers
 
             var newUserStrategyCode = new UserStrategyTradeCode
             {
-                Id = 0,
                 StrategyId = userStrategyTradeCodeRequest.StrategyId,
                 TradeCodeId = userStrategyTradeCodeRequest.TradeCodeId,
                 UserId = user.Id
@@ -123,7 +122,6 @@ namespace ViaTradeBackend.Controllers
 
             var strategyLink = new UserTradeStrategy
             {
-                Id = 0,
                 TradeStrategyId = userStrategyRequest.StrategyId,
                 UserId = user.Id
             };

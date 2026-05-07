@@ -12,7 +12,6 @@ namespace Infrastructure.Repositoryes.DataBase
         public DbSet<TradeStrategy> TradeStrategies { get; set; }
         public DbSet<UserTradeStrategy> UserTradeStrategies { get; set; }
         public DbSet<Note> Notes{ get; set; }
-        public DbSet<NoteType> NoteTypes { get; set; }
         public DbSet<UserStrategyTradeCode> UserStrategyTradeCodes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -40,14 +39,6 @@ namespace Infrastructure.Repositoryes.DataBase
             modelBuilder.Entity<UserStrategyTradeCode>()
                 .HasIndex(x => new { x.UserId, x.TradeCodeId, x.StrategyId})
                 .IsUnique();
-
-            modelBuilder.Entity<NoteType>(entity =>
-            {
-                entity.HasMany(nt => nt.Notes)
-                      .WithOne(n => n.NoteType)
-                      .HasForeignKey(n => n.TypeId)
-                      .OnDelete(DeleteBehavior.Restrict);
-            });
 
             modelBuilder.Entity<Note>(entity =>
             {
@@ -92,10 +83,6 @@ namespace Infrastructure.Repositoryes.DataBase
                 new TradeCode { Id = 2, ExchangeId = "GMKN", Description = "Норникель" }
             );
 
-            //modelBuilder.Entity<NoteType>().HasData(
-            //    new NoteType { Id = 1, TypeName = "Заметка на фин. инструмент" },
-            //    new NoteType { Id = 2, TypeName = "Заметка на статегию" }
-            //);
         }
     }
 }

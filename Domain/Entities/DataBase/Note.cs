@@ -5,13 +5,12 @@ namespace Domain.Entities.DataBase
 {
     public class Note : BaseEntity
     {
-        public int UserId { get; set; }
+        [Required]
+        public required int UserId { get; set; }
 
         [Required]
         [StringLength(1024)]
         public required string NoteText { get; set; }
-
-        public int TypeId { get; set; }
 
         public int? TradeCodeId { get; set; }
 
@@ -19,8 +18,6 @@ namespace Domain.Entities.DataBase
 
         [JsonIgnore]
         public User? User { get; set; }
-        [JsonIgnore]
-        public NoteType? NoteType { get; set; }
         [JsonIgnore]
         public TradeCode? TradeCode { get; set; }
         [JsonIgnore]

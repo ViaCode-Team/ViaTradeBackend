@@ -1,4 +1,14 @@
-﻿namespace Domain.Models.Dto
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Domain.Models.Dto
 {
-    public record UserStrategyTradeCodeDto(int UserId, int TradeCodeId, int StrategyId);
+    public class UserStrategyTradeCodeDto
+    {
+        [Required]
+        public required int UserId { get; set; }
+        [Required]
+        public required int TradeCodeId { get; set; }
+        [Required]
+        public required int StrategyId { get; set; }
+    }
 }

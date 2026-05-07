@@ -13,47 +13,47 @@ namespace Infrastructure.Services
         private readonly IFileReader _tradefileReader = tradefileReader;
         private readonly TradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
 
-        public async Task<IEnumerable<TradeCode>> GetAllCodesAsync(CancellationToken ct = default)
+        public async Task<IEnumerable<TradeCode>> GetAllCodesAsync(CancellationToken cancellationToken = default)
         {
-            return await _tradeCodeRepository.GetAllAsync(ct);
+            return await _tradeCodeRepository.GetAllAsync(cancellationToken);
         }
 
         public async Task<IEnumerable<TradeCodeFileDto>> GetSysAllCodesAsync(
             TradeDataType dataType,
-            CancellationToken ct = default)
+            CancellationToken cancellationToken = default)
         {
             var tradeFiles = _tradefileReader.GetTradeCodes(dataType);
-            var tradeCodes = await _tradeCodeRepository.GetAllAsync(ct);
+            var tradeCodes = await _tradeCodeRepository.GetAllAsync(cancellationToken);
 
             var dbCodeMap = tradeCodes
                 .ToDictionary(
-                    c => c.ExchangeId,
-                    c => c.Id,
+                    tradeCode => tradeCode.ExchangeId,
+                    tradeCode => tradeCode.Id,
                     StringComparer.OrdinalIgnoreCase
                 );
 
             return tradeFiles
-                .Where(fc => dbCodeMap.ContainsKey(fc.TradeCode))
-                .Select(fc => new TradeCodeFileDto(
-                    Id: dbCodeMap[fc.TradeCode],
-                    ExchangeId: fc.TradeCode,
-                    TimeFrame: fc.TimeFrame,
-                    StartDate: fc.StartDate,
-                    EndDate: fc.EndDate
-                ));
+                .Where(fileCode => dbCodeMap.ContainsKey(fileCode.TradeCode))
+                .Select(fileCode => new TradeCodeFileDto{
+                    Id = dbCodeMap[fileCode.TradeCode],
+                    ExchangeId = fileCode.TradeCode,
+                    TimeFrame = fileCode.TimeFrame,
+                    StartDate = fileCode.StartDate,
+                    EndDate = fileCode.EndDate
+                });
         }
 
         public async Task<TradeCodeFileDto> GetSysCodeByIdAsync(
             TradeDataType dataType,
             string tradeIdString,
-            CancellationToken ct = default)
+            CancellationToken cancellationToken = default)
         {
             string exchangeId;
             int? dbId = null;
 
             if (int.TryParse(tradeIdString, out var tradeCodeId))
             {
-                var dbEntity = await _tradeCodeRepository.GetByIdAsync(tradeCodeId, ct) 
+                var dbEntity = await _tradeCodeRepository.GetByIdAsync(tradeCodeId, cancellationToken) 
                     ?? throw new KeyNotFoundException($"TradeCode with Id {tradeCodeId} not found in database");
                 
                 exchangeId = dbEntity.ExchangeId;
@@ -65,33 +65,33 @@ namespace Infrastructure.Services
 
                 var dbEntities = await _tradeCodeRepository.FindAsync(
                     c => c.ExchangeId == exchangeId,
-                    ct);
+                    cancellationToken);
 
                 dbId = dbEntities.FirstOrDefault()?.Id;
             }
 
             var fileCodes = _tradefileReader.GetTradeCodes(dataType, [exchangeId]);
-            var fileData = fileCodes.FirstOrDefault() 
+            var fileCode = fileCodes.FirstOrDefault() 
                 ?? throw new KeyNotFoundException($"No file data found for trade code '{exchangeId}'");
 
             if (dbId == null)
             {
                 var dbEntities = await _tradeCodeRepository.FindAsync(
-                    c => c.ExchangeId == fileData.TradeCode,
-                    ct);
+                    c => c.ExchangeId == fileCode.TradeCode,
+                    cancellationToken);
                 dbId = dbEntities.FirstOrDefault()?.Id;
             }
 
             if (dbId == null)
                 throw new KeyNotFoundException($"TradeCode '{exchangeId}' is not registered in database");
 
-            return new TradeCodeFileDto(
-                Id: dbId.Value,
-                ExchangeId: fileData.TradeCode,
-                TimeFrame: fileData.TimeFrame,
-                StartDate: fileData.StartDate,
-                EndDate: fileData.EndDate
-            );
+            return new TradeCodeFileDto {
+                Id = dbId.Value,
+                ExchangeId = fileCode.TradeCode,
+                TimeFrame = fileCode.TimeFrame,
+                StartDate = fileCode.StartDate,
+                EndDate = fileCode.EndDate
+            };
         }
     }
 }

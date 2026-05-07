@@ -1,4 +1,9 @@
-﻿namespace ViaTradeBackend.Models.Trade
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace ViaTradeBackend.Models.Trade
 {
-    public record CreateUserStrategyRequest(int StrategyId);
-}
+    public class CreateUserStrategyRequest {
+        [Required]
+        public required int StrategyId { get; set; }
+    }
+} 

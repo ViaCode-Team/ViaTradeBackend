@@ -1,4 +1,11 @@
 ﻿namespace Domain.Models.Dto
 {
-    public record TradeCodeFileDto(int Id, string ExchangeId, string TimeFrame, DateTime StartDate, DateTime EndDate);
+    public class TradeCodeFileDto
+    {
+        public required int Id { get; set; }
+        public required string ExchangeId { get; set; }
+        public required string TimeFrame { get; set; }
+        public required DateTime StartDate { get; set; }
+        public required DateTime EndDate { get; set; }
+    }
 }

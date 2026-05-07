@@ -1,4 +1,13 @@
-﻿namespace Domain.Models.Dto
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Domain.Models.Dto
 {
-    public record TradeCodeDto(int Id, string ExchangeId, string? Description);
+    public class TradeCodeDto
+    {
+        [Required]
+        public required int Id { get; set; }
+        [Required]
+        public required string ExchangeId { get; set; }
+        public string? Description { get; set; }
+    }
 }

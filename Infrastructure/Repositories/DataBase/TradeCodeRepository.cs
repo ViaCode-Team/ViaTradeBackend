@@ -11,7 +11,10 @@ namespace Infrastructure.Repositoryes.DataBase
         {
             return await _dbSet
                 .Where(e => e.ExchangeId == code)
-                .Select(e => new TradeCodeDto(e.Id, e.ExchangeId, e.Description))
+                .Select(e => new TradeCodeDto{ 
+                    Id = e.Id,
+                    ExchangeId = e.ExchangeId, 
+                    Description = e.Description })
                 .FirstOrDefaultAsync(cancellationToken);
         }
     }

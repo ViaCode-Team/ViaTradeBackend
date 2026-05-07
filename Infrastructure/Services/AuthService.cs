@@ -116,10 +116,10 @@ namespace Infrastructure.Services
 
             var user = new User
             {
-                Id = 0,
                 Login = login,
                 HashPassword = BCrypt.Net.BCrypt.HashPassword(password),
-                LastLoginDate = DateTime.UtcNow
+                LastLoginDate = DateTime.UtcNow,
+                RegisterDate = DateTime.UtcNow,
             };
 
             await _userRepository.AddAsync(user, cancellationToken);

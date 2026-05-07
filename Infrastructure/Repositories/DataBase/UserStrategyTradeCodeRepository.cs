@@ -13,7 +13,10 @@ namespace Infrastructure.Repositories.DataBase
         {
             return await _dbSet
                 .Where(e => e.UserId == userId)
-                .Select(e => new UserStrategyTradeCodeDto(e.UserId, e.TradeCodeId, e.StrategyId))
+                .Select(e => new UserStrategyTradeCodeDto {
+                    UserId = e.UserId,
+                    TradeCodeId = e.TradeCodeId,
+                    StrategyId = e.StrategyId })
                 .ToListAsync(cancellationToken);
         }
     }
