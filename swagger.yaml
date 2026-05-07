@@ -2041,6 +2041,8 @@ paths:
 components:
   schemas:
     CreateUserStrategyRequest:
+      required:
+        - strategyId
       type: object
       properties:
         strategyId:
@@ -2164,6 +2166,7 @@ components:
     TradeCode:
       required:
         - exchangeId
+        - id
       type: object
       properties:
         id:
@@ -2179,6 +2182,12 @@ components:
           nullable: true
       additionalProperties: false
     TradeCodeFileDto:
+      required:
+        - endDate
+        - exchangeId
+        - id
+        - startDate
+        - timeFrame
       type: object
       properties:
         id:
@@ -2197,6 +2206,7 @@ components:
       additionalProperties: false
     TradeStrategy:
       required:
+        - id
         - name
       type: object
       properties:
@@ -2256,6 +2266,10 @@ components:
           format: date-time
       additionalProperties: false
     UserStrategyTradeCodeDto:
+      required:
+        - strategyId
+        - tradeCodeId
+        - userId
       type: object
       properties:
         userId:
@@ -2282,6 +2296,10 @@ components:
           format: int32
       additionalProperties: false
     UserTradeStrategyDto:
+      required:
+        - id
+        - tradeStrategyId
+        - userId
       type: object
       properties:
         id:
