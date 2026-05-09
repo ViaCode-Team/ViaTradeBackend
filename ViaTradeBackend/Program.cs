@@ -1,4 +1,5 @@
-﻿using Application.Interfaces;
+﻿using System.Text.Json.Serialization;
+using Application.Interfaces;
 using Application.Interfaces.Auth;
 using Application.Interfaces.Redis;
 using Domain.Models;
@@ -120,7 +121,14 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 // API CONTROLLERS & SWAGGER
-builder.Services.AddControllers();
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.DefaultIgnoreCondition =
+            JsonIgnoreCondition.WhenWritingNull;
+    });
+
 builder.Services.AddEndpointsApiExplorer();
 
 // Custom Swagger configuration (see Swagger/ folder)

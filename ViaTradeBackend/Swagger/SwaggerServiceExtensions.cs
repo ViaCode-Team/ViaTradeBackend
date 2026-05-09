@@ -22,6 +22,7 @@ namespace ViaTradeBackend.Swagger
 
                 options.SupportNonNullableReferenceTypes();
                 options.NonNullableReferenceTypesAsRequired();
+                options.SchemaFilter<OptionalPropertiesAsNonNullableSchemaFilter>();
 
 
                 options.CustomOperationIds(apiDesc =>

@@ -14,7 +14,7 @@ namespace ViaTradeBackend.Controllers
             return Ok();
         }
 
-        [HttpGet("byuser/instrument")]
+        [HttpGet("byuser/instrument/{id}")]
         public async Task<IActionResult> test()
         {
             return Ok();
