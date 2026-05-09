@@ -2168,7 +2168,6 @@ components:
           format: date-time
         tgId:
           type: string
-          nullable: true
       additionalProperties: false
     ProblemDetails:
       required:
@@ -2254,7 +2253,6 @@ components:
         accuracy:
           type: integer
           format: int32
-          nullable: true
         results:
           type: array
           items:
@@ -2276,7 +2274,6 @@ components:
         description:
           maxLength: 512
           type: string
-          nullable: true
       additionalProperties: false
     TradeCodeFileDto:
       required:
@@ -2317,31 +2314,24 @@ components:
         description:
           maxLength: 256
           type: string
-          nullable: true
         accuracy:
           type: integer
           format: int32
-          nullable: true
         signalFrequency:
           maxLength: 128
           type: string
-          nullable: true
         investmentHorizon:
           maxLength: 128
           type: string
-          nullable: true
         logicDesc:
           maxLength: 256
           type: string
-          nullable: true
         useDesc:
           maxLength: 256
           type: string
-          nullable: true
         limitDesc:
           maxLength: 256
           type: string
-          nullable: true
       additionalProperties: false
     UserSessionDto:
       required:
