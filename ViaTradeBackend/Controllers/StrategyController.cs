@@ -49,7 +49,7 @@ namespace ViaTradeBackend.Controllers
         public async Task<ActionResult<IEnumerable<UserStrategyTradeCodeDto>>> GetAllInstrumentsLink(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var user = await _userService.EnsureUserAsunc(userId, cancellationToken);
+            var user = await _userService.EnsureUserAsync(userId, cancellationToken);
 
             var response = await _userStrategyTradeCodeRepository.GetAllAsync(user.Id, cancellationToken);
 
@@ -63,7 +63,7 @@ namespace ViaTradeBackend.Controllers
             CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var user = await _userService.EnsureUserAsunc(userId, cancellationToken);
+            var user = await _userService.EnsureUserAsync(userId, cancellationToken);
 
             var newUserStrategyCode = new UserStrategyTradeCode
             {
@@ -106,7 +106,7 @@ namespace ViaTradeBackend.Controllers
         public async Task<ActionResult<IEnumerable<UserTradeStrategyDto>>> GetUsersStrategy(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var user = await _userService.EnsureUserAsunc(userId, cancellationToken);
+            var user = await _userService.EnsureUserAsync(userId, cancellationToken);
 
             var response = await _userTradeStrategyRepository.GetByUser(user.Id, cancellationToken);
 
@@ -118,7 +118,7 @@ namespace ViaTradeBackend.Controllers
         public async Task<ActionResult> CreateUsersStrategy([FromBody, Required] CreateUserStrategyRequest userStrategyRequest, CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var user = await _userService.EnsureUserAsunc(userId, cancellationToken);
+            var user = await _userService.EnsureUserAsync(userId, cancellationToken);
 
             var strategyLink = new UserTradeStrategy
             {

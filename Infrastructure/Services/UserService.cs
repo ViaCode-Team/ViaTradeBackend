@@ -8,7 +8,7 @@ namespace Infrastructure.Services
     {
         private readonly UserRepository _userRepository = userRepository;
 
-        public async Task<User> EnsureUserAsunc(int userId, CancellationToken cancellationToken)
+        public async Task<User> EnsureUserAsync(int userId, CancellationToken cancellationToken)
         {
             return await _userRepository.GetByIdAsync(userId, cancellationToken)
                 ?? throw new UnauthorizedAccessException();

@@ -5,6 +5,6 @@ namespace Application.Interfaces
 {
     public interface IUserService
     {
-        Task<User> EnsureUserAsunc(int userId, CancellationToken cancellationToken);
+        Task<User> EnsureUserAsync(int userId, CancellationToken cancellationToken);
     }
 }

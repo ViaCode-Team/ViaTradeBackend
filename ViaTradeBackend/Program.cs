@@ -84,11 +84,13 @@ builder.Services.AddScoped<UserTradeStrategyRepository>();
 builder.Services.AddScoped<UserStrategyTradeCodeRepository>();
 builder.Services.AddScoped<TradeStrategyRepository>();
 builder.Services.AddScoped<TradeCodeRepository>();
+builder.Services.AddScoped<NoteRepository>();
 // Application services
 builder.Services.AddScoped<ITradeCodeService, TradeCodeService>();
 builder.Services.AddScoped<ITradeResultsService, TradeResultsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<NoteService>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 builder.Services.AddScoped<IFileReader, TradeFileReader>();
 //builder.Services.AddScoped<CsvHelper>();

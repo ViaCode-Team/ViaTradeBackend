@@ -23,4 +23,10 @@ namespace Domain.Entities.DataBase
         [JsonIgnore]
         public TradeStrategy? TradeStrategy { get; set; }
     }
+
+    public enum NoteType
+    {
+        TradeCodeNote,
+        TradeStrategyNote
+    }
 }

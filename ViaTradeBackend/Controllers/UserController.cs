@@ -22,7 +22,7 @@ namespace ViaTradeBackend.Controllers
         public async Task<ActionResult<MeDto>> GetMe(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var user = await _userService.EnsureUserAsunc(userId, cancellationToken);
+            var user = await _userService.EnsureUserAsync(userId, cancellationToken);
 
             return Ok(new MeDto
             {
