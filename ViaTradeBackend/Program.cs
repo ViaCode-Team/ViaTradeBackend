@@ -1,6 +1,7 @@
 ﻿using System.Text.Json.Serialization;
 using Application.Interfaces;
 using Application.Interfaces.Auth;
+using Application.Interfaces.Database;
 using Application.Interfaces.Redis;
 using Domain.Models;
 using Infrastructure.Repositories.DataBase;
@@ -79,6 +80,7 @@ builder.Services.AddHostedService<SessionCleanupService>();
 builder.Services.AddScoped<UserRedisRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
+builder.Services.AddScoped<TradeRemindRepository>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddScoped<UserTradeStrategyRepository>();
 builder.Services.AddScoped<UserStrategyTradeCodeRepository>();
