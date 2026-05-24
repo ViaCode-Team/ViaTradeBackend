@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Application.Interfaces.Auth;
 using Domain.Entities.DataBase;
-using Domain.Models;
+using Domain.Models.ConfigOptions;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 

@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 using Application.Interfaces.Redis;
-using Domain.Models;
+using Domain.Models.Dto.User;
 using StackExchange.Redis;
 
 namespace Infrastructure.Repositoryes.Redis

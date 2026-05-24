@@ -2,7 +2,7 @@
 using System.Text.RegularExpressions;
 using Application.Interfaces;
 using Domain.Entities.CSV;
-using Domain.Models;
+using Domain.Models.ConfigOptions;
 using Domain.Models.TradeLogic;
 using Microsoft.Extensions.Options;
 

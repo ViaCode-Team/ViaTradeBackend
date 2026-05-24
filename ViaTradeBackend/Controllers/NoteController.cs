@@ -2,6 +2,7 @@
 using Application.Interfaces.Auth;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto;
+using Domain.Models.Dto.NoteRemind;
 using Infrastructure.Repositories.DataBase;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Application.Interfaces.Auth;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto;
+using Domain.Models.Dto.Strategy;
 using Infrastructure.Repositories.DataBase;
 using Infrastructure.Repositoryes.DataBase;
 using Infrastructure.Services;

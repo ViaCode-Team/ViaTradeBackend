@@ -2,7 +2,7 @@
 using Application.Interfaces.Database;
 using Application.Interfaces.Redis;
 using Domain.Entities.DataBase;
-using Domain.Models;
+using Domain.Models.Dto.User;
 using Infrastructure.Repositoryes.DataBase;
 
 namespace Infrastructure.Services

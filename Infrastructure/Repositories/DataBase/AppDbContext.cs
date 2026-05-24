@@ -88,6 +88,11 @@ namespace Infrastructure.Repositoryes.DataBase
                 new TradeCode { Id = 2, ExchangeId = "GMKN", Description = "Норникель" }
             );
 
+            modelBuilder.Entity<TradeType>().HasData(
+                new TradeType { Id = 1, Name = "Акция" },
+                new TradeType { Id = 2, Name = "Фьючерс" }
+            );
+
         }
     }
 }

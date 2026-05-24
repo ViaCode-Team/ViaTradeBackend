@@ -1,9 +1,9 @@
 ﻿using Application.Interfaces.Auth;
+using Domain.Models.Dto.User;
 using Infrastructure.Repositoryes.DataBase;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ViaTradeBackend.Models.User;
 
 namespace ViaTradeBackend.Controllers
 {

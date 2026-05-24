@@ -1,4 +1,4 @@
-﻿namespace Domain.Models.Dto
+﻿namespace Domain.Models.Dto.Trade
 {
     public class TradeCodeFileDto
     {

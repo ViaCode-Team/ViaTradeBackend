@@ -1,5 +1,7 @@
 ﻿using Application.Interfaces.Auth;
 using Domain.Models;
+using Domain.Models.ConfigOptions;
+using Domain.Models.Dto.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;

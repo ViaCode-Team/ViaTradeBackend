@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces.Redis;
-using Domain.Models;
+using Domain.Models.ConfigOptions;
 using Microsoft.Extensions.Options;
 
 namespace ViaTradeBackend.BackgroundServices

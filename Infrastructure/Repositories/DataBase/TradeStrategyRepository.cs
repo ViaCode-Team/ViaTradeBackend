@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces.Database;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto;
+using Domain.Models.Dto.Strategy;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositoryes.DataBase

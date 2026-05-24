@@ -1,6 +1,6 @@
 ﻿using Application.Interfaces.Database;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto;
+using Domain.Models.Dto.NoteRemind;
 using Infrastructure.Repositoryes.DataBase;
 using Microsoft.EntityFrameworkCore;
 

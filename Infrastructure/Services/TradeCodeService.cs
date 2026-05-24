@@ -1,7 +1,7 @@
 ﻿using Application.Interfaces;
 using Domain.Entities.CSV;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto;
+using Domain.Models.Dto.Trade;
 using Infrastructure.Repositoryes.DataBase;
 
 namespace Infrastructure.Services

@@ -3,7 +3,7 @@ using Application.Interfaces;
 using Application.Interfaces.Auth;
 using Domain.Entities.CSV;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto;
+using Domain.Models.Dto.Trade;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

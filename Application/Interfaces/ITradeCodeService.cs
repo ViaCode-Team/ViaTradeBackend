@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.CSV;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto;
+using Domain.Models.Dto.Trade;
 
 namespace Application.Interfaces
 {

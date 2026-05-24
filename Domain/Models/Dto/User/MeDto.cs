@@ -1,4 +1,4 @@
-﻿namespace ViaTradeBackend.Models.User
+﻿namespace Domain.Models.Dto.User
 {
     public class MeDto
     { 

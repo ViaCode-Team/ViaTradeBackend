@@ -1,8 +1,8 @@
-﻿using System.Text.Json.Serialization;
+﻿using Domain.Entities.DataBase;
 
-namespace Domain.Entities.DataBase
+namespace Domain.Models.Dto.Trade
 {
-    public class Trade : BaseEntity
+    public class TradeDto
     {
         public DateTime DateOpen { get; set; }
         public DateTime? DateClose { get; set; }
@@ -12,17 +12,10 @@ namespace Domain.Entities.DataBase
 
         public double? NetIncome { get; set; }
         public int Count { get; set; }
-        public decimal Price { get; set; }
+        public int Price { get; set; }
 
         public int TradeTypeId { get; set; }
         public int TradeCodeId { get; set; }
         public int UserId { get; set; }
-
-        [JsonIgnore]
-        public TradeType? TradeType { get; set; }
-        [JsonIgnore]
-        public TradeCode? TradeCode { get; set; }
-        [JsonIgnore]
-        public User? User { get; set; }
     }
 }

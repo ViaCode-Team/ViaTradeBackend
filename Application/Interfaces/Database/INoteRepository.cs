@@ -1,5 +1,5 @@
 ﻿using Domain.Entities.DataBase;
-using Domain.Models.Dto;
+using Domain.Models.Dto.NoteRemind;
 
 namespace Application.Interfaces.Database
 {
