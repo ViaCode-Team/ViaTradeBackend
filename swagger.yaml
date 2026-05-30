@@ -1786,6 +1786,10 @@ paths:
           schema:
             type: string
             format: date-time
+        - name: tradeSignal
+          in: query
+          schema:
+            $ref: '#/components/schemas/TradeSignal'
       responses:
         '200':
           description: OK
@@ -4094,6 +4098,7 @@ components:
         - id
         - lastLoginDate
         - login
+        - registerDate
       type: object
       properties:
         id:
@@ -4102,6 +4107,9 @@ components:
         login:
           type: string
         lastLoginDate:
+          type: string
+          format: date-time
+        registerDate:
           type: string
           format: date-time
         tgId:
@@ -4238,6 +4246,7 @@ components:
         - price
         - tradeCodeId
         - tradeOpen
+        - tradeSignal
         - tradeTypeId
         - userId
       type: object
@@ -4275,6 +4284,8 @@ components:
         userId:
           type: integer
           format: int32
+        tradeSignal:
+          $ref: '#/components/schemas/TradeSignal'
       additionalProperties: false
     TradeCode:
       required:
@@ -4362,6 +4373,7 @@ components:
         - dateOpen
         - tradeCodeId
         - tradeOpen
+        - tradeSignal
         - tradeTypeId
       type: object
       properties:
@@ -4377,6 +4389,8 @@ components:
         tradeClose:
           type: number
           format: double
+        tradeSignal:
+          $ref: '#/components/schemas/TradeSignal'
         count:
           maximum: 2147483647
           minimum: 0
@@ -4389,6 +4403,13 @@ components:
           type: integer
           format: int32
       additionalProperties: false
+    TradeSignal:
+      enum:
+        - 0
+        - 1
+        - -1
+      type: integer
+      format: int32
     TradeStrategy:
       required:
         - id
