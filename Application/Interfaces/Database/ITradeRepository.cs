@@ -7,6 +7,6 @@ namespace Application.Interfaces.Database
     {
         Task<IEnumerable<Trade>> GetByUserAsync(int userId, CancellationToken cancellationToken);
         Task<IEnumerable<Trade>> GetByUserAndTradeCodeAsync(int userId, int tradeCodeId, CancellationToken cancellationToken);
-        Task<IEnumerable<Trade>> GetByUserAndDateRangeAsync(int userId, DateTime? from, DateTime? to, CancellationToken cancellationToken);
+        Task<IEnumerable<Trade>> GetByUserAndDateRangeAsync(int userId, DateTime? from, DateTime? to, TradeSignal? tradeSignal, CancellationToken cancellationToken);
     }
 }

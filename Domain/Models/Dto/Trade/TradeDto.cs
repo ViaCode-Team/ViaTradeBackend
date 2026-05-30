@@ -14,6 +14,8 @@ namespace Domain.Models.Dto.Trade
         public int Count { get; set; }
         public int Price { get; set; }
 
+        public required TradeSignal TradeSignal { get; set; }
+
         public int TradeTypeId { get; set; }
         public int TradeCodeId { get; set; }
         public int UserId { get; set; }

@@ -30,12 +30,12 @@ namespace ViaTradeBackend.Controllers
         [HttpGet("byuser")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Trade>>> GetByUser(CancellationToken cancellationToken,
-            DateTime? startDate, DateTime? endDate)
+            [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] TradeSignal? tradeSignal)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
             await _userService.EnsureUserAsync(userId, cancellationToken);
 
-            var trades = await _tradeRepository.GetByUserAndDateRangeAsync(userId, startDate, endDate, cancellationToken);
+            var trades = await _tradeRepository.GetByUserAndDateRangeAsync(userId, startDate, endDate, tradeSignal, cancellationToken);
 
             return Ok(trades);
         }
@@ -70,7 +70,7 @@ namespace ViaTradeBackend.Controllers
             var tradeType = await _tradeTypeRepository.GetByIdAsync(request.TradeTypeId, cancellationToken);
             if (tradeType == null) return BadRequest(new { error = $"TradeType {request.TradeTypeId} not found" });
 
-            double? netIncome = CalculateNetIncome(request.TradeOpen, request.TradeClose, request.Count, request.TradeTypeId);
+            double? netIncome = CalculateNetIncome(request.TradeOpen, request.TradeClose, request.TradeSignal);
 
             var trade = new Trade
             {
@@ -81,6 +81,7 @@ namespace ViaTradeBackend.Controllers
                 NetIncome = netIncome,
                 Count = request.Count,
                 Price = (decimal)request.TradeOpen * request.Count,
+                TradeSignal = request.TradeSignal,
                 TradeTypeId = request.TradeTypeId,
                 TradeCodeId = request.TradeCodeId,
                 UserId = userId
@@ -111,7 +112,7 @@ namespace ViaTradeBackend.Controllers
             var tradeType = await _tradeTypeRepository.GetByIdAsync(request.TradeTypeId, cancellationToken);
             if (tradeType == null) return BadRequest(new { error = $"TradeType {request.TradeTypeId} not found" });
 
-            double? netIncome = CalculateNetIncome(request.TradeOpen, request.TradeClose, request.Count, request.TradeTypeId);
+            double? netIncome = CalculateNetIncome(request.TradeOpen, request.TradeClose, request.TradeSignal);
 
             trade.DateOpen = request.DateOpen;
             trade.DateClose = request.DateClose;
@@ -119,6 +120,7 @@ namespace ViaTradeBackend.Controllers
             trade.TradeClose = request.TradeClose;
             trade.NetIncome = netIncome;
             trade.Count = request.Count;
+            trade.TradeSignal = request.TradeSignal;
             trade.Price = (decimal)request.TradeOpen * request.Count;
             trade.TradeTypeId = request.TradeTypeId;
             trade.TradeCodeId = request.TradeCodeId;
@@ -150,15 +152,18 @@ namespace ViaTradeBackend.Controllers
             return NoContent();
         }
 
-        private static double? CalculateNetIncome(double tradeOpen, double? tradeClose, int count, int tradeTypeId)
+        private static double? CalculateNetIncome(double tradeOpen, double? tradeClose, TradeSignal tradeSignal)
         {
             if (tradeClose == null) return null;
-
             if (tradeOpen == 0) return null;
+            if (tradeSignal == TradeSignal.HOLD) return null;
 
-            var percent = (tradeClose.Value - tradeOpen) / tradeOpen * 100;
+            double basePercent = (tradeClose.Value - tradeOpen) / tradeOpen * 100;
 
-            return Math.Round(percent, 2);
+            // Invert result for short positions (SELL)
+            double adjustedPercent = tradeSignal == TradeSignal.SELL ? -basePercent : basePercent;
+
+            return Math.Round(adjustedPercent, 2);
         }
     }
 }

@@ -29,6 +29,7 @@ namespace ViaTradeBackend.Controllers
                 Id = user.Id,
                 Login = user.Login,
                 LastLoginDate = user.LastLoginDate,
+                RegisterDate = user.RegisterDate,
                 TgId = user.TgId
             });
         }

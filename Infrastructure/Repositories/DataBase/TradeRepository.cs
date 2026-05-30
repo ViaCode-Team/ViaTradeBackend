@@ -27,7 +27,7 @@ namespace Infrastructure.Repositories.DataBase
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<IEnumerable<Trade>> GetByUserAndDateRangeAsync(int userId, DateTime? from, DateTime? to, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Trade>> GetByUserAndDateRangeAsync(int userId, DateTime? from, DateTime? to, TradeSignal? tradeSignal, CancellationToken cancellationToken)
         {
             var query = _dbSet
                 .Include(t => t.TradeType)
@@ -39,6 +39,11 @@ namespace Infrastructure.Repositories.DataBase
 
             if (to.HasValue)
                 query = query.Where(t => t.DateOpen <= to.Value.Date.AddDays(1).AddTicks(-1));
+
+            if (tradeSignal.HasValue)
+            {
+                query = query.Where(t => t.TradeSignal == tradeSignal);
+            }
 
             return await query.ToListAsync(cancellationToken);
         }

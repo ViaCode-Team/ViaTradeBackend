@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Domain.Entities.DataBase;
 
 namespace ViaTradeBackend.Models.Trade
 {
@@ -13,6 +14,8 @@ namespace ViaTradeBackend.Models.Trade
         public double TradeOpen { get; set; }
 
         public double? TradeClose { get; set; }
+
+        public required TradeSignal TradeSignal { get; set; }
 
         [Range(0, int.MaxValue)]
         public int Count { get; set; }
