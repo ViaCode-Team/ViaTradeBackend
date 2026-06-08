@@ -1,15 +1,19 @@
-﻿using Application.Interfaces.Auth;
+﻿using System.ComponentModel.DataAnnotations;
+using Application.Interfaces.Auth;
+using Domain.Entities.DataBase;
+using Domain.Entities.Redis;
 using Domain.Models.Dto.User;
+using Domain.Models.Request.Auth;
 using Infrastructure.Repositoryes.DataBase;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ViaTradeBackend.Attribute;
 
 namespace ViaTradeBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class UserController(UserRepository userRepository, IJwtHelper jwtHelper,
         UserService userService) : ControllerBase
     {
@@ -17,6 +21,7 @@ namespace ViaTradeBackend.Controllers
         private readonly IJwtHelper _jwtHelper = jwtHelper;
         private readonly UserService _userService = userService;
 
+        [Authorize]
         [HttpGet("me")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<MeDto>> GetMe(CancellationToken cancellationToken)
@@ -32,6 +37,47 @@ namespace ViaTradeBackend.Controllers
                 RegisterDate = user.RegisterDate,
                 TgId = user.TgId
             });
+        }
+
+        [Authorize]
+        [HttpGet("tgToken")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<TgTokenResponse>> GetTgToken(CancellationToken cancellationToken)
+        {
+            var userId = _jwtHelper.GetUserIdFromClaims(User);
+            var user = await _userService.EnsureUserAsync(userId, cancellationToken);
+
+            var response = new TgTokenResponse
+            {
+                TgToken = await _userService.GenerateTgLink(user.Id)
+            };
+
+            return Ok(response);
+        }
+
+        [ServicePassword]
+        [HttpPost("tgToken")]
+        [ProducesResponseType(StatusCodes.Status202Accepted)]
+        public async Task<ActionResult> PostTgToken([FromBody, Required] TgTokenRequest tgTokenRequest, CancellationToken cancellationToken)
+        {
+            var userId = await _userService.GetUserId(tgTokenRequest.TgToken) ??
+                throw new NullReferenceException(nameof(tgTokenRequest.TgToken));
+
+            var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
+
+            user.TgId = tgTokenRequest.TgId;
+            _userRepository.Update(user);
+            await _userRepository.SaveChangesAsync();
+
+            return Accepted();
+        }
+
+        [ServicePassword]
+        [HttpGet("user")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<User>>> GetUser(CancellationToken cancellationToken)
+        {
+            return Ok(await _userRepository.GetAllWithTgLikn(cancellationToken));
         }
 
     }

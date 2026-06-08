@@ -1,10 +1,13 @@
-﻿using System.Threading;
-using Domain.Entities.DataBase;
+﻿using Domain.Entities.DataBase;
 
 namespace Application.Interfaces
 {
     public interface IUserService
     {
         Task<User> EnsureUserAsync(int userId, CancellationToken cancellationToken);
+
+        Task<string> GenerateTgLink(int userId);
+
+        Task<int?> GetUserId(string tgToken);
     }
 }

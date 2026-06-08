@@ -12,5 +12,10 @@ namespace Infrastructure.Repositoryes.DataBase
             return await _dbSet
                 .FirstOrDefaultAsync(u => u.Login == login, cancellationToken);
         }
+
+        public async Task<IEnumerable<User>> GetAllWithTgLikn(CancellationToken cancellationToken = default)
+        {
+            return await _dbSet.Where(u => u.TgId != null).ToListAsync(cancellationToken);
+        }
     }
 }

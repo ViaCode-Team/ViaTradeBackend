@@ -7,12 +7,12 @@ using Infrastructure.Repositoryes.DataBase;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ViaTradeBackend.Attribute;
 
 namespace ViaTradeBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class TradeRemindController(
         TradeRemindRepository tradeRemindRepository,
         TradeCodeRepository tradeCodeRepository,
@@ -24,6 +24,15 @@ namespace ViaTradeBackend.Controllers
         private readonly IJwtHelper _jwtHelper = jwtHelper;
         private readonly UserService _userService = userService;
 
+        [ServicePassword]
+        [HttpGet("byuser/actual")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<TradeRemind>>> GetActualRemind(CancellationToken cancellationToken)
+        {
+            return Ok(await _tradeRemindRepository.GetActualTradeRemind(cancellationToken));
+        }
+
+        [Authorize]
         [HttpGet("byuser")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<TradeRemind>>> GetAllByUser(CancellationToken cancellationToken)
@@ -35,6 +44,7 @@ namespace ViaTradeBackend.Controllers
             return Ok(reminders);
         }
 
+        [Authorize]
         [HttpGet("byuser/instrument/{idInstrument}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<TradeRemind>>> GetTradeRemindByUserInstrument(
@@ -52,6 +62,7 @@ namespace ViaTradeBackend.Controllers
             return Ok(reminders);
         }
 
+        [Authorize]
         [HttpGet("byuser/{remindId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<TradeRemind>> GetTradeRemindById(
@@ -67,6 +78,7 @@ namespace ViaTradeBackend.Controllers
             return Ok(reminder);
         }
 
+        [Authorize]
         [HttpPost("byuser/instrument/{idInstrument}")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         public async Task<ActionResult> CreateInstrumentRemind(
@@ -95,6 +107,7 @@ namespace ViaTradeBackend.Controllers
             return Created();
         }
 
+        [Authorize]
         [HttpPut("byuser/{redindId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> UpdateRemind(
@@ -121,6 +134,7 @@ namespace ViaTradeBackend.Controllers
             return NoContent();
         }
 
+        [Authorize]
         [HttpDelete("byuser/{redindId}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         public async Task<ActionResult> DeleteRemind(

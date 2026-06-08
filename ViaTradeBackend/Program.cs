@@ -40,6 +40,10 @@ builder.Services.Configure<JwtOptions>(
     builder.Configuration.GetSection("Jwt")
 );
 
+builder.Services.Configure<ServiceSecurity>(
+    builder.Configuration.GetSection("ServiceSecurity")
+);
+
 builder.Services.Configure<AuthCookiOptions>(
     builder.Configuration.GetSection("AuthCookies")
 );
@@ -78,6 +82,7 @@ builder.Services.AddHostedService<SessionCleanupService>();
 // SERVICES REGISTRATION
 // Repositories
 builder.Services.AddScoped<UserRedisRepository>();
+builder.Services.AddScoped<TgTokenRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<ITradeRepository, TradeRepository>();
