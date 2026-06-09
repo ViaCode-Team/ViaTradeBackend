@@ -33,7 +33,7 @@ namespace Infrastructure.Services
 
             await _tgTokenRepository.SetAsync(entity, TimeSpan.FromMinutes(5));
 
-            return $"https://t.me/YourBot?start={token}";
+            return $"https://t.me/ViaTradeBot?start={token}";
         }
 
         public async Task<int?> GetUserId(string tgToken)

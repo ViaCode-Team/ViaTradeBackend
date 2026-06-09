@@ -13,7 +13,7 @@ namespace ViaTradeBackend.Attribute
                 .GetRequiredService<IOptions<ServiceSecurity>>();
 
             var expectedPassword = options.Value.Password;
-            var providedPassword = context.HttpContext.Request.Headers["X-Service-Password"];
+            var providedPassword = context.HttpContext.Request.Headers["TgBot-Service-Password"];
 
             if (string.IsNullOrWhiteSpace(providedPassword) ||
                 !string.Equals(providedPassword, expectedPassword, StringComparison.Ordinal))

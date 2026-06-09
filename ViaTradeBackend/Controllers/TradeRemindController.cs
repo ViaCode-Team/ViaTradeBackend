@@ -32,6 +32,15 @@ namespace ViaTradeBackend.Controllers
             return Ok(await _tradeRemindRepository.GetActualTradeRemind(cancellationToken));
         }
 
+        [ServicePassword]
+        [HttpDelete("byuser/actual/{remindId}")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        public async Task<ActionResult<List<TradeRemind>>> DelActualRemind([FromRoute, Required] int remindId, CancellationToken cancellationToken)
+        {
+            await _tradeRemindRepository.ExecuteDeleteAsync(r => r.Id == remindId, cancellationToken);
+            return NoContent();
+        }
+
         [Authorize]
         [HttpGet("byuser")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -54,7 +63,6 @@ namespace ViaTradeBackend.Controllers
             var userId = _jwtHelper.GetUserIdFromClaims(User);
             await _userService.EnsureUserAsync(userId, cancellationToken);
 
-            // Validate TradeCode exists
             var tradeCode = await _tradeCodeRepository.GetByIdAsync(idInstrument, cancellationToken);
             if (tradeCode == null) return NotFound();
 
