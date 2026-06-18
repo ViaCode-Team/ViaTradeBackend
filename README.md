@@ -24,7 +24,7 @@
 ## Архитектура решения
 
 Проект состоит из нескольких независимых компонентов.
-- Web ASP.Net (этот репозиторий)
+- ViaTradeBackend (этот репозиторий)
 - PythonAnalyzer (https://github.com/mrRiten/ViaTradeAnalyzer)
 - PythonTgBot (https://github.com/mrRiten/ViaTradeTgBot)
 
@@ -107,30 +107,28 @@ src
 
 ```bash
 git clone https://github.com/ViaCode-Team/ViaTradeBackend.git
-
 dotnet restore
-
 dotnet ef database update
-
 dotnet run
 ```
 
 ### Analyzer
 
 ```bash
+git clone https://github.com/mrRiten/ViaTradeAnalyzer
 uv sync
-
 python main.py
 ```
+*Анализатор автоматичеки создаст нужные файлы и дериктории для хранения данных парсинга и анализа*
 
 ### Telegram Bot
 
 ```bash
+git clone https://github.com/mrRiten/ViaTradeTgBot
 uv sync
-
 python main.py
 ```
-
+*В конфигурации бота необходимо прописать токен авторизации сервиса, совпадающий с токеном оснвного бэкенда*
 
 ## Результат проекта
 
