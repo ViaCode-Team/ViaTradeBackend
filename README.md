@@ -106,7 +106,7 @@ src
 ### Backend
 
 ```bash
-git clone <repository>
+git clone https://github.com/ViaCode-Team/ViaTradeBackend.git
 
 dotnet restore
 
