@@ -6,8 +6,6 @@ using Application.Interfaces.Redis;
 using Domain.Models.ConfigOptions;
 using Infrastructure.Repositories.DataBase;
 using Infrastructure.Repositories.Redis;
-using Infrastructure.Repositoryes.DataBase;
-using Infrastructure.Repositoryes.Redis;
 using Infrastructure.Services;
 using Infrastructure.Utils;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -95,6 +93,9 @@ builder.Services.AddScoped<TradeStrategyRepository>();
 builder.Services.AddScoped<TradeCodeRepository>();
 builder.Services.AddScoped<NoteRepository>();
 // Application services
+builder.Services.AddScoped<ITradeRemindService, TradeRemindService>();
+builder.Services.AddScoped<IStrategyService, StrategyService>();
+builder.Services.AddScoped<IStatisticService, StatisticService>();
 builder.Services.AddScoped<ITradeCodeService, TradeCodeService>();
 builder.Services.AddScoped<ITradeResultsService, TradeResultsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();

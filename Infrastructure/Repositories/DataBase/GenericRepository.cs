@@ -3,7 +3,7 @@ using Application.Interfaces.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
-namespace Infrastructure.Repositoryes.DataBase
+namespace Infrastructure.Repositories.DataBase
 {
     public class GenericRepository<TEntity, TDto> : IRepository<TEntity, TDto>
         where TEntity : class

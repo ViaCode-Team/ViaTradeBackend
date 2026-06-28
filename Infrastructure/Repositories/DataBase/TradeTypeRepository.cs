@@ -1,6 +1,6 @@
 ﻿using Domain.Entities.DataBase;
 using Domain.Models.Dto.Trade;
-using Infrastructure.Repositoryes.DataBase;
+using Infrastructure.Repositories.DataBase;
 
 namespace Infrastructure.Repositories.DataBase
 {

@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Application.Interfaces;
 using Application.Interfaces.Auth;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.Strategy;
-using Infrastructure.Repositories.DataBase;
-using Infrastructure.Repositoryes.DataBase;
-using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Models.Trade;
@@ -14,23 +12,18 @@ namespace ViaTradeBackend.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class StrategyController(UserTradeStrategyRepository userTradeStrategyRepository, TradeStrategyRepository tradeStrategyRepository,
-        IJwtHelper jwtHelper, UserService userService, UserStrategyTradeCodeRepository userStrategyTradeCodeRepository) : ControllerBase
+    public class StrategyController(
+        IStrategyService strategyService,
+        IJwtHelper jwtHelper) : ControllerBase
     {
-        private readonly TradeStrategyRepository _tradeStrategyRepository = tradeStrategyRepository;
-        private readonly UserTradeStrategyRepository _userTradeStrategyRepository = userTradeStrategyRepository;
-        private readonly UserStrategyTradeCodeRepository _userStrategyTradeCodeRepository = userStrategyTradeCodeRepository;
-        private readonly UserService _userService = userService;
+        private readonly IStrategyService _strategyService = strategyService;
         private readonly IJwtHelper _jwtHelper = jwtHelper;
-
-        // ToDo: Create StrategyService
 
         [HttpGet("")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<TradeStrategy>>> GetAll(CancellationToken cancellationToken)
         {
-            var response = await _tradeStrategyRepository.GetAllAsync(cancellationToken);
-
+            var response = await _strategyService.GetAllStrategiesAsync(cancellationToken);
             return Ok(response);
         }
 
@@ -38,9 +31,7 @@ namespace ViaTradeBackend.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<TradeStrategy>> GetById([Required] int strategyId, CancellationToken cancellationToken)
         {
-            var response = await _tradeStrategyRepository.GetByIdAsync(strategyId, cancellationToken)
-                ?? throw new KeyNotFoundException();
-
+            var response = await _strategyService.GetStrategyByIdAsync(strategyId, cancellationToken);
             return Ok(response);
         }
 
@@ -49,10 +40,7 @@ namespace ViaTradeBackend.Controllers
         public async Task<ActionResult<IEnumerable<UserStrategyTradeCodeDto>>> GetAllInstrumentsLink(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var user = await _userService.EnsureUserAsync(userId, cancellationToken);
-
-            var response = await _userStrategyTradeCodeRepository.GetAllAsync(user.Id, cancellationToken);
-
+            var response = await _strategyService.GetUserStrategyCodesAsync(userId, cancellationToken);
             return Ok(response);
         }
 
@@ -63,18 +51,7 @@ namespace ViaTradeBackend.Controllers
             CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var user = await _userService.EnsureUserAsync(userId, cancellationToken);
-
-            var newUserStrategyCode = new UserStrategyTradeCode
-            {
-                StrategyId = userStrategyTradeCodeRequest.StrategyId,
-                TradeCodeId = userStrategyTradeCodeRequest.TradeCodeId,
-                UserId = user.Id
-            };
-
-            await _userStrategyTradeCodeRepository.AddAsync(newUserStrategyCode, cancellationToken);
-            await _userStrategyTradeCodeRepository.SaveChangesAsync(cancellationToken);
-
+            await _strategyService.CreateUserStrategyCodeAsync(userStrategyTradeCodeRequest, userId, cancellationToken);
             return Created();
         }
 
@@ -86,18 +63,7 @@ namespace ViaTradeBackend.Controllers
             CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-
-            var affectedRows = await _userStrategyTradeCodeRepository.ExecuteDeleteAsync(
-                e => e.UserId == userId &&
-                     e.StrategyId == strategyId &&
-                     e.TradeCodeId == tradeCodeId,
-                cancellationToken);
-
-            if (affectedRows == 0)
-            {
-                return NotFound();
-            }
-
+            await _strategyService.DeleteUserStrategyCodeAsync(strategyId, tradeCodeId, userId, cancellationToken);
             return NoContent();
         }
 
@@ -106,10 +72,7 @@ namespace ViaTradeBackend.Controllers
         public async Task<ActionResult<IEnumerable<UserTradeStrategyDto>>> GetUsersStrategy(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var user = await _userService.EnsureUserAsync(userId, cancellationToken);
-
-            var response = await _userTradeStrategyRepository.GetByUser(user.Id, cancellationToken);
-
+            var response = await _strategyService.GetUserStrategiesAsync(userId, cancellationToken);
             return Ok(response);
         }
 
@@ -118,17 +81,7 @@ namespace ViaTradeBackend.Controllers
         public async Task<ActionResult> CreateUsersStrategy([FromBody, Required] CreateUserStrategyRequest userStrategyRequest, CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var user = await _userService.EnsureUserAsync(userId, cancellationToken);
-
-            var strategyLink = new UserTradeStrategy
-            {
-                TradeStrategyId = userStrategyRequest.StrategyId,
-                UserId = user.Id
-            };
-
-            await _userTradeStrategyRepository.AddAsync(strategyLink, cancellationToken);
-            await _userTradeStrategyRepository.SaveChangesAsync(cancellationToken);
-
+            await _strategyService.CreateUserStrategyAsync(userStrategyRequest, userId, cancellationToken);
             return Created();
         }
 
@@ -137,16 +90,7 @@ namespace ViaTradeBackend.Controllers
         public async Task<ActionResult> DeleteUsersStrategy([FromQuery, Required] int strategyId, CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-
-            var affectedRows = await _userTradeStrategyRepository.ExecuteDeleteAsync(
-                e => e.UserId == userId && e.TradeStrategyId == strategyId,
-                cancellationToken);
-
-            if (affectedRows == 0)
-            {
-                return NotFound();
-            }
-
+            await _strategyService.DeleteUserStrategyAsync(strategyId, userId, cancellationToken);
             return NoContent();
         }
     }

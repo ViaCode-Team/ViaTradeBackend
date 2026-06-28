@@ -2,7 +2,7 @@
 using Domain.Entities.CSV;
 using Domain.Models.TradeLogic;
 using Infrastructure.Repositories.DataBase;
-using Infrastructure.Repositoryes.DataBase;
+using Infrastructure.Repositories.DataBase;
 
 namespace Infrastructure.Services
 {

@@ -46,6 +46,7 @@ namespace ViaTradeBackend.Controllers
             await _userService.EnsureUserAsync(userId, cancellationToken);
 
             var note = await _noteRepository.GetUserNoteByProp(idInstrument, userId, NoteType.TradeCodeNote, cancellationToken);
+
             return Ok(note);
         }
 

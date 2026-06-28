@@ -1,7 +1,7 @@
 ﻿using Domain.Entities.DataBase;
 using Domain.Models.Dto.NoteRemind;
 using Infrastructure.Repositories.DataBase;
-using Infrastructure.Repositoryes.DataBase;
+using Infrastructure.Repositories.DataBase;
 
 namespace Infrastructure.Services
 {
