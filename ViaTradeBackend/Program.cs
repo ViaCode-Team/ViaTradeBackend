@@ -1,5 +1,4 @@
-﻿using System.Text.Json.Serialization;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Application.Interfaces.Auth;
 using Application.Interfaces.Database;
 using Application.Interfaces.Redis;
@@ -13,6 +12,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
+using System.Text.Json.Serialization;
 using ViaTradeBackend.BackgroundServices;
 using ViaTradeBackend.Handler;
 using ViaTradeBackend.Middleware;
@@ -68,7 +68,7 @@ builder.Services.AddOptions<AnalyzerDataOption>()
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
 {
     var configuration = ConfigurationOptions.Parse(
-        builder.Configuration.GetConnectionString("RedisLocalDevRiten")
+        builder.Configuration.GetConnectionString("Redis")
         ?? throw new NullReferenceException("Redis connection string is missing"));
 
     return ConnectionMultiplexer.Connect(configuration);
@@ -106,7 +106,7 @@ builder.Services.AddScoped<IFileReader, TradeFileReader>();
 //builder.Services.AddScoped<CsvHelper>();
 builder.Services.AddScoped<ITradeDataBuilder, TradeDataBuilder>();
 // DATABASE SETUP (MySQL)
-var connectionString = builder.Configuration.GetConnectionString("MySqlLocalDevRiten")
+var connectionString = builder.Configuration.GetConnectionString("MySql")
     ?? throw new NullReferenceException("MySQL connection string is missing");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
