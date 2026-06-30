@@ -1,21 +1,27 @@
 ﻿using Application.Interfaces;
 using Application.Interfaces.Database;
 using Domain.Entities.DataBase;
+using Domain.Models.Dto;
 using Infrastructure.Repositories.DataBase;
 using ViaTradeBackend.Models.Trade;
 
 namespace Infrastructure.Services
 {
     public class StatisticService(
-    ITradeRepository tradeRepository,
-    TradeCodeRepository tradeCodeRepository,
-    TradeTypeRepository tradeTypeRepository,
-    UserService userService) : IStatisticService
+        ITradeRepository tradeRepository,
+        TradeCodeRepository tradeCodeRepository,
+        TradeTypeRepository tradeTypeRepository,
+        UserService userService) : IStatisticService
     {
         private readonly ITradeRepository _tradeRepository = tradeRepository;
         private readonly TradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
         private readonly TradeTypeRepository _tradeTypeRepository = tradeTypeRepository;
         private readonly UserService _userService = userService;
+
+        public async Task<GlobalStatistic> GetGlobalStatisticAsync(int userId, CancellationToken cancellationToken)
+        {
+            return await _tradeRepository.GetGlobalStatisticAsync(userId, cancellationToken);
+        }
 
         public async Task<IEnumerable<Trade>> GetByUserAsync(int userId, DateTime? startDate, DateTime? endDate,
             TradeSignal? tradeSignal, CancellationToken cancellationToken)

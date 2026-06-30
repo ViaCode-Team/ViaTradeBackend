@@ -18,6 +18,15 @@ namespace ViaTradeBackend.Controllers
         private readonly IStatisticService _statisticService = statisticService;
         private readonly IJwtHelper _jwtHelper = jwtHelper;
 
+        [HttpGet("global/byuser")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<Trade>>> GetGlobalByUser(CancellationToken cancellationToken)
+        {
+            var userId = _jwtHelper.GetUserIdFromClaims(User);
+            var trades = await _statisticService.GetGlobalStatisticAsync(userId, cancellationToken);
+            return Ok(trades);
+        }
+
         [HttpGet("byuser")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<Trade>>> GetByUser(CancellationToken cancellationToken,
