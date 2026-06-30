@@ -1,9 +1,8 @@
 ﻿using Application.Interfaces.Auth;
-using Application.Interfaces.Database;
 using Application.Interfaces.Redis;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.User;
-using Infrastructure.Repositoryes.DataBase;
+using Infrastructure.Repositories.DataBase;
 
 namespace Infrastructure.Services
 {

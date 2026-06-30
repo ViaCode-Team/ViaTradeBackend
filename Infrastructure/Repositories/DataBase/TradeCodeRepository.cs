@@ -3,7 +3,7 @@ using Domain.Entities.DataBase;
 using Domain.Models.Dto.Trade;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Repositoryes.DataBase
+namespace Infrastructure.Repositories.DataBase
 {
     public class TradeCodeRepository(AppDbContext context) : GenericRepository<TradeCode, TradeCodeDto>(context), ITradeCodeRepository
     {

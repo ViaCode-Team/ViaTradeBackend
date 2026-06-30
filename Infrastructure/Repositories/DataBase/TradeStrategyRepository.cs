@@ -3,7 +3,7 @@ using Domain.Entities.DataBase;
 using Domain.Models.Dto.Strategy;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Repositoryes.DataBase
+namespace Infrastructure.Repositories.DataBase
 {
     public class TradeStrategyRepository(AppDbContext context) : GenericRepository<TradeStrategy, TradeStrategyDto>(context),
         ITradeStrategyRepository

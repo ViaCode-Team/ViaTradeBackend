@@ -3,7 +3,7 @@ using Application.Interfaces.Redis;
 using Domain.Models.Dto.User;
 using StackExchange.Redis;
 
-namespace Infrastructure.Repositoryes.Redis
+namespace Infrastructure.Repositories.Redis
 {
     public class SessionRepository(
         IConnectionMultiplexer redis) : ISessionRepository

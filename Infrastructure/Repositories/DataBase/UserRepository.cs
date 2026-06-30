@@ -3,7 +3,7 @@ using Domain.Entities.DataBase;
 using Domain.Models.Dto.User;
 using Microsoft.EntityFrameworkCore;
 
-namespace Infrastructure.Repositoryes.DataBase
+namespace Infrastructure.Repositories.DataBase
 {
     public class UserRepository(AppDbContext context) : GenericRepository<User, UserDto>(context), IUserRepository
     {

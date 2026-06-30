@@ -3,7 +3,7 @@ using Application.Interfaces.Redis;
 using Domain.Entities.Redis;
 using StackExchange.Redis;
 
-namespace Infrastructure.Repositoryes.Redis
+namespace Infrastructure.Repositories.Redis
 {
     public class RedisRepository<T>(IConnectionMultiplexer redis, string prefix) : IRedisRepository<T> where T : RedisEntity
     {
