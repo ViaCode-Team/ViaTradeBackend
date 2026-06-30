@@ -1,7 +1,9 @@
 ﻿using Application.Interfaces.Database;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto;
+using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Trade;
+using Domain.Services;
 using Infrastructure.Repositories.DataBase;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,34 +23,30 @@ namespace Infrastructure.Repositories.DataBase
                 LoseTrades = await tradeStatistic.CountAsync(t => t.NetIncome < 0, cancellationToken),
             };
 
-            // Calculate absolute income using math formula based on TradeSignal enum values (BUY=1, SELL=-1)
-            // Formula: (Close - Open) * Count * SignalDirection
-            var totalAbsoluteIncome = await tradeStatistic.SumAsync(
-                t => ((t.TradeClose ?? 0) - t.TradeOpen) * t.Count * (int)t.TradeSignal,
-                cancellationToken);
+            var totalAbsoluteIncome = await tradeStatistic
+                .Select(TradeStatisticsCalcService.AbsoluteIncomeExpression)
+                .SumAsync(cancellationToken);
 
             var incomeStatistic = new IncomeTradeStatistic
             {
                 TotalIncome = Math.Round((decimal)totalAbsoluteIncome, 2),
-                AverageIncome = resultTrade.TotalTrades > 0
-                    ? Math.Round((decimal)totalAbsoluteIncome / resultTrade.TotalTrades, 2)
-                    : 0m,
+                AverageIncome = TradeStatisticsCalcService.CalculateAverageIncome((decimal)totalAbsoluteIncome, resultTrade.TotalTrades),
             };
 
             var totalProfit = await tradeStatistic
                 .Where(t => t.NetIncome > 0)
-                .SumAsync(t => Math.Abs(((t.TradeClose ?? 0) - t.TradeOpen) * t.Count * (int)t.TradeSignal), cancellationToken);
+                .Select(TradeStatisticsCalcService.AbsoluteIncomeAbsExpression)
+                .SumAsync(cancellationToken);
 
             var totalLoss = await tradeStatistic
                 .Where(t => t.NetIncome < 0)
-                .SumAsync(t => Math.Abs(((t.TradeClose ?? 0) - t.TradeOpen) * t.Count * (int)t.TradeSignal), cancellationToken);
+                .Select(TradeStatisticsCalcService.AbsoluteIncomeAbsExpression)
+                .SumAsync(cancellationToken);
 
             var winrateStatistic = new WinrateTradeStatistic
             {
-                TotalWinrate = resultTrade.TotalTrades > 0
-                    ? (float)Math.Round((double)resultTrade.WinTrades / resultTrade.TotalTrades * 100, 2)
-                    : 0f,
-                ProfitFactor = CalculateProfitFactor(totalProfit, totalLoss)
+                TotalWinrate = TradeStatisticsCalcService.CalculateWinrate(resultTrade.WinTrades, resultTrade.TotalTrades),
+                ProfitFactor = TradeStatisticsCalcService.CalculateProfitFactor(totalProfit, totalLoss)
             };
 
             return new GlobalStatistic
@@ -57,17 +55,6 @@ namespace Infrastructure.Repositories.DataBase
                 IncomeStatistic = incomeStatistic,
                 WinrateStatistic = winrateStatistic
             };
-        }
-
-        private static float CalculateProfitFactor(double totalProfit, double totalLoss)
-        {
-            if (totalLoss > 0)
-                return (float)Math.Round(totalProfit / totalLoss, 3);
-
-            if (totalProfit > 0)
-                return float.PositiveInfinity;
-
-            return 0f;
         }
 
         public async Task<IEnumerable<Trade>> GetByUserAsync(int userId, CancellationToken cancellationToken)

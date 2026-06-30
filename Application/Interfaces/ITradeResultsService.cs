@@ -1,9 +1,14 @@
-﻿using Domain.Models.TradeLogic;
+﻿using Domain.Models.Dto.Statistic;
+using Domain.Models.TradeLogic;
 
 namespace Application.Interfaces
 {
     public interface ITradeResultsService
     {
+        Task<SignalStatistic> GetSignalStatisticAsync(
+            int userId, 
+            CancellationToken cancellationToken);
+
         Task<StrategyResultResponse> GetStrategyResultAsync(
             int userId,
             DateTime? startDate,

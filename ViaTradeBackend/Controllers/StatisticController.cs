@@ -2,6 +2,7 @@
 using Application.Interfaces;
 using Application.Interfaces.Auth;
 using Domain.Entities.DataBase;
+using Domain.Models.Dto.Statistic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Models.Trade;
@@ -20,11 +21,11 @@ namespace ViaTradeBackend.Controllers
 
         [HttpGet("global/byuser")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Trade>>> GetGlobalByUser(CancellationToken cancellationToken)
+        public async Task<ActionResult<GlobalStatistic>> GetGlobalByUser(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var trades = await _statisticService.GetGlobalStatisticAsync(userId, cancellationToken);
-            return Ok(trades);
+            var tradeStatistics = await _statisticService.GetGlobalStatisticAsync(userId, cancellationToken);
+            return Ok(tradeStatistics);
         }
 
         [HttpGet("byuser")]

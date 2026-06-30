@@ -45,7 +45,7 @@ namespace Infrastructure.Services
                      e.TradeCodeId == request.TradeCodeId,
                 cancellationToken);
 
-            if (existing != null)
+            if (existing.Any())
                 throw new InvalidOperationException("User strategy code already exists");
 
             var newUserStrategyCode = new UserStrategyTradeCode
@@ -87,7 +87,7 @@ namespace Infrastructure.Services
                 e => e.UserId == userId && e.TradeStrategyId == request.StrategyId,
                 cancellationToken);
 
-            if (existing != null)
+            if (existing.Any())
                 throw new InvalidOperationException("User strategy already exists");
 
             var strategyLink = new UserTradeStrategy

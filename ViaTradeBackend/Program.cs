@@ -103,7 +103,6 @@ builder.Services.AddScoped<UserService>();
 builder.Services.AddScoped<NoteService>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 builder.Services.AddScoped<IFileReader, TradeFileReader>();
-//builder.Services.AddScoped<CsvHelper>();
 builder.Services.AddScoped<ITradeDataBuilder, TradeDataBuilder>();
 // DATABASE SETUP (MySQL)
 var connectionString = builder.Configuration.GetConnectionString("MySql")

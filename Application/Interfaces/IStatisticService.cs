@@ -1,5 +1,5 @@
 ﻿using Domain.Entities.DataBase;
-using Domain.Models.Dto;
+using Domain.Models.Dto.Statistic;
 using ViaTradeBackend.Models.Trade;
 
 namespace Application.Interfaces

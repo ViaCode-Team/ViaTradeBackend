@@ -1,6 +1,4 @@
-﻿using Domain.Entities.CSV;
-
-namespace Domain.Models.TradeLogic
+﻿namespace Domain.Models.TradeLogic
 {
     public class StrategyResultResponse
     {

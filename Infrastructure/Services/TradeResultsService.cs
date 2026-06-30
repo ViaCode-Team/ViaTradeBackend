@@ -1,17 +1,35 @@
 ﻿using Application.Interfaces;
 using Domain.Entities.CSV;
+using Domain.Models.Dto.Statistic;
 using Domain.Models.TradeLogic;
-using Infrastructure.Repositories.DataBase;
+using Domain.Services;
 using Infrastructure.Repositories.DataBase;
 
 namespace Infrastructure.Services
 {
-    public class TradeResultsService(IFileReader tradefileReader, TradeStrategyRepository tradeStrategyRepository,
+    public class TradeResultsService(IFileReader tradefileReader, UserService userService, TradeStrategyRepository tradeStrategyRepository,
         UserTradeStrategyRepository userTradeStrategyRepository) : ITradeResultsService
     {
         private readonly IFileReader _tradefileReader = tradefileReader;
         private readonly UserTradeStrategyRepository _userTradeStrategyRepository = userTradeStrategyRepository;
         private readonly TradeStrategyRepository _tradeStrategyRepository = tradeStrategyRepository;
+        private readonly UserService _userService = userService;
+        public async Task<SignalStatistic> GetSignalStatisticAsync(int userId, CancellationToken cancellationToken)
+        {
+            await _userService.EnsureUserAsync(userId, cancellationToken);
+            var signals = await GetStrategyResultAsync(userId, DateTime.Now, null, cancellationToken);
+
+            var allResults = signals.Strategies
+                .SelectMany(s => s.Tickers)
+                .SelectMany(t => t.Results);
+
+            return new SignalStatistic
+            {
+                TotalSignals = SignalStatisticsCalcService.CountTotalSignals(allResults),
+                BuySignals = SignalStatisticsCalcService.CountBuySignals(allResults),
+                SellSignals = SignalStatisticsCalcService.CountSellSignals(allResults)
+            };
+        }
 
         public async Task<StrategyResultResponse> GetStrategyResultAsync(
             int userId,
@@ -19,10 +37,16 @@ namespace Infrastructure.Services
             DateTime? endDate,
             CancellationToken cancellationToken)
         {
+            // startDate work only with out time or with T00:00:00 time
+            if (startDate != null)
+            {
+                startDate = startDate.Value.Date;
+            }
+
             var strategys = await _tradeStrategyRepository.GetAllAsync();
-            
+
             var userPreferences = await _userTradeStrategyRepository.GetUserPreferencesAsync(userId, cancellationToken);
-            
+
             if (!userPreferences.Any())
                 return new StrategyResultResponse { Strategies = new List<StrategyData>() };
 
