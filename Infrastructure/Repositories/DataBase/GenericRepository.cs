@@ -1,5 +1,5 @@
 ﻿using System.Linq.Expressions;
-using Application.Interfaces.Database;
+using Application.Interfaces.Repositories.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 

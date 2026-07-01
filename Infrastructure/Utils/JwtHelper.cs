@@ -2,7 +2,7 @@
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
-using Application.Interfaces.Auth;
+using Application.Interfaces.Utils;
 using Domain.Entities.DataBase;
 using Domain.Models.ConfigOptions;
 using Microsoft.Extensions.Options;

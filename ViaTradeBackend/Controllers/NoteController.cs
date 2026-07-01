@@ -1,12 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using Application.Interfaces;
-using Application.Interfaces.Auth;
+using Application.Interfaces.Utils;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto;
 using Domain.Models.Dto.NoteRemind;
 using Domain.Models.Dto.Statistic;
-using Infrastructure.Repositories.DataBase;
-using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Models.Note;
@@ -17,19 +14,15 @@ namespace ViaTradeBackend.Controllers
     [ApiController]
     [Authorize]
     public class NoteController(
-        NoteRepository noteRepository,
-        NoteService noteService,
-        IJwtHelper jwtHelper,
-        UserService userService) : ControllerBase
+        INoteService noteService,
+        IJwtHelper jwtHelper) : ControllerBase
     {
-        private readonly NoteRepository _noteRepository = noteRepository;
-        private readonly NoteService _noteService = noteService;
+        private readonly INoteService _noteService = noteService;
         private readonly IJwtHelper _jwtHelper = jwtHelper;
-        private readonly UserService _userService = userService;
 
         [HttpGet("statistics")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<NoteStatistic>> GetStatistics(CancellationToken cancellationToken)
+        public async Task<ActionResult<NoteStatistic>> GetNoteStatistics(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
             var statistics = await _noteService.GetNoteStatisticAsync(userId, cancellationToken);
@@ -41,9 +34,7 @@ namespace ViaTradeBackend.Controllers
         public async Task<ActionResult<IEnumerable<Note>>> GetByUserInstrumentAll(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            await _userService.EnsureUserAsync(userId, cancellationToken);
-
-            var notes = await _noteRepository.GetUserNoteByPropAll(userId, NoteType.TradeCodeNote, cancellationToken);
+            var notes = await _noteService.GetUserNoteByPropAllAsync(userId, NoteType.TradeCodeNote, cancellationToken);
             return Ok(notes);
         }
 
@@ -54,9 +45,7 @@ namespace ViaTradeBackend.Controllers
             CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            await _userService.EnsureUserAsync(userId, cancellationToken);
-
-            var note = await _noteRepository.GetUserNoteByProp(idInstrument, userId, NoteType.TradeCodeNote, cancellationToken);
+            var note = await _noteService.GetUserNoteByPropAsync(idInstrument, userId, NoteType.TradeCodeNote, cancellationToken);
 
             return Ok(note);
         }
@@ -66,9 +55,7 @@ namespace ViaTradeBackend.Controllers
         public async Task<ActionResult<IEnumerable<Note>>> GetByUserStrategyAll(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            await _userService.EnsureUserAsync(userId, cancellationToken);
-
-            var notes = await _noteRepository.GetUserNoteByPropAll(userId, NoteType.TradeStrategyNote, cancellationToken);
+            var notes = await _noteService.GetUserNoteByPropAllAsync(userId, NoteType.TradeStrategyNote, cancellationToken);
             return Ok(notes);
         }
 
@@ -79,9 +66,7 @@ namespace ViaTradeBackend.Controllers
             CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            await _userService.EnsureUserAsync(userId, cancellationToken);
-
-            var note = await _noteRepository.GetUserNoteByProp(idStrategy, userId, NoteType.TradeStrategyNote, cancellationToken);
+            var note = await _noteService.GetUserNoteByPropAsync(idStrategy, userId, NoteType.TradeStrategyNote, cancellationToken);
             return Ok(note);
         }
 
@@ -93,8 +78,6 @@ namespace ViaTradeBackend.Controllers
             CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            await _userService.EnsureUserAsync(userId, cancellationToken);
-
             var dto = new NoteDto { UserId = userId, NoteText = request.NoteText };
             await _noteService.AddUserNoteWithValidationAsync(idInstrument, NoteType.TradeCodeNote, dto, cancellationToken);
             return Created();
@@ -108,8 +91,6 @@ namespace ViaTradeBackend.Controllers
             CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            await _userService.EnsureUserAsync(userId, cancellationToken);
-
             var dto = new NoteDto { UserId = userId, NoteText = request.NoteText };
             await _noteService.AddUserNoteWithValidationAsync(idStrategy, NoteType.TradeStrategyNote, dto, cancellationToken);
             return Created();
@@ -123,8 +104,6 @@ namespace ViaTradeBackend.Controllers
             CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            await _userService.EnsureUserAsync(userId, cancellationToken);
-
             var dto = new NoteDto { UserId = userId, NoteText = request.NoteText };
             await _noteService.UpdateUserNoteWithValidationAsync(idInstrument, NoteType.TradeCodeNote, dto, cancellationToken);
             return NoContent();
@@ -138,8 +117,6 @@ namespace ViaTradeBackend.Controllers
             CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            await _userService.EnsureUserAsync(userId, cancellationToken);
-
             var dto = new NoteDto { UserId = userId, NoteText = request.NoteText };
             await _noteService.UpdateUserNoteWithValidationAsync(idStrategy, NoteType.TradeStrategyNote, dto, cancellationToken);
             return NoContent();
@@ -152,9 +129,7 @@ namespace ViaTradeBackend.Controllers
             CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            await _userService.EnsureUserAsync(userId, cancellationToken);
-
-            await _noteRepository.DeleteUserNoteAsync(idInstrument, userId, NoteType.TradeCodeNote, cancellationToken);
+            await _noteService.DeleteUserNoteAsync(idInstrument, userId, NoteType.TradeCodeNote, cancellationToken);
             return NoContent();
         }
 
@@ -165,9 +140,7 @@ namespace ViaTradeBackend.Controllers
             CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            await _userService.EnsureUserAsync(userId, cancellationToken);
-
-            await _noteRepository.DeleteUserNoteAsync(idStrategy, userId, NoteType.TradeStrategyNote, cancellationToken);
+            await _noteService.DeleteUserNoteAsync(idStrategy, userId, NoteType.TradeStrategyNote, cancellationToken);
             return NoContent();
         }
     }

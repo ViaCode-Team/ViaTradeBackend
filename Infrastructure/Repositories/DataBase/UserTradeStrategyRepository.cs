@@ -1,4 +1,4 @@
-﻿using Application.Interfaces.Database;
+﻿using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.Strategy;
 using Infrastructure.Repositories.DataBase;

@@ -1,5 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
-using Application.Interfaces.Redis;
+using Application.Interfaces.Repositories.Redis;
 using Microsoft.AspNetCore.Authorization;
 
 namespace ViaTradeBackend.Handler

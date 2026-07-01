@@ -1,10 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Application.Interfaces.Auth;
+using System.ComponentModel.DataAnnotations;
+using Application.Interfaces;
+using Application.Interfaces.Utils;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.User;
 using Domain.Models.Request.Auth;
-using Infrastructure.Repositories.DataBase;
-using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Attribute;
@@ -14,14 +13,12 @@ namespace ViaTradeBackend.Controllers
     [Route("api/[controller]")]
     [ApiController]
     public class UserController(
-        UserRepository userRepository,
         IJwtHelper jwtHelper,
-        UserService userService,
+        IUserService userService,
         ILogger<UserController> logger) : ControllerBase
     {
-        private readonly UserRepository _userRepository = userRepository;
         private readonly IJwtHelper _jwtHelper = jwtHelper;
-        private readonly UserService _userService = userService;
+        private readonly IUserService _userService = userService;
         private readonly ILogger<UserController> _logger = logger;
 
         [Authorize]
@@ -68,17 +65,9 @@ namespace ViaTradeBackend.Controllers
             CancellationToken cancellationToken)
         {
             _logger.LogInformation("Processing Telegram token for user");
-            var userId = await _userService.GetUserId(tgTokenRequest.TgToken)
-                ?? throw new NullReferenceException(nameof(tgTokenRequest.TgToken));
+            await _userService.LinkTelegramAsync(tgTokenRequest.TgToken, tgTokenRequest.TgId, cancellationToken);
 
-            var user = await _userRepository.GetByIdAsync(userId, cancellationToken)
-                ?? throw new NullReferenceException(nameof(tgTokenRequest.TgToken)); ;
-
-            user.TgId = tgTokenRequest.TgId;
-            _userRepository.Update(user);
-            await _userRepository.SaveChangesAsync();
-
-            _logger.LogInformation("Telegram token processed successfully for user: {UserId}", userId);
+            _logger.LogInformation("Telegram token processed successfully");
             return Accepted();
         }
 
@@ -88,7 +77,7 @@ namespace ViaTradeBackend.Controllers
         public async Task<ActionResult<List<User>>> GetUser(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Getting all users with Telegram links");
-            return Ok(await _userRepository.GetAllWithTgLikn(cancellationToken));
+            return Ok(await _userService.GetAllWithTgLinkAsync(cancellationToken));
         }
     }
 }

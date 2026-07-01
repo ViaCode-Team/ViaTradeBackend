@@ -1,6 +1,6 @@
 ﻿using System.Globalization;
 using System.Text.RegularExpressions;
-using Application.Interfaces;
+using Application.Interfaces.Utils;
 using Domain.Models.TradeLogic;
 
 namespace Infrastructure.Utils

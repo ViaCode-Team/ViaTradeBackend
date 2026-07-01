@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces;
-using Application.Interfaces.Auth;
+using Application.Interfaces.Utils;
 using Domain.Entities.CSV;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.Statistic;

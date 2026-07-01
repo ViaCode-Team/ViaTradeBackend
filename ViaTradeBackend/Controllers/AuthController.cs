@@ -1,4 +1,5 @@
-﻿using Application.Interfaces.Auth;
+﻿using Application.Interfaces.Services;
+using Application.Interfaces.Utils;
 using Domain.Models;
 using Domain.Models.ConfigOptions;
 using Domain.Models.Dto.User;

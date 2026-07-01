@@ -1,7 +1,11 @@
-﻿using Application.Interfaces;
-using Application.Interfaces.Auth;
-using Application.Interfaces.Database;
-using Application.Interfaces.Redis;
+using System.Text.Json.Serialization;
+using Application.Interfaces;
+using Application.Interfaces.Repositories.Database;
+using Application.Interfaces.Repositories.Redis;
+using Application.Interfaces.Services;
+using Application.Interfaces.Utils;
+using Application.Services;
+using Domain.Entities.Redis;
 using Domain.Models.ConfigOptions;
 using Infrastructure.Repositories.DataBase;
 using Infrastructure.Repositories.Redis;
@@ -12,7 +16,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
-using System.Text.Json.Serialization;
 using ViaTradeBackend.BackgroundServices;
 using ViaTradeBackend.Handler;
 using ViaTradeBackend.Middleware;
@@ -52,7 +55,7 @@ builder.Services.Configure<AnalyzerDataOption>(
 
 // REDIS SETUP
 // Register Redis connection as singleton (shared across the app)
-builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
 {
     var configuration = ConfigurationOptions.Parse(
         builder.Configuration.GetConnectionString("Redis")
@@ -67,18 +70,19 @@ builder.Services.AddHostedService<SessionCleanupService>();
 // SERVICES REGISTRATION
 // Repositories
 builder.Services.AddScoped<UserRedisRepository>();
-builder.Services.AddScoped<TgTokenRepository>();
+builder.Services.AddScoped<IRedisRepository<TgTokenEntity>, TgTokenRepository>();
 builder.Services.AddScoped<ISessionRepository, SessionRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
 builder.Services.AddScoped<ITradeRepository, TradeRepository>();
-builder.Services.AddScoped<TradeTypeRepository>();
-builder.Services.AddScoped<TradeRemindRepository>();
-builder.Services.AddScoped<UserRepository>();
-builder.Services.AddScoped<UserTradeStrategyRepository>();
-builder.Services.AddScoped<UserStrategyTradeCodeRepository>();
-builder.Services.AddScoped<TradeStrategyRepository>();
-builder.Services.AddScoped<TradeCodeRepository>();
-builder.Services.AddScoped<NoteRepository>();
+builder.Services.AddScoped<ITradeTypeRepository, TradeTypeRepository>();
+builder.Services.AddScoped<ITradeRemindRepository, TradeRemindRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserTradeStrategyRepository, UserTradeStrategyRepository>();
+builder.Services.AddScoped<IUserStrategyTradeCodeRepository, UserStrategyTradeCodeRepository>();
+builder.Services.AddScoped<ITradeStrategyRepository, TradeStrategyRepository>();
+builder.Services.AddScoped<ITradeCodeRepository, TradeCodeRepository>();
+builder.Services.AddScoped<INoteRepository, NoteRepository>();
+
 // Application services
 builder.Services.AddScoped<ITradeRemindService, TradeRemindService>();
 builder.Services.AddScoped<IStrategyService, StrategyService>();
@@ -86,12 +90,13 @@ builder.Services.AddScoped<ITradeService, TradeService>();
 builder.Services.AddScoped<ITradeCodeService, TradeCodeService>();
 builder.Services.AddScoped<ITradeResultsService, TradeResultsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<INoteService, NoteService>();
-builder.Services.AddScoped<NoteService>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
+builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddScoped<IFileReader, TradeFileReader>();
 builder.Services.AddScoped<ITradeDataBuilder, TradeDataBuilder>();
+
 // DATABASE SETUP (MySQL)
 var connectionString = builder.Configuration.GetConnectionString("MySql")
     ?? throw new NullReferenceException("MySQL connection string is missing");

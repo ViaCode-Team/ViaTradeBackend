@@ -1,5 +1,5 @@
 ﻿using Application.Interfaces;
-using Application.Interfaces.Auth;
+using Application.Interfaces.Utils;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.TradeLogic;
 using Microsoft.AspNetCore.Authorization;
@@ -20,10 +20,10 @@ namespace ViaTradeBackend.Controllers
 
         [HttpGet("statistics")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<SignalStatistic>> GetSignalByUser(CancellationToken cancellationToken)
+        public async Task<ActionResult<SignalStatistic>> GetResultStatistics(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var signalStatistics = await _tradeResultsService.GetSignalStatisticAsync(userId, cancellationToken);
+            var signalStatistics = await _tradeResultsService.GetStrategyResultStatisticAsync(userId, cancellationToken);
             return Ok(signalStatistics);
         }
 

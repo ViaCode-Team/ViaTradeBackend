@@ -1,4 +1,4 @@
-﻿using Application.Interfaces.Redis;
+﻿using Application.Interfaces.Repositories.Redis;
 using Domain.Models.ConfigOptions;
 using Microsoft.Extensions.Options;
 

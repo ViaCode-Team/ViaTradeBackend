@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Application.Interfaces;
-using Application.Interfaces.Auth;
+using Application.Interfaces.Utils;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto;
 using Domain.Models.Dto.Statistic;
@@ -22,7 +22,7 @@ namespace ViaTradeBackend.Controllers
         [Authorize]
         [HttpGet("statistics")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<TradeRemindStatistic>> GetStatistics(CancellationToken cancellationToken)
+        public async Task<ActionResult<TradeRemindStatistic>> GetRemindStatistics(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
             var statistics = await _tradeRemindService.GetTradeRemindStatisticAsync(userId, cancellationToken);
