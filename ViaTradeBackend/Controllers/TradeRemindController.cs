@@ -61,7 +61,7 @@ namespace ViaTradeBackend.Controllers
         [Authorize]
         [HttpGet("byuser/{remindId}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<TradeRemind>> GetById(
+        public async Task<ActionResult<TradeRemind>> GetRemindById(
             [Required] int remindId,
             CancellationToken cancellationToken)
         {

@@ -38,7 +38,7 @@ namespace ViaTradeBackend.Controllers
 
         [HttpGet("byuser/instrument/{idInstrument}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<Note>> GetByUserInstrument(
+        public async Task<ActionResult<Note>> GetNoteByUserInstrument(
             [Required, FromRoute] int idInstrument,
             CancellationToken cancellationToken)
         {
