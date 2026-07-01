@@ -12,16 +12,16 @@ namespace ViaTradeBackend.Controllers
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class StatisticController(
+    public class TradeController(
         IStatisticService statisticService,
         IJwtHelper jwtHelper) : ControllerBase
     {
         private readonly IStatisticService _statisticService = statisticService;
         private readonly IJwtHelper _jwtHelper = jwtHelper;
 
-        [HttpGet("global/byuser")]
+        [HttpGet("statistics")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<GlobalStatistic>> GetGlobalByUser(CancellationToken cancellationToken)
+        public async Task<ActionResult<GlobalStatistic>> GetStatisticsByUser(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
             var tradeStatistics = await _statisticService.GetGlobalStatisticAsync(userId, cancellationToken);

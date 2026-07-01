@@ -18,7 +18,7 @@ namespace ViaTradeBackend.Controllers
         private readonly ITradeResultsService _tradeResultsService = tradeResultsService;
         private readonly IJwtHelper _jwtHelper = jwtHelper;
 
-        [HttpGet("strategy/actual/statistics")]
+        [HttpGet("statistics")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<SignalStatistic>> GetSignalByUser(CancellationToken cancellationToken)
         {
