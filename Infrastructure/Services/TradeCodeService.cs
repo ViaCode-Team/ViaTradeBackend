@@ -1,6 +1,7 @@
-﻿using Application.Interfaces;
+using Application.Interfaces;
 using Domain.Entities.CSV;
 using Domain.Entities.DataBase;
+using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Trade;
 using Infrastructure.Repositories.DataBase;
 
@@ -16,6 +17,14 @@ namespace Infrastructure.Services
         public async Task<IEnumerable<TradeCode>> GetAllCodesAsync(CancellationToken cancellationToken = default)
         {
             return await _tradeCodeRepository.GetAllAsync(cancellationToken);
+        }
+
+        public async Task<StockStatistic> GetStockStatisticAsync(CancellationToken cancellationToken = default)
+        {
+            return new StockStatistic
+            {
+                TotalStocks = await _tradeCodeRepository.CountAsync(cancellationToken)
+            };
         }
 
         public async Task<IEnumerable<TradeCodeFileDto>> GetSysAllCodesAsync(
@@ -34,7 +43,7 @@ namespace Infrastructure.Services
 
             return tradeFiles
                 .Where(fileCode => dbCodeMap.ContainsKey(fileCode.TradeCode))
-                .Select(fileCode => new TradeCodeFileDto{
+                .Select(fileCode => new TradeCodeFileDto {
                     Id = dbCodeMap[fileCode.TradeCode],
                     ExchangeId = fileCode.TradeCode,
                     TimeFrame = fileCode.TimeFrame,
@@ -53,9 +62,9 @@ namespace Infrastructure.Services
 
             if (int.TryParse(tradeIdString, out var tradeCodeId))
             {
-                var dbEntity = await _tradeCodeRepository.GetByIdAsync(tradeCodeId, cancellationToken) 
+                var dbEntity = await _tradeCodeRepository.GetByIdAsync(tradeCodeId, cancellationToken)
                     ?? throw new KeyNotFoundException($"TradeCode with Id {tradeCodeId} not found in database");
-                
+
                 exchangeId = dbEntity.ExchangeId;
                 dbId = dbEntity.Id;
             }
@@ -71,7 +80,7 @@ namespace Infrastructure.Services
             }
 
             var fileCodes = _tradefileReader.GetTradeCodes(dataType, [exchangeId]);
-            var fileCode = fileCodes.FirstOrDefault() 
+            var fileCode = fileCodes.FirstOrDefault()
                 ?? throw new KeyNotFoundException($"No file data found for trade code '{exchangeId}'");
 
             if (dbId == null)

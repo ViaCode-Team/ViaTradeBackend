@@ -1,22 +1,33 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Application.Interfaces.Auth;
 using Domain.Entities.CSV;
 using Domain.Entities.DataBase;
+using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Trade;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace ViaTradeBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class TradeCodeController(IJwtHelper jwtHelper, ITradeCodeService tradeService) : ControllerBase
+    public class TradeCodeController(
+        IJwtHelper jwtHelper,
+        ITradeCodeService tradeService) : ControllerBase
     {
         private readonly IJwtHelper _jwtHelper = jwtHelper;
         private readonly ITradeCodeService _tradeService = tradeService;
-        
+
+        [HttpGet("stocks/statistics")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<StockStatistic>> GetStockStatistics(CancellationToken cancellationToken)
+        {
+            var result = await _tradeService.GetStockStatisticAsync(cancellationToken);
+            return Ok(result);
+        }
+
         [HttpGet("stocks")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<IEnumerable<TradeCode>>> GetAllStocksCodes()

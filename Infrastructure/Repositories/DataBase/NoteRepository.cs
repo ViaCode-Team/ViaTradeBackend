@@ -8,6 +8,18 @@ namespace Infrastructure.Repositories.DataBase
 {
     public class NoteRepository(AppDbContext context) : GenericRepository<Note, NoteDto>(context), INoteRepository
     {
+        public async Task<int> CountByUserAsync(int userId, CancellationToken cancellationToken)
+        {
+            return await _dbSet.CountAsync(n => n.UserId == userId, cancellationToken);
+        }
+
+        public async Task<int> CountByUserAndTypeAsync(int userId, NoteType noteType, CancellationToken cancellationToken) => noteType switch
+        {
+            NoteType.TradeCodeNote => await _dbSet.CountAsync(n => n.UserId == userId && n.TradeCodeId != null, cancellationToken),
+            NoteType.TradeStrategyNote => await _dbSet.CountAsync(n => n.UserId == userId && n.TradeStrategyId != null, cancellationToken),
+            _ => throw new KeyNotFoundException()
+        };
+
         public async Task<IEnumerable<Note>> GetUserNoteByPropAll(int userId, NoteType noteType, CancellationToken cancellationToken) => noteType switch
         {
             NoteType.TradeCodeNote => await _dbSet

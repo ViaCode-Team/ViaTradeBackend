@@ -19,6 +19,11 @@ namespace Infrastructure.Repositories.DataBase
             return await _dbSet.Where(r => r.UserId == userId).ToListAsync(cancellationToken);
         }
 
+        public async Task<int> CountByUserAsync(int userId, CancellationToken cancellationToken)
+        {
+            return await _dbSet.CountAsync(r => r.UserId == userId, cancellationToken);
+        }
+
         public async Task<IEnumerable<TradeRemind>> GetByUserAndTradeCodeAsync(int userId, int tradeCodeId, CancellationToken cancellationToken)
         {
             return await _dbSet.Where(r => r.UserId == userId && r.TradeCodeId == tradeCodeId).ToListAsync(cancellationToken);

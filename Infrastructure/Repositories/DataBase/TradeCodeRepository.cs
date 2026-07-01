@@ -7,6 +7,11 @@ namespace Infrastructure.Repositories.DataBase
 {
     public class TradeCodeRepository(AppDbContext context) : GenericRepository<TradeCode, TradeCodeDto>(context), ITradeCodeRepository
     {
+        public async Task<int> CountAsync(CancellationToken cancellationToken = default)
+        {
+            return await _dbSet.CountAsync(cancellationToken);
+        }
+
         public async Task<TradeCodeDto?> GetByExchangeIdAsync(string code, CancellationToken cancellationToken = default)
         {
             return await _dbSet

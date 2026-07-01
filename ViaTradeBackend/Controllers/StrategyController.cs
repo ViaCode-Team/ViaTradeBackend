@@ -2,6 +2,7 @@
 using Application.Interfaces;
 using Application.Interfaces.Auth;
 using Domain.Entities.DataBase;
+using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Strategy;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,6 +19,15 @@ namespace ViaTradeBackend.Controllers
     {
         private readonly IStrategyService _strategyService = strategyService;
         private readonly IJwtHelper _jwtHelper = jwtHelper;
+
+        [HttpGet("statistics")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<StrategyStatistic>> GetStatistics(CancellationToken cancellationToken)
+        {
+            var userId = _jwtHelper.GetUserIdFromClaims(User);
+            var response = await _strategyService.GetStrategyStatisticAsync(userId, cancellationToken);
+            return Ok(response);
+        }
 
         [HttpGet("")]
         [ProducesResponseType(StatusCodes.Status200OK)]

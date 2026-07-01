@@ -8,6 +8,11 @@ namespace Infrastructure.Repositories.DataBase
     public class TradeStrategyRepository(AppDbContext context) : GenericRepository<TradeStrategy, TradeStrategyDto>(context),
         ITradeStrategyRepository
     {
+        public async Task<int> CountAsync(CancellationToken cancellationToken = default)
+        {
+            return await _dbSet.CountAsync(cancellationToken);
+        }
+
         public async Task<TradeStrategyDto?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
         {
             return await _dbSet

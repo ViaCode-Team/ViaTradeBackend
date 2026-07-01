@@ -1,5 +1,6 @@
-﻿using Application.Interfaces;
+using Application.Interfaces;
 using Domain.Entities.DataBase;
+using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Strategy;
 using Infrastructure.Repositories.DataBase;
 using ViaTradeBackend.Models.Trade;
@@ -20,6 +21,21 @@ namespace Infrastructure.Services
         public async Task<IEnumerable<TradeStrategy>> GetAllStrategiesAsync(CancellationToken cancellationToken)
         {
             return await _tradeStrategyRepository.GetAllAsync(cancellationToken);
+        }
+
+        public async Task<StrategyStatistic> GetStrategyStatisticAsync(int userId, CancellationToken cancellationToken)
+        {
+            await _userService.EnsureUserAsync(userId, cancellationToken);
+
+            var totalStrategies = await _tradeStrategyRepository.CountAsync(cancellationToken);
+            var activeStrategies = await _userTradeStrategyRepository.CountByUserAsync(userId, cancellationToken);
+
+            return new StrategyStatistic
+            {
+                TotalStrategies = totalStrategies,
+                ActiveStrategies = activeStrategies,
+                DisabledStrategies = Math.Max(totalStrategies - activeStrategies, 0)
+            };
         }
 
         public async Task<TradeStrategy> GetStrategyByIdAsync(int strategyId, CancellationToken cancellationToken)

@@ -1,6 +1,7 @@
-﻿using Application.Interfaces;
+using Application.Interfaces;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto;
+using Domain.Models.Dto.Statistic;
 using Infrastructure.Repositories.DataBase;
 
 namespace Infrastructure.Services
@@ -17,6 +18,16 @@ namespace Infrastructure.Services
         public async Task<IEnumerable<TradeRemind>> GetActualRemindAsync(CancellationToken cancellationToken)
         {
             return await _tradeRemindRepository.GetActualTradeRemind(cancellationToken);
+        }
+
+        public async Task<TradeRemindStatistic> GetTradeRemindStatisticAsync(int userId, CancellationToken cancellationToken)
+        {
+            await _userService.EnsureUserAsync(userId, cancellationToken);
+
+            return new TradeRemindStatistic
+            {
+                TotalReminds = await _tradeRemindRepository.CountByUserAsync(userId, cancellationToken)
+            };
         }
 
         public async Task DeleteActualRemindAsync(int remindId, CancellationToken cancellationToken)

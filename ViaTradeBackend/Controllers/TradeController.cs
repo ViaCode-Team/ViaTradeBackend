@@ -13,10 +13,10 @@ namespace ViaTradeBackend.Controllers
     [ApiController]
     [Authorize]
     public class TradeController(
-        IStatisticService statisticService,
+        ITradeService tradeService,
         IJwtHelper jwtHelper) : ControllerBase
     {
-        private readonly IStatisticService _statisticService = statisticService;
+        private readonly ITradeService _tradeService = tradeService;
         private readonly IJwtHelper _jwtHelper = jwtHelper;
 
         [HttpGet("statistics")]
@@ -24,7 +24,7 @@ namespace ViaTradeBackend.Controllers
         public async Task<ActionResult<GlobalStatistic>> GetStatisticsByUser(CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var tradeStatistics = await _statisticService.GetGlobalStatisticAsync(userId, cancellationToken);
+            var tradeStatistics = await _tradeService.GetGlobalStatisticAsync(userId, cancellationToken);
             return Ok(tradeStatistics);
         }
 
@@ -34,7 +34,7 @@ namespace ViaTradeBackend.Controllers
             [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] TradeSignal? tradeSignal)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var trades = await _statisticService.GetByUserAsync(userId, startDate, endDate, tradeSignal, cancellationToken);
+            var trades = await _tradeService.GetByUserAsync(userId, startDate, endDate, tradeSignal, cancellationToken);
             return Ok(trades);
         }
 
@@ -45,7 +45,7 @@ namespace ViaTradeBackend.Controllers
             CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var trade = await _statisticService.GetTradeByIdAsync(id, userId, cancellationToken);
+            var trade = await _tradeService.GetTradeByIdAsync(id, userId, cancellationToken);
             return Ok(trade);
         }
 
@@ -56,7 +56,7 @@ namespace ViaTradeBackend.Controllers
             CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var trade = await _statisticService.CreateTradeAsync(request, userId, cancellationToken);
+            var trade = await _tradeService.CreateTradeAsync(request, userId, cancellationToken);
             return CreatedAtAction(nameof(GetTradeById), new { id = trade.Id }, trade);
         }
 
@@ -68,7 +68,7 @@ namespace ViaTradeBackend.Controllers
             CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            await _statisticService.UpdateTradeAsync(id, request, userId, cancellationToken);
+            await _tradeService.UpdateTradeAsync(id, request, userId, cancellationToken);
             return NoContent();
         }
 
@@ -79,7 +79,7 @@ namespace ViaTradeBackend.Controllers
             CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            await _statisticService.DeleteTradeAsync(id, userId, cancellationToken);
+            await _tradeService.DeleteTradeAsync(id, userId, cancellationToken);
             return NoContent();
         }
     }

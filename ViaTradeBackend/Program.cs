@@ -46,22 +46,9 @@ builder.Services.Configure<AuthCookiOptions>(
     builder.Configuration.GetSection("AuthCookies")
 );
 
-builder.Services.AddOptions<AnalyzerDataOption>()
-    .Configure<IConfiguration>((options, config) =>
-    {
-        var section = config.GetSection("AnalyzerData");
-        var activeProfile = section["ActiveProfile"]
-            ?? throw new InvalidOperationException("AnalyzerData:ActiveProfile is not set");
-
-        var profileSection = section.GetSection($"Profiles:{activeProfile}");
-        if (!profileSection.Exists())
-        {
-            throw new InvalidOperationException($"Profile '{activeProfile}' not found in AnalyzerData:Profiles");
-        }
-
-        // Bind selected profile to options instance
-        profileSection.Bind(options);
-    });
+builder.Services.Configure<AnalyzerDataOption>(
+    builder.Configuration.GetSection("AnalyzerData")
+);
 
 // REDIS SETUP
 // Register Redis connection as singleton (shared across the app)
@@ -95,11 +82,12 @@ builder.Services.AddScoped<NoteRepository>();
 // Application services
 builder.Services.AddScoped<ITradeRemindService, TradeRemindService>();
 builder.Services.AddScoped<IStrategyService, StrategyService>();
-builder.Services.AddScoped<IStatisticService, StatisticService>();
+builder.Services.AddScoped<ITradeService, TradeService>();
 builder.Services.AddScoped<ITradeCodeService, TradeCodeService>();
 builder.Services.AddScoped<ITradeResultsService, TradeResultsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<INoteService, NoteService>();
 builder.Services.AddScoped<NoteService>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 builder.Services.AddScoped<IFileReader, TradeFileReader>();
@@ -147,9 +135,6 @@ builder.Services.AddViaTradeSwagger();
 
 // BUILD & MIDDLEWARE PIPELINE
 var app = builder.Build();
-
-// Register AnalyzerDataOptions with profile selection logic
-
 
 // Swagger UI (Development only, configured in SwaggerMiddlewareExtensions)
 app.UseViaTradeSwagger();

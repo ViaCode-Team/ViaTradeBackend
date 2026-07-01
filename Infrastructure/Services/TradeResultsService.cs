@@ -7,7 +7,10 @@ using Infrastructure.Repositories.DataBase;
 
 namespace Infrastructure.Services
 {
-    public class TradeResultsService(IFileReader tradefileReader, UserService userService, TradeStrategyRepository tradeStrategyRepository,
+    public class TradeResultsService(
+        IFileReader tradefileReader, 
+        UserService userService, 
+        TradeStrategyRepository tradeStrategyRepository,
         UserTradeStrategyRepository userTradeStrategyRepository) : ITradeResultsService
     {
         private readonly IFileReader _tradefileReader = tradefileReader;

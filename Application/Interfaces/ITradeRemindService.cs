@@ -1,11 +1,13 @@
-﻿using Domain.Entities.DataBase;
+using Domain.Entities.DataBase;
 using Domain.Models.Dto;
+using Domain.Models.Dto.Statistic;
 
 namespace Application.Interfaces
 {
     public interface ITradeRemindService
     {
         Task<IEnumerable<TradeRemind>> GetActualRemindAsync(CancellationToken cancellationToken);
+        Task<TradeRemindStatistic> GetTradeRemindStatisticAsync(int userId, CancellationToken cancellationToken);
         Task DeleteActualRemindAsync(int remindId, CancellationToken cancellationToken);
         Task<IEnumerable<TradeRemind>> GetAllByUserAsync(int userId, CancellationToken cancellationToken);
         Task<IEnumerable<TradeRemind>> GetByUserAndTradeCodeAsync(int userId, int tradeCodeId, CancellationToken cancellationToken);

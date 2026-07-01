@@ -1,6 +1,7 @@
-﻿using Domain.Entities.DataBase;
+using Application.Interfaces;
+using Domain.Entities.DataBase;
 using Domain.Models.Dto.NoteRemind;
-using Infrastructure.Repositories.DataBase;
+using Domain.Models.Dto.Statistic;
 using Infrastructure.Repositories.DataBase;
 
 namespace Infrastructure.Services
@@ -8,11 +9,25 @@ namespace Infrastructure.Services
     public class NoteService(
         NoteRepository noteRepository,
         TradeCodeRepository tradeCodeRepository,
-        TradeStrategyRepository tradeStrategyRepository)
+        TradeStrategyRepository tradeStrategyRepository,
+        UserService userService) : INoteService
     {
         private readonly NoteRepository _noteRepository = noteRepository;
         private readonly TradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
         private readonly TradeStrategyRepository _tradeStrategyRepository = tradeStrategyRepository;
+        private readonly UserService _userService = userService;
+
+        public async Task<NoteStatistic> GetNoteStatisticAsync(int userId, CancellationToken cancellationToken)
+        {
+            await _userService.EnsureUserAsync(userId, cancellationToken);
+
+            return new NoteStatistic
+            {
+                TotalNotes = await _noteRepository.CountByUserAsync(userId, cancellationToken),
+                StockNotes = await _noteRepository.CountByUserAndTypeAsync(userId, NoteType.TradeCodeNote, cancellationToken),
+                StrategyNotes = await _noteRepository.CountByUserAndTypeAsync(userId, NoteType.TradeStrategyNote, cancellationToken)
+            };
+        }
 
         public async Task ValidateRelatedEntityExistsAsync(int relatedId, NoteType noteType, CancellationToken cancellationToken)
         {
@@ -33,7 +48,7 @@ namespace Infrastructure.Services
         {
             var existing = await _noteRepository.FindUserNoteByEntityAsync(userId, relatedId, noteType, cancellationToken);
             if (existing != null)
-            { 
+            {
                 throw new InvalidOperationException($"User already has a note assigned to this {noteType}");
             }
         }

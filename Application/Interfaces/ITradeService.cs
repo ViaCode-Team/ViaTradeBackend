@@ -4,7 +4,7 @@ using ViaTradeBackend.Models.Trade;
 
 namespace Application.Interfaces
 {
-    public interface IStatisticService
+    public interface ITradeService
     {
         Task<GlobalStatistic> GetGlobalStatisticAsync(int userId, CancellationToken cancellationToken);
         Task<IEnumerable<Trade>> GetByUserAsync(int userId, DateTime? startDate, DateTime? endDate, TradeSignal? tradeSignal, CancellationToken cancellationToken);

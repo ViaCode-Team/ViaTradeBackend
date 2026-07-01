@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Application.Interfaces.Auth;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto;
+using Domain.Models.Dto.Statistic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Attribute;
@@ -17,6 +18,16 @@ namespace ViaTradeBackend.Controllers
     {
         private readonly ITradeRemindService _tradeRemindService = tradeRemindService;
         private readonly IJwtHelper _jwtHelper = jwtHelper;
+
+        [Authorize]
+        [HttpGet("statistics")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<TradeRemindStatistic>> GetStatistics(CancellationToken cancellationToken)
+        {
+            var userId = _jwtHelper.GetUserIdFromClaims(User);
+            var statistics = await _tradeRemindService.GetTradeRemindStatisticAsync(userId, cancellationToken);
+            return Ok(statistics);
+        }
 
         [ServicePassword]
         [HttpGet("byuser/actual")]

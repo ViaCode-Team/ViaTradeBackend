@@ -12,7 +12,10 @@ namespace ViaTradeBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class AuthController(IAuthService authService, IJwtHelper jwtHelper, IOptions<AuthCookiOptions> authOptions) : ControllerBase
+    public class AuthController(
+        IAuthService authService,
+        IJwtHelper jwtHelper,
+        IOptions<AuthCookiOptions> authOptions) : ControllerBase
     {
         private readonly IAuthService _authService = authService;
         private readonly IJwtHelper _jwtHelper = jwtHelper;

@@ -20,6 +20,12 @@ namespace Infrastructure.Repositories.DataBase
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task<int> CountByUserAsync(int userId, CancellationToken cancellationToken)
+        {
+            return await _context.UserTradeStrategies
+                .CountAsync(e => e.UserId == userId, cancellationToken);
+        }
+
         public async Task<Dictionary<string, List<string>>> GetUserPreferencesAsync(
             int userId,
             CancellationToken ct)

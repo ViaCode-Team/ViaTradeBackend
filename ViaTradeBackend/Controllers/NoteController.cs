@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using Application.Interfaces;
 using Application.Interfaces.Auth;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto;
 using Domain.Models.Dto.NoteRemind;
+using Domain.Models.Dto.Statistic;
 using Infrastructure.Repositories.DataBase;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
@@ -24,6 +26,15 @@ namespace ViaTradeBackend.Controllers
         private readonly NoteService _noteService = noteService;
         private readonly IJwtHelper _jwtHelper = jwtHelper;
         private readonly UserService _userService = userService;
+
+        [HttpGet("statistics")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<NoteStatistic>> GetStatistics(CancellationToken cancellationToken)
+        {
+            var userId = _jwtHelper.GetUserIdFromClaims(User);
+            var statistics = await _noteService.GetNoteStatisticAsync(userId, cancellationToken);
+            return Ok(statistics);
+        }
 
         [HttpGet("byuser/instrument")]
         [ProducesResponseType(StatusCodes.Status200OK)]

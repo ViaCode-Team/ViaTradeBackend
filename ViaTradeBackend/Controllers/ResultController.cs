@@ -1,18 +1,18 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Application.Interfaces;
+﻿using Application.Interfaces;
 using Application.Interfaces.Auth;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.TradeLogic;
-using Infrastructure.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace ViaTradeBackend.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
     [Authorize]
-    public class ResultController(ITradeResultsService tradeResultsService,
+    public class ResultController(
+        ITradeResultsService tradeResultsService,
         IJwtHelper jwtHelper) : ControllerBase
     {
         private readonly ITradeResultsService _tradeResultsService = tradeResultsService;
