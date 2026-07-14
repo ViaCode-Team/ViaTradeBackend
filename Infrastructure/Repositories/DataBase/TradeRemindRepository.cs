@@ -10,7 +10,7 @@ namespace Infrastructure.Repositories.DataBase;
 public class TradeRemindRepository(AppDbContext context)
 	: GenericRepository<TradeRemind, TradeRemindDto>(context), ITradeRemindRepository
 {
-	public async Task<IEnumerable<TradeRemind>> GetActualTradeRemind(CancellationToken cancellationToken)
+	public async Task<IEnumerable<TradeRemind>> GetActualRemind(CancellationToken cancellationToken)
 	{
 		return await _dbSet.Where(r => r.DateTime <= DateTime.Now).ToListAsync(cancellationToken);
 	}

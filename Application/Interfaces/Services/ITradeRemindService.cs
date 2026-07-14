@@ -8,7 +8,7 @@ namespace Application.Interfaces;
 public interface ITradeRemindService
 {
 	Task<IEnumerable<TradeRemind>> GetActualRemindAsync(CancellationToken cancellationToken);
-	Task<TradeRemindStatistic> GetTradeRemindStatisticAsync(int userId, CancellationToken cancellationToken);
+	Task<TradeRemindStatistic> GetRemindStatisticAsync(int userId, CancellationToken cancellationToken);
 	Task DeleteActualRemindAsync(int remindId, CancellationToken cancellationToken);
 	Task<PagedResult<TradeRemind>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken);
 	Task<PagedResult<TradeRemind>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken cancellationToken);

@@ -12,7 +12,10 @@ public sealed class OptionalPropertiesAsNonNullableSchemaFilter : ISchemaFilter
 
 		foreach (var property in schema.Properties.ToList())
 		{
-			if (schema.Required.Contains(property.Key))
+            if (schema.Required == null)
+                continue;
+
+            if (schema.Required.Contains(property.Key))
 				continue;
 
 			if (property.Value is not OpenApiSchema openApiSchema)

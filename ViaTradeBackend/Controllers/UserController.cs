@@ -43,7 +43,7 @@ public class UserController(
 	[Authorize]
 	[HttpGet("tgToken")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<TgTokenResponse>> GetTgToken(CancellationToken cancellationToken)
+	public async Task<ActionResult<TgTokenResponse>> GenerateTgToken(CancellationToken cancellationToken)
 	{
 		_logger.LogInformation("Generating Telegram token for user");
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
@@ -60,7 +60,7 @@ public class UserController(
 	[ServicePassword]
 	[HttpPost("tgToken")]
 	[ProducesResponseType(StatusCodes.Status202Accepted)]
-	public async Task<ActionResult> PostTgToken(
+	public async Task<ActionResult> LinkTgToken(
 		[FromBody, Required] TgTokenRequest tgTokenRequest,
 		CancellationToken cancellationToken)
 	{
@@ -74,7 +74,7 @@ public class UserController(
 	[ServicePassword]
 	[HttpGet("user")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<List<User>>> GetUser(CancellationToken cancellationToken)
+	public async Task<ActionResult<List<User>>> GetUsersWithTgLink(CancellationToken cancellationToken)
 	{
 		_logger.LogInformation("Getting all users with Telegram links");
 		return Ok(await _userService.GetAllWithTgLinkAsync(cancellationToken));

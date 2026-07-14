@@ -1,4 +1,4 @@
-﻿using Application.Interfaces;
+using Application.Interfaces;
 using Application.Interfaces.Utils;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.TradeLogic;
@@ -20,7 +20,7 @@ public class ResultController(
 
 	[HttpGet("statistics")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<SignalStatistic>> GetResultStatistics(CancellationToken cancellationToken)
+	public async Task<ActionResult<SignalStatistic>> GetStrategyResultStatistics(CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var signalStatistics = await _tradeResultsService.GetStrategyResultStatisticAsync(userId, cancellationToken);
@@ -29,7 +29,7 @@ public class ResultController(
 
 	[HttpGet("strategy")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<StrategyResultResponse>> GetResult(
+	public async Task<ActionResult<StrategyResultResponse>> GetStrategyResults(
 		[FromQuery] DateTime? startDate,
 		[FromQuery] DateTime? endTime,
 		CancellationToken cancellationToken)
@@ -41,7 +41,7 @@ public class ResultController(
 
 	[HttpGet("strategy/{strategyName}/{tradeCode}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<StrategyResultResponse>> GetResultByStrategyAndTradeCode(
+	public async Task<ActionResult<StrategyResultResponse>> GetStrategyResultsByCode(
 		[FromRoute, Required] string strategyName,
 		[FromRoute, Required] string tradeCode,
 		[FromQuery] DateTime? startDate,

@@ -32,7 +32,7 @@ public class NoteController(
 
 	[HttpGet("byuser/instrument")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<Note>>> GetTradeCodeNoteAll([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<ActionResult<PagedResult<Note>>> GetUserTradeCodeNotes([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var notes = await _noteService.GetUserNoteByPropPagedAsync(userId, NoteType.TradeCodeNote, paginationRequest, cancellationToken);
@@ -41,7 +41,7 @@ public class NoteController(
 
 	[HttpGet("byuser/instrument/{idInstrument}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<Note>> GetNoteByUserInstrument(
+	public async Task<ActionResult<Note>> GetUserTradeCodeNoteById(
 		[Required, FromRoute] int idInstrument,
 		CancellationToken cancellationToken)
 	{
@@ -53,7 +53,7 @@ public class NoteController(
 
 	[HttpGet("byuser/strategy")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<Note>>> GetTradeStrategyNoteAll([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<ActionResult<PagedResult<Note>>> GetUserStrategyNotes([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var notes = await _noteService.GetUserNoteByPropPagedAsync(userId, NoteType.TradeStrategyNote, paginationRequest, cancellationToken);
@@ -62,7 +62,7 @@ public class NoteController(
 
 	[HttpGet("byuser/strategy/{idStrategy}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<Note>> GetByUserStrategy(
+	public async Task<ActionResult<Note>> GetUserStrategyNoteById(
 		[Required, FromRoute] int idStrategy,
 		CancellationToken cancellationToken)
 	{
@@ -73,7 +73,7 @@ public class NoteController(
 
 	[HttpPost("byuser/instrument/{idInstrument}")]
 	[ProducesResponseType(StatusCodes.Status201Created)]
-	public async Task<ActionResult> CreateInstrumentNote(
+	public async Task<ActionResult> CreateUserTradeCodeNote(
 		[Required, FromRoute] int idInstrument,
 		[FromBody, Required] NoteRequest request,
 		CancellationToken cancellationToken)
@@ -86,7 +86,7 @@ public class NoteController(
 
 	[HttpPost("byuser/strategy/{idStrategy}")]
 	[ProducesResponseType(StatusCodes.Status201Created)]
-	public async Task<ActionResult> CreateStrategyNote(
+	public async Task<ActionResult> CreateUserStrategyNote(
 		[Required, FromRoute] int idStrategy,
 		[FromBody, Required] NoteRequest request,
 		CancellationToken cancellationToken)
@@ -99,7 +99,7 @@ public class NoteController(
 
 	[HttpPut("byuser/instrument/{idInstrument}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
-	public async Task<ActionResult> UpdateInstrumentNote(
+	public async Task<ActionResult> UpdateUserTradeCodeNote(
 		[Required, FromRoute] int idInstrument,
 		[FromBody, Required] NoteRequest request,
 		CancellationToken cancellationToken)
@@ -112,7 +112,7 @@ public class NoteController(
 
 	[HttpPut("byuser/strategy/{idStrategy}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
-	public async Task<ActionResult> UpdateStrategyNote(
+	public async Task<ActionResult> UpdateUserStrategyNote(
 		[Required, FromRoute] int idStrategy,
 		[FromBody, Required] NoteRequest request,
 		CancellationToken cancellationToken)
@@ -125,7 +125,7 @@ public class NoteController(
 
 	[HttpDelete("byuser/instrument/{idInstrument}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
-	public async Task<ActionResult> DeleteInstrumentNote(
+	public async Task<ActionResult> DeleteUserTradeCodeNote(
 		[Required, FromRoute] int idInstrument,
 		CancellationToken cancellationToken)
 	{
@@ -136,7 +136,7 @@ public class NoteController(
 
 	[HttpDelete("byuser/strategy/{idStrategy}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
-	public async Task<ActionResult> DeleteStrategyNote(
+	public async Task<ActionResult> DeleteUserStrategyNote(
 		[Required, FromRoute] int idStrategy,
 		CancellationToken cancellationToken)
 	{

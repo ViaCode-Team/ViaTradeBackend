@@ -31,7 +31,7 @@ public class TradeCodeController(
 
 	[HttpGet("stocks")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<TradeCode>>> GetAllStocksCodes([FromQuery] PaginationRequest paginationRequest)
+	public async Task<ActionResult<PagedResult<TradeCode>>> GetStockCodes([FromQuery] PaginationRequest paginationRequest)
 	{
 		var result = await _tradeService.GetCodesPagedAsync(paginationRequest);
 		return Ok(result);
@@ -39,7 +39,7 @@ public class TradeCodeController(
 
 	[HttpGet("sys/stocks")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<IEnumerable<TradeCodeFileDto>>> GetSysAllStocksCodes()
+	public async Task<ActionResult<IEnumerable<TradeCodeFileDto>>> GetSysStockCodes()
 	{
 		var result = await _tradeService.GetSysAllCodesAsync(TradeDataType.Stocks);
 		return Ok(result);
@@ -47,7 +47,7 @@ public class TradeCodeController(
 
 	[HttpGet("sys/stocks/{tradeIdString}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<TradeCodeFileDto>> GetSysCodeById(
+	public async Task<ActionResult<TradeCodeFileDto>> GetSysStockCodeById(
 		[FromRoute, Required] string tradeIdString,
 		CancellationToken cancellationToken)
 	{

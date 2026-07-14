@@ -18,10 +18,10 @@ public class TradeRemindService(
 
 	public async Task<IEnumerable<TradeRemind>> GetActualRemindAsync(CancellationToken cancellationToken)
 	{
-		return await _tradeRemindRepository.GetActualTradeRemind(cancellationToken);
+		return await _tradeRemindRepository.GetActualRemind(cancellationToken);
 	}
 
-	public async Task<TradeRemindStatistic> GetTradeRemindStatisticAsync(int userId, CancellationToken cancellationToken)
+	public async Task<TradeRemindStatistic> GetRemindStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
 

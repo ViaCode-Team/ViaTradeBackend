@@ -31,8 +31,12 @@ public class TradeController(
 
 	[HttpGet("byuser")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<Trade>>> GetByUser(CancellationToken cancellationToken,
-		[FromQuery] PaginationRequest paginationRequest, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] TradeSignal? tradeSignal)
+	public async Task<ActionResult<PagedResult<Trade>>> GetUserTrades(
+		[FromQuery] PaginationRequest paginationRequest,
+		[FromQuery] DateTime? startDate,
+		[FromQuery] DateTime? endDate,
+		[FromQuery] TradeSignal? tradeSignal,
+		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var trades = await _tradeService.GetByUserPagedAsync(userId, startDate, endDate, tradeSignal, paginationRequest, cancellationToken);
@@ -52,7 +56,7 @@ public class TradeController(
 
 	[HttpPost("byuser")]
 	[ProducesResponseType(StatusCodes.Status201Created)]
-	public async Task<ActionResult<Trade>> CreateTrade(
+	public async Task<ActionResult<Trade>> CreateUserTrade(
 		[FromBody, Required] TradeRequest request,
 		CancellationToken cancellationToken)
 	{
@@ -63,7 +67,7 @@ public class TradeController(
 
 	[HttpPut("byuser/{id}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
-	public async Task<ActionResult> UpdateTrade(
+	public async Task<ActionResult> UpdateUserTrade(
 		[Required, FromRoute] int id,
 		[FromBody, Required] TradeRequest request,
 		CancellationToken cancellationToken)
@@ -75,7 +79,7 @@ public class TradeController(
 
 	[HttpDelete("byuser/{id}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
-	public async Task<ActionResult> DeleteTrade(
+	public async Task<ActionResult> DeleteUserTrade(
 		[Required, FromRoute] int id,
 		CancellationToken cancellationToken)
 	{

@@ -13,7 +13,7 @@ namespace ViaTradeBackend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class TradeRemindController(
+public class RemindController(
 	ITradeRemindService tradeRemindService,
 	IJwtHelper jwtHelper) : ControllerBase
 {
@@ -26,14 +26,14 @@ public class TradeRemindController(
 	public async Task<ActionResult<TradeRemindStatistic>> GetRemindStatistics(CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var statistics = await _tradeRemindService.GetTradeRemindStatisticAsync(userId, cancellationToken);
+		var statistics = await _tradeRemindService.GetRemindStatisticAsync(userId, cancellationToken);
 		return Ok(statistics);
 	}
 
 	[ServicePassword]
 	[HttpGet("byuser/actual")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<List<TradeRemind>>> GetActualRemind(CancellationToken cancellationToken)
+	public async Task<ActionResult<List<TradeRemind>>> GetActualReminders(CancellationToken cancellationToken)
 	{
 		var reminders = await _tradeRemindService.GetActualRemindAsync(cancellationToken);
 		return Ok(reminders);
@@ -42,7 +42,7 @@ public class TradeRemindController(
 	[ServicePassword]
 	[HttpDelete("byuser/actual/{remindId}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
-	public async Task<ActionResult> DeleteActualRemind([FromRoute, Required] int remindId, CancellationToken cancellationToken)
+	public async Task<ActionResult> DeleteActualReminder([FromRoute, Required] int remindId, CancellationToken cancellationToken)
 	{
 		await _tradeRemindService.DeleteActualRemindAsync(remindId, cancellationToken);
 		return NoContent();
@@ -51,7 +51,7 @@ public class TradeRemindController(
 	[Authorize]
 	[HttpGet("byuser")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<TradeRemind>>> GetAllByUser([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<ActionResult<PagedResult<TradeRemind>>> GetUserReminders([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var reminders = await _tradeRemindService.GetByUserPagedAsync(userId, paginationRequest, cancellationToken);
@@ -61,7 +61,7 @@ public class TradeRemindController(
 	[Authorize]
 	[HttpGet("byuser/instrument/{idInstrument}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<TradeRemind>>> GetByUserInstrument(
+	public async Task<ActionResult<PagedResult<TradeRemind>>> GetUserRemindersByInstrument(
 		[FromQuery] PaginationRequest paginationRequest,
 		[Required, FromRoute] int idInstrument,
 		CancellationToken cancellationToken)
@@ -74,7 +74,7 @@ public class TradeRemindController(
 	[Authorize]
 	[HttpGet("byuser/{remindId}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<TradeRemind>> GetRemindById(
+	public async Task<ActionResult<TradeRemind>> GetUserReminderById(
 		[Required] int remindId,
 		CancellationToken cancellationToken)
 	{
@@ -86,7 +86,7 @@ public class TradeRemindController(
 	[Authorize]
 	[HttpPost("byuser/instrument/{idInstrument}")]
 	[ProducesResponseType(StatusCodes.Status201Created)]
-	public async Task<ActionResult> Create(
+	public async Task<ActionResult> CreateUserReminder(
 		[Required, FromRoute] int idInstrument,
 		[FromBody, Required] TradeRemindRequest request,
 		CancellationToken cancellationToken)
@@ -99,7 +99,7 @@ public class TradeRemindController(
 	[Authorize]
 	[HttpPut("byuser/{remindId}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
-	public async Task<ActionResult> Update(
+	public async Task<ActionResult> UpdateUserReminder(
 		[Required, FromRoute] int remindId,
 		[FromBody, Required] TradeRemindRequest request,
 		CancellationToken cancellationToken)
@@ -112,7 +112,7 @@ public class TradeRemindController(
 	[Authorize]
 	[HttpDelete("byuser/{remindId}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
-	public async Task<ActionResult> Delete(
+	public async Task<ActionResult> DeleteUserReminder(
 		[Required, FromRoute] int remindId,
 		CancellationToken cancellationToken)
 	{

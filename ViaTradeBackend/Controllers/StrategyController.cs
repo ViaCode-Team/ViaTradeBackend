@@ -32,7 +32,7 @@ public class StrategyController(
 
 	[HttpGet("")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<TradeStrategy>>> GetAll(
+	public async Task<ActionResult<PagedResult<TradeStrategy>>> GetStrategies(
 		[FromQuery] PaginationRequest paginationRequest,
 		CancellationToken cancellationToken)
 	{
@@ -42,7 +42,7 @@ public class StrategyController(
 
 	[HttpGet("{strategyId}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<TradeStrategy>> GetById([Required] int strategyId, CancellationToken cancellationToken)
+	public async Task<ActionResult<TradeStrategy>> GetStrategyById([Required] int strategyId, CancellationToken cancellationToken)
 	{
 		var response = await _strategyService.GetStrategyByIdAsync(strategyId, cancellationToken);
 		return Ok(response);
@@ -50,7 +50,7 @@ public class StrategyController(
 
 	[HttpGet("byuser/instrumentslink")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<UserStrategyTradeCodeDto>>> GetAllInstrumentsLink([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<ActionResult<PagedResult<UserStrategyTradeCodeDto>>> GetUserStrategyTradeCodes([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var response = await _strategyService.GetUserStrategyCodesPagedAsync(userId, paginationRequest, cancellationToken);
@@ -59,7 +59,7 @@ public class StrategyController(
 
 	[HttpPost("byuser/instrumentslink")]
 	[ProducesResponseType(StatusCodes.Status201Created)]
-	public async Task<ActionResult> CreateInstrumentsLink(
+	public async Task<ActionResult> CreateUserStrategyTradeCode(
 		[FromBody, Required] UserStrategyTradeCodeRequest userStrategyTradeCodeRequest,
 		CancellationToken cancellationToken)
 	{
@@ -70,7 +70,7 @@ public class StrategyController(
 
 	[HttpDelete("byuser/instrumentslink")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
-	public async Task<ActionResult> DeleteInstrumentsLink(
+	public async Task<ActionResult> DeleteUserStrategyTradeCode(
 		[FromQuery, Required] int strategyId,
 		[FromQuery, Required] int tradeCodeId,
 		CancellationToken cancellationToken)
@@ -82,7 +82,7 @@ public class StrategyController(
 
 	[HttpGet("byuser")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<UserTradeStrategyDto>>> GetUsersStrategy([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<ActionResult<PagedResult<UserTradeStrategyDto>>> GetUserStrategies([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var response = await _strategyService.GetUserStrategiesPagedAsync(userId, paginationRequest, cancellationToken);
@@ -91,7 +91,7 @@ public class StrategyController(
 
 	[HttpPost("byuser")]
 	[ProducesResponseType(StatusCodes.Status201Created)]
-	public async Task<ActionResult> CreateUsersStrategy([FromBody, Required] CreateUserStrategyRequest userStrategyRequest, CancellationToken cancellationToken)
+	public async Task<ActionResult> CreateUserStrategy([FromBody, Required] CreateUserStrategyRequest userStrategyRequest, CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		await _strategyService.CreateUserStrategyAsync(userStrategyRequest, userId, cancellationToken);
@@ -100,7 +100,7 @@ public class StrategyController(
 
 	[HttpDelete("byuser")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
-	public async Task<ActionResult> DeleteUsersStrategy([FromQuery, Required] int strategyId, CancellationToken cancellationToken)
+	public async Task<ActionResult> DeleteUserStrategy([FromQuery, Required] int strategyId, CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		await _strategyService.DeleteUserStrategyAsync(strategyId, userId, cancellationToken);

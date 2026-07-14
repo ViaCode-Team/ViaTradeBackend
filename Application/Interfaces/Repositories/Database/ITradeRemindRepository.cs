@@ -6,7 +6,7 @@ namespace Application.Interfaces.Repositories.Database;
 
 public interface ITradeRemindRepository : IRepository<TradeRemind, TradeRemindDto>
 {
-	Task<IEnumerable<TradeRemind>> GetActualTradeRemind(CancellationToken cancellationToken);
+	Task<IEnumerable<TradeRemind>> GetActualRemind(CancellationToken cancellationToken);
 	Task<PagedResult<TradeRemind>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken);
 	Task<PagedResult<TradeRemind>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken cancellationToken);
 	Task<int> CountByUserAsync(int userId, CancellationToken cancellationToken);

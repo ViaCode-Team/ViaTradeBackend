@@ -1,4 +1,4 @@
-﻿using Application.Interfaces.Services;
+using Application.Interfaces.Services;
 using Application.Interfaces.Utils;
 using Domain.Models;
 using Domain.Models.ConfigOptions;
@@ -55,7 +55,7 @@ public class AuthController(
 	}
 
 	[HttpPost("refresh")]
-	public async Task<ActionResult> Refresh(
+	public async Task<ActionResult> RefreshToken(
 		CancellationToken cancellationToken)
 	{
 		if (!Request.Cookies.TryGetValue(_authCookiOptions.RefreshTokenCookie, out var refreshToken))
@@ -99,7 +99,7 @@ public class AuthController(
 	[HttpGet("sessions")]
 	[Authorize(Policy = "ActiveSession")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<UserSessionDto>> GetSessions()
+	public async Task<ActionResult<UserSessionDto>> GetUserSessions()
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 
