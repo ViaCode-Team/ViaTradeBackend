@@ -5,33 +5,27 @@ namespace ViaTradeBackend.Swagger.Filters;
 
 public sealed class OptionalPropertiesAsNonNullableSchemaFilter : ISchemaFilter
 {
-	public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
-	{
-		if (schema.Properties is null || schema.Properties.Count == 0)
-			return;
+    public void Apply(IOpenApiSchema schema, SchemaFilterContext context)
+    {
+        if (schema.Properties is null || schema.Properties.Count == 0)
+            return;
 
-		foreach (var property in schema.Properties.ToList())
-		{
-            if (schema.Required == null)
+        var requiredProperties = schema.Required;
+
+        foreach (var (propertyName, propertySchema) in schema.Properties.ToList())
+        {
+            if (requiredProperties?.Contains(propertyName) == true)
                 continue;
 
-            if (schema.Required.Contains(property.Key))
-				continue;
+            var type = propertySchema.Type;
 
-			if (property.Value is not OpenApiSchema openApiSchema)
-				continue;
+            if (type is null || !type.Value.HasFlag(JsonSchemaType.Null))
+                continue;
 
-			if (openApiSchema.Type is not { } type)
-				continue;
+            var copiedSchema = (OpenApiSchema)propertySchema.CreateShallowCopy();       
+            copiedSchema.Type = type.Value & ~JsonSchemaType.Null;
 
-			if (!type.HasFlag(JsonSchemaType.Null))
-				continue;
-
-			var copiedSchema = (OpenApiSchema)openApiSchema.CreateShallowCopy();
-
-			copiedSchema.Type = type & ~JsonSchemaType.Null;
-
-			schema.Properties[property.Key] = copiedSchema;
-		}
-	}
+            schema.Properties[propertyName] = copiedSchema;
+        }
+    }
 }

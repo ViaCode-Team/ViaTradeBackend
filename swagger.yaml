@@ -649,20 +649,10 @@ paths:
         - Note
       operationId: GetUserTradeCodeNotes
       parameters:
-        - name: PageNumber
+        - name: pagination
           in: query
           schema:
-            maximum: 2147483647
-            minimum: 1
-            type: integer
-            format: int32
-        - name: PageSize
-          in: query
-          schema:
-            maximum: 100
-            minimum: 1
-            type: integer
-            format: int32
+            $ref: '#/components/schemas/PaginationRequest'
       responses:
         '200':
           description: OK
@@ -1158,20 +1148,10 @@ paths:
         - Note
       operationId: GetUserStrategyNotes
       parameters:
-        - name: PageNumber
+        - name: pagination
           in: query
           schema:
-            maximum: 2147483647
-            minimum: 1
-            type: integer
-            format: int32
-        - name: PageSize
-          in: query
-          schema:
-            maximum: 100
-            minimum: 1
-            type: integer
-            format: int32
+            $ref: '#/components/schemas/PaginationRequest'
       responses:
         '200':
           description: OK
@@ -1955,20 +1935,10 @@ paths:
         - Remind
       operationId: GetUserReminders
       parameters:
-        - name: PageNumber
+        - name: pagination
           in: query
           schema:
-            maximum: 2147483647
-            minimum: 1
-            type: integer
-            format: int32
-        - name: PageSize
-          in: query
-          schema:
-            maximum: 100
-            minimum: 1
-            type: integer
-            format: int32
+            $ref: '#/components/schemas/PaginationRequest'
       responses:
         '200':
           description: OK
@@ -2065,26 +2035,16 @@ paths:
         - Remind
       operationId: GetUserRemindersByInstrument
       parameters:
-        - name: PageNumber
-          in: query
-          schema:
-            maximum: 2147483647
-            minimum: 1
-            type: integer
-            format: int32
-        - name: PageSize
-          in: query
-          schema:
-            maximum: 100
-            minimum: 1
-            type: integer
-            format: int32
         - name: idInstrument
           in: path
           required: true
           schema:
             type: integer
             format: int32
+        - name: pagination
+          in: query
+          schema:
+            $ref: '#/components/schemas/PaginationRequest'
       responses:
         '200':
           description: OK
@@ -2992,20 +2952,10 @@ paths:
         - Strategy
       operationId: GetStrategies
       parameters:
-        - name: PageNumber
+        - name: pagination
           in: query
           schema:
-            maximum: 2147483647
-            minimum: 1
-            type: integer
-            format: int32
-        - name: PageSize
-          in: query
-          schema:
-            maximum: 100
-            minimum: 1
-            type: integer
-            format: int32
+            $ref: '#/components/schemas/PaginationRequest'
       responses:
         '200':
           description: OK
@@ -3204,20 +3154,10 @@ paths:
         - Strategy
       operationId: GetUserStrategyTradeCodes
       parameters:
-        - name: PageNumber
+        - name: pagination
           in: query
           schema:
-            maximum: 2147483647
-            minimum: 1
-            type: integer
-            format: int32
-        - name: PageSize
-          in: query
-          schema:
-            maximum: 100
-            minimum: 1
-            type: integer
-            format: int32
+            $ref: '#/components/schemas/PaginationRequest'
       responses:
         '200':
           description: OK
@@ -3507,20 +3447,10 @@ paths:
         - Strategy
       operationId: GetUserStrategies
       parameters:
-        - name: PageNumber
+        - name: pagination
           in: query
           schema:
-            maximum: 2147483647
-            minimum: 1
-            type: integer
-            format: int32
-        - name: PageSize
-          in: query
-          schema:
-            maximum: 100
-            minimum: 1
-            type: integer
-            format: int32
+            $ref: '#/components/schemas/PaginationRequest'
       responses:
         '200':
           description: OK
@@ -3899,20 +3829,6 @@ paths:
         - Trade
       operationId: GetUserTrades
       parameters:
-        - name: PageNumber
-          in: query
-          schema:
-            maximum: 2147483647
-            minimum: 1
-            type: integer
-            format: int32
-        - name: PageSize
-          in: query
-          schema:
-            maximum: 100
-            minimum: 1
-            type: integer
-            format: int32
         - name: startDate
           in: query
           schema:
@@ -3927,6 +3843,10 @@ paths:
           in: query
           schema:
             $ref: '#/components/schemas/TradeSignal'
+        - name: pagination
+          in: query
+          schema:
+            $ref: '#/components/schemas/PaginationRequest'
       responses:
         '200':
           description: OK
@@ -4521,20 +4441,10 @@ paths:
         - TradeCode
       operationId: GetStockCodes
       parameters:
-        - name: PageNumber
+        - name: pagination
           in: query
           schema:
-            maximum: 2147483647
-            minimum: 1
-            type: integer
-            format: int32
-        - name: PageSize
-          in: query
-          schema:
-            maximum: 100
-            minimum: 1
-            type: integer
-            format: int32
+            $ref: '#/components/schemas/PaginationRequest'
       responses:
         '200':
           description: OK
@@ -5352,6 +5262,23 @@ components:
           type: integer
           format: int32
         strategyNotes:
+          type: integer
+          format: int32
+      additionalProperties: false
+    PaginationRequest:
+      required:
+        - pageNumber
+        - pageSize
+      type: object
+      properties:
+        pageNumber:
+          maximum: 2147483647
+          minimum: 1
+          type: integer
+          format: int32
+        pageSize:
+          maximum: 100
+          minimum: 1
           type: integer
           format: int32
       additionalProperties: false
