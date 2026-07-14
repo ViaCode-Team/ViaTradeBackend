@@ -548,30 +548,134 @@ paths:
                 title: Internal Server Error
                 status: 500
                 detail: Specific error details here
-  /api/Note/byuser/instrument:
+  /api/Note/statistics:
     get:
       tags:
         - Note
-      operationId: GetByUserInstrumentAll
+      operationId: GetNoteStatistics
       responses:
         '200':
           description: OK
           content:
             text/plain:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Note'
+                $ref: '#/components/schemas/NoteStatistic'
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Note'
+                $ref: '#/components/schemas/NoteStatistic'
             text/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Note'
+                $ref: '#/components/schemas/NoteStatistic'
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/400
+                title: Bad Request
+                status: 400
+                detail: Specific error details here
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/401
+                title: Unauthorized
+                status: 401
+                detail: Specific error details here
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/403
+                title: Forbidden
+                status: 403
+                detail: Specific error details here
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/404
+                title: Not Found
+                status: 404
+                detail: Specific error details here
+        '408':
+          description: Timeout - Server timeout
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/408
+                title: Timeout
+                status: 408
+                detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
+                detail: Specific error details here
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/500
+                title: Internal Server Error
+                status: 500
+                detail: Specific error details here
+  /api/Note/byuser/instrument:
+    get:
+      tags:
+        - Note
+      operationId: GetTradeCodeNoteAll
+      parameters:
+        - name: PageNumber
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/NotePagedResult'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotePagedResult'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/NotePagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -653,7 +757,7 @@ paths:
     get:
       tags:
         - Note
-      operationId: GetByUserInstrument
+      operationId: GetNoteByUserInstrument
       parameters:
         - name: idInstrument
           in: path
@@ -1052,26 +1156,35 @@ paths:
     get:
       tags:
         - Note
-      operationId: GetByUserStrategyAll
+      operationId: GetTradeStrategyNoteAll
+      parameters:
+        - name: PageNumber
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
       responses:
         '200':
           description: OK
           content:
             text/plain:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Note'
+                $ref: '#/components/schemas/NotePagedResult'
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Note'
+                $ref: '#/components/schemas/NotePagedResult'
             text/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Note'
+                $ref: '#/components/schemas/NotePagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -1548,6 +1661,101 @@ paths:
                 title: Internal Server Error
                 status: 500
                 detail: Specific error details here
+  /api/Result/statistics:
+    get:
+      tags:
+        - Result
+      operationId: GetResultStatistics
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/SignalStatistic'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignalStatistic'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/SignalStatistic'
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/400
+                title: Bad Request
+                status: 400
+                detail: Specific error details here
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/401
+                title: Unauthorized
+                status: 401
+                detail: Specific error details here
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/403
+                title: Forbidden
+                status: 403
+                detail: Specific error details here
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/404
+                title: Not Found
+                status: 404
+                detail: Specific error details here
+        '408':
+          description: Timeout - Server timeout
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/408
+                title: Timeout
+                status: 408
+                detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
+                detail: Specific error details here
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/500
+                title: Internal Server Error
+                status: 500
+                detail: Specific error details here
   /api/Result/strategy:
     get:
       tags:
@@ -1770,438 +1978,24 @@ paths:
                 title: Internal Server Error
                 status: 500
                 detail: Specific error details here
-  /api/Statistic/byuser:
+  /api/Strategy/statistics:
     get:
       tags:
-        - Statistic
-      operationId: GetByUser
-      parameters:
-        - name: startDate
-          in: query
-          schema:
-            type: string
-            format: date-time
-        - name: endDate
-          in: query
-          schema:
-            type: string
-            format: date-time
-        - name: tradeSignal
-          in: query
-          schema:
-            $ref: '#/components/schemas/TradeSignal'
+        - Strategy
+      operationId: GetStrategyStatistics
       responses:
         '200':
           description: OK
           content:
             text/plain:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Trade'
+                $ref: '#/components/schemas/StrategyStatistic'
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Trade'
+                $ref: '#/components/schemas/StrategyStatistic'
             text/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Trade'
-        '400':
-          description: Bad Request - Invalid input data
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/400
-                title: Bad Request
-                status: 400
-                detail: Specific error details here
-        '401':
-          description: Unauthorized - Invalid credentials
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/401
-                title: Unauthorized
-                status: 401
-                detail: Specific error details here
-        '403':
-          description: Forbidden - Access denied
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/403
-                title: Forbidden
-                status: 403
-                detail: Specific error details here
-        '404':
-          description: Not Found - Resource does not exist
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/404
-                title: Not Found
-                status: 404
-                detail: Specific error details here
-        '408':
-          description: Timeout - Server timeout
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/408
-                title: Timeout
-                status: 408
-                detail: Specific error details here
-        '409':
-          description: Conflict - Conflict operation
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/409
-                title: Conflict
-                status: 409
-                detail: Specific error details here
-        '500':
-          description: Internal Server Error - Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/500
-                title: Internal Server Error
-                status: 500
-                detail: Specific error details here
-    post:
-      tags:
-        - Statistic
-      operationId: CreateTrade
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TradeRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/TradeRequest'
-          application/*+json:
-            schema:
-              $ref: '#/components/schemas/TradeRequest'
-        required: true
-      responses:
-        '201':
-          description: Created
-        '400':
-          description: Bad Request - Invalid input data
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/400
-                title: Bad Request
-                status: 400
-                detail: Specific error details here
-        '401':
-          description: Unauthorized - Invalid credentials
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/401
-                title: Unauthorized
-                status: 401
-                detail: Specific error details here
-        '403':
-          description: Forbidden - Access denied
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/403
-                title: Forbidden
-                status: 403
-                detail: Specific error details here
-        '404':
-          description: Not Found - Resource does not exist
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/404
-                title: Not Found
-                status: 404
-                detail: Specific error details here
-        '408':
-          description: Timeout - Server timeout
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/408
-                title: Timeout
-                status: 408
-                detail: Specific error details here
-        '409':
-          description: Conflict - Conflict operation
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/409
-                title: Conflict
-                status: 409
-                detail: Specific error details here
-        '500':
-          description: Internal Server Error - Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/500
-                title: Internal Server Error
-                status: 500
-                detail: Specific error details here
-  '/api/Statistic/{id}':
-    get:
-      tags:
-        - Statistic
-      operationId: GetTradeById
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-      responses:
-        '200':
-          description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/Trade'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Trade'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/Trade'
-        '400':
-          description: Bad Request - Invalid input data
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/400
-                title: Bad Request
-                status: 400
-                detail: Specific error details here
-        '401':
-          description: Unauthorized - Invalid credentials
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/401
-                title: Unauthorized
-                status: 401
-                detail: Specific error details here
-        '403':
-          description: Forbidden - Access denied
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/403
-                title: Forbidden
-                status: 403
-                detail: Specific error details here
-        '404':
-          description: Not Found - Resource does not exist
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/404
-                title: Not Found
-                status: 404
-                detail: Specific error details here
-        '408':
-          description: Timeout - Server timeout
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/408
-                title: Timeout
-                status: 408
-                detail: Specific error details here
-        '409':
-          description: Conflict - Conflict operation
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/409
-                title: Conflict
-                status: 409
-                detail: Specific error details here
-        '500':
-          description: Internal Server Error - Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/500
-                title: Internal Server Error
-                status: 500
-                detail: Specific error details here
-  '/api/Statistic/byuser/{id}':
-    put:
-      tags:
-        - Statistic
-      operationId: UpdateTrade
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/TradeRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/TradeRequest'
-          application/*+json:
-            schema:
-              $ref: '#/components/schemas/TradeRequest'
-        required: true
-      responses:
-        '204':
-          description: No Content
-        '400':
-          description: Bad Request - Invalid input data
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/400
-                title: Bad Request
-                status: 400
-                detail: Specific error details here
-        '401':
-          description: Unauthorized - Invalid credentials
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/401
-                title: Unauthorized
-                status: 401
-                detail: Specific error details here
-        '403':
-          description: Forbidden - Access denied
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/403
-                title: Forbidden
-                status: 403
-                detail: Specific error details here
-        '404':
-          description: Not Found - Resource does not exist
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/404
-                title: Not Found
-                status: 404
-                detail: Specific error details here
-        '408':
-          description: Timeout - Server timeout
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/408
-                title: Timeout
-                status: 408
-                detail: Specific error details here
-        '409':
-          description: Conflict - Conflict operation
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/409
-                title: Conflict
-                status: 409
-                detail: Specific error details here
-        '500':
-          description: Internal Server Error - Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/500
-                title: Internal Server Error
-                status: 500
-                detail: Specific error details here
-    delete:
-      tags:
-        - Statistic
-      operationId: DeleteTrade
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-            format: int32
-      responses:
-        '204':
-          description: No Content
+                $ref: '#/components/schemas/StrategyStatistic'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -2284,25 +2078,34 @@ paths:
       tags:
         - Strategy
       operationId: GetAll
+      parameters:
+        - name: PageNumber
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
       responses:
         '200':
           description: OK
           content:
             text/plain:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeStrategy'
+                $ref: '#/components/schemas/TradeStrategyPagedResult'
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeStrategy'
+                $ref: '#/components/schemas/TradeStrategyPagedResult'
             text/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeStrategy'
+                $ref: '#/components/schemas/TradeStrategyPagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -2487,25 +2290,34 @@ paths:
       tags:
         - Strategy
       operationId: GetAllInstrumentsLink
+      parameters:
+        - name: PageNumber
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
       responses:
         '200':
           description: OK
           content:
             text/plain:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserStrategyTradeCodeDto'
+                $ref: '#/components/schemas/UserStrategyTradeCodeDtoPagedResult'
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserStrategyTradeCodeDto'
+                $ref: '#/components/schemas/UserStrategyTradeCodeDtoPagedResult'
             text/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserStrategyTradeCodeDto'
+                $ref: '#/components/schemas/UserStrategyTradeCodeDtoPagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -2781,25 +2593,34 @@ paths:
       tags:
         - Strategy
       operationId: GetUsersStrategy
+      parameters:
+        - name: PageNumber
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
       responses:
         '200':
           description: OK
           content:
             text/plain:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserTradeStrategyDto'
+                $ref: '#/components/schemas/UserTradeStrategyDtoPagedResult'
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserTradeStrategyDto'
+                $ref: '#/components/schemas/UserTradeStrategyDtoPagedResult'
             text/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/UserTradeStrategyDto'
+                $ref: '#/components/schemas/UserTradeStrategyDtoPagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3064,30 +2885,756 @@ paths:
                 title: Internal Server Error
                 status: 500
                 detail: Specific error details here
-  /api/TradeCode/stocks:
+  /api/Trade/statistics:
     get:
       tags:
-        - TradeCode
-      operationId: GetAllStocksCodes
+        - Trade
+      operationId: GetTradeStatistics
       responses:
         '200':
           description: OK
           content:
             text/plain:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeCode'
+                $ref: '#/components/schemas/GlobalStatistic'
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeCode'
+                $ref: '#/components/schemas/GlobalStatistic'
             text/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeCode'
+                $ref: '#/components/schemas/GlobalStatistic'
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/400
+                title: Bad Request
+                status: 400
+                detail: Specific error details here
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/401
+                title: Unauthorized
+                status: 401
+                detail: Specific error details here
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/403
+                title: Forbidden
+                status: 403
+                detail: Specific error details here
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/404
+                title: Not Found
+                status: 404
+                detail: Specific error details here
+        '408':
+          description: Timeout - Server timeout
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/408
+                title: Timeout
+                status: 408
+                detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
+                detail: Specific error details here
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/500
+                title: Internal Server Error
+                status: 500
+                detail: Specific error details here
+  /api/Trade/byuser:
+    get:
+      tags:
+        - Trade
+      operationId: GetByUser
+      parameters:
+        - name: PageNumber
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: tradeSignal
+          in: query
+          schema:
+            $ref: '#/components/schemas/TradeSignal'
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/TradePagedResult'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradePagedResult'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/TradePagedResult'
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/400
+                title: Bad Request
+                status: 400
+                detail: Specific error details here
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/401
+                title: Unauthorized
+                status: 401
+                detail: Specific error details here
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/403
+                title: Forbidden
+                status: 403
+                detail: Specific error details here
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/404
+                title: Not Found
+                status: 404
+                detail: Specific error details here
+        '408':
+          description: Timeout - Server timeout
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/408
+                title: Timeout
+                status: 408
+                detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
+                detail: Specific error details here
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/500
+                title: Internal Server Error
+                status: 500
+                detail: Specific error details here
+    post:
+      tags:
+        - Trade
+      operationId: CreateTrade
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/TradeRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/TradeRequest'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Trade'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trade'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/Trade'
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/400
+                title: Bad Request
+                status: 400
+                detail: Specific error details here
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/401
+                title: Unauthorized
+                status: 401
+                detail: Specific error details here
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/403
+                title: Forbidden
+                status: 403
+                detail: Specific error details here
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/404
+                title: Not Found
+                status: 404
+                detail: Specific error details here
+        '408':
+          description: Timeout - Server timeout
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/408
+                title: Timeout
+                status: 408
+                detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
+                detail: Specific error details here
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/500
+                title: Internal Server Error
+                status: 500
+                detail: Specific error details here
+  '/api/Trade/{id}':
+    get:
+      tags:
+        - Trade
+      operationId: GetTradeById
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/Trade'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trade'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/Trade'
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/400
+                title: Bad Request
+                status: 400
+                detail: Specific error details here
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/401
+                title: Unauthorized
+                status: 401
+                detail: Specific error details here
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/403
+                title: Forbidden
+                status: 403
+                detail: Specific error details here
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/404
+                title: Not Found
+                status: 404
+                detail: Specific error details here
+        '408':
+          description: Timeout - Server timeout
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/408
+                title: Timeout
+                status: 408
+                detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
+                detail: Specific error details here
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/500
+                title: Internal Server Error
+                status: 500
+                detail: Specific error details here
+  '/api/Trade/byuser/{id}':
+    put:
+      tags:
+        - Trade
+      operationId: UpdateTrade
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TradeRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/TradeRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/TradeRequest'
+        required: true
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/400
+                title: Bad Request
+                status: 400
+                detail: Specific error details here
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/401
+                title: Unauthorized
+                status: 401
+                detail: Specific error details here
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/403
+                title: Forbidden
+                status: 403
+                detail: Specific error details here
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/404
+                title: Not Found
+                status: 404
+                detail: Specific error details here
+        '408':
+          description: Timeout - Server timeout
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/408
+                title: Timeout
+                status: 408
+                detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
+                detail: Specific error details here
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/500
+                title: Internal Server Error
+                status: 500
+                detail: Specific error details here
+    delete:
+      tags:
+        - Trade
+      operationId: DeleteTrade
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/400
+                title: Bad Request
+                status: 400
+                detail: Specific error details here
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/401
+                title: Unauthorized
+                status: 401
+                detail: Specific error details here
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/403
+                title: Forbidden
+                status: 403
+                detail: Specific error details here
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/404
+                title: Not Found
+                status: 404
+                detail: Specific error details here
+        '408':
+          description: Timeout - Server timeout
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/408
+                title: Timeout
+                status: 408
+                detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
+                detail: Specific error details here
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/500
+                title: Internal Server Error
+                status: 500
+                detail: Specific error details here
+  /api/TradeCode/stocks/statistics:
+    get:
+      tags:
+        - TradeCode
+      operationId: GetStockStatistics
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/StockStatistic'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StockStatistic'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/StockStatistic'
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/400
+                title: Bad Request
+                status: 400
+                detail: Specific error details here
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/401
+                title: Unauthorized
+                status: 401
+                detail: Specific error details here
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/403
+                title: Forbidden
+                status: 403
+                detail: Specific error details here
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/404
+                title: Not Found
+                status: 404
+                detail: Specific error details here
+        '408':
+          description: Timeout - Server timeout
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/408
+                title: Timeout
+                status: 408
+                detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
+                detail: Specific error details here
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/500
+                title: Internal Server Error
+                status: 500
+                detail: Specific error details here
+  /api/TradeCode/stocks:
+    get:
+      tags:
+        - TradeCode
+      operationId: GetAllStocksCodes
+      parameters:
+        - name: PageNumber
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/TradeCodePagedResult'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradeCodePagedResult'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/TradeCodePagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3367,6 +3914,101 @@ paths:
                 title: Internal Server Error
                 status: 500
                 detail: Specific error details here
+  /api/TradeRemind/statistics:
+    get:
+      tags:
+        - TradeRemind
+      operationId: GetRemindStatistics
+      responses:
+        '200':
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: '#/components/schemas/TradeRemindStatistic'
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradeRemindStatistic'
+            text/json:
+              schema:
+                $ref: '#/components/schemas/TradeRemindStatistic'
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/400
+                title: Bad Request
+                status: 400
+                detail: Specific error details here
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/401
+                title: Unauthorized
+                status: 401
+                detail: Specific error details here
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/403
+                title: Forbidden
+                status: 403
+                detail: Specific error details here
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/404
+                title: Not Found
+                status: 404
+                detail: Specific error details here
+        '408':
+          description: Timeout - Server timeout
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/408
+                title: Timeout
+                status: 408
+                detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
+                detail: Specific error details here
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/500
+                title: Internal Server Error
+                status: 500
+                detail: Specific error details here
   /api/TradeRemind/byuser/actual:
     get:
       tags:
@@ -3468,30 +4110,131 @@ paths:
                 title: Internal Server Error
                 status: 500
                 detail: Specific error details here
+  '/api/TradeRemind/byuser/actual/{remindId}':
+    delete:
+      tags:
+        - TradeRemind
+      operationId: DeleteActualRemind
+      parameters:
+        - name: remindId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/400
+                title: Bad Request
+                status: 400
+                detail: Specific error details here
+        '401':
+          description: Unauthorized - Invalid credentials
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/401
+                title: Unauthorized
+                status: 401
+                detail: Specific error details here
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/403
+                title: Forbidden
+                status: 403
+                detail: Specific error details here
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/404
+                title: Not Found
+                status: 404
+                detail: Specific error details here
+        '408':
+          description: Timeout - Server timeout
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/408
+                title: Timeout
+                status: 408
+                detail: Specific error details here
+        '409':
+          description: Conflict - Conflict operation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/409
+                title: Conflict
+                status: 409
+                detail: Specific error details here
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.com/500
+                title: Internal Server Error
+                status: 500
+                detail: Specific error details here
   /api/TradeRemind/byuser:
     get:
       tags:
         - TradeRemind
       operationId: GetAllByUser
+      parameters:
+        - name: PageNumber
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
       responses:
         '200':
           description: OK
           content:
             text/plain:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeRemind'
+                $ref: '#/components/schemas/TradeRemindPagedResult'
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeRemind'
+                $ref: '#/components/schemas/TradeRemindPagedResult'
             text/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeRemind'
+                $ref: '#/components/schemas/TradeRemindPagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3573,8 +4316,22 @@ paths:
     get:
       tags:
         - TradeRemind
-      operationId: GetTradeRemindByUserInstrument
+      operationId: GetByUserInstrument
       parameters:
+        - name: PageNumber
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
         - name: idInstrument
           in: path
           required: true
@@ -3587,19 +4344,13 @@ paths:
           content:
             text/plain:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeRemind'
+                $ref: '#/components/schemas/TradeRemindPagedResult'
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeRemind'
+                $ref: '#/components/schemas/TradeRemindPagedResult'
             text/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeRemind'
+                $ref: '#/components/schemas/TradeRemindPagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3680,7 +4431,7 @@ paths:
     post:
       tags:
         - TradeRemind
-      operationId: CreateInstrumentRemind
+      operationId: Create
       parameters:
         - name: idInstrument
           in: path
@@ -3784,7 +4535,7 @@ paths:
     get:
       tags:
         - TradeRemind
-      operationId: GetTradeRemindById
+      operationId: GetRemindById
       parameters:
         - name: remindId
           in: path
@@ -3882,13 +4633,12 @@ paths:
                 title: Internal Server Error
                 status: 500
                 detail: Specific error details here
-  '/api/TradeRemind/byuser/{redindId}':
     put:
       tags:
         - TradeRemind
-      operationId: UpdateRemind
+      operationId: Update
       parameters:
-        - name: redindId
+        - name: remindId
           in: path
           required: true
           schema:
@@ -3989,9 +4739,9 @@ paths:
     delete:
       tags:
         - TradeRemind
-      operationId: DeleteRemind
+      operationId: Delete
       parameters:
-        - name: redindId
+        - name: remindId
           in: path
           required: true
           schema:
@@ -4475,6 +5225,33 @@ components:
           type: integer
           format: int32
       additionalProperties: false
+    GlobalStatistic:
+      required:
+        - incomeStatistic
+        - tradeStatistic
+        - winrateStatistic
+      type: object
+      properties:
+        tradeStatistic:
+          $ref: '#/components/schemas/TradeStatistic'
+        incomeStatistic:
+          $ref: '#/components/schemas/IncomeTradeStatistic'
+        winrateStatistic:
+          $ref: '#/components/schemas/WinrateTradeStatistic'
+      additionalProperties: false
+    IncomeTradeStatistic:
+      required:
+        - averageIncome
+        - totalIncome
+      type: object
+      properties:
+        totalIncome:
+          type: number
+          format: double
+        averageIncome:
+          type: number
+          format: double
+      additionalProperties: false
     LoginRequest:
       required:
         - login
@@ -4532,6 +5309,25 @@ components:
           type: integer
           format: int32
       additionalProperties: false
+    NotePagedResult:
+      required:
+        - items
+        - totalCount
+        - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Note'
+        totalCount:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+          readOnly: true
+      additionalProperties: false
     NoteRequest:
       required:
         - noteText
@@ -4541,6 +5337,23 @@ components:
           maxLength: 1024
           minLength: 0
           type: string
+      additionalProperties: false
+    NoteStatistic:
+      required:
+        - stockNotes
+        - strategyNotes
+        - totalNotes
+      type: object
+      properties:
+        totalNotes:
+          type: integer
+          format: int32
+        stockNotes:
+          type: integer
+          format: int32
+        strategyNotes:
+          type: integer
+          format: int32
       additionalProperties: false
     ProblemDetails:
       required:
@@ -4575,6 +5388,32 @@ components:
           type: string
         password:
           type: string
+      additionalProperties: false
+    SignalStatistic:
+      required:
+        - buySignals
+        - sellSignals
+        - totalSignals
+      type: object
+      properties:
+        totalSignals:
+          type: integer
+          format: int32
+        buySignals:
+          type: integer
+          format: int32
+        sellSignals:
+          type: integer
+          format: int32
+      additionalProperties: false
+    StockStatistic:
+      required:
+        - totalStocks
+      type: object
+      properties:
+        totalStocks:
+          type: integer
+          format: int32
       additionalProperties: false
     StrategyData:
       required:
@@ -4614,6 +5453,23 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/StrategyData'
+      additionalProperties: false
+    StrategyStatistic:
+      required:
+        - activeStrategies
+        - disabledStrategies
+        - totalStrategies
+      type: object
+      properties:
+        totalStrategies:
+          type: integer
+          format: int32
+        activeStrategies:
+          type: integer
+          format: int32
+        disabledStrategies:
+          type: integer
+          format: int32
       additionalProperties: false
     TgTokenRequest:
       required:
@@ -4739,6 +5595,44 @@ components:
           type: string
           format: date-time
       additionalProperties: false
+    TradeCodePagedResult:
+      required:
+        - items
+        - totalCount
+        - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TradeCode'
+        totalCount:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+          readOnly: true
+      additionalProperties: false
+    TradePagedResult:
+      required:
+        - items
+        - totalCount
+        - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Trade'
+        totalCount:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+          readOnly: true
+      additionalProperties: false
     TradeRemind:
       required:
         - dateTime
@@ -4765,6 +5659,25 @@ components:
           type: integer
           format: int32
       additionalProperties: false
+    TradeRemindPagedResult:
+      required:
+        - items
+        - totalCount
+        - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TradeRemind'
+        totalCount:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+          readOnly: true
+      additionalProperties: false
     TradeRemindRequest:
       required:
         - dateTime
@@ -4778,6 +5691,15 @@ components:
         dateTime:
           type: string
           format: date-time
+      additionalProperties: false
+    TradeRemindStatistic:
+      required:
+        - totalReminds
+      type: object
+      properties:
+        totalReminds:
+          type: integer
+          format: int32
       additionalProperties: false
     TradeRequest:
       required:
@@ -4822,6 +5744,23 @@ components:
         - -1
       type: integer
       format: int32
+    TradeStatistic:
+      required:
+        - loseTrades
+        - totalTrades
+        - winTrades
+      type: object
+      properties:
+        totalTrades:
+          type: integer
+          format: int32
+        winTrades:
+          type: integer
+          format: int32
+        loseTrades:
+          type: integer
+          format: int32
+      additionalProperties: false
     TradeStrategy:
       required:
         - id
@@ -4856,6 +5795,25 @@ components:
         limitDesc:
           maxLength: 256
           type: string
+      additionalProperties: false
+    TradeStrategyPagedResult:
+      required:
+        - items
+        - totalCount
+        - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/TradeStrategy'
+        totalCount:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+          readOnly: true
       additionalProperties: false
     User:
       required:
@@ -4934,6 +5892,25 @@ components:
           type: integer
           format: int32
       additionalProperties: false
+    UserStrategyTradeCodeDtoPagedResult:
+      required:
+        - items
+        - totalCount
+        - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserStrategyTradeCodeDto'
+        totalCount:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+          readOnly: true
+      additionalProperties: false
     UserStrategyTradeCodeRequest:
       required:
         - strategyId
@@ -5004,12 +5981,44 @@ components:
           type: integer
           format: int32
       additionalProperties: false
+    UserTradeStrategyDtoPagedResult:
+      required:
+        - items
+        - totalCount
+        - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserTradeStrategyDto'
+        totalCount:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+          readOnly: true
+      additionalProperties: false
+    WinrateTradeStatistic:
+      required:
+        - profitFactor
+        - totalWinrate
+      type: object
+      properties:
+        totalWinrate:
+          type: number
+          format: float
+        profitFactor:
+          type: number
+          format: float
+      additionalProperties: false
 tags:
   - name: Auth
   - name: Note
   - name: Result
-  - name: Statistic
   - name: Strategy
+  - name: Trade
   - name: TradeCode
   - name: TradeRemind
   - name: User

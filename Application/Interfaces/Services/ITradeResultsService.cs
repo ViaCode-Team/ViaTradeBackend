@@ -6,7 +6,7 @@ namespace Application.Interfaces
     public interface ITradeResultsService
     {
         Task<SignalStatistic> GetStrategyResultStatisticAsync(
-            int userId, 
+            int userId,
             CancellationToken cancellationToken);
 
         Task<StrategyResultResponse> GetStrategyResultAsync(

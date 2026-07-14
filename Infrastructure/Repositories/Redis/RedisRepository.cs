@@ -1,13 +1,13 @@
-﻿using System.Text.Json;
-using Application.Interfaces.Repositories.Redis;
+﻿using Application.Interfaces.Repositories.Redis;
 using Domain.Entities.Redis;
 using StackExchange.Redis;
+using System.Text.Json;
 
 namespace Infrastructure.Repositories.Redis
 {
     public class RedisRepository<T>(IConnectionMultiplexer redis, string prefix) : IRedisRepository<T> where T : RedisEntity
     {
-        protected readonly StackExchange.Redis.IDatabase _db = redis.GetDatabase();
+        protected readonly IDatabase _db = redis.GetDatabase();
         protected readonly string _prefix = prefix;
 
         protected string GetKey(string id) => $"{_prefix}{id}";
@@ -16,7 +16,7 @@ namespace Infrastructure.Repositories.Redis
         {
             var value = await _db.StringGetAsync(GetKey(id));
             if (value.IsNullOrEmpty) return default;
-            return JsonSerializer.Deserialize<T>(value!);
+            return JsonSerializer.Deserialize<T>(value.ToString());
         }
 
         public async Task SetAsync(T entity, TimeSpan? expiry = null)
@@ -39,8 +39,9 @@ namespace Infrastructure.Repositories.Redis
             foreach (var key in keys)
             {
                 var value = await _db.StringGetAsync(key);
+
                 if (!value.IsNullOrEmpty)
-                    result.Add(JsonSerializer.Deserialize<T>(value!)!);
+                    result.Add(JsonSerializer.Deserialize<T>(value.ToString())!);
             }
 
             return result;

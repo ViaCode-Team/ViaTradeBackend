@@ -1,5 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
-using Domain.Entities.DataBase;
+﻿using Domain.Entities.DataBase;
+using System.ComponentModel.DataAnnotations;
 
 namespace ViaTradeBackend.Models.Trade
 {

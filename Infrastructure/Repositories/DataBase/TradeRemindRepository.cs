@@ -1,7 +1,8 @@
-﻿using Application.Interfaces.Repositories.Database;
+using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.NoteRemind;
-using Infrastructure.Repositories.DataBase;
+using Domain.Models.Pagination;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase
@@ -13,10 +14,10 @@ namespace Infrastructure.Repositories.DataBase
         {
             return await _dbSet.Where(r => r.DateTime <= DateTime.Now).ToListAsync(cancellationToken);
         }
-        
-        public async Task<IEnumerable<TradeRemind>> GetByUserAsync(int userId, CancellationToken cancellationToken)
+
+        public async Task<PagedResult<TradeRemind>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
-            return await _dbSet.Where(r => r.UserId == userId).ToListAsync(cancellationToken);
+            return await _dbSet.Where(r => r.UserId == userId).ToPagedResultAsync(paginationRequest, cancellationToken);
         }
 
         public async Task<int> CountByUserAsync(int userId, CancellationToken cancellationToken)
@@ -24,9 +25,9 @@ namespace Infrastructure.Repositories.DataBase
             return await _dbSet.CountAsync(r => r.UserId == userId, cancellationToken);
         }
 
-        public async Task<IEnumerable<TradeRemind>> GetByUserAndTradeCodeAsync(int userId, int tradeCodeId, CancellationToken cancellationToken)
+        public async Task<PagedResult<TradeRemind>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
-            return await _dbSet.Where(r => r.UserId == userId && r.TradeCodeId == tradeCodeId).ToListAsync(cancellationToken);
+            return await _dbSet.Where(r => r.UserId == userId && r.TradeCodeId == tradeCodeId).ToPagedResultAsync(paginationRequest, cancellationToken);
         }
     }
 }

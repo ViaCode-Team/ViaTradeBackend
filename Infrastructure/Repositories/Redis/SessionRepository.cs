@@ -1,7 +1,7 @@
-﻿using System.Text.Json;
-using Application.Interfaces.Repositories.Redis;
+﻿using Application.Interfaces.Repositories.Redis;
 using Domain.Models.Dto.User;
 using StackExchange.Redis;
+using System.Text.Json;
 
 namespace Infrastructure.Repositories.Redis
 {
@@ -30,7 +30,7 @@ namespace Infrastructure.Repositories.Redis
         {
             var value = await _db.StringGetAsync(SessionKey(sessionId));
             if (value.IsNullOrEmpty) return null;
-            return JsonSerializer.Deserialize<UserSession>(value!);
+            return JsonSerializer.Deserialize<UserSession>(value.ToString());
         }
 
         public async Task RemoveAsync(string sessionId)

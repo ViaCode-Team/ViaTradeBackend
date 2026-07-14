@@ -11,7 +11,7 @@ namespace Infrastructure.Repositories.DataBase
         public DbSet<TradeCode> TradeCodes { get; set; }
         public DbSet<TradeStrategy> TradeStrategies { get; set; }
         public DbSet<UserTradeStrategy> UserTradeStrategies { get; set; }
-        public DbSet<Note> Notes{ get; set; }
+        public DbSet<Note> Notes { get; set; }
         public DbSet<TradeRemind> TradeReminds { get; set; }
         public DbSet<UserStrategyTradeCode> UserStrategyTradeCodes { get; set; }
 
@@ -38,7 +38,7 @@ namespace Infrastructure.Repositories.DataBase
                 .IsUnique();
 
             modelBuilder.Entity<UserStrategyTradeCode>()
-                .HasIndex(x => new { x.UserId, x.TradeCodeId, x.StrategyId})
+                .HasIndex(x => new { x.UserId, x.TradeCodeId, x.StrategyId })
                 .IsUnique();
 
             modelBuilder.Entity<TradeRemind>()

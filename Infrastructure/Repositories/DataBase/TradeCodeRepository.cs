@@ -16,10 +16,12 @@ namespace Infrastructure.Repositories.DataBase
         {
             return await _dbSet
                 .Where(e => e.ExchangeId == code)
-                .Select(e => new TradeCodeDto{ 
+                .Select(e => new TradeCodeDto
+                {
                     Id = e.Id,
-                    ExchangeId = e.ExchangeId, 
-                    Description = e.Description })
+                    ExchangeId = e.ExchangeId,
+                    Description = e.Description
+                })
                 .FirstOrDefaultAsync(cancellationToken);
         }
     }

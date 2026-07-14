@@ -2,8 +2,9 @@
 
 namespace ViaTradeBackend.Models.Trade
 {
-    public class CreateUserStrategyRequest {
+    public class CreateUserStrategyRequest
+    {
         [Required]
         public required int StrategyId { get; set; }
     }
-} 
+}

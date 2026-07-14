@@ -1,7 +1,7 @@
-﻿using System.Text.Json.Nodes;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Text.Json.Nodes;
 
 namespace ViaTradeBackend.Swagger.Filters
 {
@@ -27,7 +27,7 @@ namespace ViaTradeBackend.Swagger.Filters
 
             foreach (var (statusCode, description) in errorResponses)
             {
-                operation.Responses.TryAdd(statusCode.ToString(), new OpenApiResponse
+                operation.Responses?.TryAdd(statusCode.ToString(), new OpenApiResponse
                 {
                     Description = description,
                     Content = new Dictionary<string, OpenApiMediaType>

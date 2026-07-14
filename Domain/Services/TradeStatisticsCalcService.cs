@@ -1,5 +1,5 @@
-﻿using System.Linq.Expressions;
-using Domain.Entities.DataBase;
+﻿using Domain.Entities.DataBase;
+using System.Linq.Expressions;
 
 namespace Domain.Services
 {

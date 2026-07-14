@@ -1,16 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Domain.Models.Dto.Statistic
+﻿namespace Domain.Models.Dto.Statistic
 {
     public class SignalStatistic
     {
-        [Required]
-        public int TotalSignals { get; set; }
+        public required int TotalSignals { get; set; }
 
-        [Required]
-        public int BuySignals { get; set; }
+        public required int BuySignals { get; set; }
 
-        [Required]
-        public int SellSignals { get; set; }
+        public required int SellSignals { get; set; }
     }
 }

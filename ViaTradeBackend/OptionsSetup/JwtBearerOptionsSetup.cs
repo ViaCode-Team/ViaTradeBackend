@@ -1,8 +1,8 @@
-﻿using System.Text;
-using Domain.Models.ConfigOptions;
+﻿using Domain.Models.ConfigOptions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace ViaTradeBackend.OptionsSetup
 {

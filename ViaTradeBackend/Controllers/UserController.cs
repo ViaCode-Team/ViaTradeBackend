@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using Application.Interfaces;
 using Application.Interfaces.Utils;
 using Domain.Entities.DataBase;
@@ -6,6 +5,7 @@ using Domain.Models.Dto.User;
 using Domain.Models.Request.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using ViaTradeBackend.Attribute;
 
 namespace ViaTradeBackend.Controllers

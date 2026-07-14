@@ -4,7 +4,6 @@ namespace ViaTradeBackend.Models.Note
 {
     public class NoteRequest
     {
-        [Required]
         [StringLength(1024)]
         public required string NoteText { get; set; }
     }

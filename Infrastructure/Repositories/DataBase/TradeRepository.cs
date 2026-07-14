@@ -1,10 +1,10 @@
-﻿using Application.Interfaces.Repositories.Database;
+using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Trade;
+using Domain.Models.Pagination;
 using Domain.Services;
-using Infrastructure.Repositories.DataBase;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase
@@ -57,43 +57,43 @@ namespace Infrastructure.Repositories.DataBase
             };
         }
 
-        public async Task<IEnumerable<Trade>> GetByUserAsync(int userId, CancellationToken cancellationToken)
+        public async Task<PagedResult<Trade>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
             return await _dbSet
                 .Include(t => t.TradeType)
                 .Include(t => t.TradeCode)
                 .Where(t => t.UserId == userId)
-                .ToListAsync(cancellationToken);
+                .ToPagedResultAsync(paginationRequest, cancellationToken);
         }
 
-        public async Task<IEnumerable<Trade>> GetByUserAndTradeCodeAsync(int userId, int tradeCodeId, CancellationToken cancellationToken)
+        public async Task<PagedResult<Trade>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
             return await _dbSet
                 .Include(t => t.TradeType)
                 .Include(t => t.TradeCode)
                 .Where(t => t.UserId == userId && t.TradeCodeId == tradeCodeId)
-                .ToListAsync(cancellationToken);
+                .ToPagedResultAsync(paginationRequest, cancellationToken);
         }
 
-        public async Task<IEnumerable<Trade>> GetByUserAndDateRangeAsync(int userId, DateTime? from, DateTime? to, TradeSignal? tradeSignal, CancellationToken cancellationToken)
+        public async Task<PagedResult<Trade>> GetByUserAndDateRangePagedAsync(int userId, DateTime? from, DateTime? to, TradeSignal? tradeSignal, PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
-            var query = _dbSet
+            var queryable = _dbSet
                 .Include(t => t.TradeType)
                 .Include(t => t.TradeCode)
                 .Where(t => t.UserId == userId);
 
             if (from.HasValue)
-                query = query.Where(t => t.DateOpen >= from.Value);
+                queryable = queryable.Where(t => t.DateOpen >= from.Value);
 
             if (to.HasValue)
-                query = query.Where(t => t.DateOpen <= to.Value.Date.AddDays(1).AddTicks(-1));
+                queryable = queryable.Where(t => t.DateOpen <= to.Value.Date.AddDays(1).AddTicks(-1));
 
             if (tradeSignal.HasValue)
             {
-                query = query.Where(t => t.TradeSignal == tradeSignal);
+                queryable = queryable.Where(t => t.TradeSignal == tradeSignal);
             }
 
-            return await query.ToListAsync(cancellationToken);
+            return await queryable.ToPagedResultAsync(paginationRequest, cancellationToken);
         }
     }
 }

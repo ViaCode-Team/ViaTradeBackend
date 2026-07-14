@@ -1,7 +1,9 @@
-﻿using System.Linq.Expressions;
 using Application.Interfaces.Repositories.Database;
+using Domain.Models.Pagination;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
+using System.Linq.Expressions;
 
 namespace Infrastructure.Repositories.DataBase
 {
@@ -28,11 +30,24 @@ namespace Infrastructure.Repositories.DataBase
             return await _dbSet.ToListAsync(ct);
         }
 
+        public async Task<PagedResult<TEntity>> GetPagedAsync(PaginationRequest paginationRequest, CancellationToken ct = default)
+        {
+            return await _dbSet.ToPagedResultAsync(paginationRequest, ct);
+        }
+
         public async Task<IEnumerable<TEntity>> FindAsync(
             Expression<Func<TEntity, bool>> predicate,
             CancellationToken ct = default)
         {
             return await _dbSet.Where(predicate).ToListAsync(ct);
+        }
+
+        public async Task<PagedResult<TEntity>> FindPagedAsync(
+            Expression<Func<TEntity, bool>> predicate,
+            PaginationRequest paginationRequest,
+            CancellationToken ct = default)
+        {
+            return await _dbSet.Where(predicate).ToPagedResultAsync(paginationRequest, ct);
         }
 
         public async Task AddAsync(TEntity entity, CancellationToken ct = default)

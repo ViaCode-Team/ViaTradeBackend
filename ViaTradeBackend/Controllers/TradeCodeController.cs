@@ -1,9 +1,10 @@
-﻿using Application.Interfaces;
+using Application.Interfaces;
 using Application.Interfaces.Utils;
 using Domain.Entities.CSV;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Trade;
+using Domain.Models.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -30,9 +31,9 @@ namespace ViaTradeBackend.Controllers
 
         [HttpGet("stocks")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<TradeCode>>> GetAllStocksCodes()
+        public async Task<ActionResult<PagedResult<TradeCode>>> GetAllStocksCodes([FromQuery] PaginationRequest paginationRequest)
         {
-            var result = await _tradeService.GetAllCodesAsync();
+            var result = await _tradeService.GetCodesPagedAsync(paginationRequest);
             return Ok(result);
         }
 

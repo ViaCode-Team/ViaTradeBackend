@@ -3,6 +3,7 @@ using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.NoteRemind;
 using Domain.Models.Dto.Statistic;
+using Domain.Models.Pagination;
 
 namespace Application.Services
 {
@@ -29,10 +30,10 @@ namespace Application.Services
             };
         }
 
-        public async Task<IEnumerable<Note>> GetUserNoteByPropAllAsync(int userId, NoteType noteType, CancellationToken cancellationToken)
+        public async Task<PagedResult<Note>> GetUserNoteByPropPagedAsync(int userId, NoteType noteType, PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
             await _userService.EnsureUserAsync(userId, cancellationToken);
-            return await _noteRepository.GetUserNoteByPropAll(userId, noteType, cancellationToken);
+            return await _noteRepository.GetUserNoteByPropPagedAsync(userId, noteType, paginationRequest, cancellationToken);
         }
 
         public async Task<Note> GetUserNoteByPropAsync(int id, int userId, NoteType noteType, CancellationToken cancellationToken)

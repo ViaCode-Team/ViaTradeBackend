@@ -1,4 +1,3 @@
-using System.Text.Json.Serialization;
 using Application.Interfaces;
 using Application.Interfaces.Repositories.Database;
 using Application.Interfaces.Repositories.Redis;
@@ -16,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
+using System.Text.Json.Serialization;
 using ViaTradeBackend.BackgroundServices;
 using ViaTradeBackend.Handler;
 using ViaTradeBackend.Middleware;

@@ -1,5 +1,5 @@
-﻿using System.Security.Claims;
-using Domain.Entities.DataBase;
+﻿using Domain.Entities.DataBase;
+using System.Security.Claims;
 
 namespace Application.Interfaces.Utils
 {

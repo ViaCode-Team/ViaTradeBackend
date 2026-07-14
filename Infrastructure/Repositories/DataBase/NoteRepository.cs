@@ -1,7 +1,8 @@
-﻿using Application.Interfaces.Repositories.Database;
+using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.NoteRemind;
-using Infrastructure.Repositories.DataBase;
+using Domain.Models.Pagination;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase
@@ -20,15 +21,15 @@ namespace Infrastructure.Repositories.DataBase
             _ => throw new KeyNotFoundException()
         };
 
-        public async Task<IEnumerable<Note>> GetUserNoteByPropAll(int userId, NoteType noteType, CancellationToken cancellationToken) => noteType switch
+        public async Task<PagedResult<Note>> GetUserNoteByPropPagedAsync(int userId, NoteType noteType, PaginationRequest paginationRequest, CancellationToken cancellationToken) => noteType switch
         {
             NoteType.TradeCodeNote => await _dbSet
                 .Where(n => n.UserId == userId && n.TradeCodeId != null)
-                .ToListAsync(cancellationToken),
+                .ToPagedResultAsync(paginationRequest, cancellationToken),
 
             NoteType.TradeStrategyNote => await _dbSet
                 .Where(n => n.UserId == userId && n.TradeStrategyId != null)
-                .ToListAsync(cancellationToken),
+                .ToPagedResultAsync(paginationRequest, cancellationToken),
 
             _ => throw new KeyNotFoundException()
         };

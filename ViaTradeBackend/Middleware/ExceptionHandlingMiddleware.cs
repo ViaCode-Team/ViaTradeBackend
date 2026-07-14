@@ -1,5 +1,5 @@
-﻿using System.Text.Json;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 using ViaTradeBackend.Models.Exceptions;
 
 namespace ViaTradeBackend.Middleware
@@ -71,7 +71,7 @@ namespace ViaTradeBackend.Middleware
 #if !DEBUG
                 _ => HandleAll(),
 #else
-        _ => throw exception // In DEBUG mode, propagate exception for debugging
+                _ => throw exception // In DEBUG mode, propagate exception for debugging
 #endif
             };
 

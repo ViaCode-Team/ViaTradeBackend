@@ -1,7 +1,7 @@
-﻿using System.Globalization;
-using System.Text.RegularExpressions;
-using Application.Interfaces.Utils;
+﻿using Application.Interfaces.Utils;
 using Domain.Models.TradeLogic;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Infrastructure.Utils
 {

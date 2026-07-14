@@ -1,11 +1,12 @@
-using System.ComponentModel.DataAnnotations;
 using Application.Interfaces;
 using Application.Interfaces.Utils;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.NoteRemind;
 using Domain.Models.Dto.Statistic;
+using Domain.Models.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using ViaTradeBackend.Models.Note;
 
 namespace ViaTradeBackend.Controllers
@@ -31,10 +32,10 @@ namespace ViaTradeBackend.Controllers
 
         [HttpGet("byuser/instrument")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Note>>> GetByUserInstrumentAll(CancellationToken cancellationToken)
+        public async Task<ActionResult<PagedResult<Note>>> GetTradeCodeNoteAll([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var notes = await _noteService.GetUserNoteByPropAllAsync(userId, NoteType.TradeCodeNote, cancellationToken);
+            var notes = await _noteService.GetUserNoteByPropPagedAsync(userId, NoteType.TradeCodeNote, paginationRequest, cancellationToken);
             return Ok(notes);
         }
 
@@ -52,10 +53,10 @@ namespace ViaTradeBackend.Controllers
 
         [HttpGet("byuser/strategy")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Note>>> GetByUserStrategyAll(CancellationToken cancellationToken)
+        public async Task<ActionResult<PagedResult<Note>>> GetTradeStrategyNoteAll([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var notes = await _noteService.GetUserNoteByPropAllAsync(userId, NoteType.TradeStrategyNote, cancellationToken);
+            var notes = await _noteService.GetUserNoteByPropPagedAsync(userId, NoteType.TradeStrategyNote, paginationRequest, cancellationToken);
             return Ok(notes);
         }
 

@@ -1,10 +1,10 @@
-﻿using System.Globalization;
-using System.Text.RegularExpressions;
-using Application.Interfaces.Utils;
+﻿using Application.Interfaces.Utils;
 using Domain.Entities.CSV;
 using Domain.Models.ConfigOptions;
 using Domain.Models.TradeLogic;
 using Microsoft.Extensions.Options;
+using System.Globalization;
+using System.Text.RegularExpressions;
 
 namespace Infrastructure.Services
 {

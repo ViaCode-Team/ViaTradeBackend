@@ -1,12 +1,8 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Domain.Models.Dto.Strategy
+﻿namespace Domain.Models.Dto.Strategy
 {
     public class TradeStrategyDto
     {
-        [Required]
         public required int Id { get; set; }
-        [Required]
         public required string Name { get; set; }
         public string? Description { get; set; }
         public int? Accuracy { get; set; }

@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
 using Application.Interfaces;
 using Application.Interfaces.Utils;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Strategy;
+using Domain.Models.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using ViaTradeBackend.Models.Trade;
 
 namespace ViaTradeBackend.Controllers
@@ -31,9 +32,11 @@ namespace ViaTradeBackend.Controllers
 
         [HttpGet("")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<TradeStrategy>>> GetAll(CancellationToken cancellationToken)
+        public async Task<ActionResult<PagedResult<TradeStrategy>>> GetAll(
+            [FromQuery] PaginationRequest paginationRequest,
+            CancellationToken cancellationToken)
         {
-            var response = await _strategyService.GetAllStrategiesAsync(cancellationToken);
+            var response = await _strategyService.GetStrategiesPagedAsync(paginationRequest, cancellationToken);
             return Ok(response);
         }
 
@@ -47,10 +50,10 @@ namespace ViaTradeBackend.Controllers
 
         [HttpGet("byuser/instrumentslink")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<UserStrategyTradeCodeDto>>> GetAllInstrumentsLink(CancellationToken cancellationToken)
+        public async Task<ActionResult<PagedResult<UserStrategyTradeCodeDto>>> GetAllInstrumentsLink([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var response = await _strategyService.GetUserStrategyCodesAsync(userId, cancellationToken);
+            var response = await _strategyService.GetUserStrategyCodesPagedAsync(userId, paginationRequest, cancellationToken);
             return Ok(response);
         }
 
@@ -79,10 +82,10 @@ namespace ViaTradeBackend.Controllers
 
         [HttpGet("byuser")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<UserTradeStrategyDto>>> GetUsersStrategy(CancellationToken cancellationToken)
+        public async Task<ActionResult<PagedResult<UserTradeStrategyDto>>> GetUsersStrategy([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var response = await _strategyService.GetUserStrategiesAsync(userId, cancellationToken);
+            var response = await _strategyService.GetUserStrategiesPagedAsync(userId, paginationRequest, cancellationToken);
             return Ok(response);
         }
 

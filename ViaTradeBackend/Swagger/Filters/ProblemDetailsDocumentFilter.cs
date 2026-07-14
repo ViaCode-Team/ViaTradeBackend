@@ -1,6 +1,6 @@
-﻿using System.Text.Json.Nodes;
-using Microsoft.OpenApi;
+﻿using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Text.Json.Nodes;
 
 namespace ViaTradeBackend.Swagger.Filters
 {
@@ -10,7 +10,7 @@ namespace ViaTradeBackend.Swagger.Filters
         {
             swaggerDoc.Components ??= new();
 
-            swaggerDoc.Components.Schemas["ProblemDetails"] = new OpenApiSchema
+            swaggerDoc.Components?.Schemas?["ProblemDetails"] = new OpenApiSchema
             {
                 Type = JsonSchemaType.Object,
                 Required = new HashSet<string> { "type", "status", "title", "detail" },

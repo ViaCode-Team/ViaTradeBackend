@@ -1,4 +1,5 @@
-﻿using System.Linq.Expressions;
+using Domain.Models.Pagination;
+using System.Linq.Expressions;
 
 namespace Application.Interfaces.Repositories.Database
 {
@@ -6,7 +7,9 @@ namespace Application.Interfaces.Repositories.Database
     {
         Task<TEntity?> GetByIdAsync(int id, CancellationToken ct = default);
         Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken ct = default);
+        Task<PagedResult<TEntity>> GetPagedAsync(PaginationRequest paginationRequest, CancellationToken ct = default);
         Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
+        Task<PagedResult<TEntity>> FindPagedAsync(Expression<Func<TEntity, bool>> predicate, PaginationRequest paginationRequest, CancellationToken ct = default);
         Task AddAsync(TEntity entity, CancellationToken ct = default);
         void Update(TEntity entity);
         void Remove(TEntity entity);

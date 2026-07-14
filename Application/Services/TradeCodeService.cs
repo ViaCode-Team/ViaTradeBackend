@@ -5,6 +5,7 @@ using Domain.Entities.CSV;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Trade;
+using Domain.Models.Pagination;
 
 namespace Application.Services
 {
@@ -15,9 +16,9 @@ namespace Application.Services
         private readonly IFileReader _tradefileReader = tradefileReader;
         private readonly ITradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
 
-        public async Task<IEnumerable<TradeCode>> GetAllCodesAsync(CancellationToken cancellationToken = default)
+        public async Task<PagedResult<TradeCode>> GetCodesPagedAsync(PaginationRequest paginationRequest, CancellationToken cancellationToken = default)
         {
-            return await _tradeCodeRepository.GetAllAsync(cancellationToken);
+            return await _tradeCodeRepository.GetPagedAsync(paginationRequest, cancellationToken);
         }
 
         public async Task<StockStatistic> GetStockStatisticAsync(CancellationToken cancellationToken = default)

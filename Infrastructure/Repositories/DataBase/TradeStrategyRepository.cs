@@ -18,7 +18,8 @@ namespace Infrastructure.Repositories.DataBase
             return await _dbSet
                 .AsNoTracking()
                 .Where(tradeStrategy => tradeStrategy.Name == name)
-                .Select(tradeStrategy => new TradeStrategyDto {
+                .Select(tradeStrategy => new TradeStrategyDto
+                {
                     Id = tradeStrategy.Id,
                     Name = tradeStrategy.Name,
                     Description = tradeStrategy.Description,
@@ -27,7 +28,8 @@ namespace Infrastructure.Repositories.DataBase
                     InvestmentHorizon = tradeStrategy.InvestmentHorizon,
                     LogicDesc = tradeStrategy.LogicDesc,
                     UseDesc = tradeStrategy.UseDesc,
-                    LimitDesc = tradeStrategy.LimitDesc})
+                    LimitDesc = tradeStrategy.LimitDesc
+                })
                 .FirstOrDefaultAsync(cancellationToken);
         }
     }

@@ -3,6 +3,7 @@ using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto;
 using Domain.Models.Dto.Statistic;
+using Domain.Models.Pagination;
 
 namespace Application.Services
 {
@@ -35,20 +36,20 @@ namespace Application.Services
             await _tradeRemindRepository.ExecuteDeleteAsync(r => r.Id == remindId, cancellationToken);
         }
 
-        public async Task<IEnumerable<TradeRemind>> GetAllByUserAsync(int userId, CancellationToken cancellationToken)
+        public async Task<PagedResult<TradeRemind>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
             await _userService.EnsureUserAsync(userId, cancellationToken);
-            return await _tradeRemindRepository.GetByUserAsync(userId, cancellationToken);
+            return await _tradeRemindRepository.GetByUserPagedAsync(userId, paginationRequest, cancellationToken);
         }
 
-        public async Task<IEnumerable<TradeRemind>> GetByUserAndTradeCodeAsync(int userId, int tradeCodeId, CancellationToken cancellationToken)
+        public async Task<PagedResult<TradeRemind>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
             await _userService.EnsureUserAsync(userId, cancellationToken);
             var tradeCode = await _tradeCodeRepository.GetByIdAsync(tradeCodeId, cancellationToken);
             if (tradeCode == null)
                 throw new KeyNotFoundException();
 
-            return await _tradeRemindRepository.GetByUserAndTradeCodeAsync(userId, tradeCodeId, cancellationToken);
+            return await _tradeRemindRepository.GetByUserAndTradeCodePagedAsync(userId, tradeCodeId, paginationRequest, cancellationToken);
         }
 
         public async Task<TradeRemind> GetByIdAsync(int remindId, int userId, CancellationToken cancellationToken)

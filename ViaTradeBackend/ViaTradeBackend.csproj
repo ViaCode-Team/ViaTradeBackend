@@ -1,27 +1,24 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>5001262e-6237-421d-b09e-f4956f03d30c</UserSecretsId>
   </PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.12" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.3.9" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.12">
 			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.12">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
-		<PackageReference Include="StackExchange.Redis" Version="2.10.1" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.4" />
-		<PackageReference Include="Microsoft.OpenApi" Version="2.4.1" />
+		<PackageReference Include="StackExchange.Redis" Version="3.0.17" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
 	</ItemGroup>
 
   <ItemGroup>
@@ -30,16 +27,13 @@
     <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
   </ItemGroup>
 
-	<Target Name="GenerateSwagger" AfterTargets="Build" Condition="'$(GenerateSwaggerFile)' == 'true'">
-		<MakeDir Directories="$(OutDir)swagger\v1" />
-
+	<Target Name="GenerateSwagger" AfterTargets="Build">
 		<PropertyGroup>
-			<SwaggerOutputPath>$(OutDir)swagger\v1\swagger.yaml</SwaggerOutputPath>
+			<SolutionDir>$(ProjectDir)..\</SolutionDir>
+			<SwaggerOutputPath>$(SolutionDir)swagger.yaml</SwaggerOutputPath>
 		</PropertyGroup>
 
-		<Exec Command="dotnet tool run swagger tofile --yaml --output &quot;$(SwaggerOutputPath)&quot; --openapiversion 3.0 &quot;$(TargetPath)&quot; v1" WorkingDirectory="$(ProjectDir)" />
-
-		<Message Text="Swagger YAML generated at $(SwaggerOutputPath)" Importance="high" />
+		<Exec IgnoreExitCode="true" Command="dotnet tool run swagger tofile --yaml --output &quot;$(SwaggerOutputPath)&quot; --openapiversion 3.0 &quot;$(TargetPath)&quot; v1" WorkingDirectory="$(ProjectDir)" />
 	</Target>
 
 </Project>

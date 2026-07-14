@@ -1,11 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
 using Application.Interfaces;
 using Application.Interfaces.Utils;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto;
 using Domain.Models.Dto.Statistic;
+using Domain.Models.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using ViaTradeBackend.Attribute;
 
 namespace ViaTradeBackend.Controllers
@@ -50,22 +51,23 @@ namespace ViaTradeBackend.Controllers
         [Authorize]
         [HttpGet("byuser")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<TradeRemind>>> GetAllByUser(CancellationToken cancellationToken)
+        public async Task<ActionResult<PagedResult<TradeRemind>>> GetAllByUser([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var reminders = await _tradeRemindService.GetAllByUserAsync(userId, cancellationToken);
+            var reminders = await _tradeRemindService.GetByUserPagedAsync(userId, paginationRequest, cancellationToken);
             return Ok(reminders);
         }
 
         [Authorize]
         [HttpGet("byuser/instrument/{idInstrument}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<TradeRemind>>> GetByUserInstrument(
+        public async Task<ActionResult<PagedResult<TradeRemind>>> GetByUserInstrument(
+            [FromQuery] PaginationRequest paginationRequest,
             [Required, FromRoute] int idInstrument,
             CancellationToken cancellationToken)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var reminders = await _tradeRemindService.GetByUserAndTradeCodeAsync(userId, idInstrument, cancellationToken);
+            var reminders = await _tradeRemindService.GetByUserAndTradeCodePagedAsync(userId, idInstrument, paginationRequest, cancellationToken);
             return Ok(reminders);
         }
 

@@ -1,23 +1,26 @@
-﻿using Application.Interfaces.Repositories.Database;
+using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.Strategy;
-using Infrastructure.Repositories.DataBase;
+using Domain.Models.Pagination;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase
 {
-    public class UserTradeStrategyRepository(AppDbContext context) : GenericRepository<UserTradeStrategy, UserTradeStrategyDto>(context), 
+    public class UserTradeStrategyRepository(AppDbContext context) : GenericRepository<UserTradeStrategy, UserTradeStrategyDto>(context),
         IUserTradeStrategyRepository
     {
-        public async Task<IEnumerable<UserTradeStrategyDto>> GetByUser(int userId, CancellationToken cancellationToken)
+        public async Task<PagedResult<UserTradeStrategyDto>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
             return await _context.UserTradeStrategies
                 .Where(e => e.UserId == userId)
-                .Select(e => new UserTradeStrategyDto {
-                    Id = e.Id, 
+                .Select(e => new UserTradeStrategyDto
+                {
+                    Id = e.Id,
                     UserId = e.UserId,
-                    TradeStrategyId = e.TradeStrategyId })
-                .ToListAsync(cancellationToken);
+                    TradeStrategyId = e.TradeStrategyId
+                })
+                .ToPagedResultAsync(paginationRequest, cancellationToken);
         }
 
         public async Task<int> CountByUserAsync(int userId, CancellationToken cancellationToken)

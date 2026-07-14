@@ -1,10 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
 using Application.Interfaces;
 using Application.Interfaces.Utils;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.Statistic;
+using Domain.Models.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 using ViaTradeBackend.Models.Trade;
 
 namespace ViaTradeBackend.Controllers
@@ -30,11 +31,11 @@ namespace ViaTradeBackend.Controllers
 
         [HttpGet("byuser")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<IEnumerable<Trade>>> GetByUser(CancellationToken cancellationToken,
-            [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] TradeSignal? tradeSignal)
+        public async Task<ActionResult<PagedResult<Trade>>> GetByUser(CancellationToken cancellationToken,
+            [FromQuery] PaginationRequest paginationRequest, [FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate, [FromQuery] TradeSignal? tradeSignal)
         {
             var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var trades = await _tradeService.GetByUserAsync(userId, startDate, endDate, tradeSignal, cancellationToken);
+            var trades = await _tradeService.GetByUserPagedAsync(userId, startDate, endDate, tradeSignal, paginationRequest, cancellationToken);
             return Ok(trades);
         }
 

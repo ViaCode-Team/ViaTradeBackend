@@ -1,6 +1,6 @@
-﻿using System.Reflection;
-using Microsoft.OpenApi;
+﻿using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using System.Reflection;
 using ViaTradeBackend.Swagger.Filters;
 
 namespace ViaTradeBackend.Swagger

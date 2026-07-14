@@ -3,6 +3,7 @@ using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Strategy;
+using Domain.Models.Pagination;
 using ViaTradeBackend.Models.Trade;
 
 namespace Application.Services
@@ -18,9 +19,9 @@ namespace Application.Services
         private readonly IUserStrategyTradeCodeRepository _userStrategyTradeCodeRepository = userStrategyTradeCodeRepository;
         private readonly IUserService _userService = userService;
 
-        public async Task<IEnumerable<TradeStrategy>> GetAllStrategiesAsync(CancellationToken cancellationToken)
+        public async Task<PagedResult<TradeStrategy>> GetStrategiesPagedAsync(PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
-            return await _tradeStrategyRepository.GetAllAsync(cancellationToken);
+            return await _tradeStrategyRepository.GetPagedAsync(paginationRequest, cancellationToken);
         }
 
         public async Task<StrategyStatistic> GetStrategyStatisticAsync(int userId, CancellationToken cancellationToken)
@@ -45,10 +46,11 @@ namespace Application.Services
             return strategy;
         }
 
-        public async Task<IEnumerable<UserStrategyTradeCodeDto>> GetUserStrategyCodesAsync(int userId, CancellationToken cancellationToken)
+        public async Task<PagedResult<UserStrategyTradeCodeDto>> GetUserStrategyCodesPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
             await _userService.EnsureUserAsync(userId, cancellationToken);
-            return await _userStrategyTradeCodeRepository.GetAllAsync(userId, cancellationToken);
+
+            return await _userStrategyTradeCodeRepository.GetPagedAsync(userId, paginationRequest, cancellationToken);
         }
 
         public async Task CreateUserStrategyCodeAsync(UserStrategyTradeCodeRequest request, int userId, CancellationToken cancellationToken)
@@ -89,10 +91,11 @@ namespace Application.Services
                 throw new KeyNotFoundException("User strategy code not found");
         }
 
-        public async Task<IEnumerable<UserTradeStrategyDto>> GetUserStrategiesAsync(int userId, CancellationToken cancellationToken)
+        public async Task<PagedResult<UserTradeStrategyDto>> GetUserStrategiesPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
         {
             await _userService.EnsureUserAsync(userId, cancellationToken);
-            return await _userTradeStrategyRepository.GetByUser(userId, cancellationToken);
+
+            return await _userTradeStrategyRepository.GetByUserPagedAsync(userId, paginationRequest, cancellationToken);
         }
 
         public async Task CreateUserStrategyAsync(CreateUserStrategyRequest request, int userId, CancellationToken cancellationToken)
