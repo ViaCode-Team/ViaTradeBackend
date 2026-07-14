@@ -1,8 +1,7 @@
-﻿namespace Domain.Models.TradeLogic
+﻿namespace Domain.Models.TradeLogic;
+
+public class StrategyData
 {
-    public class StrategyData
-    {
-        public required string Name { get; set; }
-        public List<TickerResults> Tickers { get; set; } = new();
-    }
+	public required string Name { get; set; }
+	public List<TickerResults> Tickers { get; set; } = new();
 }

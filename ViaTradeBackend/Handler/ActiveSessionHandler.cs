@@ -2,37 +2,36 @@
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
 
-namespace ViaTradeBackend.Handler
+namespace ViaTradeBackend.Handler;
+
+public class ActiveSessionRequirement : IAuthorizationRequirement { }
+
+public class ActiveSessionHandler(ISessionRepository sessionRepository) : AuthorizationHandler<ActiveSessionRequirement>
 {
-    public class ActiveSessionRequirement : IAuthorizationRequirement { }
+	private readonly ISessionRepository _sessionRepository = sessionRepository;
 
-    public class ActiveSessionHandler(ISessionRepository sessionRepository) : AuthorizationHandler<ActiveSessionRequirement>
-    {
-        private readonly ISessionRepository _sessionRepository = sessionRepository;
+	protected override async Task HandleRequirementAsync(
+		AuthorizationHandlerContext context,
+		ActiveSessionRequirement requirement)
+	{
+		var sessionId = context.User.Claims
+			.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value;
 
-        protected override async Task HandleRequirementAsync(
-            AuthorizationHandlerContext context,
-            ActiveSessionRequirement requirement)
-        {
-            var sessionId = context.User.Claims
-                .FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value;
+		if (string.IsNullOrEmpty(sessionId))
+		{
+			context.Fail();
+			return;
+		}
 
-            if (string.IsNullOrEmpty(sessionId))
-            {
-                context.Fail();
-                return;
-            }
+		var session = await _sessionRepository.GetAsync(sessionId);
 
-            var session = await _sessionRepository.GetAsync(sessionId);
-
-            if (session != null)
-            {
-                context.Succeed(requirement);
-            }
-            else
-            {
-                context.Fail();
-            }
-        }
-    }
+		if (session != null)
+		{
+			context.Succeed(requirement);
+		}
+		else
+		{
+			context.Fail();
+		}
+	}
 }

@@ -1,7 +1,6 @@
-﻿namespace Domain.Entities.Redis
+﻿namespace Domain.Entities.Redis;
+
+public abstract class RedisEntity
 {
-    public abstract class RedisEntity
-    {
-        public string Id { get; set; } = Guid.NewGuid().ToString();
-    }
+	public string Id { get; set; } = Guid.NewGuid().ToString();
 }

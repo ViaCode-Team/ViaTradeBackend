@@ -1,7 +1,6 @@
-﻿namespace Domain.Models.Dto.User
+﻿namespace Domain.Models.Dto.User;
+
+public class TgTokenResponse
 {
-    public class TgTokenResponse
-    {
-        public required string TgToken { get; set; }
-    }
+	public required string TgToken { get; set; }
 }

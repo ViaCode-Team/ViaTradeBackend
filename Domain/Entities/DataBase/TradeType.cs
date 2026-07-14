@@ -1,15 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Domain.Entities.DataBase
-{
-    public class TradeType : BaseEntity
-    {
-        [Required]
-        [MaxLength(128)]
-        public required string Name { get; set; }
+namespace Domain.Entities.DataBase;
 
-        [JsonIgnore]
-        public ICollection<Trade>? Trades { get; set; }
-    }
+public class TradeType : BaseEntity
+{
+	[Required]
+	[MaxLength(128)]
+	public required string Name { get; set; }
+
+	[JsonIgnore]
+	public ICollection<Trade>? Trades { get; set; }
 }

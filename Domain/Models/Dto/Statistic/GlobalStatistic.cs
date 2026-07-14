@@ -1,11 +1,10 @@
-﻿namespace Domain.Models.Dto.Statistic
+﻿namespace Domain.Models.Dto.Statistic;
+
+public class GlobalStatistic
 {
-    public class GlobalStatistic
-    {
-        public required TradeStatistic TradeStatistic { get; set; }
+	public required TradeStatistic TradeStatistic { get; set; }
 
-        public required IncomeTradeStatistic IncomeStatistic { get; set; }
+	public required IncomeTradeStatistic IncomeStatistic { get; set; }
 
-        public required WinrateTradeStatistic WinrateStatistic { get; set; }
-    }
+	public required WinrateTradeStatistic WinrateStatistic { get; set; }
 }

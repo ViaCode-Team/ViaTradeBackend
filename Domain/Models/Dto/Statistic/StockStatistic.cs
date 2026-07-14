@@ -1,7 +1,6 @@
-namespace Domain.Models.Dto.Statistic
+namespace Domain.Models.Dto.Statistic;
+
+public class StockStatistic
 {
-    public class StockStatistic
-    {
-        public int TotalStocks { get; set; }
-    }
+	public int TotalStocks { get; set; }
 }

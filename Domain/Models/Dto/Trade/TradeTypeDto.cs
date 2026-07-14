@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Domain.Models.Dto.Trade
+namespace Domain.Models.Dto.Trade;
+
+public class TradeTypeDto
 {
-    public class TradeTypeDto
-    {
-        [Required]
-        [MaxLength(128)]
-        public required string Name { get; set; }
-    }
+	[Required]
+	[MaxLength(128)]
+	public required string Name { get; set; }
 }

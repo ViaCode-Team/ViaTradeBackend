@@ -1,7 +1,6 @@
-﻿namespace Domain.Models.TradeLogic
-{
-    public enum TimeFrame
-    {
+﻿namespace Domain.Models.TradeLogic;
 
-    }
+public enum TimeFrame
+{
+
 }

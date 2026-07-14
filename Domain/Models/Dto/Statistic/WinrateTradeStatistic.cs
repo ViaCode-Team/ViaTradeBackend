@@ -1,9 +1,8 @@
-﻿namespace Domain.Models.Dto.Statistic
-{
-    public class WinrateTradeStatistic
-    {
-        public float TotalWinrate { get; set; }
+﻿namespace Domain.Models.Dto.Statistic;
 
-        public float ProfitFactor { get; set; }
-    }
+public class WinrateTradeStatistic
+{
+	public float TotalWinrate { get; set; }
+
+	public float ProfitFactor { get; set; }
 }

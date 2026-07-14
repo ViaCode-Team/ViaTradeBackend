@@ -1,7 +1,6 @@
-namespace Domain.Models.Dto.Statistic
+namespace Domain.Models.Dto.Statistic;
+
+public class TradeRemindStatistic
 {
-    public class TradeRemindStatistic
-    {
-        public int TotalReminds { get; set; }
-    }
+	public int TotalReminds { get; set; }
 }

@@ -1,21 +1,20 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Domain.Entities.DataBase
+namespace Domain.Entities.DataBase;
+
+
+public class TradeCode : BaseEntity
 {
+	[Required]
+	[MaxLength(128)]
+	public required string ExchangeId { get; set; }
 
-    public class TradeCode : BaseEntity
-    {
-        [Required]
-        [MaxLength(128)]
-        public required string ExchangeId { get; set; }
+	[MaxLength(512)]
+	public string? Description { get; set; }
 
-        [MaxLength(512)]
-        public string? Description { get; set; }
-
-        [JsonIgnore]
-        public ICollection<Trade>? Trades { get; set; }
-        [JsonIgnore]
-        public ICollection<UserTradeCode>? UserTradeCodes { get; set; }
-    }
+	[JsonIgnore]
+	public ICollection<Trade>? Trades { get; set; }
+	[JsonIgnore]
+	public ICollection<UserTradeCode>? UserTradeCodes { get; set; }
 }

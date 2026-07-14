@@ -1,9 +1,8 @@
-﻿namespace Domain.Models.Dto.Strategy
+﻿namespace Domain.Models.Dto.Strategy;
+
+public class UserTradeStrategyDto
 {
-    public class UserTradeStrategyDto
-    {
-        public required int Id { get; set; }
-        public required int UserId { get; set; }
-        public required int TradeStrategyId { get; set; }
-    }
+	public required int Id { get; set; }
+	public required int UserId { get; set; }
+	public required int TradeStrategyId { get; set; }
 }

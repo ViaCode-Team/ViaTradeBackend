@@ -1,23 +1,22 @@
 ﻿using Domain.Entities.DataBase;
 
-namespace Domain.Models.Dto.Trade
+namespace Domain.Models.Dto.Trade;
+
+public class TradeDto
 {
-    public class TradeDto
-    {
-        public DateTime DateOpen { get; set; }
-        public DateTime? DateClose { get; set; }
+	public DateTime DateOpen { get; set; }
+	public DateTime? DateClose { get; set; }
 
-        public double TradeOpen { get; set; }
-        public double? TradeClose { get; set; }
+	public double TradeOpen { get; set; }
+	public double? TradeClose { get; set; }
 
-        public double? NetIncome { get; set; }
-        public int Count { get; set; }
-        public int Price { get; set; }
+	public double? NetIncome { get; set; }
+	public int Count { get; set; }
+	public int Price { get; set; }
 
-        public required TradeSignal TradeSignal { get; set; }
+	public required TradeSignal TradeSignal { get; set; }
 
-        public int TradeTypeId { get; set; }
-        public int TradeCodeId { get; set; }
-        public int UserId { get; set; }
-    }
+	public int TradeTypeId { get; set; }
+	public int TradeCodeId { get; set; }
+	public int UserId { get; set; }
 }

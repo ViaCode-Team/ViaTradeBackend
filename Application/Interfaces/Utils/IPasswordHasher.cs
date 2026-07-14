@@ -1,8 +1,7 @@
-namespace Application.Interfaces.Utils
+namespace Application.Interfaces.Utils;
+
+public interface IPasswordHasher
 {
-    public interface IPasswordHasher
-    {
-        string Hash(string password);
-        bool Verify(string password, string passwordHash);
-    }
+	string Hash(string password);
+	bool Verify(string password, string passwordHash);
 }

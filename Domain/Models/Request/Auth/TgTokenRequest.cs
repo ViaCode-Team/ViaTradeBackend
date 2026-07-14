@@ -1,9 +1,8 @@
-﻿namespace Domain.Models.Request.Auth
-{
-    public class TgTokenRequest
-    {
-        public required string TgToken { get; set; }
+﻿namespace Domain.Models.Request.Auth;
 
-        public required string TgId { get; set; }
-    }
+public class TgTokenRequest
+{
+	public required string TgToken { get; set; }
+
+	public required string TgId { get; set; }
 }

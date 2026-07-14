@@ -1,7 +1,6 @@
-﻿namespace Domain.Models.ConfigOptions
+﻿namespace Domain.Models.ConfigOptions;
+
+public class ServiceSecurity
 {
-    public class ServiceSecurity
-    {
-        public required string Password { get; set; }
-    }
+	public required string Password { get; set; }
 }

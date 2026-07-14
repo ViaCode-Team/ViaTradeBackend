@@ -1,9 +1,8 @@
 ﻿using Domain.Models.TradeLogic;
 
-namespace Application.Interfaces.Utils
+namespace Application.Interfaces.Utils;
+
+public interface ITradeDataBuilder
 {
-    public interface ITradeDataBuilder
-    {
-        IEnumerable<TradeCodeFile> BuildFileTradeResonse(IEnumerable<string>? fileNames);
-    }
+	IEnumerable<TradeCodeFile> BuildFileTradeResonse(IEnumerable<string>? fileNames);
 }

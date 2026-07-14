@@ -27,41 +27,41 @@ var builder = WebApplication.CreateBuilder(args);
 // AUTHORIZATION & POLICIES
 // Custom policy for active session validation
 builder.Services.AddAuthorizationBuilder()
-    .AddPolicy("ActiveSession", policy =>
-    {
-        policy.RequireAuthenticatedUser();
-        policy.AddRequirements(new ActiveSessionRequirement());
-    });
+	.AddPolicy("ActiveSession", policy =>
+	{
+		policy.RequireAuthenticatedUser();
+		policy.AddRequirements(new ActiveSessionRequirement());
+	});
 
 builder.Services.AddScoped<IAuthorizationHandler, ActiveSessionHandler>();
 
 // OPTIONS CONFIGURATION
 // Bind configuration sections to strongly-typed options
 builder.Services.Configure<JwtOptions>(
-    builder.Configuration.GetSection("Jwt")
+	builder.Configuration.GetSection("Jwt")
 );
 
 builder.Services.Configure<ServiceSecurity>(
-    builder.Configuration.GetSection("ServiceSecurity")
+	builder.Configuration.GetSection("ServiceSecurity")
 );
 
 builder.Services.Configure<AuthCookiOptions>(
-    builder.Configuration.GetSection("AuthCookies")
+	builder.Configuration.GetSection("AuthCookies")
 );
 
 builder.Services.Configure<AnalyzerDataOption>(
-    builder.Configuration.GetSection("AnalyzerData")
+	builder.Configuration.GetSection("AnalyzerData")
 );
 
 // REDIS SETUP
 // Register Redis connection as singleton (shared across the app)
 builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
 {
-    var configuration = ConfigurationOptions.Parse(
-        builder.Configuration.GetConnectionString("Redis")
-        ?? throw new NullReferenceException("Redis connection string is missing"));
+	var configuration = ConfigurationOptions.Parse(
+		builder.Configuration.GetConnectionString("Redis")
+		?? throw new NullReferenceException("Redis connection string is missing"));
 
-    return ConnectionMultiplexer.Connect(configuration);
+	return ConnectionMultiplexer.Connect(configuration);
 });
 
 // Background service for expired sessions cleanup
@@ -99,15 +99,15 @@ builder.Services.AddScoped<ITradeDataBuilder, TradeDataBuilder>();
 
 // DATABASE SETUP (MySQL)
 var connectionString = builder.Configuration.GetConnectionString("MySql")
-    ?? throw new NullReferenceException("MySQL connection string is missing");
+	?? throw new NullReferenceException("MySQL connection string is missing");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
-    options.UseMySql(
-        connectionString,
-        ServerVersion.AutoDetect(connectionString),
-        mySqlOptions => mySqlOptions.EnableStringComparisonTranslations()
-    );
+	options.UseMySql(
+		connectionString,
+		ServerVersion.AutoDetect(connectionString),
+		mySqlOptions => mySqlOptions.EnableStringComparisonTranslations()
+	);
 });
 
 // AUTHENTICATION (JWT)
@@ -116,8 +116,8 @@ builder.Services.AddSingleton<IConfigureOptions<JwtBearerOptions>, JwtBearerOpti
 
 builder.Services.AddAuthentication(options =>
 {
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+	options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+	options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
 })
 .AddJwtBearer();
 
@@ -126,12 +126,12 @@ builder.Services.AddAuthorization();
 
 // API CONTROLLERS & SWAGGER
 builder.Services
-    .AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.DefaultIgnoreCondition =
-            JsonIgnoreCondition.WhenWritingNull;
-    });
+	.AddControllers()
+	.AddJsonOptions(options =>
+	{
+		options.JsonSerializerOptions.DefaultIgnoreCondition =
+			JsonIgnoreCondition.WhenWritingNull;
+	});
 
 builder.Services.AddEndpointsApiExplorer();
 

@@ -9,102 +9,101 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using ViaTradeBackend.Models.Trade;
 
-namespace ViaTradeBackend.Controllers
+namespace ViaTradeBackend.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+[Authorize]
+public class StrategyController(
+	IStrategyService strategyService,
+	IJwtHelper jwtHelper) : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    [Authorize]
-    public class StrategyController(
-        IStrategyService strategyService,
-        IJwtHelper jwtHelper) : ControllerBase
-    {
-        private readonly IStrategyService _strategyService = strategyService;
-        private readonly IJwtHelper _jwtHelper = jwtHelper;
+	private readonly IStrategyService _strategyService = strategyService;
+	private readonly IJwtHelper _jwtHelper = jwtHelper;
 
-        [HttpGet("statistics")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<StrategyStatistic>> GetStrategyStatistics(CancellationToken cancellationToken)
-        {
-            var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var response = await _strategyService.GetStrategyStatisticAsync(userId, cancellationToken);
-            return Ok(response);
-        }
+	[HttpGet("statistics")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	public async Task<ActionResult<StrategyStatistic>> GetStrategyStatistics(CancellationToken cancellationToken)
+	{
+		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var response = await _strategyService.GetStrategyStatisticAsync(userId, cancellationToken);
+		return Ok(response);
+	}
 
-        [HttpGet("")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<PagedResult<TradeStrategy>>> GetAll(
-            [FromQuery] PaginationRequest paginationRequest,
-            CancellationToken cancellationToken)
-        {
-            var response = await _strategyService.GetStrategiesPagedAsync(paginationRequest, cancellationToken);
-            return Ok(response);
-        }
+	[HttpGet("")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	public async Task<ActionResult<PagedResult<TradeStrategy>>> GetAll(
+		[FromQuery] PaginationRequest paginationRequest,
+		CancellationToken cancellationToken)
+	{
+		var response = await _strategyService.GetStrategiesPagedAsync(paginationRequest, cancellationToken);
+		return Ok(response);
+	}
 
-        [HttpGet("{strategyId}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<TradeStrategy>> GetById([Required] int strategyId, CancellationToken cancellationToken)
-        {
-            var response = await _strategyService.GetStrategyByIdAsync(strategyId, cancellationToken);
-            return Ok(response);
-        }
+	[HttpGet("{strategyId}")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	public async Task<ActionResult<TradeStrategy>> GetById([Required] int strategyId, CancellationToken cancellationToken)
+	{
+		var response = await _strategyService.GetStrategyByIdAsync(strategyId, cancellationToken);
+		return Ok(response);
+	}
 
-        [HttpGet("byuser/instrumentslink")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<PagedResult<UserStrategyTradeCodeDto>>> GetAllInstrumentsLink([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
-        {
-            var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var response = await _strategyService.GetUserStrategyCodesPagedAsync(userId, paginationRequest, cancellationToken);
-            return Ok(response);
-        }
+	[HttpGet("byuser/instrumentslink")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	public async Task<ActionResult<PagedResult<UserStrategyTradeCodeDto>>> GetAllInstrumentsLink([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	{
+		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var response = await _strategyService.GetUserStrategyCodesPagedAsync(userId, paginationRequest, cancellationToken);
+		return Ok(response);
+	}
 
-        [HttpPost("byuser/instrumentslink")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult> CreateInstrumentsLink(
-            [FromBody, Required] UserStrategyTradeCodeRequest userStrategyTradeCodeRequest,
-            CancellationToken cancellationToken)
-        {
-            var userId = _jwtHelper.GetUserIdFromClaims(User);
-            await _strategyService.CreateUserStrategyCodeAsync(userStrategyTradeCodeRequest, userId, cancellationToken);
-            return Created();
-        }
+	[HttpPost("byuser/instrumentslink")]
+	[ProducesResponseType(StatusCodes.Status201Created)]
+	public async Task<ActionResult> CreateInstrumentsLink(
+		[FromBody, Required] UserStrategyTradeCodeRequest userStrategyTradeCodeRequest,
+		CancellationToken cancellationToken)
+	{
+		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		await _strategyService.CreateUserStrategyCodeAsync(userStrategyTradeCodeRequest, userId, cancellationToken);
+		return Created();
+	}
 
-        [HttpDelete("byuser/instrumentslink")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult> DeleteInstrumentsLink(
-            [FromQuery, Required] int strategyId,
-            [FromQuery, Required] int tradeCodeId,
-            CancellationToken cancellationToken)
-        {
-            var userId = _jwtHelper.GetUserIdFromClaims(User);
-            await _strategyService.DeleteUserStrategyCodeAsync(strategyId, tradeCodeId, userId, cancellationToken);
-            return NoContent();
-        }
+	[HttpDelete("byuser/instrumentslink")]
+	[ProducesResponseType(StatusCodes.Status204NoContent)]
+	public async Task<ActionResult> DeleteInstrumentsLink(
+		[FromQuery, Required] int strategyId,
+		[FromQuery, Required] int tradeCodeId,
+		CancellationToken cancellationToken)
+	{
+		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		await _strategyService.DeleteUserStrategyCodeAsync(strategyId, tradeCodeId, userId, cancellationToken);
+		return NoContent();
+	}
 
-        [HttpGet("byuser")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<PagedResult<UserTradeStrategyDto>>> GetUsersStrategy([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
-        {
-            var userId = _jwtHelper.GetUserIdFromClaims(User);
-            var response = await _strategyService.GetUserStrategiesPagedAsync(userId, paginationRequest, cancellationToken);
-            return Ok(response);
-        }
+	[HttpGet("byuser")]
+	[ProducesResponseType(StatusCodes.Status200OK)]
+	public async Task<ActionResult<PagedResult<UserTradeStrategyDto>>> GetUsersStrategy([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	{
+		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var response = await _strategyService.GetUserStrategiesPagedAsync(userId, paginationRequest, cancellationToken);
+		return Ok(response);
+	}
 
-        [HttpPost("byuser")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
-        public async Task<ActionResult> CreateUsersStrategy([FromBody, Required] CreateUserStrategyRequest userStrategyRequest, CancellationToken cancellationToken)
-        {
-            var userId = _jwtHelper.GetUserIdFromClaims(User);
-            await _strategyService.CreateUserStrategyAsync(userStrategyRequest, userId, cancellationToken);
-            return Created();
-        }
+	[HttpPost("byuser")]
+	[ProducesResponseType(StatusCodes.Status201Created)]
+	public async Task<ActionResult> CreateUsersStrategy([FromBody, Required] CreateUserStrategyRequest userStrategyRequest, CancellationToken cancellationToken)
+	{
+		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		await _strategyService.CreateUserStrategyAsync(userStrategyRequest, userId, cancellationToken);
+		return Created();
+	}
 
-        [HttpDelete("byuser")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<ActionResult> DeleteUsersStrategy([FromQuery, Required] int strategyId, CancellationToken cancellationToken)
-        {
-            var userId = _jwtHelper.GetUserIdFromClaims(User);
-            await _strategyService.DeleteUserStrategyAsync(strategyId, userId, cancellationToken);
-            return NoContent();
-        }
-    }
+	[HttpDelete("byuser")]
+	[ProducesResponseType(StatusCodes.Status204NoContent)]
+	public async Task<ActionResult> DeleteUsersStrategy([FromQuery, Required] int strategyId, CancellationToken cancellationToken)
+	{
+		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		await _strategyService.DeleteUserStrategyAsync(strategyId, userId, cancellationToken);
+		return NoContent();
+	}
 }
