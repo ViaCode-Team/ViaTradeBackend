@@ -57,6 +57,7 @@ public class GenericRepository<TEntity, TDto> : IRepository<TEntity, TDto>
 	}
 
 	public void Update(TEntity entity) => _dbSet.Update(entity);
+
 	public void Remove(TEntity entity) => _dbSet.Remove(entity);
 
 	public async Task<int> SaveChangesAsync(CancellationToken ct = default)

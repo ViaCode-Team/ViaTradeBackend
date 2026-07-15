@@ -1,4 +1,4 @@
-﻿using Application.Interfaces.Utils;
+using Application.Interfaces.Utils;
 using Domain.Entities.CSV;
 using Domain.Models.ConfigOptions;
 using Domain.Models.TradeLogic;
@@ -126,9 +126,7 @@ public class TradeFileReader : IFileReader
 			Regex.IsMatch(p, @"^\d{4}-\d{2}-\d{2}$"));
 
 		if (lastDateIndex >= 0 && lastDateIndex + 1 < parts.Length)
-		{
 			return string.Join("_", parts.Skip(lastDateIndex + 1));
-		}
 
 		return parts[^1];
 	}

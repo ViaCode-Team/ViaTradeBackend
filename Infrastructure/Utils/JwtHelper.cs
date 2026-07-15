@@ -1,4 +1,4 @@
-﻿using Application.Interfaces.Utils;
+using Application.Interfaces.Utils;
 using Domain.Entities.DataBase;
 using Domain.Models.ConfigOptions;
 using Microsoft.Extensions.Options;
@@ -36,7 +36,6 @@ public class JwtHelper(IOptions<JwtOptions> options) : IJwtHelper
 
 		return new JwtSecurityTokenHandler().WriteToken(token);
 	}
-
 
 	public string GenerateRefreshToken()
 	{

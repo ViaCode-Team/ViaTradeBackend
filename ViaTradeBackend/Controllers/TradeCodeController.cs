@@ -1,7 +1,6 @@
 using Application.Interfaces;
 using Application.Interfaces.Utils;
 using Domain.Entities.CSV;
-using Domain.Entities.DataBase;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Trade;
 using Domain.Models.Pagination;

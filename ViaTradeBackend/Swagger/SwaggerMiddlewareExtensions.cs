@@ -1,4 +1,4 @@
-﻿namespace ViaTradeBackend.Swagger;
+namespace ViaTradeBackend.Swagger;
 
 public static class SwaggerMiddlewareExtensions
 {

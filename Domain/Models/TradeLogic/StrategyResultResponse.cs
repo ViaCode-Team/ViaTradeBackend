@@ -2,5 +2,5 @@
 
 public class StrategyResultResponse
 {
-	public List<StrategyData> Strategies { get; set; } = new();
+	public List<StrategyData> Strategies { get; set; } = [];
 }

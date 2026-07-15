@@ -1,4 +1,4 @@
-﻿using Application.Interfaces.Repositories.Redis;
+using Application.Interfaces.Repositories.Redis;
 using Domain.Models.ConfigOptions;
 using Microsoft.Extensions.Options;
 
@@ -25,6 +25,7 @@ public class SessionCleanupService(
 				await Task.Delay(_cleanupInterval, stoppingToken);
 
 				using var scope = _services.CreateScope();
+
 				var sessionRepo = scope.ServiceProvider.GetRequiredService<ISessionRepository>();
 
 				var threshold = DateTime.UtcNow.AddDays(-_sessionLifetimeDays);

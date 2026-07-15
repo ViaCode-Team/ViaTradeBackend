@@ -24,7 +24,6 @@ public static class SwaggerServiceExtensions
 			options.NonNullableReferenceTypesAsRequired();
 			options.SchemaFilter<OptionalPropertiesAsNonNullableSchemaFilter>();
 
-
 			options.CustomOperationIds(apiDesc =>
 				apiDesc.TryGetMethodInfo(out var methodInfo) ? methodInfo.Name : null);
 

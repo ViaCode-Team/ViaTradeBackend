@@ -1,4 +1,4 @@
-﻿using Application.Interfaces.Repositories.Redis;
+using Application.Interfaces.Repositories.Redis;
 using StackExchange.Redis;
 
 namespace Infrastructure.Repositories.Redis;
@@ -8,6 +8,7 @@ public class RefreshTokenRepository(IConnectionMultiplexer redis) : IRefreshToke
 	private readonly IDatabase _db = redis.GetDatabase();
 
 	private static string TokenKey(string sessionId) => $"refresh:{sessionId}";
+
 	private static string IndexKey(string token) => $"refresh:idx:{token}";
 
 	public async Task StoreAsync(string sessionId, string refreshToken, TimeSpan ttl)

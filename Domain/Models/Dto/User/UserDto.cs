@@ -1,13 +1,18 @@
 using System.ComponentModel.DataAnnotations;
+
 namespace Domain.Models.Dto.User;
+
 public class UserDto
 {
 	public required int Id { get; set; }
+
 	public required string Login { get; set; }
+
 	public required string HashPassword { get; set; }
+
 	public DateTime LastLoginDate { get; set; } = DateTime.UtcNow;
+
 	public required DateTime RegisterDate { get; set; }
 	[MaxLength(512)]
 	public string? TgId { get; set; }
 }
-

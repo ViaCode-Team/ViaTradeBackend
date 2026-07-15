@@ -5,4 +5,12 @@ root = true
 indent_style = tab
 indent_size = 4
 tab_width = 4
+insert_final_newline = true
+
 csharp_style_namespace_declarations = file_scoped:warning
+csharp_prefer_braces = false:warning
+csharp_style_prefer_switch_expression = true:suggestion
+csharp_style_pattern_matching_over_is_with_cast_check = true:suggestion
+csharp_style_pattern_matching_over_as_with_null_check = true:suggestion
+
+dotnet_diagnostic.IDE0305.severity = none

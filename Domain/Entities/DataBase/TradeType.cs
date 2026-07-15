@@ -1,6 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+
 namespace Domain.Entities.DataBase;
+
 public class TradeType : BaseEntity
 {
 	[MaxLength(128)]
@@ -8,4 +10,3 @@ public class TradeType : BaseEntity
 	[JsonIgnore]
 	public ICollection<Trade>? Trades { get; set; }
 }
-

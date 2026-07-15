@@ -1,4 +1,4 @@
-﻿using Application.Interfaces.Repositories.Redis;
+using Application.Interfaces.Repositories.Redis;
 using Domain.Models.Dto.User;
 using StackExchange.Redis;
 using System.Text.Json;
@@ -11,6 +11,7 @@ public class SessionRepository(
 	private readonly IDatabase _db = redis.GetDatabase();
 
 	private static string SessionKey(string sessionId) => $"session:{sessionId}";
+
 	private static string UserSessionsKey(int userId) => $"user:sessions:{userId}";
 
 	public async Task CreateAsync(UserSession session, TimeSpan ttl)
@@ -63,6 +64,7 @@ public class SessionRepository(
 	}
 
 	// Cleaning old records from User`s Session SET <user:sessions:{userId}>
+
 	public async Task<int> CleanupExpiredSessionsAsync(DateTime threshold)
 	{
 		var server = _db.Multiplexer.GetServer(_db.Multiplexer.GetEndPoints()[0]);

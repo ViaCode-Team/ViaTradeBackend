@@ -1,10 +1,13 @@
-using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+
 namespace Domain.Entities.DataBase;
+
 public class UserStrategyTradeCode : BaseEntity
 {
 	public required int UserId { get; set; }
+
 	public required int TradeCodeId { get; set; }
+
 	public required int StrategyId { get; set; }
 	[JsonIgnore]
 	public User? User { get; set; }
@@ -13,4 +16,3 @@ public class UserStrategyTradeCode : BaseEntity
 	[JsonIgnore]
 	public TradeStrategy? TradeStrategy { get; set; }
 }
-
