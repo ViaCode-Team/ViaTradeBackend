@@ -15,19 +15,8 @@ public class TradeRepository(AppDbContext context)
 {
 	public async Task<GlobalStatistic> GetGlobalStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
-		var statsData = await _dbSet
-			.Where(t => t.UserId == userId && t.NetIncome.HasValue)
-			.GroupBy(t => 1)
-			.Select(g => new
-			{
-				TotalTrades = g.Count(),
-				WinTrades = g.Count(t => t.NetIncome > 0),
-				LoseTrades = g.Count(t => t.NetIncome < 0),
-				TotalAbsoluteIncome = g.Sum(t => ((t.TradeClose ?? 0) - t.TradeOpen) * t.Count * (int)t.TradeSignal),
-				TotalProfit = g.Where(t => t.NetIncome > 0).Sum(t => Math.Abs(((t.TradeClose ?? 0) - t.TradeOpen) * t.Count * (int)t.TradeSignal)),
-				TotalLoss = g.Where(t => t.NetIncome < 0).Sum(t => Math.Abs(((t.TradeClose ?? 0) - t.TradeOpen) * t.Count * (int)t.TradeSignal))
-			})
-			.FirstOrDefaultAsync(cancellationToken);
+		var query = _dbSet.Where(t => t.UserId == userId);
+		var statsData = await TradeStatisticsCalcService.CalculateAggregate(query).FirstOrDefaultAsync(cancellationToken);
 
 		if (statsData == null)
 		{
