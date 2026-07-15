@@ -458,19 +458,36 @@ paths:
       tags:
         - Auth
       operationId: GetUserSessions
+      parameters:
+        - name: Page
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+            default: 1
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 20
       responses:
         '200':
           description: OK
           content:
             text/plain:
               schema:
-                $ref: '#/components/schemas/UserSessionDto'
+                $ref: '#/components/schemas/UserSessionDtoPagedResult'
             application/json:
               schema:
-                $ref: '#/components/schemas/UserSessionDto'
+                $ref: '#/components/schemas/UserSessionDtoPagedResult'
             text/json:
               schema:
-                $ref: '#/components/schemas/UserSessionDto'
+                $ref: '#/components/schemas/UserSessionDtoPagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -5946,6 +5963,25 @@ components:
         lastSeen:
           type: string
           format: date-time
+      additionalProperties: false
+    UserSessionDtoPagedResult:
+      required:
+        - items
+        - totalCount
+        - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserSessionDto'
+        totalCount:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+          readOnly: true
       additionalProperties: false
     UserStrategyTradeCodeDto:
       required:

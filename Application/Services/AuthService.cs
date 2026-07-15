@@ -4,6 +4,7 @@ using Application.Interfaces.Services;
 using Application.Interfaces.Utils;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.User;
+using Domain.Models.Pagination;
 
 namespace Application.Services;
 
@@ -133,5 +134,10 @@ public class AuthService(
 	public async Task<IEnumerable<UserSession>> GetUserSessionsAsync(int userId)
 	{
 		return await _sessionRepository.GetUserSessionsAsync(userId);
+	}
+
+	public async Task<PagedResult<UserSession>> GetPagedUserSessionsAsync(int userId, PaginationRequest paginationRequest)
+	{
+		return await _sessionRepository.GetPagedUserSessionsAsync(userId, paginationRequest);
 	}
 }

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
+using Domain.Models.Pagination;
 using ViaTradeBackend.Models.Auth;
 
 namespace ViaTradeBackend.Controllers;
@@ -99,13 +100,13 @@ public class AuthController(
 	[HttpGet("sessions")]
 	[Authorize(Policy = "ActiveSession")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<UserSessionDto>> GetUserSessions()
+	public async Task<ActionResult<PagedResult<UserSessionDto>>> GetUserSessions([FromQuery] PaginationRequest paginationRequest)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 
-		var sessions = await _authService.GetUserSessionsAsync(userId);
+		var pagedSessions = await _authService.GetPagedUserSessionsAsync(userId, paginationRequest);
 
-		var result = sessions.Select(s => new UserSessionDto
+		var result = pagedSessions.Map(s => new UserSessionDto
 		{
 			Id = s.Id,
 			UserAgent = s.UserAgent,

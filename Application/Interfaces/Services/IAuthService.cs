@@ -1,5 +1,5 @@
-﻿using Domain.Models.Dto.User;
-
+using Domain.Models.Dto.User;
+using Domain.Models.Pagination;
 namespace Application.Interfaces.Services;
 
 public interface IAuthService
@@ -10,4 +10,5 @@ public interface IAuthService
 	Task LogoutSessionAsync(string refreshToken);
 	Task LogoutAllAsync(int userId);
 	Task<IEnumerable<UserSession>> GetUserSessionsAsync(int userId);
+	Task<PagedResult<UserSession>> GetPagedUserSessionsAsync(int userId, PaginationRequest paginationRequest);
 }

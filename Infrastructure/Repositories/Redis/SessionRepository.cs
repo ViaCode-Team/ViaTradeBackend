@@ -1,12 +1,12 @@
 using Application.Interfaces.Repositories.Redis;
 using Domain.Models.Dto.User;
+using Domain.Models.Pagination;
 using StackExchange.Redis;
 using System.Text.Json;
 
 namespace Infrastructure.Repositories.Redis;
 
-public class SessionRepository(
-	IConnectionMultiplexer redis) : ISessionRepository
+public class SessionRepository(IConnectionMultiplexer redis) : ISessionRepository
 {
 	private readonly IDatabase _db = redis.GetDatabase();
 
@@ -52,15 +52,42 @@ public class SessionRepository(
 	{
 		var sessionIds = await _db.SortedSetRangeByRankAsync(UserSessionsKey(userId), 0, -1);
 		var result = new List<UserSession>();
+		if (sessionIds.Length == 0) return result;
 
-		foreach (var id in sessionIds)
+		var keys = sessionIds.Select(id => (RedisKey)SessionKey(id!)).ToArray();
+		var values = await _db.StringGetAsync(keys);
+
+		foreach (var value in values)
 		{
-			var session = await GetAsync(id!);
-			if (session != null)
-				result.Add(session);
+			if (!value.IsNullOrEmpty)
+				result.Add(JsonSerializer.Deserialize<UserSession>(value.ToString())!);
 		}
 
 		return result;
+	}
+
+	public async Task<PagedResult<UserSession>> GetPagedUserSessionsAsync(int userId, PaginationRequest paginationRequest)
+	{
+		var totalCount = await _db.SortedSetLengthAsync(UserSessionsKey(userId));
+		
+		int start = (paginationRequest.Page - 1) * paginationRequest.PageSize;
+		int stop = start + paginationRequest.PageSize - 1;
+
+		var sessionIds = await _db.SortedSetRangeByRankAsync(UserSessionsKey(userId), start, stop, Order.Descending);
+		var result = new List<UserSession>();
+		if (sessionIds.Length > 0)
+		{
+			var keys = sessionIds.Select(id => (RedisKey)SessionKey(id!)).ToArray();
+			var values = await _db.StringGetAsync(keys);
+
+			foreach (var value in values)
+			{
+				if (!value.IsNullOrEmpty)
+					result.Add(JsonSerializer.Deserialize<UserSession>(value.ToString())!);
+			}
+		}
+
+		return new PagedResult<UserSession>(result, (int)totalCount, paginationRequest.Page, paginationRequest.PageSize);
 	}
 
 	// Cleaning old records from User`s Session SET <user:sessions:{userId}>
