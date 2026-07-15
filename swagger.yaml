@@ -5276,11 +5276,13 @@ components:
           minimum: 1
           type: integer
           format: int32
+          default: 1
         pageSize:
           maximum: 100
           minimum: 1
           type: integer
           format: int32
+          default: 20
       additionalProperties: false
     ProblemDetails:
       required:

@@ -17,7 +17,7 @@ public class TradeRemindRepository(AppDbContext context)
 
 	public async Task<PagedResult<TradeRemind>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
-		return await _dbSet.Where(r => r.UserId == userId).ToPagedResultAsync(paginationRequest, cancellationToken);
+		return await _dbSet.Where(r => r.UserId == userId).OrderBy(r => r.Id).ToPagedResultAsync(paginationRequest, cancellationToken);
 	}
 
 	public async Task<int> CountByUserAsync(int userId, CancellationToken cancellationToken)
@@ -27,6 +27,6 @@ public class TradeRemindRepository(AppDbContext context)
 
 	public async Task<PagedResult<TradeRemind>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
-		return await _dbSet.Where(r => r.UserId == userId && r.TradeCodeId == tradeCodeId).ToPagedResultAsync(paginationRequest, cancellationToken);
+		return await _dbSet.Where(r => r.UserId == userId && r.TradeCodeId == tradeCodeId).OrderBy(r => r.Id).ToPagedResultAsync(paginationRequest, cancellationToken);
 	}
 }

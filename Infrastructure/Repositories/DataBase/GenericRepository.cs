@@ -1,4 +1,5 @@
 using Application.Interfaces.Repositories.Database;
+using Domain.Entities.DataBase;
 using Domain.Models.Pagination;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -8,7 +9,7 @@ using System.Linq.Expressions;
 namespace Infrastructure.Repositories.DataBase;
 
 public class GenericRepository<TEntity, TDto> : IRepository<TEntity, TDto>
-	where TEntity : class
+	where TEntity : BaseEntity
 	where TDto : class
 {
 	protected readonly AppDbContext _context;
@@ -32,7 +33,7 @@ public class GenericRepository<TEntity, TDto> : IRepository<TEntity, TDto>
 
 	public async Task<PagedResult<TEntity>> GetPagedAsync(PaginationRequest paginationRequest, CancellationToken ct = default)
 	{
-		return await _dbSet.ToPagedResultAsync(paginationRequest, ct);
+		return await _dbSet.OrderBy(e => e.Id).ToPagedResultAsync(paginationRequest, ct);
 	}
 
 	public async Task<IEnumerable<TEntity>> FindAsync(
@@ -47,7 +48,7 @@ public class GenericRepository<TEntity, TDto> : IRepository<TEntity, TDto>
 		PaginationRequest paginationRequest,
 		CancellationToken ct = default)
 	{
-		return await _dbSet.Where(predicate).ToPagedResultAsync(paginationRequest, ct);
+		return await _dbSet.Where(predicate).OrderBy(e => e.Id).ToPagedResultAsync(paginationRequest, ct);
 	}
 
 	public async Task AddAsync(TEntity entity, CancellationToken ct = default)

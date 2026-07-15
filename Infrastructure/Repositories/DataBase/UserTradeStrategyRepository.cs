@@ -14,6 +14,7 @@ public class UserTradeStrategyRepository(AppDbContext context) : GenericReposito
 	{
 		return await _context.UserTradeStrategies
 			.Where(e => e.UserId == userId)
+			.OrderBy(e => e.Id)
 			.Select(e => new UserTradeStrategyDto
 			{
 				Id = e.Id,

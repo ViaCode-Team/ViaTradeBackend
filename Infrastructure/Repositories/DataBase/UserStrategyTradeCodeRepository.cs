@@ -17,6 +17,7 @@ public class UserStrategyTradeCodeRepository(AppDbContext context) :
 	{
 		return await _dbSet
 			.Where(e => e.UserId == userId)
+			.OrderBy(e => e.Id)
 			.Select(e => new UserStrategyTradeCodeDto
 			{
 				UserId = e.UserId,

@@ -25,10 +25,12 @@ public class NoteRepository(AppDbContext context) : GenericRepository<Note, Note
 	{
 		NoteType.TradeCodeNote => await _dbSet
 			.Where(n => n.UserId == userId && n.TradeCodeId != null)
+			.OrderBy(n => n.Id)
 			.ToPagedResultAsync(paginationRequest, cancellationToken),
 
 		NoteType.TradeStrategyNote => await _dbSet
 			.Where(n => n.UserId == userId && n.TradeStrategyId != null)
+			.OrderBy(n => n.Id)
 			.ToPagedResultAsync(paginationRequest, cancellationToken),
 
 		_ => throw new KeyNotFoundException()

@@ -63,6 +63,7 @@ public class TradeRepository(AppDbContext context)
 			.Include(t => t.TradeType)
 			.Include(t => t.TradeCode)
 			.Where(t => t.UserId == userId)
+			.OrderBy(t => t.Id)
 			.ToPagedResultAsync(paginationRequest, cancellationToken);
 	}
 
@@ -72,6 +73,7 @@ public class TradeRepository(AppDbContext context)
 			.Include(t => t.TradeType)
 			.Include(t => t.TradeCode)
 			.Where(t => t.UserId == userId && t.TradeCodeId == tradeCodeId)
+			.OrderBy(t => t.Id)
 			.ToPagedResultAsync(paginationRequest, cancellationToken);
 	}
 
@@ -93,6 +95,6 @@ public class TradeRepository(AppDbContext context)
 			queryable = queryable.Where(t => t.TradeSignal == tradeSignal);
 		}
 
-		return await queryable.ToPagedResultAsync(paginationRequest, cancellationToken);
+		return await queryable.OrderBy(t => t.Id).ToPagedResultAsync(paginationRequest, cancellationToken);
 	}
 }

@@ -12,15 +12,6 @@ public static class QueryableExtensions
 	{
 		var totalCount = await source.CountAsync(ct);
 
-		if (!source.Expression.ToString().Contains("OrderBy"))
-		{
-			var idProperty = typeof(T).GetProperty("Id");
-			if (idProperty != null)
-			{
-				source = source.OrderBy(e => EF.Property<object>(e, "Id"));
-			}
-		}
-
 		var items = await source
 			.Skip((paginationRequest.PageNumber - 1) * paginationRequest.PageSize)
 			.Take(paginationRequest.PageSize)
