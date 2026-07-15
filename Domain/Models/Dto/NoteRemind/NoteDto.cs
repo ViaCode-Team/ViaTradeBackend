@@ -1,9 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Models.Dto.NoteRemind;
 
 public class NoteDto
 {
+	public int Id { get; set; }
 	public required int UserId { get; set; }
 
 	[StringLength(1024)]

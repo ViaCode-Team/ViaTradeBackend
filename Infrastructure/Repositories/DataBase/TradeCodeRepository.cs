@@ -1,6 +1,8 @@
-﻿using Application.Interfaces.Repositories.Database;
+using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.Trade;
+using Domain.Models.Pagination;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase;
@@ -23,5 +25,18 @@ public class TradeCodeRepository(AppDbContext context) : GenericRepository<Trade
 				Description = e.Description
 			})
 			.FirstOrDefaultAsync(cancellationToken);
+	}
+
+	public async Task<PagedResult<TradeCodeDto>> GetCodesPagedAsync(PaginationRequest paginationRequest, CancellationToken cancellationToken = default)
+	{
+		return await _dbSet
+			.Select(e => new TradeCodeDto
+			{
+				Id = e.Id,
+				ExchangeId = e.ExchangeId,
+				Description = e.Description
+			})
+			.OrderBy(e => e.Id)
+			.ToPagedAsync(paginationRequest, cancellationToken);
 	}
 }

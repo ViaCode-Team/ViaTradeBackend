@@ -8,7 +8,7 @@ namespace Application.Interfaces;
 
 public interface IStrategyService
 {
-	Task<PagedResult<TradeStrategy>> GetStrategiesPagedAsync(PaginationRequest paginationRequest, CancellationToken cancellationToken);
+	Task<PagedResult<TradeStrategyDto>> GetStrategiesPagedAsync(PaginationRequest paginationRequest, CancellationToken cancellationToken);
 	Task<StrategyStatistic> GetStrategyStatisticAsync(int userId, CancellationToken cancellationToken);
 	Task<TradeStrategy> GetStrategyByIdAsync(int strategyId, CancellationToken cancellationToken);
 	Task<PagedResult<UserStrategyTradeCodeDto>> GetUserStrategyCodesPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken);

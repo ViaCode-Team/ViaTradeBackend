@@ -8,7 +8,7 @@ public sealed class PaginationRequestOperationFilter : IOperationFilter
 {
     private static readonly HashSet<string> PaginationParameterNames =
     [
-        nameof(PaginationRequest.PageNumber),
+        nameof(PaginationRequest.Page),
         nameof(PaginationRequest.PageSize)
     ];
 

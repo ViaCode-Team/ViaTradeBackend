@@ -2,6 +2,7 @@ using Application.Interfaces;
 using Application.Interfaces.Utils;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto;
+using Domain.Models.Dto.NoteRemind;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Pagination;
 using Microsoft.AspNetCore.Authorization;
@@ -51,17 +52,17 @@ public class RemindController(
 	[Authorize]
 	[HttpGet("byuser")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<TradeRemind>>> GetUserReminders([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<ActionResult<PagedResult<TradeRemindDto>>> GetUserReminders([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var reminders = await _tradeRemindService.GetByUserPagedAsync(userId, paginationRequest, cancellationToken);
-		return Ok(reminders);
+		var userReminders = await _tradeRemindService.GetByUserPagedAsync(userId, paginationRequest, cancellationToken);
+		return Ok(userReminders);
 	}
 
 	[Authorize]
 	[HttpGet("byuser/instrument/{idInstrument}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<TradeRemind>>> GetUserRemindersByInstrument(
+	public async Task<ActionResult<PagedResult<TradeRemindDto>>> GetUserRemindersByInstrument(
 		[FromQuery] PaginationRequest paginationRequest,
 		[Required, FromRoute] int idInstrument,
 		CancellationToken cancellationToken)

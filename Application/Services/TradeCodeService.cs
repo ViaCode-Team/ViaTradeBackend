@@ -16,9 +16,9 @@ public class TradeCodeService(
 	private readonly IFileReader _tradefileReader = tradefileReader;
 	private readonly ITradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
 
-	public async Task<PagedResult<TradeCode>> GetCodesPagedAsync(PaginationRequest paginationRequest, CancellationToken cancellationToken = default)
+	public async Task<PagedResult<TradeCodeDto>> GetCodesPagedAsync(PaginationRequest paginationRequest, CancellationToken cancellationToken = default)
 	{
-		return await _tradeCodeRepository.GetPagedAsync(paginationRequest, cancellationToken);
+		return await _tradeCodeRepository.GetCodesPagedAsync(paginationRequest, cancellationToken);
 	}
 
 	public async Task<StockStatistic> GetStockStatisticAsync(CancellationToken cancellationToken = default)

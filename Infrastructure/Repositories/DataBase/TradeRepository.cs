@@ -57,31 +57,55 @@ public class TradeRepository(AppDbContext context)
 		};
 	}
 
-	public async Task<PagedResult<Trade>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<TradeDto>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		return await _dbSet
-			.Include(t => t.TradeType)
-			.Include(t => t.TradeCode)
 			.Where(t => t.UserId == userId)
+			.Select(t => new TradeDto
+			{
+				Id = t.Id,
+				DateOpen = t.DateOpen,
+				DateClose = t.DateClose,
+				TradeOpen = t.TradeOpen,
+				TradeClose = t.TradeClose,
+				NetIncome = t.NetIncome,
+				Count = t.Count,
+				Price = t.Price,
+				TradeSignal = t.TradeSignal,
+				TradeTypeId = t.TradeTypeId,
+				TradeCodeId = t.TradeCodeId,
+				UserId = t.UserId
+			})
 			.OrderBy(t => t.Id)
-			.ToPagedResultAsync(paginationRequest, cancellationToken);
+			.ToPagedAsync(paginationRequest, cancellationToken);
 	}
 
-	public async Task<PagedResult<Trade>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<TradeDto>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		return await _dbSet
-			.Include(t => t.TradeType)
-			.Include(t => t.TradeCode)
 			.Where(t => t.UserId == userId && t.TradeCodeId == tradeCodeId)
+			.Select(t => new TradeDto
+			{
+				Id = t.Id,
+				DateOpen = t.DateOpen,
+				DateClose = t.DateClose,
+				TradeOpen = t.TradeOpen,
+				TradeClose = t.TradeClose,
+				NetIncome = t.NetIncome,
+				Count = t.Count,
+				Price = t.Price,
+				TradeSignal = t.TradeSignal,
+				TradeTypeId = t.TradeTypeId,
+				TradeCodeId = t.TradeCodeId,
+				UserId = t.UserId
+			})
 			.OrderBy(t => t.Id)
-			.ToPagedResultAsync(paginationRequest, cancellationToken);
+			.ToPagedAsync(paginationRequest, cancellationToken);
 	}
 
-	public async Task<PagedResult<Trade>> GetByUserAndDateRangePagedAsync(int userId, DateTime? from, DateTime? to, TradeSignal? tradeSignal, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<TradeDto>> GetByUserAndDateRangePagedAsync(int userId, DateTime? from, DateTime? to, TradeSignal? tradeSignal, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		var queryable = _dbSet
-			.Include(t => t.TradeType)
-			.Include(t => t.TradeCode)
 			.Where(t => t.UserId == userId);
 
 		if (from.HasValue)
@@ -95,6 +119,23 @@ public class TradeRepository(AppDbContext context)
 			queryable = queryable.Where(t => t.TradeSignal == tradeSignal);
 		}
 
-		return await queryable.OrderBy(t => t.Id).ToPagedResultAsync(paginationRequest, cancellationToken);
+		return await queryable
+			.Select(t => new TradeDto
+			{
+				Id = t.Id,
+				DateOpen = t.DateOpen,
+				DateClose = t.DateClose,
+				TradeOpen = t.TradeOpen,
+				TradeClose = t.TradeClose,
+				NetIncome = t.NetIncome,
+				Count = t.Count,
+				Price = t.Price,
+				TradeSignal = t.TradeSignal,
+				TradeTypeId = t.TradeTypeId,
+				TradeCodeId = t.TradeCodeId,
+				UserId = t.UserId
+			})
+			.OrderBy(t => t.Id)
+			.ToPagedAsync(paginationRequest, cancellationToken);
 	}
 }

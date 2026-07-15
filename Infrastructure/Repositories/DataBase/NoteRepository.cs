@@ -9,7 +9,7 @@ namespace Infrastructure.Repositories.DataBase;
 
 public class NoteRepository(AppDbContext context) : GenericRepository<Note, NoteDto>(context), INoteRepository
 {
-	public async Task<int> CountByUserAsync(int userId, CancellationToken cancellationToken)
+	public async Task<int> CountByUserAsync(int userId, CancellationToken cancellationToken = default)
 	{
 		return await _dbSet.CountAsync(n => n.UserId == userId, cancellationToken);
 	}
@@ -21,17 +21,33 @@ public class NoteRepository(AppDbContext context) : GenericRepository<Note, Note
 		_ => throw new KeyNotFoundException()
 	};
 
-	public async Task<PagedResult<Note>> GetUserNoteByPropPagedAsync(int userId, NoteType noteType, PaginationRequest paginationRequest, CancellationToken cancellationToken) => noteType switch
+	public async Task<PagedResult<NoteDto>> GetUserNoteByPropPagedAsync(int userId, NoteType noteType, PaginationRequest paginationRequest, CancellationToken cancellationToken) => noteType switch
 	{
 		NoteType.TradeCodeNote => await _dbSet
 			.Where(n => n.UserId == userId && n.TradeCodeId != null)
+			.Select(n => new NoteDto
+			{
+				Id = n.Id,
+				UserId = n.UserId,
+				NoteText = n.NoteText,
+				TradeCodeId = n.TradeCodeId,
+				TradeStrategyId = n.TradeStrategyId
+			})
 			.OrderBy(n => n.Id)
-			.ToPagedResultAsync(paginationRequest, cancellationToken),
+			.ToPagedAsync(paginationRequest, cancellationToken),
 
 		NoteType.TradeStrategyNote => await _dbSet
 			.Where(n => n.UserId == userId && n.TradeStrategyId != null)
+			.Select(n => new NoteDto
+			{
+				Id = n.Id,
+				UserId = n.UserId,
+				NoteText = n.NoteText,
+				TradeCodeId = n.TradeCodeId,
+				TradeStrategyId = n.TradeStrategyId
+			})
 			.OrderBy(n => n.Id)
-			.ToPagedResultAsync(paginationRequest, cancellationToken),
+			.ToPagedAsync(paginationRequest, cancellationToken),
 
 		_ => throw new KeyNotFoundException()
 	};

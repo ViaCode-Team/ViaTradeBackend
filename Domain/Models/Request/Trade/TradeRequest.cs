@@ -1,17 +1,14 @@
-﻿using Domain.Entities.DataBase;
+using Domain.Entities.DataBase;
 using System.ComponentModel.DataAnnotations;
 
 namespace ViaTradeBackend.Models.Trade;
 
 public class TradeRequest
 {
-	[Required]
-	public DateTime DateOpen { get; set; }
+	public required DateTime DateOpen { get; set; }
 
 	public DateTime? DateClose { get; set; }
-
-	[Required]
-	public double TradeOpen { get; set; }
+	public required double TradeOpen { get; set; }
 
 	public double? TradeClose { get; set; }
 
@@ -19,10 +16,7 @@ public class TradeRequest
 
 	[Range(0, int.MaxValue)]
 	public int Count { get; set; }
-
-	[Required]
-	public int TradeTypeId { get; set; }
-
-	[Required]
-	public int TradeCodeId { get; set; }
+	public required int TradeTypeId { get; set; }
+	public required int TradeCodeId { get; set; }
 }
+

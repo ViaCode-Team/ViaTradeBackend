@@ -1,9 +1,10 @@
-﻿using Domain.Entities.DataBase;
+using Domain.Entities.DataBase;
 
 namespace Domain.Models.Dto.Trade;
 
 public class TradeDto
 {
+	public required int Id { get; set; }
 	public DateTime DateOpen { get; set; }
 	public DateTime? DateClose { get; set; }
 
@@ -12,7 +13,7 @@ public class TradeDto
 
 	public double? NetIncome { get; set; }
 	public int Count { get; set; }
-	public int Price { get; set; }
+	public decimal Price { get; set; }
 
 	public required TradeSignal TradeSignal { get; set; }
 

@@ -32,7 +32,7 @@ public class NoteController(
 
 	[HttpGet("byuser/instrument")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<Note>>> GetUserTradeCodeNotes([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<ActionResult<PagedResult<NoteDto>>> GetUserTradeCodeNotes([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var notes = await _noteService.GetUserNoteByPropPagedAsync(userId, NoteType.TradeCodeNote, paginationRequest, cancellationToken);
@@ -53,7 +53,7 @@ public class NoteController(
 
 	[HttpGet("byuser/strategy")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<Note>>> GetUserStrategyNotes([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<ActionResult<PagedResult<NoteDto>>> GetUserStrategyNotes([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var notes = await _noteService.GetUserNoteByPropPagedAsync(userId, NoteType.TradeStrategyNote, paginationRequest, cancellationToken);

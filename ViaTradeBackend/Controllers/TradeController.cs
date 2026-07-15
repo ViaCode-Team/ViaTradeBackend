@@ -2,6 +2,7 @@ using Application.Interfaces;
 using Application.Interfaces.Utils;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.Statistic;
+using Domain.Models.Dto.Trade;
 using Domain.Models.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -31,7 +32,7 @@ public class TradeController(
 
 	[HttpGet("byuser")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<Trade>>> GetUserTrades(
+	public async Task<ActionResult<PagedResult<TradeDto>>> GetUserTrades(
 		[FromQuery] PaginationRequest paginationRequest,
 		[FromQuery] DateTime? startDate,
 		[FromQuery] DateTime? endDate,
@@ -39,8 +40,8 @@ public class TradeController(
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var trades = await _tradeService.GetByUserPagedAsync(userId, startDate, endDate, tradeSignal, paginationRequest, cancellationToken);
-		return Ok(trades);
+		var userTrades = await _tradeService.GetByUserPagedAsync(userId, startDate, endDate, tradeSignal, paginationRequest, cancellationToken);
+		return Ok(userTrades);
 	}
 
 	[HttpGet("{id}")]

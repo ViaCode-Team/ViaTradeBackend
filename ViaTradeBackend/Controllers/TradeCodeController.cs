@@ -31,7 +31,7 @@ public class TradeCodeController(
 
 	[HttpGet("stocks")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<TradeCode>>> GetStockCodes([FromQuery] PaginationRequest paginationRequest)
+	public async Task<ActionResult<PagedResult<TradeCodeDto>>> GetStockCodes([FromQuery] PaginationRequest paginationRequest)
 	{
 		var result = await _tradeService.GetCodesPagedAsync(paginationRequest);
 		return Ok(result);

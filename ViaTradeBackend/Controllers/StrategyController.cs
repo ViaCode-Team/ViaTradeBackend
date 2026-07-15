@@ -32,7 +32,7 @@ public class StrategyController(
 
 	[HttpGet("")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<TradeStrategy>>> GetStrategies(
+	public async Task<ActionResult<PagedResult<TradeStrategyDto>>> GetStrategies(
 		[FromQuery] PaginationRequest paginationRequest,
 		CancellationToken cancellationToken)
 	{

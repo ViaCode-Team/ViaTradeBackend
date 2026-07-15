@@ -19,9 +19,9 @@ public class StrategyService(
 	private readonly IUserStrategyTradeCodeRepository _userStrategyTradeCodeRepository = userStrategyTradeCodeRepository;
 	private readonly IUserService _userService = userService;
 
-	public async Task<PagedResult<TradeStrategy>> GetStrategiesPagedAsync(PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<TradeStrategyDto>> GetStrategiesPagedAsync(PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
-		return await _tradeStrategyRepository.GetPagedAsync(paginationRequest, cancellationToken);
+		return await _tradeStrategyRepository.GetStrategiesPagedAsync(paginationRequest, cancellationToken);
 	}
 
 	public async Task<StrategyStatistic> GetStrategyStatisticAsync(int userId, CancellationToken cancellationToken)

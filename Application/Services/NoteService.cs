@@ -30,7 +30,7 @@ public class NoteService(
 		};
 	}
 
-	public async Task<PagedResult<Note>> GetUserNoteByPropPagedAsync(int userId, NoteType noteType, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<NoteDto>> GetUserNoteByPropPagedAsync(int userId, NoteType noteType, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
 		return await _noteRepository.GetUserNoteByPropPagedAsync(userId, noteType, paginationRequest, cancellationToken);

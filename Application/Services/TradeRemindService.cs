@@ -4,6 +4,7 @@ using Domain.Entities.DataBase;
 using Domain.Models.Dto;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Pagination;
+using Domain.Models.Dto.NoteRemind;
 
 namespace Application.Services;
 
@@ -36,18 +37,19 @@ public class TradeRemindService(
 		await _tradeRemindRepository.ExecuteDeleteAsync(r => r.Id == remindId, cancellationToken);
 	}
 
-	public async Task<PagedResult<TradeRemind>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<TradeRemindDto>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
 		return await _tradeRemindRepository.GetByUserPagedAsync(userId, paginationRequest, cancellationToken);
 	}
 
-	public async Task<PagedResult<TradeRemind>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<TradeRemindDto>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
 		var tradeCode = await _tradeCodeRepository.GetByIdAsync(tradeCodeId, cancellationToken);
-		if (tradeCode == null)
-			throw new KeyNotFoundException();
+
+		if (tradeCode is null)
+			throw new KeyNotFoundException($"TradeCode with id: {tradeCodeId} not found");
 
 		return await _tradeRemindRepository.GetByUserAndTradeCodePagedAsync(userId, tradeCodeId, paginationRequest, cancellationToken);
 	}

@@ -8,7 +8,7 @@ namespace Application.Interfaces;
 public interface INoteService
 {
 	Task<NoteStatistic> GetNoteStatisticAsync(int userId, CancellationToken cancellationToken);
-	Task<PagedResult<Note>> GetUserNoteByPropPagedAsync(int userId, NoteType noteType, PaginationRequest paginationRequest, CancellationToken cancellationToken);
+	Task<PagedResult<NoteDto>> GetUserNoteByPropPagedAsync(int userId, NoteType noteType, PaginationRequest paginationRequest, CancellationToken cancellationToken);
 	Task<Note> GetUserNoteByPropAsync(int id, int userId, NoteType noteType, CancellationToken cancellationToken);
 	Task AddUserNoteWithValidationAsync(int relatedId, NoteType noteType, NoteDto dto, CancellationToken cancellationToken);
 	Task UpdateUserNoteWithValidationAsync(int relatedId, NoteType noteType, NoteDto dto, CancellationToken cancellationToken);

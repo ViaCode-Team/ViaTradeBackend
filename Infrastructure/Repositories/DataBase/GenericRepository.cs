@@ -33,7 +33,7 @@ public class GenericRepository<TEntity, TDto> : IRepository<TEntity, TDto>
 
 	public async Task<PagedResult<TEntity>> GetPagedAsync(PaginationRequest paginationRequest, CancellationToken ct = default)
 	{
-		return await _dbSet.OrderBy(e => e.Id).ToPagedResultAsync(paginationRequest, ct);
+		return await _dbSet.OrderBy(e => e.Id).ToPagedAsync(paginationRequest, ct);
 	}
 
 	public async Task<IEnumerable<TEntity>> FindAsync(
@@ -48,7 +48,7 @@ public class GenericRepository<TEntity, TDto> : IRepository<TEntity, TDto>
 		PaginationRequest paginationRequest,
 		CancellationToken ct = default)
 	{
-		return await _dbSet.Where(predicate).OrderBy(e => e.Id).ToPagedResultAsync(paginationRequest, ct);
+		return await _dbSet.Where(predicate).OrderBy(e => e.Id).ToPagedAsync(paginationRequest, ct);
 	}
 
 	public async Task AddAsync(TEntity entity, CancellationToken ct = default)

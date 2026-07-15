@@ -15,15 +15,16 @@ public class UserStrategyTradeCodeRepository(AppDbContext context) :
 		PaginationRequest paginationRequest,
 		CancellationToken cancellationToken)
 	{
-		return await _dbSet
+		var paged = await _dbSet
 			.Where(e => e.UserId == userId)
 			.OrderBy(e => e.Id)
-			.Select(e => new UserStrategyTradeCodeDto
-			{
-				UserId = e.UserId,
-				TradeCodeId = e.TradeCodeId,
-				StrategyId = e.StrategyId
-			})
-			.ToPagedResultAsync(paginationRequest, cancellationToken);
+			.ToPagedAsync(paginationRequest, cancellationToken);
+
+		return paged.Map(e => new UserStrategyTradeCodeDto
+		{
+			UserId = e.UserId,
+			TradeCodeId = e.TradeCodeId,
+			StrategyId = e.StrategyId
+		});
 	}
 }

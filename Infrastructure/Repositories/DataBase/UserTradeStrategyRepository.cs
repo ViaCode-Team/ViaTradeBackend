@@ -14,14 +14,14 @@ public class UserTradeStrategyRepository(AppDbContext context) : GenericReposito
 	{
 		return await _context.UserTradeStrategies
 			.Where(e => e.UserId == userId)
-			.OrderBy(e => e.Id)
 			.Select(e => new UserTradeStrategyDto
 			{
 				Id = e.Id,
 				UserId = e.UserId,
 				TradeStrategyId = e.TradeStrategyId
 			})
-			.ToPagedResultAsync(paginationRequest, cancellationToken);
+			.OrderBy(e => e.Id)
+			.ToPagedAsync(paginationRequest, cancellationToken);
 	}
 
 	public async Task<int> CountByUserAsync(int userId, CancellationToken cancellationToken)

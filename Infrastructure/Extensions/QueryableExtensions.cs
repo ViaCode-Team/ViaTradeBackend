@@ -5,18 +5,20 @@ namespace Infrastructure.Extensions;
 
 public static class QueryableExtensions
 {
-	public static async Task<PagedResult<T>> ToPagedResultAsync<T>(
-		this IQueryable<T> source,
+	public static async Task<PagedResult<T>> ToPagedAsync<T>(
+		this IOrderedQueryable<T> source,
 		PaginationRequest paginationRequest,
 		CancellationToken ct = default)
 	{
 		var totalCount = await source.CountAsync(ct);
+		if (totalCount == 0)
+			return new PagedResult<T>([], 0, paginationRequest.Page, paginationRequest.PageSize);
 
 		var items = await source
-			.Skip((paginationRequest.PageNumber - 1) * paginationRequest.PageSize)
+			.Skip((paginationRequest.Page - 1) * paginationRequest.PageSize)
 			.Take(paginationRequest.PageSize)
 			.ToListAsync(ct);
 
-		return new PagedResult<T>(items, totalCount, paginationRequest.PageNumber, paginationRequest.PageSize);
+		return new PagedResult<T>(items, totalCount, paginationRequest.Page, paginationRequest.PageSize);
 	}
 }

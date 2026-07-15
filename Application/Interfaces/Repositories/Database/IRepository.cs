@@ -15,7 +15,6 @@ public interface IRepository<TEntity, TDto> where TEntity : BaseEntity where TDt
 	void Update(TEntity entity);
 	void Remove(TEntity entity);
 	Task<int> SaveChangesAsync(CancellationToken ct = default);
-
 	Task<IEnumerable<TDto>> GetProjectedAsync(Expression<Func<TEntity, TDto>> projection, CancellationToken ct = default);
 	Task<int> ExecuteDeleteAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
 }

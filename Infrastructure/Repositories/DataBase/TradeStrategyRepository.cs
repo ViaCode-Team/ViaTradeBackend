@@ -1,6 +1,8 @@
-﻿using Application.Interfaces.Repositories.Database;
+using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.Strategy;
+using Domain.Models.Pagination;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase;
@@ -31,5 +33,25 @@ public class TradeStrategyRepository(AppDbContext context) : GenericRepository<T
 				LimitDesc = tradeStrategy.LimitDesc
 			})
 			.FirstOrDefaultAsync(cancellationToken);
+	}
+
+	public async Task<PagedResult<TradeStrategyDto>> GetStrategiesPagedAsync(PaginationRequest paginationRequest, CancellationToken cancellationToken = default)
+	{
+		return await _dbSet
+			.AsNoTracking()
+			.Select(tradeStrategy => new TradeStrategyDto
+			{
+				Id = tradeStrategy.Id,
+				Name = tradeStrategy.Name,
+				Description = tradeStrategy.Description,
+				Accuracy = tradeStrategy.Accuracy,
+				SignalFrequency = tradeStrategy.SignalFrequency,
+				InvestmentHorizon = tradeStrategy.InvestmentHorizon,
+				LogicDesc = tradeStrategy.LogicDesc,
+				UseDesc = tradeStrategy.UseDesc,
+				LimitDesc = tradeStrategy.LimitDesc
+			})
+			.OrderBy(s => s.Id)
+			.ToPagedAsync(paginationRequest, cancellationToken);
 	}
 }

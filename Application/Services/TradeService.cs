@@ -4,6 +4,7 @@ using Domain.Entities.DataBase;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Pagination;
 using ViaTradeBackend.Models.Trade;
+using Domain.Models.Dto.Trade;
 
 namespace Application.Services;
 
@@ -24,8 +25,7 @@ public class TradeService(
 		return await _tradeRepository.GetGlobalStatisticAsync(userId, cancellationToken);
 	}
 
-	public async Task<PagedResult<Trade>> GetByUserPagedAsync(int userId, DateTime? startDate, DateTime? endDate,
-		TradeSignal? tradeSignal, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<TradeDto>> GetByUserPagedAsync(int userId, DateTime? startDate, DateTime? endDate, TradeSignal? tradeSignal, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
 		return await _tradeRepository.GetByUserAndDateRangePagedAsync(userId, startDate, endDate, tradeSignal, paginationRequest, cancellationToken);

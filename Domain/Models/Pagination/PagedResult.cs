@@ -8,13 +8,24 @@ public sealed record PagedResult<T>(
 	[property: JsonIgnore] int PageNumber,
 	[property: JsonIgnore] int PageSize)
 {
-	public int TotalPages => CalculateTotalPages(TotalCount, PageSize);
+	public int TotalPages => CalculateTotalPages();
 
-	private static int CalculateTotalPages(int totalCount, int pageSize)
+	private int CalculateTotalPages()
 	{
-		if (totalCount == 0)
+		if (TotalCount == 0)
 			return 0;
 
-		return (int)Math.Ceiling(totalCount / (double)pageSize);
+		int totalPages = TotalCount / PageSize;
+		int remainder = TotalCount % PageSize;
+
+		if (remainder > 0)
+			totalPages++;
+
+		return totalPages;
+	}
+
+	public PagedResult<TResult> Map<TResult>(Func<T, TResult> mapFunc)
+	{
+		return new PagedResult<TResult>(Items.Select(mapFunc).ToList(), TotalCount, PageNumber, PageSize);
 	}
 }
