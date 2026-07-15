@@ -4,6 +4,8 @@ using Domain.Entities.DataBase;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Trade;
 using Domain.Models.Pagination;
+using Domain.Models.Filters;
+using Application.Specifications;
 using ViaTradeBackend.Models.Trade;
 
 namespace Application.Services;
@@ -22,18 +24,22 @@ public class TradeService(
 	public async Task<GlobalStatistic> GetGlobalStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 		return await _tradeRepository.GetGlobalStatisticAsync(userId, cancellationToken);
 	}
 
-	public async Task<PagedResult<TradeDto>> GetByUserPagedAsync(int userId, DateTime? startDate, DateTime? endDate, TradeSignal? tradeSignal, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<TradeDto>> GetByUserPagedAsync(int userId, TradeFilterRequest? filterRequest, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
-		return await _tradeRepository.GetByUserAndDateRangePagedAsync(userId, startDate, endDate, tradeSignal, paginationRequest, cancellationToken);
+
+		var spec = new TradeSpecification(userId, filterRequest);
+		return await _tradeRepository.GetPagedFilteredAsync(spec, paginationRequest, cancellationToken);
 	}
 
 	public async Task<Trade> GetTradeByIdAsync(int id, int userId, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 		var trade = await _tradeRepository.GetByIdAsync(id, cancellationToken);
 		if (trade == null || trade.UserId != userId)
 			throw new KeyNotFoundException();

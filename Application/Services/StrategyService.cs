@@ -4,6 +4,8 @@ using Domain.Entities.DataBase;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Strategy;
 using Domain.Models.Pagination;
+using Domain.Models.Filters;
+using Application.Specifications;
 using ViaTradeBackend.Models.Trade;
 
 namespace Application.Services;
@@ -19,17 +21,25 @@ public class StrategyService(
 	private readonly IUserStrategyTradeCodeRepository _userStrategyTradeCodeRepository = userStrategyTradeCodeRepository;
 	private readonly IUserService _userService = userService;
 
-	public async Task<PagedResult<TradeStrategyDto>> GetStrategiesPagedAsync(PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<TradeStrategyDto>> GetStrategiesPagedAsync(int userId, StrategyFilterRequest? filterRequest, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
 	{
-		return await _tradeStrategyRepository.GetStrategiesPagedAsync(paginationRequest, cancellationToken);
+		await _userService.EnsureUserAsync(userId, cancellationToken);
+
+		var spec = new StrategySpecification(userId, filterRequest);
+		return await _tradeStrategyRepository.GetPagedFilteredAsync(userId, spec, paginationRequest, cancellationToken);
 	}
 
 	public async Task<StrategyStatistic> GetStrategyStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
 
-		var totalStrategies = await _tradeStrategyRepository.CountAsync(cancellationToken);
-		var activeStrategies = await _userTradeStrategyRepository.CountByUserAsync(userId, cancellationToken);
+		var totalStrategiesTask = _tradeStrategyRepository.CountAsync(cancellationToken);
+		var activeStrategiesTask = _userTradeStrategyRepository.CountByUserAsync(userId, cancellationToken);
+
+		await Task.WhenAll(totalStrategiesTask, activeStrategiesTask);
+
+		var totalStrategies = totalStrategiesTask.Result;
+		var activeStrategies = activeStrategiesTask.Result;
 
 		return new StrategyStatistic
 		{

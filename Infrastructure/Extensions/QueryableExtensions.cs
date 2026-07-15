@@ -6,10 +6,12 @@ namespace Infrastructure.Extensions;
 public static class QueryableExtensions
 {
 	public static async Task<PagedResult<T>> ToPagedAsync<T>(
-		this IOrderedQueryable<T> source,
-		PaginationRequest paginationRequest,
+		this IQueryable<T> source,
+		PaginationRequest? paginationRequest,
 		CancellationToken ct = default)
 	{
+		paginationRequest ??= new PaginationRequest();
+
 		var totalCount = await source.CountAsync(ct);
 		if (totalCount == 0)
 			return new PagedResult<T>([], 0, paginationRequest.Page, paginationRequest.PageSize);

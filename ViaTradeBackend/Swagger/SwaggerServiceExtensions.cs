@@ -30,7 +30,6 @@ public static class SwaggerServiceExtensions
 			options.DocumentFilter<ProblemDetailsDocumentFilter>();
 
 			options.OperationFilter<ProblemDetailsOperationFilter>();
-			options.OperationFilter<PaginationRequestOperationFilter>();
 
 			var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 			var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);

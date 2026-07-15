@@ -1,5 +1,6 @@
 using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
+using Domain.Interfaces;
 using Domain.Models.Pagination;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -31,9 +32,20 @@ public class GenericRepository<TEntity, TDto> : IRepository<TEntity, TDto>
 		return await _dbSet.ToListAsync(ct);
 	}
 
-	public async Task<PagedResult<TEntity>> GetPagedAsync(PaginationRequest paginationRequest, CancellationToken ct = default)
+	public async Task<PagedResult<TEntity>> GetPagedAsync(PaginationRequest? paginationRequest, CancellationToken ct = default)
 	{
 		return await _dbSet.OrderBy(e => e.Id).ToPagedAsync(paginationRequest, ct);
+	}
+
+	public async Task<PagedResult<TEntity>> GetPagedAsync(ISpecification<TEntity> spec, PaginationRequest? paginationRequest, CancellationToken ct = default)
+	{
+		var query = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
+		// Default order by Id if none is provided
+		if (spec.OrderBy == null && spec.OrderByDescending == null)
+		{
+			query = query.OrderBy(e => e.Id);
+		}
+		return await query.ToPagedAsync(paginationRequest, ct);
 	}
 
 	public async Task<IEnumerable<TEntity>> FindAsync(
@@ -45,7 +57,7 @@ public class GenericRepository<TEntity, TDto> : IRepository<TEntity, TDto>
 
 	public async Task<PagedResult<TEntity>> FindPagedAsync(
 		Expression<Func<TEntity, bool>> predicate,
-		PaginationRequest paginationRequest,
+		PaginationRequest? paginationRequest,
 		CancellationToken ct = default)
 	{
 		return await _dbSet.Where(predicate).OrderBy(e => e.Id).ToPagedAsync(paginationRequest, ct);

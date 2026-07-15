@@ -2,6 +2,7 @@ using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.Strategy;
 using Domain.Models.Pagination;
+using Domain.Interfaces;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +19,6 @@ public class TradeStrategyRepository(AppDbContext context) : GenericRepository<T
 	public async Task<TradeStrategyDto?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
 	{
 		return await _dbSet
-			.AsNoTracking()
 			.Where(tradeStrategy => tradeStrategy.Name == name)
 			.Select(tradeStrategy => new TradeStrategyDto
 			{
@@ -35,10 +35,11 @@ public class TradeStrategyRepository(AppDbContext context) : GenericRepository<T
 			.FirstOrDefaultAsync(cancellationToken);
 	}
 
-	public async Task<PagedResult<TradeStrategyDto>> GetStrategiesPagedAsync(PaginationRequest paginationRequest, CancellationToken cancellationToken = default)
+	public async Task<PagedResult<TradeStrategyDto>> GetPagedFilteredAsync(int userId, ISpecification<TradeStrategy> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken = default)
 	{
-		return await _dbSet
-			.AsNoTracking()
+		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
+
+		return await queryable
 			.Select(tradeStrategy => new TradeStrategyDto
 			{
 				Id = tradeStrategy.Id,
@@ -49,9 +50,9 @@ public class TradeStrategyRepository(AppDbContext context) : GenericRepository<T
 				InvestmentHorizon = tradeStrategy.InvestmentHorizon,
 				LogicDesc = tradeStrategy.LogicDesc,
 				UseDesc = tradeStrategy.UseDesc,
-				LimitDesc = tradeStrategy.LimitDesc
+				LimitDesc = tradeStrategy.LimitDesc,
+				IsActive = tradeStrategy.UserTradeStrategies != null && tradeStrategy.UserTradeStrategies.Any(uts => uts.UserId == userId)
 			})
-			.OrderBy(s => s.Id)
 			.ToPagedAsync(paginationRequest, cancellationToken);
 	}
 }

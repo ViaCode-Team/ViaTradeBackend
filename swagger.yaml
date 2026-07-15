@@ -643,16 +643,32 @@ paths:
                 title: Internal Server Error
                 status: 500
                 detail: Specific error details here
-  /api/Note/byuser/instrument:
+  /api/Note/byuser:
     get:
       tags:
         - Note
-      operationId: GetUserTradeCodeNotes
+      operationId: GetUserNotes
       parameters:
-        - name: pagination
+        - name: Target
           in: query
           schema:
-            $ref: '#/components/schemas/PaginationRequest'
+            $ref: '#/components/schemas/NoteType'
+        - name: Page
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+            default: 1
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 20
       responses:
         '200':
           description: OK
@@ -1065,106 +1081,6 @@ paths:
       responses:
         '204':
           description: No Content
-        '400':
-          description: Bad Request - Invalid input data
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/400
-                title: Bad Request
-                status: 400
-                detail: Specific error details here
-        '401':
-          description: Unauthorized - Invalid credentials
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/401
-                title: Unauthorized
-                status: 401
-                detail: Specific error details here
-        '403':
-          description: Forbidden - Access denied
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/403
-                title: Forbidden
-                status: 403
-                detail: Specific error details here
-        '404':
-          description: Not Found - Resource does not exist
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/404
-                title: Not Found
-                status: 404
-                detail: Specific error details here
-        '408':
-          description: Timeout - Server timeout
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/408
-                title: Timeout
-                status: 408
-                detail: Specific error details here
-        '409':
-          description: Conflict - Conflict operation
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/409
-                title: Conflict
-                status: 409
-                detail: Specific error details here
-        '500':
-          description: Internal Server Error - Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/500
-                title: Internal Server Error
-                status: 500
-                detail: Specific error details here
-  /api/Note/byuser/strategy:
-    get:
-      tags:
-        - Note
-      operationId: GetUserStrategyNotes
-      parameters:
-        - name: pagination
-          in: query
-          schema:
-            $ref: '#/components/schemas/PaginationRequest'
-      responses:
-        '200':
-          description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/NoteDtoPagedResult'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NoteDtoPagedResult'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/NoteDtoPagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -1935,10 +1851,22 @@ paths:
         - Remind
       operationId: GetUserReminders
       parameters:
-        - name: pagination
+        - name: Page
           in: query
           schema:
-            $ref: '#/components/schemas/PaginationRequest'
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+            default: 1
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 20
       responses:
         '200':
           description: OK
@@ -2035,16 +1963,28 @@ paths:
         - Remind
       operationId: GetUserRemindersByInstrument
       parameters:
+        - name: Page
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+            default: 1
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 20
         - name: idInstrument
           in: path
           required: true
           schema:
             type: integer
             format: int32
-        - name: pagination
-          in: query
-          schema:
-            $ref: '#/components/schemas/PaginationRequest'
       responses:
         '200':
           description: OK
@@ -2952,10 +2892,26 @@ paths:
         - Strategy
       operationId: GetStrategies
       parameters:
-        - name: pagination
+        - name: IsActive
           in: query
           schema:
-            $ref: '#/components/schemas/PaginationRequest'
+            type: boolean
+        - name: Page
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+            default: 1
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 20
       responses:
         '200':
           description: OK
@@ -3154,10 +3110,22 @@ paths:
         - Strategy
       operationId: GetUserStrategyTradeCodes
       parameters:
-        - name: pagination
+        - name: Page
           in: query
           schema:
-            $ref: '#/components/schemas/PaginationRequest'
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+            default: 1
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 20
       responses:
         '200':
           description: OK
@@ -3447,10 +3415,22 @@ paths:
         - Strategy
       operationId: GetUserStrategies
       parameters:
-        - name: pagination
+        - name: Page
           in: query
           schema:
-            $ref: '#/components/schemas/PaginationRequest'
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+            default: 1
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 20
       responses:
         '200':
           description: OK
@@ -3829,24 +3809,44 @@ paths:
         - Trade
       operationId: GetUserTrades
       parameters:
-        - name: startDate
-          in: query
-          schema:
-            type: string
-            format: date-time
-        - name: endDate
-          in: query
-          schema:
-            type: string
-            format: date-time
-        - name: tradeSignal
+        - name: Signal
           in: query
           schema:
             $ref: '#/components/schemas/TradeSignal'
-        - name: pagination
+        - name: Status
           in: query
           schema:
-            $ref: '#/components/schemas/PaginationRequest'
+            $ref: '#/components/schemas/TradeStatus'
+        - name: TradeTypeName
+          in: query
+          schema:
+            type: string
+        - name: StartDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: EndDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: Page
+          in: query
+          schema:
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+            default: 1
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 20
       responses:
         '200':
           description: OK
@@ -4441,10 +4441,22 @@ paths:
         - TradeCode
       operationId: GetStockCodes
       parameters:
-        - name: pagination
+        - name: Page
           in: query
           schema:
-            $ref: '#/components/schemas/PaginationRequest'
+            maximum: 2147483647
+            minimum: 1
+            type: integer
+            format: int32
+            default: 1
+        - name: PageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 20
       responses:
         '200':
           description: OK
@@ -5289,25 +5301,12 @@ components:
           type: integer
           format: int32
       additionalProperties: false
-    PaginationRequest:
-      required:
-        - page
-        - pageSize
-      type: object
-      properties:
-        page:
-          maximum: 2147483647
-          minimum: 1
-          type: integer
-          format: int32
-          default: 1
-        pageSize:
-          maximum: 100
-          minimum: 1
-          type: integer
-          format: int32
-          default: 20
-      additionalProperties: false
+    NoteType:
+      enum:
+        - 0
+        - 1
+      type: integer
+      format: int32
     ProblemDetails:
       required:
         - type
@@ -5800,6 +5799,12 @@ components:
           type: integer
           format: int32
       additionalProperties: false
+    TradeStatus:
+      enum:
+        - 0
+        - 1
+      type: integer
+      format: int32
     TradeStrategy:
       required:
         - id
@@ -5837,6 +5842,7 @@ components:
     TradeStrategyDto:
       required:
         - id
+        - isActive
         - name
       type: object
       properties:
@@ -5860,6 +5866,8 @@ components:
           type: string
         limitDesc:
           type: string
+        isActive:
+          type: boolean
       additionalProperties: false
     TradeStrategyDtoPagedResult:
       required:

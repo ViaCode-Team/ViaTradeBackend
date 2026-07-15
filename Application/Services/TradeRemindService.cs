@@ -40,12 +40,14 @@ public class TradeRemindService(
 	public async Task<PagedResult<TradeRemindDto>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 		return await _tradeRemindRepository.GetByUserPagedAsync(userId, paginationRequest, cancellationToken);
 	}
 
 	public async Task<PagedResult<TradeRemindDto>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 		var tradeCode = await _tradeCodeRepository.GetByIdAsync(tradeCodeId, cancellationToken);
 
 		if (tradeCode is null)
@@ -57,6 +59,7 @@ public class TradeRemindService(
 	public async Task<TradeRemind> GetByIdAsync(int remindId, int userId, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 		var reminder = await _tradeRemindRepository.GetByIdAsync(remindId, cancellationToken);
 		if (reminder == null || reminder.UserId != userId)
 			throw new KeyNotFoundException();
@@ -67,6 +70,7 @@ public class TradeRemindService(
 	public async Task CreateAsync(int userId, int tradeCodeId, TradeRemindRequest request, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 		var tradeCode = await _tradeCodeRepository.GetByIdAsync(tradeCodeId, cancellationToken);
 		if (tradeCode == null)
 			throw new KeyNotFoundException();
@@ -86,6 +90,7 @@ public class TradeRemindService(
 	public async Task UpdateAsync(int remindId, int userId, TradeRemindRequest request, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 		var remind = await _tradeRemindRepository.GetByIdAsync(remindId, cancellationToken);
 		if (remind == null || remind.UserId != userId)
 			throw new KeyNotFoundException();
@@ -104,6 +109,7 @@ public class TradeRemindService(
 	public async Task DeleteAsync(int remindId, int userId, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 		var remind = await _tradeRemindRepository.GetByIdAsync(remindId, cancellationToken);
 		if (remind == null || remind.UserId != userId)
 			throw new KeyNotFoundException();

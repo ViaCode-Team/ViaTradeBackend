@@ -3,6 +3,7 @@ using Domain.Entities.DataBase;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Trade;
 using Domain.Models.Pagination;
+using Domain.Interfaces;
 using Domain.Services;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -14,39 +15,47 @@ public class TradeRepository(AppDbContext context)
 {
 	public async Task<GlobalStatistic> GetGlobalStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
-		var tradeStatistic = _dbSet.Where(t => t.UserId == userId && t.NetIncome.HasValue);
+		var statsData = await _dbSet
+			.Where(t => t.UserId == userId && t.NetIncome.HasValue)
+			.GroupBy(t => 1)
+			.Select(g => new
+			{
+				TotalTrades = g.Count(),
+				WinTrades = g.Count(t => t.NetIncome > 0),
+				LoseTrades = g.Count(t => t.NetIncome < 0),
+				TotalAbsoluteIncome = g.Sum(t => ((t.TradeClose ?? 0) - t.TradeOpen) * t.Count * (int)t.TradeSignal),
+				TotalProfit = g.Where(t => t.NetIncome > 0).Sum(t => Math.Abs(((t.TradeClose ?? 0) - t.TradeOpen) * t.Count * (int)t.TradeSignal)),
+				TotalLoss = g.Where(t => t.NetIncome < 0).Sum(t => Math.Abs(((t.TradeClose ?? 0) - t.TradeOpen) * t.Count * (int)t.TradeSignal))
+			})
+			.FirstOrDefaultAsync(cancellationToken);
+
+		if (statsData == null)
+		{
+			return new GlobalStatistic
+			{
+				TradeStatistic = new TradeStatistic { TotalTrades = 0, WinTrades = 0, LoseTrades = 0 },
+				IncomeStatistic = new IncomeTradeStatistic { TotalIncome = 0, AverageIncome = 0 },
+				WinrateStatistic = new WinrateTradeStatistic { TotalWinrate = 0, ProfitFactor = 0 }
+			};
+		}
 
 		var resultTrade = new TradeStatistic
 		{
-			TotalTrades = await tradeStatistic.CountAsync(cancellationToken),
-			WinTrades = await tradeStatistic.CountAsync(t => t.NetIncome > 0, cancellationToken),
-			LoseTrades = await tradeStatistic.CountAsync(t => t.NetIncome < 0, cancellationToken),
+			TotalTrades = statsData.TotalTrades,
+			WinTrades = statsData.WinTrades,
+			LoseTrades = statsData.LoseTrades,
 		};
-
-		var totalAbsoluteIncome = await tradeStatistic
-			.Select(TradeStatisticsCalcService.AbsoluteIncomeExpression)
-			.SumAsync(cancellationToken);
 
 		var incomeStatistic = new IncomeTradeStatistic
 		{
-			TotalIncome = Math.Round((decimal)totalAbsoluteIncome, 2),
-			AverageIncome = TradeStatisticsCalcService.CalculateAverageIncome((decimal)totalAbsoluteIncome, resultTrade.TotalTrades),
+			TotalIncome = Math.Round((decimal)statsData.TotalAbsoluteIncome, 2),
+			AverageIncome = TradeStatisticsCalcService.CalculateAverageIncome((decimal)statsData.TotalAbsoluteIncome, statsData.TotalTrades),
 		};
-
-		var totalProfit = await tradeStatistic
-			.Where(t => t.NetIncome > 0)
-			.Select(TradeStatisticsCalcService.AbsoluteIncomeAbsExpression)
-			.SumAsync(cancellationToken);
-
-		var totalLoss = await tradeStatistic
-			.Where(t => t.NetIncome < 0)
-			.Select(TradeStatisticsCalcService.AbsoluteIncomeAbsExpression)
-			.SumAsync(cancellationToken);
 
 		var winrateStatistic = new WinrateTradeStatistic
 		{
-			TotalWinrate = TradeStatisticsCalcService.CalculateWinrate(resultTrade.WinTrades, resultTrade.TotalTrades),
-			ProfitFactor = TradeStatisticsCalcService.CalculateProfitFactor(totalProfit, totalLoss)
+			TotalWinrate = TradeStatisticsCalcService.CalculateWinrate(statsData.WinTrades, statsData.TotalTrades),
+			ProfitFactor = TradeStatisticsCalcService.CalculateProfitFactor(statsData.TotalProfit, statsData.TotalLoss)
 		};
 
 		return new GlobalStatistic
@@ -103,21 +112,9 @@ public class TradeRepository(AppDbContext context)
 			.ToPagedAsync(paginationRequest, cancellationToken);
 	}
 
-	public async Task<PagedResult<TradeDto>> GetByUserAndDateRangePagedAsync(int userId, DateTime? from, DateTime? to, TradeSignal? tradeSignal, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<TradeDto>> GetPagedFilteredAsync(ISpecification<Trade> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
 	{
-		var queryable = _dbSet
-			.Where(t => t.UserId == userId);
-
-		if (from.HasValue)
-			queryable = queryable.Where(t => t.DateOpen >= from.Value);
-
-		if (to.HasValue)
-			queryable = queryable.Where(t => t.DateOpen <= to.Value.Date.AddDays(1).AddTicks(-1));
-
-		if (tradeSignal.HasValue)
-		{
-			queryable = queryable.Where(t => t.TradeSignal == tradeSignal);
-		}
+		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
 
 		return await queryable
 			.Select(t => new TradeDto
@@ -135,7 +132,6 @@ public class TradeRepository(AppDbContext context)
 				TradeCodeId = t.TradeCodeId,
 				UserId = t.UserId
 			})
-			.OrderBy(t => t.Id)
 			.ToPagedAsync(paginationRequest, cancellationToken);
 	}
 }

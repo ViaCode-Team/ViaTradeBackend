@@ -4,6 +4,7 @@ using Domain.Entities.DataBase;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Trade;
 using Domain.Models.Pagination;
+using Domain.Models.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -33,14 +34,12 @@ public class TradeController(
 	[HttpGet("byuser")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	public async Task<ActionResult<PagedResult<TradeDto>>> GetUserTrades(
-		[FromQuery] PaginationRequest paginationRequest,
-		[FromQuery] DateTime? startDate,
-		[FromQuery] DateTime? endDate,
-		[FromQuery] TradeSignal? tradeSignal,
+		[FromQuery] TradeFilterRequest? filterRequest,
+		[FromQuery] PaginationRequest? paginationRequest,
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var userTrades = await _tradeService.GetByUserPagedAsync(userId, startDate, endDate, tradeSignal, paginationRequest, cancellationToken);
+		var userTrades = await _tradeService.GetByUserPagedAsync(userId, filterRequest, paginationRequest, cancellationToken);
 		return Ok(userTrades);
 	}
 

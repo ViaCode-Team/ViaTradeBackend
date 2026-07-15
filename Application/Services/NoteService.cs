@@ -4,6 +4,8 @@ using Domain.Entities.DataBase;
 using Domain.Models.Dto.NoteRemind;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Pagination;
+using Domain.Models.Filters;
+using Application.Specifications;
 
 namespace Application.Services;
 
@@ -22,23 +24,21 @@ public class NoteService(
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
 
-		return new NoteStatistic
-		{
-			TotalNotes = await _noteRepository.CountByUserAsync(userId, cancellationToken),
-			StockNotes = await _noteRepository.CountByUserAndTypeAsync(userId, NoteType.TradeCodeNote, cancellationToken),
-			StrategyNotes = await _noteRepository.CountByUserAndTypeAsync(userId, NoteType.TradeStrategyNote, cancellationToken)
-		};
+		return await _noteRepository.GetNoteStatisticAsync(userId, cancellationToken);
 	}
 
-	public async Task<PagedResult<NoteDto>> GetUserNoteByPropPagedAsync(int userId, NoteType noteType, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<NoteDto>> GetUserNotePagedAsync(int userId, NoteFilterRequest? filterRequest, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
-		return await _noteRepository.GetUserNoteByPropPagedAsync(userId, noteType, paginationRequest, cancellationToken);
+
+		var spec = new NoteSpecification(userId, filterRequest);
+		return await _noteRepository.GetPagedFilteredAsync(spec, paginationRequest, cancellationToken);
 	}
 
 	public async Task<Note> GetUserNoteByPropAsync(int id, int userId, NoteType noteType, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 		return await _noteRepository.GetUserNoteByProp(id, userId, noteType, cancellationToken);
 	}
 
@@ -58,6 +58,7 @@ public class NoteService(
 	public async Task DeleteUserNoteAsync(int id, int userId, NoteType noteType, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 		await _noteRepository.DeleteUserNoteAsync(id, userId, noteType, cancellationToken);
 	}
 
@@ -80,8 +81,6 @@ public class NoteService(
 	{
 		var existing = await _noteRepository.FindUserNoteByEntityAsync(userId, relatedId, noteType, cancellationToken);
 		if (existing != null)
-		{
 			throw new InvalidOperationException($"User already has a note assigned to this {noteType}");
-		}
 	}
 }

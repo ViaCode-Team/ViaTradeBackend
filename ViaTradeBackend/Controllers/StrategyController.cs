@@ -4,6 +4,7 @@ using Domain.Entities.DataBase;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Strategy;
 using Domain.Models.Pagination;
+using Domain.Models.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -33,10 +34,12 @@ public class StrategyController(
 	[HttpGet("")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	public async Task<ActionResult<PagedResult<TradeStrategyDto>>> GetStrategies(
-		[FromQuery] PaginationRequest paginationRequest,
+		[FromQuery] StrategyFilterRequest? filterRequest,
+		[FromQuery] PaginationRequest? paginationRequest,
 		CancellationToken cancellationToken)
 	{
-		var response = await _strategyService.GetStrategiesPagedAsync(paginationRequest, cancellationToken);
+		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var response = await _strategyService.GetStrategiesPagedAsync(userId, filterRequest, paginationRequest, cancellationToken);
 		return Ok(response);
 	}
 

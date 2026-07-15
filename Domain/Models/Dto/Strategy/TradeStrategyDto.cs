@@ -19,4 +19,5 @@ public class TradeStrategyDto
 	public string? UseDesc { get; set; }
 
 	public string? LimitDesc { get; set; }
+	public bool IsActive { get; set; }
 }

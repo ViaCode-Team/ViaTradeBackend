@@ -22,6 +22,7 @@ public class TradeResultsService(
 	public async Task<SignalStatistic> GetStrategyResultStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 		var signals = await GetStrategyResultAsync(userId, DateTime.Now, null, cancellationToken);
 
 		var allResults = signals.Strategies

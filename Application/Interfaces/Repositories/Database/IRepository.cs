@@ -1,5 +1,6 @@
 using Domain.Entities.DataBase;
 using Domain.Models.Pagination;
+using Domain.Interfaces;
 using System.Linq.Expressions;
 
 namespace Application.Interfaces.Repositories.Database;
@@ -8,9 +9,10 @@ public interface IRepository<TEntity, TDto> where TEntity : BaseEntity where TDt
 {
 	Task<TEntity?> GetByIdAsync(int id, CancellationToken ct = default);
 	Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken ct = default);
-	Task<PagedResult<TEntity>> GetPagedAsync(PaginationRequest paginationRequest, CancellationToken ct = default);
+	Task<PagedResult<TEntity>> GetPagedAsync(PaginationRequest? paginationRequest, CancellationToken ct = default);
+	Task<PagedResult<TEntity>> GetPagedAsync(ISpecification<TEntity> spec, PaginationRequest? paginationRequest, CancellationToken ct = default);
 	Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
-	Task<PagedResult<TEntity>> FindPagedAsync(Expression<Func<TEntity, bool>> predicate, PaginationRequest paginationRequest, CancellationToken ct = default);
+	Task<PagedResult<TEntity>> FindPagedAsync(Expression<Func<TEntity, bool>> predicate, PaginationRequest? paginationRequest, CancellationToken ct = default);
 	Task AddAsync(TEntity entity, CancellationToken ct = default);
 	void Update(TEntity entity);
 	void Remove(TEntity entity);

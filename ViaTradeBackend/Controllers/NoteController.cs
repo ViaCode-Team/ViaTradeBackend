@@ -4,6 +4,7 @@ using Domain.Entities.DataBase;
 using Domain.Models.Dto.NoteRemind;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Pagination;
+using Domain.Models.Filters;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -30,12 +31,15 @@ public class NoteController(
 		return Ok(statistics);
 	}
 
-	[HttpGet("byuser/instrument")]
+	[HttpGet("byuser")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<NoteDto>>> GetUserTradeCodeNotes([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<ActionResult<PagedResult<NoteDto>>> GetUserNotes(
+		[FromQuery] NoteFilterRequest? filterRequest,
+		[FromQuery] PaginationRequest? paginationRequest,
+		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var notes = await _noteService.GetUserNoteByPropPagedAsync(userId, NoteType.TradeCodeNote, paginationRequest, cancellationToken);
+		var notes = await _noteService.GetUserNotePagedAsync(userId, filterRequest, paginationRequest, cancellationToken);
 		return Ok(notes);
 	}
 
@@ -47,17 +51,7 @@ public class NoteController(
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var note = await _noteService.GetUserNoteByPropAsync(idInstrument, userId, NoteType.TradeCodeNote, cancellationToken);
-
 		return Ok(note);
-	}
-
-	[HttpGet("byuser/strategy")]
-	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<NoteDto>>> GetUserStrategyNotes([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
-	{
-		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var notes = await _noteService.GetUserNoteByPropPagedAsync(userId, NoteType.TradeStrategyNote, paginationRequest, cancellationToken);
-		return Ok(notes);
 	}
 
 	[HttpGet("byuser/strategy/{idStrategy}")]

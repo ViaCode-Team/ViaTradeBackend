@@ -1,5 +1,4 @@
 using Application.Interfaces;
-using Application.Interfaces.Utils;
 using Domain.Entities.CSV;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Trade;
@@ -13,11 +12,8 @@ namespace ViaTradeBackend.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class TradeCodeController(
-	IJwtHelper jwtHelper,
-	ITradeCodeService tradeService) : ControllerBase
+public class TradeCodeController(ITradeCodeService tradeService) : ControllerBase
 {
-	private readonly IJwtHelper _jwtHelper = jwtHelper;
 	private readonly ITradeCodeService _tradeService = tradeService;
 
 	[HttpGet("stocks/statistics")]
