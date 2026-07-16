@@ -4,7 +4,7 @@ namespace Application.Interfaces;
 
 public interface IUserService
 {
-	Task<User> EnsureUserAsync(int userId, CancellationToken cancellationToken);
+	Task<User?> GetByIdAsync(int id, CancellationToken cancellationToken);
 	Task<string> GenerateTgLink(int userId);
 	Task<int?> GetUserId(string tgToken);
 	Task<User?> GetByLoginAsync(string login, CancellationToken cancellationToken);

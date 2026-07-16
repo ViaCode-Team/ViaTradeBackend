@@ -14,14 +14,9 @@ public class UserService(
 	private readonly IUserRepository _userRepository = userRepository;
 	private readonly IRedisRepository<TgTokenEntity> _tgTokenRepository = tgTokenRepository;
 
-	public async Task<User> EnsureUserAsync(int userId, CancellationToken cancellationToken)
+	public async Task<User?> GetByIdAsync(int id, CancellationToken cancellationToken)
 	{
-		var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
-
-		if (user == null)
-			throw new UnauthorizedAccessException();
-
-		return user;
+		return await _userRepository.GetByIdAsync(id, cancellationToken);
 	}
 
 	public async Task<string> GenerateTgLink(int userId)

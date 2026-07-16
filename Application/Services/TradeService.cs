@@ -13,33 +13,25 @@ namespace Application.Services;
 public class TradeService(
 	ITradeRepository tradeRepository,
 	ITradeCodeRepository tradeCodeRepository,
-	ITradeTypeRepository tradeTypeRepository,
-	IUserService userService) : ITradeService
+	ITradeTypeRepository tradeTypeRepository) : ITradeService
 {
 	private readonly ITradeRepository _tradeRepository = tradeRepository;
 	private readonly ITradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
 	private readonly ITradeTypeRepository _tradeTypeRepository = tradeTypeRepository;
-	private readonly IUserService _userService = userService;
 
 	public async Task<GlobalStatistic> GetGlobalStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
-
 		return await _tradeRepository.GetGlobalStatisticAsync(userId, cancellationToken);
 	}
 
 	public async Task<PagedResult<TradeDto>> GetByUserPagedAsync(int userId, TradeFilterRequest? filterRequest, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
-
 		var spec = new TradeSpecification(userId, filterRequest);
 		return await _tradeRepository.GetPagedFilteredAsync(spec, paginationRequest, cancellationToken);
 	}
 
 	public async Task<Trade> GetTradeByIdAsync(int id, int userId, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
-
 		var trade = await _tradeRepository.GetByIdAsync(id, cancellationToken);
 		if (trade == null || trade.UserId != userId)
 			throw new KeyNotFoundException();
@@ -48,8 +40,6 @@ public class TradeService(
 
 	public async Task<Trade> CreateTradeAsync(TradeRequest request, int userId, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
-
 		_ = await _tradeCodeRepository.GetByIdAsync(request.TradeCodeId, cancellationToken)
 			?? throw new KeyNotFoundException();
 		_ = await _tradeTypeRepository.GetByIdAsync(request.TradeTypeId, cancellationToken)
@@ -77,8 +67,6 @@ public class TradeService(
 
 	public async Task<Trade> UpdateTradeAsync(int id, TradeRequest request, int userId, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
-
 		var trade = await _tradeRepository.GetByIdAsync(id, cancellationToken);
 		if (trade == null || trade.UserId != userId)
 			throw new KeyNotFoundException();
@@ -106,8 +94,6 @@ public class TradeService(
 
 	public async Task DeleteTradeAsync(int id, int userId, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
-
 		var trade = await _tradeRepository.GetByIdAsync(id, cancellationToken);
 		if (trade == null)
 			throw new KeyNotFoundException();

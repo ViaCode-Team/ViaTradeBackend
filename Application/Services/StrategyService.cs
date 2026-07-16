@@ -14,17 +14,16 @@ namespace Application.Services;
 public class StrategyService(
 	ITradeStrategyRepository tradeStrategyRepository,
 	IUserTradeStrategyRepository userTradeStrategyRepository,
-	IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository,
-	IUserService userService) : IStrategyService
+	IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository) : IStrategyService
 {
 	private readonly ITradeStrategyRepository _tradeStrategyRepository = tradeStrategyRepository;
 	private readonly IUserTradeStrategyRepository _userTradeStrategyRepository = userTradeStrategyRepository;
 	private readonly IUserStrategyTradeCodeRepository _userStrategyTradeCodeRepository = userStrategyTradeCodeRepository;
-	private readonly IUserService _userService = userService;
+
 
 	public async Task<PagedResult<TradeStrategyDto>> GetStrategiesPagedAsync(int userId, StrategyFilterRequest? filterRequest, StrategySortRequest? sortRequest, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		var spec = new StrategySpecification(userId, filterRequest, sortRequest);
 		return await _tradeStrategyRepository.GetPagedFilteredAsync(userId, spec, paginationRequest, cancellationToken);
@@ -32,7 +31,7 @@ public class StrategyService(
 
 	public async Task<StrategyStatistic> GetStrategyStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		var totalStrategiesTask = _tradeStrategyRepository.CountAsync(cancellationToken);
 		var activeStrategiesTask = _userTradeStrategyRepository.CountByUserAsync(userId, cancellationToken);
@@ -59,14 +58,14 @@ public class StrategyService(
 
 	public async Task<PagedResult<UserStrategyTradeCodeDto>> GetUserStrategyCodesPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		return await _userStrategyTradeCodeRepository.GetPagedAsync(userId, paginationRequest, cancellationToken);
 	}
 
 	public async Task CreateUserStrategyCodeAsync(UserStrategyTradeCodeRequest request, int userId, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		var existing = await _userStrategyTradeCodeRepository.FindAsync(
 			e => e.UserId == userId &&
@@ -90,7 +89,7 @@ public class StrategyService(
 
 	public async Task DeleteUserStrategyCodeAsync(int strategyId, int tradeCodeId, int userId, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		var affectedRows = await _userStrategyTradeCodeRepository.ExecuteDeleteAsync(
 			e => e.UserId == userId &&
@@ -104,14 +103,14 @@ public class StrategyService(
 
 	public async Task<PagedResult<UserTradeStrategyDto>> GetUserStrategiesPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		return await _userTradeStrategyRepository.GetByUserPagedAsync(userId, paginationRequest, cancellationToken);
 	}
 
 	public async Task CreateUserStrategyAsync(CreateUserStrategyRequest request, int userId, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		var existing = await _userTradeStrategyRepository.FindAsync(
 			e => e.UserId == userId && e.TradeStrategyId == request.StrategyId,
@@ -132,7 +131,7 @@ public class StrategyService(
 
 	public async Task DeleteUserStrategyAsync(int strategyId, int userId, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		var affectedRows = await _userTradeStrategyRepository.ExecuteDeleteAsync(
 			e => e.UserId == userId && e.TradeStrategyId == strategyId,

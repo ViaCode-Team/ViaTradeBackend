@@ -71,7 +71,7 @@ public class AuthController(
 	}
 
 	[HttpPost("logout")]
-	[Authorize(Policy = "ActiveSession")]
+	[Authorize]
 	public async Task<ActionResult> Logout()
 	{
 		if (Request.Cookies.TryGetValue(_authCookiOptions.RefreshTokenCookie, out var refreshToken))
@@ -84,7 +84,7 @@ public class AuthController(
 	}
 
 	[HttpPost("logout-all")]
-	[Authorize(Policy = "ActiveSession")]
+	[Authorize]
 	public async Task<ActionResult> LogoutAll()
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
@@ -98,7 +98,7 @@ public class AuthController(
 	}
 
 	[HttpGet("sessions")]
-	[Authorize(Policy = "ActiveSession")]
+	[Authorize]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	public async Task<ActionResult<PagedResult<UserSessionDto>>> GetUserSessions([FromQuery] PaginationRequest paginationRequest)
 	{

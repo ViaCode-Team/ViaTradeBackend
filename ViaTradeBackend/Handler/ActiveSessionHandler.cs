@@ -16,7 +16,6 @@ public class ActiveSessionHandler(ISessionRepository sessionRepository) : Author
 	{
 		var sessionId = context.User.Claims
 			.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value;
-
 		if (string.IsNullOrEmpty(sessionId))
 		{
 			context.Fail();
@@ -24,14 +23,12 @@ public class ActiveSessionHandler(ISessionRepository sessionRepository) : Author
 		}
 
 		var session = await _sessionRepository.GetAsync(sessionId);
-
-		if (session != null)
-		{
-			context.Succeed(requirement);
-		}
-		else
+		if (session == null)
 		{
 			context.Fail();
+			return;
 		}
+
+		context.Succeed(requirement);
 	}
 }

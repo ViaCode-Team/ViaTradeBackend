@@ -11,12 +11,11 @@ namespace Application.Services;
 
 public class TradeRemindService(
 	ITradeRemindRepository tradeRemindRepository,
-	ITradeCodeRepository tradeCodeRepository,
-	IUserService userService) : ITradeRemindService
+	ITradeCodeRepository tradeCodeRepository) : ITradeRemindService
 {
 	private readonly ITradeRemindRepository _tradeRemindRepository = tradeRemindRepository;
 	private readonly ITradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
-	private readonly IUserService _userService = userService;
+
 
 	public async Task<IEnumerable<TradeRemind>> GetActualRemindAsync(CancellationToken cancellationToken)
 	{
@@ -25,7 +24,7 @@ public class TradeRemindService(
 
 	public async Task<TradeRemindStatistic> GetRemindStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		return new TradeRemindStatistic
 		{
@@ -40,14 +39,14 @@ public class TradeRemindService(
 
 	public async Task<PagedResult<TradeRemindDto>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, RemindSortRequest? sortRequest = null, CancellationToken cancellationToken = default)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		return await _tradeRemindRepository.GetByUserPagedAsync(userId, paginationRequest, sortRequest, cancellationToken);
 	}
 
 	public async Task<PagedResult<TradeRemindDto>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, RemindSortRequest? sortRequest = null, CancellationToken cancellationToken = default)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		var tradeCode = await _tradeCodeRepository.GetByIdAsync(tradeCodeId, cancellationToken);
 
@@ -59,7 +58,7 @@ public class TradeRemindService(
 
 	public async Task<TradeRemind> GetByIdAsync(int remindId, int userId, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		var reminder = await _tradeRemindRepository.GetByIdAsync(remindId, cancellationToken);
 		if (reminder == null || reminder.UserId != userId)
@@ -70,7 +69,7 @@ public class TradeRemindService(
 
 	public async Task CreateAsync(int userId, int tradeCodeId, TradeRemindRequest request, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		var tradeCode = await _tradeCodeRepository.GetByIdAsync(tradeCodeId, cancellationToken);
 		if (tradeCode == null)
@@ -90,7 +89,7 @@ public class TradeRemindService(
 
 	public async Task UpdateAsync(int remindId, int userId, TradeRemindRequest request, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		var remind = await _tradeRemindRepository.GetByIdAsync(remindId, cancellationToken);
 		if (remind == null || remind.UserId != userId)
@@ -109,7 +108,7 @@ public class TradeRemindService(
 
 	public async Task DeleteAsync(int remindId, int userId, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		var remind = await _tradeRemindRepository.GetByIdAsync(remindId, cancellationToken);
 		if (remind == null || remind.UserId != userId)

@@ -12,24 +12,23 @@ namespace Application.Services;
 public class NoteService(
 	INoteRepository noteRepository,
 	ITradeCodeRepository tradeCodeRepository,
-	ITradeStrategyRepository tradeStrategyRepository,
-	IUserService userService) : INoteService
+	ITradeStrategyRepository tradeStrategyRepository) : INoteService
 {
 	private readonly INoteRepository _noteRepository = noteRepository;
 	private readonly ITradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
 	private readonly ITradeStrategyRepository _tradeStrategyRepository = tradeStrategyRepository;
-	private readonly IUserService _userService = userService;
+
 
 	public async Task<NoteStatistic> GetNoteStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		return await _noteRepository.GetNoteStatisticAsync(userId, cancellationToken);
 	}
 
 	public async Task<PagedResult<NoteDto>> GetUserNotePagedAsync(int userId, NoteFilterRequest? filterRequest, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		var spec = new NoteSpecification(userId, filterRequest);
 		return await _noteRepository.GetPagedFilteredAsync(spec, paginationRequest, cancellationToken);
@@ -37,7 +36,7 @@ public class NoteService(
 
 	public async Task<Note> GetUserNoteByPropAsync(int id, int userId, NoteType noteType, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		return await _noteRepository.GetUserNoteByProp(id, userId, noteType, cancellationToken);
 	}
@@ -57,7 +56,7 @@ public class NoteService(
 
 	public async Task DeleteUserNoteAsync(int id, int userId, NoteType noteType, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		await _noteRepository.DeleteUserNoteAsync(id, userId, noteType, cancellationToken);
 	}

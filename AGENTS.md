@@ -1,39 +1,31 @@
 # AI AGENT INSTRUCTIONS (AGENTS.md)
-> **FOR AI AGENTS ONLY**: This file contains critical project-specific constraints, workflows, and formatting rules. All AI agents MUST read and strictly adhere to these instructions when working in this workspace. 
+> **FOR AI AGENTS ONLY**: Critical rules. Read and strictly adhere.
 
 ## Meta-Rules for AGENTS.md
-- **Language**: Must be written entirely in clear, high-quality, and easy-to-understand English.
+- **Language**: Must be written entirely in clear, high-quality English.
 - **Conciseness**: Keep instructions brief, elegant, and directly actionable.
-- **Length**: Must not exceed 100 lines.
+- **Length**: Must not exceed 100 lines. If this file exceeds 6000 characters (checked when editing), ask the user if they want to compress it without losing any meaning or details.
 
-## Agent Behavior & Style
-1. **Truth & Verification**: Never guess facts, file contents, or tool outcomes. Always read the file to verify its state. Verify your changes actually work before claiming success. If you are unsure or if a verification step fails, explicitly state it instead of assuming it worked.
-2. **Security**: NEVER hardcode API keys, passwords, connection strings, or any sensitive data in the code.
-3. **Manual User Changes**: If the user has manually changed something, work within that new context. Do NOT revert or change user-authored code without explicitly asking for permission first, unless the user explicitly requested you to change it.
-4. **Coding Style**: Strictly follow the established coding style of the project. Always write high-quality, modern, and maintainable code.
-5. **Comments**: Keep comments to an absolute minimum. Only write comments if the code is highly complex or unclear (e.g., legacy code that isn't being refactored right now). If a comment is absolutely necessary, it MUST be written in English.
-6. **Proactive Rule Updates**: If the user repeatedly asks for a specific behavior, formatting, or instruction, you MUST proactively propose adding it to `AGENTS.md` to avoid repetition.
-
-## C# Coding Guidelines
-1. **Namespaces**: Use file-scoped namespaces (`namespace MyNamespace;` without braces).
-2. **Spacing - General**:
-   - Exactly **1 empty line** after `namespace`.
-   - Exactly **1 empty line** after `using` directives.
-   - Exactly **1 empty line** at the end of the file (EOF).
-3. **Spacing - Class Members**:
-   - Exactly **1 empty line** between methods.
-   - Exactly **1 empty line** between the fields block and the methods block.
-   - **Fields**: Group related fields together WITHOUT empty lines between them. Only insert an empty line between fields if they belong to distinctly different logical contexts.
-4. **Spacing - Logical Blocks**:
-   - Insert an empty line between key actions in the code if they belong to different stages of execution (e.g., validation -> [empty line] -> database save -> [empty line] -> return result).
-5. **Syntax (.NET 10 / C# 12+)**:
-   - Use modern syntax (e.g., pattern matching, switch expressions) when it improves readability.
-   - **EXCEPTION**: Do NOT use the spread collection expression `[..]` as a replacement for fluent methods. Always prefer explicit methods like `.ToList()` or `.ToArray()` over `[..collection]`. Regular collection expressions (e.g., `[]` or `[1, 2]`) are fully permitted.
-   - **Ternary Operators Prohibition**: Do NOT use the ternary conditional operator (`? :`). Replace all ternary expressions with `if/else`, `switch` expressions, or other constructs. Null-coalescing operators (`??`, `??=`) and null-conditional operators (`?.`) are fully permitted.
-6. **Braces**:
-   - Avoid unnecessary curly braces for simple, single-line actions (e.g., a simple `if` statement with an early `return`).
+## Agent Behavior & Workflow
+1. **Strict Adherence**: Perceive user prompts exactly as written. DO NOT invent tasks, features, or behaviors that the user did not explicitly request. If a prompt is ambiguous or you are unsure how to proceed, you MUST ALWAYS ask the user for clarification before making any changes.
+2. **Verify & Thoroughness**: Never guess facts/outcomes. Read files to verify states. Double-check directly/indirectly affected code. Ensure features work before claiming success. NEVER leave tasks half-finished. ALWAYS run `grep_search` to find dangling references for removed code. Clean up unused variables immediately.
+3. **User Edits**: Respect manual user code changes. Ask before reverting user-authored code.
+4. **Proactive Rules**: Propose `AGENTS.md` updates if users repeatedly ask for specific behaviors.
 
 ## Mandatory Agent Workflow
 1. **Build Verification**: After making ANY code changes, you MUST run `dotnet build` to verify the project compiles without errors.
 2. **Error Resolution**: If the build fails, you MUST fix all compilation errors and rebuild until the build succeeds.
 3. **Warning Resolution**: Whenever possible, fix compiler warnings as well.
+
+## Strict Security (CRITICAL)
+1. **Prevent IDOR**: NEVER query/update/delete by ID alone. ALL DB actions MUST verify ownership (`&& e.UserId == currentUserId`).
+2. **Secure by Default**: Do NOT remove global auth policies or add `[AllowAnonymous]` without explicit permission.
+3. **Data Leaks (DTOs)**: NEVER return raw DB entities. Always use DTOs. Never leak hashes, secrets, or internal states.
+4. **Destructive Safety**: Double-check predicates in `ExecuteDeleteAsync/ExecuteUpdateAsync`. Missing `UserId` filters wipe tables!
+5. **Secrets & DOS**: NEVER hardcode secrets/connection strings. Enforce pagination/limits to prevent resource exhaustion.
+
+## C# Coding Guidelines (C# 12+)
+1. **General**: File-scoped namespaces. Exactly 1 empty line after `namespace`, `using` directives, between methods, between fields/methods, and at EOF.
+2. **Fields/Blocks**: Group related fields (NO empty lines between them). Use empty lines between execution stages (e.g. validation -> save -> return).
+3. **Syntax Constraints**: Use modern syntax (switch expressions). NO ternary operators (`? :`); use `if/else` or `switch`. NO spread collections `[..]` for fluent methods (prefer `.ToList()`). Regular collections `[]` allowed.
+4. **Clean Code**: Avoid unnecessary braces for single-line statements. Comments must be minimal, in English, and only for highly complex code.

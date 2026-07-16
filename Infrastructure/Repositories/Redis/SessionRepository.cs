@@ -30,7 +30,9 @@ public class SessionRepository(IConnectionMultiplexer redis) : ISessionRepositor
 	public async Task<UserSession?> GetAsync(string sessionId)
 	{
 		var value = await _db.StringGetAsync(SessionKey(sessionId));
-		if (value.IsNullOrEmpty) return null;
+		if (value.IsNullOrEmpty) 
+			return null;
+
 		return JsonSerializer.Deserialize<UserSession>(value.ToString());
 	}
 

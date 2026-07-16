@@ -28,7 +28,9 @@ public class UserController(
 	{
 		_logger.LogInformation("Getting current user information");
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var user = await _userService.EnsureUserAsync(userId, cancellationToken);
+		var user = await _userService.GetByIdAsync(userId, cancellationToken);
+		if (user == null)
+			return NotFound();
 
 		return Ok(new MeDto
 		{
@@ -47,11 +49,10 @@ public class UserController(
 	{
 		_logger.LogInformation("Generating Telegram token for user");
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var user = await _userService.EnsureUserAsync(userId, cancellationToken);
-
+		
 		var response = new TgTokenResponse
 		{
-			TgToken = await _userService.GenerateTgLink(user.Id)
+			TgToken = await _userService.GenerateTgLink(userId)
 		};
 
 		return Ok(response);

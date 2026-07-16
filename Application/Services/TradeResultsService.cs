@@ -12,18 +12,17 @@ namespace Application.Services;
 
 public class TradeResultsService(
 	IFileReader tradefileReader,
-	IUserService userService,
 	ITradeStrategyRepository tradeStrategyRepository,
 	IUserTradeStrategyRepository userTradeStrategyRepository) : ITradeResultsService
 {
 	private readonly IFileReader _tradefileReader = tradefileReader;
 	private readonly IUserTradeStrategyRepository _userTradeStrategyRepository = userTradeStrategyRepository;
 	private readonly ITradeStrategyRepository _tradeStrategyRepository = tradeStrategyRepository;
-	private readonly IUserService _userService = userService;
+
 
 	public async Task<SignalStatistic> GetStrategyResultStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
-		await _userService.EnsureUserAsync(userId, cancellationToken);
+
 
 		var signals = await GetStrategyResultAsync(userId, DateTime.Now, null, null, cancellationToken);
 

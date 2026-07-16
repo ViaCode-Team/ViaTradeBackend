@@ -26,13 +26,12 @@ using ViaTradeBackend.Swagger;
 var builder = WebApplication.CreateBuilder(args);
 
 // AUTHORIZATION & POLICIES
-// Custom policy for active session validation
+// Custom policy for active session validation (Set as default)
 builder.Services.AddAuthorizationBuilder()
-	.AddPolicy("ActiveSession", policy =>
-	{
-		policy.RequireAuthenticatedUser();
-		policy.AddRequirements(new ActiveSessionRequirement());
-	});
+	.SetDefaultPolicy(new AuthorizationPolicyBuilder()
+		.RequireAuthenticatedUser()
+		.AddRequirements(new ActiveSessionRequirement())
+		.Build());
 
 builder.Services.AddScoped<IAuthorizationHandler, ActiveSessionHandler>();
 
