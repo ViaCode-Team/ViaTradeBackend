@@ -51,11 +51,11 @@ public class TradeFileReader : IFileReader
 			.Select(Path.GetFileName)
 			.Where(fileName =>
 			{
-				if (fileName == null) 
+				if (fileName == null)
 					return false;
 
 				var code = ExtractTradeCode(fileName);
-				if (code == null) 
+				if (code == null)
 					return false;
 
 				return filterSet?.Contains(code) ?? true;
@@ -153,7 +153,7 @@ public class TradeFileReader : IFileReader
 		{
 			return null;
 		}
-		
+
 		return code.ToUpperInvariant();
 	}
 
@@ -283,19 +283,19 @@ public class TradeFileReader : IFileReader
 		{
 			return r;
 		}
-		
+
 		return 0m;
 	}
 
 	private static decimal? ParseNullableDecimal(string value)
 	{
 		if (string.IsNullOrWhiteSpace(value) || value == "null" || value == "NaN") return null;
-		
+
 		if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var r))
 		{
 			return r;
 		}
-		
+
 		return null;
 	}
 
@@ -305,7 +305,7 @@ public class TradeFileReader : IFileReader
 		{
 			return r;
 		}
-		
+
 		return 0;
 	}
 }

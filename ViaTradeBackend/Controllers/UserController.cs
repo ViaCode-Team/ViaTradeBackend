@@ -49,7 +49,7 @@ public class UserController(
 	{
 		_logger.LogInformation("Generating Telegram token for user");
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		
+
 		var response = new TgTokenResponse
 		{
 			TgToken = await _userService.GenerateTgLink(userId)

@@ -1,11 +1,10 @@
 using Application.Interfaces.Repositories.Database;
+using Application.Specifications;
 using Domain.Entities.DataBase;
-using Domain.Enums;
 using Domain.Models.Dto.NoteRemind;
 using Domain.Models.Pagination;
 using Domain.Models.Sort;
 using Infrastructure.Extensions;
-using Application.Specifications;
 using Microsoft.EntityFrameworkCore;
 namespace Infrastructure.Repositories.DataBase;
 

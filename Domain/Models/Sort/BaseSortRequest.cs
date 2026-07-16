@@ -11,7 +11,7 @@ public abstract class BaseSortRequest<TEnum> : IValidatableObject where TEnum : 
 		if (SortBy == null || SortBy.Count <= 1) yield break;
 
 		var baseFields = SortBy.Select(x => x.ToString().Replace("Asc", "").Replace("Desc", "")).ToList();
-		
+
 		if (baseFields.Distinct().Count() != baseFields.Count)
 		{
 			yield return new ValidationResult(

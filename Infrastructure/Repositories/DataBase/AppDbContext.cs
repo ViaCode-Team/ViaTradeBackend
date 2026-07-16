@@ -52,7 +52,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
 			entity.ToTable(t => t.HasCheckConstraint("CK_Note_ExclusiveTarget",
 			  "(`TradeCodeId` IS NOT NULL AND `TradeStrategyId` IS NULL) OR (`TradeCodeId` IS NULL AND `TradeStrategyId` IS NOT NULL)"));
-			  
+
 			entity.HasIndex(x => x.UserId);
 		});
 

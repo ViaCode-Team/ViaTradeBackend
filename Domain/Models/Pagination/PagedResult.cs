@@ -32,7 +32,7 @@ public sealed class PagedResult<T>(
 
 	public PagedResult<TResult> Map<TResult>(Func<T, TResult> mapFunc)
 	{
-		if (mapFunc == null) 
+		if (mapFunc == null)
 			throw new KeyNotFoundException(nameof(mapFunc));
 
 		return new PagedResult<TResult>(

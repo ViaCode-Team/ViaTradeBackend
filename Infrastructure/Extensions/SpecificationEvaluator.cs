@@ -28,14 +28,14 @@ public static class SpecificationEvaluator
 			{
 				if (orderedQuery == null)
 				{
-					orderedQuery = IsDescending 
-						? query.OrderByDescending(KeySelector) 
+					orderedQuery = IsDescending
+						? query.OrderByDescending(KeySelector)
 						: query.OrderBy(KeySelector);
 				}
 				else
 				{
-					orderedQuery = IsDescending 
-						? orderedQuery.ThenByDescending(KeySelector) 
+					orderedQuery = IsDescending
+						? orderedQuery.ThenByDescending(KeySelector)
 						: orderedQuery.ThenBy(KeySelector);
 				}
 			}
