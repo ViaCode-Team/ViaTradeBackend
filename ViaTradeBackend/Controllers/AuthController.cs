@@ -3,11 +3,11 @@ using Application.Interfaces.Utils;
 using Domain.Models;
 using Domain.Models.ConfigOptions;
 using Domain.Models.Dto.User;
+using Domain.Models.Pagination;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
-using Domain.Models.Pagination;
 using ViaTradeBackend.Models.Auth;
 
 namespace ViaTradeBackend.Controllers;

@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Models.Pagination;
 
-public record PaginationRequest
+public class PaginationRequest
 {
 	public const int MaxPageSize = 100;
 

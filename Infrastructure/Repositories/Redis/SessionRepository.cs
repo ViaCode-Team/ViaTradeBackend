@@ -69,7 +69,7 @@ public class SessionRepository(IConnectionMultiplexer redis) : ISessionRepositor
 	public async Task<PagedResult<UserSession>> GetPagedUserSessionsAsync(int userId, PaginationRequest paginationRequest)
 	{
 		var totalCount = await _db.SortedSetLengthAsync(UserSessionsKey(userId));
-		
+
 		int start = (paginationRequest.Page - 1) * paginationRequest.PageSize;
 		int stop = start + paginationRequest.PageSize - 1;
 

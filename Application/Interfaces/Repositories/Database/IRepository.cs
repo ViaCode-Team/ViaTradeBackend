@@ -1,6 +1,6 @@
 using Domain.Entities.DataBase;
-using Domain.Models.Pagination;
 using Domain.Interfaces;
+using Domain.Models.Pagination;
 using System.Linq.Expressions;
 
 namespace Application.Interfaces.Repositories.Database;

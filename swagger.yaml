@@ -459,7 +459,7 @@ paths:
         - Auth
       operationId: GetUserSessions
       parameters:
-        - name: Page
+        - name: page
           in: query
           schema:
             maximum: 2147483647
@@ -467,7 +467,7 @@ paths:
             type: integer
             format: int32
             default: 1
-        - name: PageSize
+        - name: pageSize
           in: query
           schema:
             maximum: 100
@@ -666,11 +666,11 @@ paths:
         - Note
       operationId: GetUserNotes
       parameters:
-        - name: Target
+        - name: target
           in: query
           schema:
             $ref: '#/components/schemas/NoteType'
-        - name: Page
+        - name: page
           in: query
           schema:
             maximum: 2147483647
@@ -678,7 +678,7 @@ paths:
             type: integer
             format: int32
             default: 1
-        - name: PageSize
+        - name: pageSize
           in: query
           schema:
             maximum: 100
@@ -1868,7 +1868,7 @@ paths:
         - Remind
       operationId: GetUserReminders
       parameters:
-        - name: Page
+        - name: page
           in: query
           schema:
             maximum: 2147483647
@@ -1876,7 +1876,7 @@ paths:
             type: integer
             format: int32
             default: 1
-        - name: PageSize
+        - name: pageSize
           in: query
           schema:
             maximum: 100
@@ -1980,7 +1980,7 @@ paths:
         - Remind
       operationId: GetUserRemindersByInstrument
       parameters:
-        - name: Page
+        - name: page
           in: query
           schema:
             maximum: 2147483647
@@ -1988,7 +1988,7 @@ paths:
             type: integer
             format: int32
             default: 1
-        - name: PageSize
+        - name: pageSize
           in: query
           schema:
             maximum: 100
@@ -2909,11 +2909,11 @@ paths:
         - Strategy
       operationId: GetStrategies
       parameters:
-        - name: IsActive
+        - name: isActive
           in: query
           schema:
             type: boolean
-        - name: Page
+        - name: page
           in: query
           schema:
             maximum: 2147483647
@@ -2921,7 +2921,7 @@ paths:
             type: integer
             format: int32
             default: 1
-        - name: PageSize
+        - name: pageSize
           in: query
           schema:
             maximum: 100
@@ -3127,7 +3127,7 @@ paths:
         - Strategy
       operationId: GetUserStrategyTradeCodes
       parameters:
-        - name: Page
+        - name: page
           in: query
           schema:
             maximum: 2147483647
@@ -3135,7 +3135,7 @@ paths:
             type: integer
             format: int32
             default: 1
-        - name: PageSize
+        - name: pageSize
           in: query
           schema:
             maximum: 100
@@ -3432,7 +3432,7 @@ paths:
         - Strategy
       operationId: GetUserStrategies
       parameters:
-        - name: Page
+        - name: page
           in: query
           schema:
             maximum: 2147483647
@@ -3440,7 +3440,7 @@ paths:
             type: integer
             format: int32
             default: 1
-        - name: PageSize
+        - name: pageSize
           in: query
           schema:
             maximum: 100
@@ -3826,29 +3826,29 @@ paths:
         - Trade
       operationId: GetUserTrades
       parameters:
-        - name: Signal
+        - name: signal
           in: query
           schema:
             $ref: '#/components/schemas/TradeSignal'
-        - name: Status
+        - name: status
           in: query
           schema:
             $ref: '#/components/schemas/TradeStatus'
-        - name: TradeTypeName
+        - name: tradeTypeName
           in: query
           schema:
             type: string
-        - name: StartDate
-          in: query
-          schema:
-            type: string
-            format: date-time
-        - name: EndDate
+        - name: startDate
           in: query
           schema:
             type: string
             format: date-time
-        - name: Page
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: page
           in: query
           schema:
             maximum: 2147483647
@@ -3856,7 +3856,7 @@ paths:
             type: integer
             format: int32
             default: 1
-        - name: PageSize
+        - name: pageSize
           in: query
           schema:
             maximum: 100
@@ -4458,7 +4458,7 @@ paths:
         - TradeCode
       operationId: GetStockCodes
       parameters:
-        - name: Page
+        - name: page
           in: query
           schema:
             maximum: 2147483647
@@ -4466,7 +4466,7 @@ paths:
             type: integer
             format: int32
             default: 1
-        - name: PageSize
+        - name: pageSize
           in: query
           schema:
             maximum: 100
@@ -5324,6 +5324,9 @@ components:
         - 1
       type: integer
       format: int32
+      x-enumNames:
+        - TradeCodeNote
+        - TradeStrategyNote
     ProblemDetails:
       required:
         - type
@@ -5799,6 +5802,10 @@ components:
         - -1
       type: integer
       format: int32
+      x-enumNames:
+        - HOLD
+        - BUY
+        - SELL
     TradeStatistic:
       required:
         - loseTrades
@@ -5822,6 +5829,9 @@ components:
         - 1
       type: integer
       format: int32
+      x-enumNames:
+        - Open
+        - Closed
     TradeStrategy:
       required:
         - id

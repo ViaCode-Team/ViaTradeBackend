@@ -1,8 +1,8 @@
 using Domain.Entities.DataBase;
-using Domain.Models.Dto.NoteRemind;
-using Domain.Models.Pagination;
-using Domain.Models.Dto.Statistic;
 using Domain.Interfaces;
+using Domain.Models.Dto.NoteRemind;
+using Domain.Models.Dto.Statistic;
+using Domain.Models.Pagination;
 
 namespace Application.Interfaces.Repositories.Database;
 

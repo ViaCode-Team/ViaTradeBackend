@@ -1,8 +1,8 @@
 using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
+using Domain.Interfaces;
 using Domain.Models.Dto.Strategy;
 using Domain.Models.Pagination;
-using Domain.Interfaces;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 

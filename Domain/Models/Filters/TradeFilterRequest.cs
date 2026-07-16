@@ -1,10 +1,9 @@
 using Domain.Entities.DataBase;
 using Domain.Enums;
-using Domain.Models.Pagination;
 
 namespace Domain.Models.Filters;
 
-public record TradeFilterRequest
+public class TradeFilterRequest
 {
 	public TradeSignal? Signal { get; init; }
 	public TradeStatus? Status { get; init; }

@@ -1,11 +1,11 @@
 using Application.Interfaces;
 using Application.Interfaces.Repositories.Database;
+using Application.Specifications;
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Strategy;
-using Domain.Models.Pagination;
 using Domain.Models.Filters;
-using Application.Specifications;
+using Domain.Models.Pagination;
 using ViaTradeBackend.Models.Trade;
 
 namespace Application.Services;

@@ -1,8 +1,7 @@
 using Domain.Entities.DataBase;
-using Domain.Models.Dto.Strategy;
-
-using Domain.Models.Pagination;
 using Domain.Interfaces;
+using Domain.Models.Dto.Strategy;
+using Domain.Models.Pagination;
 
 namespace Application.Interfaces.Repositories.Database;
 

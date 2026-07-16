@@ -1,8 +1,8 @@
 using Domain.Entities.DataBase;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Trade;
-using Domain.Models.Pagination;
 using Domain.Models.Filters;
+using Domain.Models.Pagination;
 using ViaTradeBackend.Models.Trade;
 
 namespace Application.Interfaces;

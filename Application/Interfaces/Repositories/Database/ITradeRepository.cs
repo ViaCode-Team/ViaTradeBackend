@@ -1,8 +1,8 @@
 using Domain.Entities.DataBase;
+using Domain.Interfaces;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Trade;
 using Domain.Models.Pagination;
-using Domain.Interfaces;
 
 namespace Application.Interfaces.Repositories.Database;
 

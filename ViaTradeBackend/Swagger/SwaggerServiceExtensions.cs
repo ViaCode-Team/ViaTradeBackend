@@ -23,6 +23,7 @@ public static class SwaggerServiceExtensions
 			options.SupportNonNullableReferenceTypes();
 			options.NonNullableReferenceTypesAsRequired();
 			options.SchemaFilter<OptionalPropertiesAsNonNullableSchemaFilter>();
+			options.SchemaFilter<EnumSchemaFilter>();
 
 			options.CustomOperationIds(apiDesc =>
 				apiDesc.TryGetMethodInfo(out var methodInfo) ? methodInfo.Name : null);
@@ -30,6 +31,7 @@ public static class SwaggerServiceExtensions
 			options.DocumentFilter<ProblemDetailsDocumentFilter>();
 
 			options.OperationFilter<ProblemDetailsOperationFilter>();
+			options.OperationFilter<CamelCaseParameterFilter>();
 
 			var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 			var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);

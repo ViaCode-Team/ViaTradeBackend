@@ -127,11 +127,11 @@ public class TradeResultsService(
 			endDate);
 
 		var filteredResults = new List<StrategyResult>();
-		foreach (var result in results)
+		foreach (var (TradeCode, StrategyName, Item) in results)
 		{
-			if (result.TradeCode == tradeCode && result.StrategyName == strategyName)
+			if (TradeCode == tradeCode && StrategyName == strategyName)
 			{
-				filteredResults.Add(result.Item);
+				filteredResults.Add(Item);
 			}
 		}
 

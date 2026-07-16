@@ -1,23 +1,28 @@
-using System.Text.Json.Serialization;
-
 namespace Domain.Models.Pagination;
 
-public sealed record PagedResult<T>(
-	IReadOnlyList<T> Items,
-	int TotalCount,
-	[property: JsonIgnore] int PageNumber,
-	[property: JsonIgnore] int PageSize)
+public sealed class PagedResult<T>(
+	IReadOnlyList<T> items,
+	int totalCount,
+	int pageNumber,
+	int pageSize)
 {
-	public int TotalPages => CalculateTotalPages();
+	private readonly int _pageNumber = pageNumber;
+	private readonly int _pageSize = pageSize;
 
-	private int CalculateTotalPages()
+	public IReadOnlyList<T> Items { get; } = items;
+
+	public int TotalCount { get; } = totalCount;
+
+	public int TotalPages { get; } = CalculateTotalPages(totalCount, pageSize);
+
+	private static int CalculateTotalPages(int totalCount, int pageSize)
 	{
-		if (TotalCount == 0)
+		ArgumentOutOfRangeException.ThrowIfLessThan(pageSize, 1);
+
+		if (totalCount == 0)
 			return 0;
 
-		int totalPages = TotalCount / PageSize;
-		int remainder = TotalCount % PageSize;
-
+		int totalPages = Math.DivRem(totalCount, pageSize, out int remainder);
 		if (remainder > 0)
 			totalPages++;
 
@@ -26,6 +31,12 @@ public sealed record PagedResult<T>(
 
 	public PagedResult<TResult> Map<TResult>(Func<T, TResult> mapFunc)
 	{
-		return new PagedResult<TResult>(Items.Select(mapFunc).ToList(), TotalCount, PageNumber, PageSize);
+		ArgumentNullException.ThrowIfNull(mapFunc);
+
+		return new PagedResult<TResult>(
+			Items.Select(mapFunc).ToList(),
+			TotalCount,
+			_pageNumber,
+			_pageSize);
 	}
 }
