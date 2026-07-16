@@ -38,11 +38,30 @@ public class TradeCodeRepository(AppDbContext context) : GenericRepository<Trade
 			Description = e.Description
 		});
 
-		query = sortRequest?.SortOrder switch
+		if (sortRequest?.SortBy != null && sortRequest.SortBy.Count > 0)
 		{
-			StockSortOrder.NameDescending => query.OrderByDescending(e => e.ExchangeId),
-			_ => query.OrderBy(e => e.ExchangeId)
-		};
+			IOrderedQueryable<TradeCodeDto>? orderedQuery = null;
+			foreach (var field in sortRequest.SortBy)
+			{
+				if (orderedQuery == null)
+				{
+					orderedQuery = field switch
+					{
+						StockSortField.NameDesc => query.OrderByDescending(e => e.ExchangeId),
+						_ => query.OrderBy(e => e.ExchangeId)
+					};
+				}
+				else
+				{
+					orderedQuery = field switch
+					{
+						StockSortField.NameDesc => orderedQuery.ThenByDescending(e => e.ExchangeId),
+						_ => orderedQuery.ThenBy(e => e.ExchangeId)
+					};
+				}
+			}
+			query = orderedQuery ?? query;
+		}
 
 		return await query.ToPagedAsync(paginationRequest, cancellationToken);
 	}

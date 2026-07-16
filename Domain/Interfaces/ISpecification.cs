@@ -9,6 +9,7 @@ public interface ISpecification<T>
 	List<string> IncludeStrings { get; }
 	Expression<Func<T, object>>? OrderBy { get; }
 	Expression<Func<T, object>>? OrderByDescending { get; }
+	List<(Expression<Func<T, object>> KeySelector, bool IsDescending)> SortExpressions { get; }
 	Expression<Func<T, object>>? GroupBy { get; }
 	bool IsNoTracking { get; }
 }

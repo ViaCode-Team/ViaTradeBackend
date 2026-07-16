@@ -66,16 +66,28 @@ public class NoteRepository(AppDbContext context) : GenericRepository<Note, Note
 
 	public async Task AddUserNoteAsync(int relatedId, NoteType noteType, NoteDto dto, CancellationToken cancellationToken)
 	{
+		int? tradeCodeId = null;
+		if (noteType == NoteType.TradeCodeNote)
+		{
+			tradeCodeId = relatedId;
+		}
+
+		int? tradeStrategyId = null;
+		if (noteType == NoteType.TradeStrategyNote)
+		{
+			tradeStrategyId = relatedId;
+		}
+
 		var note = new Note
 		{
 			UserId = dto.UserId,
 			NoteText = dto.NoteText,
-			TradeCodeId = noteType == NoteType.TradeCodeNote ? relatedId : null,
-			TradeStrategyId = noteType == NoteType.TradeStrategyNote ? relatedId : null
+			TradeCodeId = tradeCodeId,
+			TradeStrategyId = tradeStrategyId
 		};
 
 		_dbSet.Add(note);
-		await context.SaveChangesAsync(cancellationToken);
+		await SaveChangesAsync(cancellationToken);
 	}
 
 	public async Task UpdateUserNoteAsync(int id, NoteType noteType, NoteDto dto, CancellationToken cancellationToken)
@@ -84,7 +96,7 @@ public class NoteRepository(AppDbContext context) : GenericRepository<Note, Note
 			?? throw new KeyNotFoundException();
 
 		note.NoteText = dto.NoteText;
-		await context.SaveChangesAsync(cancellationToken);
+		await SaveChangesAsync(cancellationToken);
 	}
 
 	public async Task DeleteUserNoteAsync(int id, int userId, NoteType noteType, CancellationToken cancellationToken)
@@ -93,7 +105,7 @@ public class NoteRepository(AppDbContext context) : GenericRepository<Note, Note
 			?? throw new KeyNotFoundException();
 
 		_dbSet.Remove(note);
-		await context.SaveChangesAsync(cancellationToken);
+		await SaveChangesAsync(cancellationToken);
 	}
 
 	private async Task<Note?> ResolveNoteAsync(int id, int userId, NoteType noteType, CancellationToken cancellationToken) => noteType switch

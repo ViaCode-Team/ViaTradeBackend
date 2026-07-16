@@ -22,7 +22,14 @@ public class RedisRepository<T>(IConnectionMultiplexer redis, string prefix) : I
 	public async Task SetAsync(T entity, TimeSpan? expiry = null)
 	{
 		var json = JsonSerializer.Serialize(entity);
-		await _db.StringSetAsync(GetKey(entity.Id), json, (Expiration)expiry!);
+		if (expiry.HasValue)
+		{
+			await _db.StringSetAsync(GetKey(entity.Id), json, expiry.Value);
+		}
+		else
+		{
+			await _db.StringSetAsync(GetKey(entity.Id), json);
+		}
 	}
 
 	public async Task RemoveAsync(string id)
@@ -41,7 +48,13 @@ public class RedisRepository<T>(IConnectionMultiplexer redis, string prefix) : I
 			var value = await _db.StringGetAsync(key);
 
 			if (!value.IsNullOrEmpty)
-				result.Add(JsonSerializer.Deserialize<T>(value.ToString())!);
+			{
+				var item = JsonSerializer.Deserialize<T>(value.ToString());
+				if (item != null)
+				{
+					result.Add(item);
+				}
+			}
 		}
 
 		return result;

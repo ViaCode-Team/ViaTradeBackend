@@ -34,7 +34,7 @@ public class RefreshTokenRepository(IConnectionMultiplexer redis) : IRefreshToke
 
 		// Cleanup old index key
 		if (!oldToken.IsNullOrEmpty)
-			await _db.KeyDeleteAsync(IndexKey(oldToken!));
+			await _db.KeyDeleteAsync(IndexKey(oldToken.ToString()));
 
 		var tran = _db.CreateTransaction();
 		var setToken = tran.StringSetAsync(TokenKey(sessionId), newRefreshToken, ttl);
@@ -49,7 +49,7 @@ public class RefreshTokenRepository(IConnectionMultiplexer redis) : IRefreshToke
 	{
 		var token = await _db.StringGetAsync(TokenKey(sessionId));
 		if (!token.IsNullOrEmpty)
-			await _db.KeyDeleteAsync(IndexKey(token!));
+			await _db.KeyDeleteAsync(IndexKey(token.ToString()));
 
 		await _db.KeyDeleteAsync(TokenKey(sessionId));
 	}

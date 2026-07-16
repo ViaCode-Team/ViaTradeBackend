@@ -5,8 +5,8 @@ using Domain.Models.Dto.NoteRemind;
 using Domain.Models.Pagination;
 using Domain.Models.Sort;
 using Infrastructure.Extensions;
+using Application.Specifications;
 using Microsoft.EntityFrameworkCore;
-
 namespace Infrastructure.Repositories.DataBase;
 
 public class TradeRemindRepository(AppDbContext context)
@@ -19,8 +19,10 @@ public class TradeRemindRepository(AppDbContext context)
 
 	public async Task<PagedResult<TradeRemindDto>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, RemindSortRequest? sortRequest = null, CancellationToken cancellationToken = default)
 	{
-		var query = _dbSet
-			.Where(r => r.UserId == userId)
+		var spec = new TradeRemindSpecification(userId, null, sortRequest);
+		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
+
+		return await queryable
 			.Select(r => new TradeRemindDto
 			{
 				Id = r.Id,
@@ -28,15 +30,8 @@ public class TradeRemindRepository(AppDbContext context)
 				DateTime = r.DateTime,
 				TradeCodeId = r.TradeCodeId,
 				UserId = r.UserId
-			});
-
-		query = sortRequest?.SortOrder switch
-		{
-			RemindSortOrder.OldestFirst => query.OrderBy(r => r.DateTime),
-			_ => query.OrderByDescending(r => r.DateTime)
-		};
-
-		return await query.ToPagedAsync(paginationRequest, cancellationToken);
+			})
+			.ToPagedAsync(paginationRequest, cancellationToken);
 	}
 
 	public async Task<int> CountByUserAsync(int userId, CancellationToken cancellationToken)
@@ -46,8 +41,10 @@ public class TradeRemindRepository(AppDbContext context)
 
 	public async Task<PagedResult<TradeRemindDto>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, RemindSortRequest? sortRequest = null, CancellationToken cancellationToken = default)
 	{
-		var query = _dbSet
-			.Where(r => r.UserId == userId && r.TradeCodeId == tradeCodeId)
+		var spec = new TradeRemindSpecification(userId, tradeCodeId, sortRequest);
+		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
+
+		return await queryable
 			.Select(r => new TradeRemindDto
 			{
 				Id = r.Id,
@@ -55,14 +52,7 @@ public class TradeRemindRepository(AppDbContext context)
 				DateTime = r.DateTime,
 				TradeCodeId = r.TradeCodeId,
 				UserId = r.UserId
-			});
-
-		query = sortRequest?.SortOrder switch
-		{
-			RemindSortOrder.OldestFirst => query.OrderBy(r => r.DateTime),
-			_ => query.OrderByDescending(r => r.DateTime)
-		};
-
-		return await query.ToPagedAsync(paginationRequest, cancellationToken);
+			})
+			.ToPagedAsync(paginationRequest, cancellationToken);
 	}
 }

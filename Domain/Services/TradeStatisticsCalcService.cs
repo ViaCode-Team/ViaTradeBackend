@@ -30,8 +30,8 @@ public static class TradeStatisticsCalcService
 				t.IsWin,
 				t.IsLose,
 				t.AbsoluteIncome,
-				Profit = t.IsWin ? Math.Abs(t.AbsoluteIncome) : 0,
-				Loss = t.IsLose ? Math.Abs(t.AbsoluteIncome) : 0
+				Profit = Convert.ToInt32(t.IsWin) * Math.Abs((double)t.AbsoluteIncome),
+				Loss = Convert.ToInt32(t.IsLose) * Math.Abs((double)t.AbsoluteIncome)
 			})
 			.GroupBy(t => 1)
 			.Select(g => new TradeGroupAggregation

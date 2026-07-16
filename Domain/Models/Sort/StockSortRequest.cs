@@ -1,8 +1,12 @@
+using System.ComponentModel.DataAnnotations;
 using Domain.Enums;
 
 namespace Domain.Models.Sort;
 
-public class StockSortRequest
+public class StockSortRequest : BaseSortRequest<StockSortField>
 {
-	public StockSortOrder SortOrder { get; init; } = StockSortOrder.NameAscending;
+	public StockSortRequest()
+	{
+		SortBy = [StockSortField.NameAsc];
+	}
 }

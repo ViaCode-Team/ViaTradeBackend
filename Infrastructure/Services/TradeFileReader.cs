@@ -51,10 +51,17 @@ public class TradeFileReader : IFileReader
 			.Select(Path.GetFileName)
 			.Where(fileName =>
 			{
+				if (fileName == null) 
+					return false;
+
 				var code = ExtractTradeCode(fileName);
-				if (code == null) return false;
-				return !hasFilter || filterSet.Contains(code);
-			});
+				if (code == null) 
+					return false;
+
+				return filterSet?.Contains(code) ?? true;
+			})
+			.Where(f => f != null)
+			.Cast<string>();
 
 		// Use builder to parse file names into response objects
 		foreach (var response in _tradeDataBuilder.BuildFileTradeResonse(matchingFiles))
@@ -142,7 +149,12 @@ public class TradeFileReader : IFileReader
 	{
 		var name = Path.GetFileNameWithoutExtension(fileName);
 		var code = name.Split('_').FirstOrDefault();
-		return string.IsNullOrWhiteSpace(code) ? null : code.ToUpperInvariant();
+		if (string.IsNullOrWhiteSpace(code))
+		{
+			return null;
+		}
+		
+		return code.ToUpperInvariant();
 	}
 
 	private string? FindFilePathByCode(TradeDataType dataType, string tradeCode)
@@ -265,15 +277,35 @@ public class TradeFileReader : IFileReader
 		throw new FormatException($"Invalid date format: {value}");
 	}
 
-	private static decimal ParseDecimal(string value) =>
-		decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var r) ? r : 0m;
+	private static decimal ParseDecimal(string value)
+	{
+		if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var r))
+		{
+			return r;
+		}
+		
+		return 0m;
+	}
 
 	private static decimal? ParseNullableDecimal(string value)
 	{
 		if (string.IsNullOrWhiteSpace(value) || value == "null" || value == "NaN") return null;
-		return decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var r) ? r : null;
+		
+		if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var r))
+		{
+			return r;
+		}
+		
+		return null;
 	}
 
-	private static long ParseLong(string value) =>
-		long.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var r) ? r : 0;
+	private static long ParseLong(string value)
+	{
+		if (long.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var r))
+		{
+			return r;
+		}
+		
+		return 0;
+	}
 }

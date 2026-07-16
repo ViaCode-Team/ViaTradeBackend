@@ -86,7 +86,7 @@ public class TradeResultsService(
 			}
 		}
 
-		var sortOrder = sortRequest?.SortOrder ?? SignalSortOrder.NewestFirst;
+		var sortFields = sortRequest?.SortBy ?? [SignalSortField.DateTimeDesc];
 
 		var strategies = allResults
 			.GroupBy(x => x.StrategyName)
@@ -96,28 +96,70 @@ public class TradeResultsService(
 					.GroupBy(x => x.TradeCode)
 					.Select(t =>
 					{
-						var results = sortOrder switch
+						IEnumerable<StrategyResult> results = t.Select(x => x.Item);
+						if (sortFields.Count > 0)
 						{
-							SignalSortOrder.OldestFirst => t.Select(x => x.Item).OrderBy(r => r.Date).ToList(),
-							_ => t.Select(x => x.Item).OrderByDescending(r => r.Date).ToList()
-						};
+							IOrderedEnumerable<StrategyResult>? orderedResults = null;
+							foreach (var field in sortFields)
+							{
+								if (orderedResults == null)
+								{
+									orderedResults = field switch
+									{
+										SignalSortField.DateTimeAsc => results.OrderBy(r => r.Date),
+										_ => results.OrderByDescending(r => r.Date)
+									};
+								}
+								else
+								{
+									orderedResults = field switch
+									{
+										SignalSortField.DateTimeAsc => orderedResults.ThenBy(r => r.Date),
+										_ => orderedResults.ThenByDescending(r => r.Date)
+									};
+								}
+							}
+							results = orderedResults ?? results.OrderByDescending(r => r.Date);
+						}
 
 						return new TickerResults
 						{
 							TradeCode = t.Key,
-							Results = results,
+							Results = results.ToList(),
 							Accuracy = t.Select(x => x.Accuracy).FirstOrDefault()
 						};
 					});
 
-				tickers = sortOrder switch
+				if (sortFields.Count > 0)
 				{
-					SignalSortOrder.AssetAscending => tickers.OrderBy(t => t.TradeCode),
-					SignalSortOrder.AssetDescending => tickers.OrderByDescending(t => t.TradeCode),
-					SignalSortOrder.AccuracyDescending => tickers.OrderByDescending(t => t.Accuracy ?? 0),
-					SignalSortOrder.AccuracyAscending => tickers.OrderBy(t => t.Accuracy ?? 0),
-					_ => tickers
-				};
+					IOrderedEnumerable<TickerResults>? orderedTickers = null;
+					foreach (var field in sortFields)
+					{
+						if (orderedTickers == null)
+						{
+							orderedTickers = field switch
+							{
+								SignalSortField.AssetAsc => tickers.OrderBy(t => t.TradeCode),
+								SignalSortField.AssetDesc => tickers.OrderByDescending(t => t.TradeCode),
+								SignalSortField.AccuracyDesc => tickers.OrderByDescending(t => t.Accuracy ?? 0),
+								SignalSortField.AccuracyAsc => tickers.OrderBy(t => t.Accuracy ?? 0),
+								_ => tickers.OrderBy(t => 0)
+							};
+						}
+						else
+						{
+							orderedTickers = field switch
+							{
+								SignalSortField.AssetAsc => orderedTickers.ThenBy(t => t.TradeCode),
+								SignalSortField.AssetDesc => orderedTickers.ThenByDescending(t => t.TradeCode),
+								SignalSortField.AccuracyDesc => orderedTickers.ThenByDescending(t => t.Accuracy ?? 0),
+								SignalSortField.AccuracyAsc => orderedTickers.ThenBy(t => t.Accuracy ?? 0),
+								_ => orderedTickers.ThenBy(t => 0)
+							};
+						}
+					}
+					tickers = orderedTickers ?? tickers;
+				}
 
 				return new StrategyData
 				{

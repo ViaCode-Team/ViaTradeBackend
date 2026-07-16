@@ -25,7 +25,13 @@ public static class SwaggerServiceExtensions
 			options.SchemaFilter<OptionalPropertiesAsNonNullableSchemaFilter>();
 
 			options.CustomOperationIds(apiDesc =>
-				apiDesc.TryGetMethodInfo(out var methodInfo) ? methodInfo.Name : null);
+			{
+				if (apiDesc.TryGetMethodInfo(out var methodInfo))
+				{
+					return methodInfo.Name;
+				}
+				return null;
+			});
 
 			options.DocumentFilter<ProblemDetailsDocumentFilter>();
 

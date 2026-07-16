@@ -51,7 +51,7 @@ public class TradeStrategyRepository(AppDbContext context) : GenericRepository<T
 				LogicDesc = tradeStrategy.LogicDesc,
 				UseDesc = tradeStrategy.UseDesc,
 				LimitDesc = tradeStrategy.LimitDesc,
-				IsActive = tradeStrategy.UserTradeStrategies != null && tradeStrategy.UserTradeStrategies.Any(uts => uts.UserId == userId)
+				IsActive = tradeStrategy.UserTradeStrategies!.Any(uts => uts.UserId == userId)
 			})
 			.ToPagedAsync(paginationRequest, cancellationToken);
 	}

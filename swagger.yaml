@@ -1884,10 +1884,12 @@ paths:
             type: integer
             format: int32
             default: 20
-        - name: sortOrder
+        - name: sortBy
           in: query
           schema:
-            $ref: '#/components/schemas/RemindSortOrder'
+            type: array
+            items:
+              $ref: '#/components/schemas/RemindSortField'
       responses:
         '200':
           description: OK
@@ -2000,10 +2002,12 @@ paths:
             type: integer
             format: int32
             default: 20
-        - name: sortOrder
+        - name: sortBy
           in: query
           schema:
-            $ref: '#/components/schemas/RemindSortOrder'
+            type: array
+            items:
+              $ref: '#/components/schemas/RemindSortField'
         - name: idInstrument
           in: path
           required: true
@@ -2610,10 +2614,12 @@ paths:
           schema:
             type: string
             format: date-time
-        - name: sortOrder
+        - name: sortBy
           in: query
           schema:
-            $ref: '#/components/schemas/SignalSortOrder'
+            type: array
+            items:
+              $ref: '#/components/schemas/SignalSortField'
       responses:
         '200':
           description: OK
@@ -2925,10 +2931,12 @@ paths:
           in: query
           schema:
             type: boolean
-        - name: sortOrder
+        - name: sortBy
           in: query
           schema:
-            $ref: '#/components/schemas/StrategySortOrder'
+            type: array
+            items:
+              $ref: '#/components/schemas/StrategySortField'
         - name: page
           in: query
           schema:
@@ -4490,10 +4498,12 @@ paths:
             type: integer
             format: int32
             default: 20
-        - name: sortOrder
+        - name: sortBy
           in: query
           schema:
-            $ref: '#/components/schemas/StockSortOrder'
+            type: array
+            items:
+              $ref: '#/components/schemas/StockSortField'
       responses:
         '200':
           description: OK
@@ -5377,19 +5387,19 @@ components:
         password:
           type: string
       additionalProperties: false
-    RemindSortOrder:
+    RemindSortField:
       enum:
-        - newestFirst
-        - oldestFirst
+        - dateTimeAsc
+        - dateTimeDesc
       type: string
-    SignalSortOrder:
+    SignalSortField:
       enum:
-        - newestFirst
-        - oldestFirst
-        - assetAscending
-        - assetDescending
-        - accuracyDescending
-        - accuracyAscending
+        - dateTimeAsc
+        - dateTimeDesc
+        - assetAsc
+        - assetDesc
+        - accuracyAsc
+        - accuracyDesc
       type: string
     SignalStatistic:
       required:
@@ -5408,10 +5418,10 @@ components:
           type: integer
           format: int32
       additionalProperties: false
-    StockSortOrder:
+    StockSortField:
       enum:
-        - nameAscending
-        - nameDescending
+        - nameAsc
+        - nameDesc
       type: string
     StockStatistic:
       required:
@@ -5461,12 +5471,12 @@ components:
           items:
             $ref: '#/components/schemas/StrategyData'
       additionalProperties: false
-    StrategySortOrder:
+    StrategySortField:
       enum:
-        - nameAscending
-        - nameDescending
-        - accuracyDescending
-        - accuracyAscending
+        - nameAsc
+        - nameDesc
+        - accuracyAsc
+        - accuracyDesc
       type: string
     StrategyStatistic:
       required:

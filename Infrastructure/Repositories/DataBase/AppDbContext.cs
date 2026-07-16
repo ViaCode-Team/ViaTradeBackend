@@ -42,8 +42,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 			.IsUnique();
 
 		modelBuilder.Entity<TradeRemind>()
-			.HasIndex(x => x.Id)
-			.IsUnique();
+			.HasIndex(x => x.UserId);
 
 		modelBuilder.Entity<Note>(entity =>
 		{
@@ -53,7 +52,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
 			entity.ToTable(t => t.HasCheckConstraint("CK_Note_ExclusiveTarget",
 			  "(`TradeCodeId` IS NOT NULL AND `TradeStrategyId` IS NULL) OR (`TradeCodeId` IS NULL AND `TradeStrategyId` IS NOT NULL)"));
+			  
+			entity.HasIndex(x => x.UserId);
 		});
+
+		modelBuilder.Entity<Trade>()
+			.HasIndex(x => x.UserId);
 
 		// Base Data
 		modelBuilder.Entity<TradeStrategy>().HasData(

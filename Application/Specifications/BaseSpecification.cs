@@ -10,6 +10,7 @@ public abstract class BaseSpecification<T> : ISpecification<T>
 	public List<string> IncludeStrings { get; } = [];
 	public Expression<Func<T, object>>? OrderBy { get; private set; }
 	public Expression<Func<T, object>>? OrderByDescending { get; private set; }
+	public List<(Expression<Func<T, object>> KeySelector, bool IsDescending)> SortExpressions { get; } = [];
 	public Expression<Func<T, object>>? GroupBy { get; private set; }
 	public bool IsNoTracking { get; private set; }
 
@@ -45,6 +46,11 @@ public abstract class BaseSpecification<T> : ISpecification<T>
 	protected void ApplyOrderByDescending(Expression<Func<T, object>> orderByDescExpression)
 	{
 		OrderByDescending = orderByDescExpression;
+	}
+
+	protected void AddOrderBy(Expression<Func<T, object>> keySelector, bool descending = false)
+	{
+		SortExpressions.Add((keySelector, descending));
 	}
 
 	protected void ApplyGroupBy(Expression<Func<T, object>> groupByExpression)

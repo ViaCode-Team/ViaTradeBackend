@@ -21,7 +21,27 @@ public static class SpecificationEvaluator
 		query = specification.IncludeStrings.Aggregate(query,
 			(current, include) => current.Include(include));
 
-		if (specification.OrderBy != null)
+		if (specification.SortExpressions.Count > 0)
+		{
+			IOrderedQueryable<TEntity>? orderedQuery = null;
+			foreach (var (KeySelector, IsDescending) in specification.SortExpressions)
+			{
+				if (orderedQuery == null)
+				{
+					orderedQuery = IsDescending 
+						? query.OrderByDescending(KeySelector) 
+						: query.OrderBy(KeySelector);
+				}
+				else
+				{
+					orderedQuery = IsDescending 
+						? orderedQuery.ThenByDescending(KeySelector) 
+						: orderedQuery.ThenBy(KeySelector);
+				}
+			}
+			query = orderedQuery ?? query;
+		}
+		else if (specification.OrderBy != null)
 		{
 			query = query.OrderBy(specification.OrderBy);
 		}

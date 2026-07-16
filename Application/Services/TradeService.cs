@@ -125,7 +125,12 @@ public class TradeService(
 			return null;
 
 		var basePercent = (tradeClose.Value - tradeOpen) / tradeOpen * 100;
-		var adjustedPercent = tradeSignal == TradeSignal.SELL ? -basePercent : basePercent;
+		double adjustedPercent = basePercent;
+		if (tradeSignal == TradeSignal.SELL)
+		{
+			adjustedPercent = -basePercent;
+		}
+
 		return Math.Round(adjustedPercent, 2);
 	}
 }

@@ -1,8 +1,12 @@
+using System.ComponentModel.DataAnnotations;
 using Domain.Enums;
 
 namespace Domain.Models.Sort;
 
-public class SignalSortRequest
+public class SignalSortRequest : BaseSortRequest<SignalSortField>
 {
-	public SignalSortOrder SortOrder { get; init; } = SignalSortOrder.NewestFirst;
+	public SignalSortRequest()
+	{
+		SortBy = [SignalSortField.DateTimeDesc];
+	}
 }

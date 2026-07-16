@@ -54,13 +54,22 @@ public class SessionRepository(IConnectionMultiplexer redis) : ISessionRepositor
 		var result = new List<UserSession>();
 		if (sessionIds.Length == 0) return result;
 
-		var keys = sessionIds.Select(id => (RedisKey)SessionKey(id!)).ToArray();
+		var keys = sessionIds
+			.Where(id => !id.IsNullOrEmpty)
+			.Select(id => (RedisKey)SessionKey(id.ToString()))
+			.ToArray();
 		var values = await _db.StringGetAsync(keys);
 
 		foreach (var value in values)
 		{
 			if (!value.IsNullOrEmpty)
-				result.Add(JsonSerializer.Deserialize<UserSession>(value.ToString())!);
+			{
+				var item = JsonSerializer.Deserialize<UserSession>(value.ToString());
+				if (item != null)
+				{
+					result.Add(item);
+				}
+			}
 		}
 
 		return result;
@@ -77,13 +86,22 @@ public class SessionRepository(IConnectionMultiplexer redis) : ISessionRepositor
 		var result = new List<UserSession>();
 		if (sessionIds.Length > 0)
 		{
-			var keys = sessionIds.Select(id => (RedisKey)SessionKey(id!)).ToArray();
+			var keys = sessionIds
+				.Where(id => !id.IsNullOrEmpty)
+				.Select(id => (RedisKey)SessionKey(id.ToString()))
+				.ToArray();
 			var values = await _db.StringGetAsync(keys);
 
 			foreach (var value in values)
 			{
 				if (!value.IsNullOrEmpty)
-					result.Add(JsonSerializer.Deserialize<UserSession>(value.ToString())!);
+				{
+					var item = JsonSerializer.Deserialize<UserSession>(value.ToString());
+					if (item != null)
+					{
+						result.Add(item);
+					}
+				}
 			}
 		}
 
@@ -115,19 +133,20 @@ public class SessionRepository(IConnectionMultiplexer redis) : ISessionRepositor
 
 				try
 				{
-					var sessionValue = await _db.StringGetAsync(SessionKey(sessionId!));
+					string idString = sessionId.ToString();
+					var sessionValue = await _db.StringGetAsync(SessionKey(idString));
 					if (!sessionValue.IsNullOrEmpty)
 					{
-						await _db.KeyDeleteAsync(SessionKey(sessionId!));
+						await _db.KeyDeleteAsync(SessionKey(idString));
 					}
 
-					await _db.SortedSetRemoveAsync(userKey, sessionId!);
+					await _db.SortedSetRemoveAsync(userKey, sessionId);
 
 					totalDeleted++;
 				}
-				catch (Exception ex)
+				catch
 				{
-					// Log warning: $"Failed to cleanup session {sessionId}: {ex.Message}"
+					// Log warning silently
 				}
 			}
 		}

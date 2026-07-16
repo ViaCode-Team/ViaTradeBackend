@@ -1,8 +1,12 @@
+using System.ComponentModel.DataAnnotations;
 using Domain.Enums;
 
 namespace Domain.Models.Sort;
 
-public class RemindSortRequest
+public class RemindSortRequest : BaseSortRequest<RemindSortField>
 {
-	public RemindSortOrder SortOrder { get; init; } = RemindSortOrder.NewestFirst;
+	public RemindSortRequest()
+	{
+		SortBy = [RemindSortField.DateTimeDesc];
+	}
 }
