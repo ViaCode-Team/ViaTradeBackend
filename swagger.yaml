@@ -1884,6 +1884,10 @@ paths:
             type: integer
             format: int32
             default: 20
+        - name: sortOrder
+          in: query
+          schema:
+            $ref: '#/components/schemas/RemindSortOrder'
       responses:
         '200':
           description: OK
@@ -1996,6 +2000,10 @@ paths:
             type: integer
             format: int32
             default: 20
+        - name: sortOrder
+          in: query
+          schema:
+            $ref: '#/components/schemas/RemindSortOrder'
         - name: idInstrument
           in: path
           required: true
@@ -2602,6 +2610,10 @@ paths:
           schema:
             type: string
             format: date-time
+        - name: sortOrder
+          in: query
+          schema:
+            $ref: '#/components/schemas/SignalSortOrder'
       responses:
         '200':
           description: OK
@@ -2913,6 +2925,10 @@ paths:
           in: query
           schema:
             type: boolean
+        - name: sortOrder
+          in: query
+          schema:
+            $ref: '#/components/schemas/StrategySortOrder'
         - name: page
           in: query
           schema:
@@ -4474,6 +4490,10 @@ paths:
             type: integer
             format: int32
             default: 20
+        - name: sortOrder
+          in: query
+          schema:
+            $ref: '#/components/schemas/StockSortOrder'
       responses:
         '200':
           description: OK
@@ -5320,13 +5340,9 @@ components:
       additionalProperties: false
     NoteType:
       enum:
-        - 0
-        - 1
-      type: integer
-      format: int32
-      x-enumNames:
-        - TradeCodeNote
-        - TradeStrategyNote
+        - tradeCodeNote
+        - tradeStrategyNote
+      type: string
     ProblemDetails:
       required:
         - type
@@ -5361,6 +5377,20 @@ components:
         password:
           type: string
       additionalProperties: false
+    RemindSortOrder:
+      enum:
+        - newestFirst
+        - oldestFirst
+      type: string
+    SignalSortOrder:
+      enum:
+        - newestFirst
+        - oldestFirst
+        - assetAscending
+        - assetDescending
+        - accuracyDescending
+        - accuracyAscending
+      type: string
     SignalStatistic:
       required:
         - buySignals
@@ -5378,6 +5408,11 @@ components:
           type: integer
           format: int32
       additionalProperties: false
+    StockSortOrder:
+      enum:
+        - nameAscending
+        - nameDescending
+      type: string
     StockStatistic:
       required:
         - totalStocks
@@ -5426,6 +5461,13 @@ components:
           items:
             $ref: '#/components/schemas/StrategyData'
       additionalProperties: false
+    StrategySortOrder:
+      enum:
+        - nameAscending
+        - nameDescending
+        - accuracyDescending
+        - accuracyAscending
+      type: string
     StrategyStatistic:
       required:
         - activeStrategies
@@ -5797,15 +5839,10 @@ components:
       additionalProperties: false
     TradeSignal:
       enum:
-        - 0
-        - 1
-        - -1
-      type: integer
-      format: int32
-      x-enumNames:
-        - HOLD
-        - BUY
-        - SELL
+        - hold
+        - buy
+        - sell
+      type: string
     TradeStatistic:
       required:
         - loseTrades
@@ -5825,13 +5862,9 @@ components:
       additionalProperties: false
     TradeStatus:
       enum:
-        - 0
-        - 1
-      type: integer
-      format: int32
-      x-enumNames:
-        - Open
-        - Closed
+        - open
+        - closed
+      type: string
     TradeStrategy:
       required:
         - id

@@ -6,6 +6,7 @@ using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Strategy;
 using Domain.Models.Filters;
 using Domain.Models.Pagination;
+using Domain.Models.Sort;
 using ViaTradeBackend.Models.Trade;
 
 namespace Application.Services;
@@ -21,11 +22,11 @@ public class StrategyService(
 	private readonly IUserStrategyTradeCodeRepository _userStrategyTradeCodeRepository = userStrategyTradeCodeRepository;
 	private readonly IUserService _userService = userService;
 
-	public async Task<PagedResult<TradeStrategyDto>> GetStrategiesPagedAsync(int userId, StrategyFilterRequest? filterRequest, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<TradeStrategyDto>> GetStrategiesPagedAsync(int userId, StrategyFilterRequest? filterRequest, StrategySortRequest? sortRequest, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
 
-		var spec = new StrategySpecification(userId, filterRequest);
+		var spec = new StrategySpecification(userId, filterRequest, sortRequest);
 		return await _tradeStrategyRepository.GetPagedFilteredAsync(userId, spec, paginationRequest, cancellationToken);
 	}
 

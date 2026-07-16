@@ -1,6 +1,7 @@
 using Application.Interfaces;
 using Application.Interfaces.Utils;
 using Domain.Models.Dto.Statistic;
+using Domain.Models.Sort;
 using Domain.Models.TradeLogic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -32,10 +33,11 @@ public class ResultController(
 	public async Task<ActionResult<StrategyResultResponse>> GetStrategyResults(
 		[FromQuery] DateTime? startDate,
 		[FromQuery] DateTime? endTime,
+		[FromQuery] SignalSortRequest? sortRequest,
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var response = await _tradeResultsService.GetStrategyResultAsync(userId, startDate, endTime, cancellationToken);
+		var response = await _tradeResultsService.GetStrategyResultAsync(userId, startDate, endTime, sortRequest, cancellationToken);
 		return Ok(response);
 	}
 

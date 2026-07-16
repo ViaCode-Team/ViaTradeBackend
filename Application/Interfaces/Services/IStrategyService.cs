@@ -3,13 +3,14 @@ using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Strategy;
 using Domain.Models.Filters;
 using Domain.Models.Pagination;
+using Domain.Models.Sort;
 using ViaTradeBackend.Models.Trade;
 
 namespace Application.Interfaces;
 
 public interface IStrategyService
 {
-	Task<PagedResult<TradeStrategyDto>> GetStrategiesPagedAsync(int userId, StrategyFilterRequest? filterRequest, PaginationRequest? paginationRequest, CancellationToken cancellationToken);
+	Task<PagedResult<TradeStrategyDto>> GetStrategiesPagedAsync(int userId, StrategyFilterRequest? filterRequest, StrategySortRequest? sortRequest, PaginationRequest? paginationRequest, CancellationToken cancellationToken);
 	Task<StrategyStatistic> GetStrategyStatisticAsync(int userId, CancellationToken cancellationToken);
 	Task<TradeStrategy> GetStrategyByIdAsync(int strategyId, CancellationToken cancellationToken);
 	Task<PagedResult<UserStrategyTradeCodeDto>> GetUserStrategyCodesPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken);

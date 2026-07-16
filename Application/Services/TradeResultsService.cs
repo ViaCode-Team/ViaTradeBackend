@@ -2,7 +2,9 @@ using Application.Interfaces;
 using Application.Interfaces.Repositories.Database;
 using Application.Interfaces.Utils;
 using Domain.Entities.CSV;
+using Domain.Enums;
 using Domain.Models.Dto.Statistic;
+using Domain.Models.Sort;
 using Domain.Models.TradeLogic;
 using Domain.Services;
 
@@ -23,7 +25,7 @@ public class TradeResultsService(
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
 
-		var signals = await GetStrategyResultAsync(userId, DateTime.Now, null, cancellationToken);
+		var signals = await GetStrategyResultAsync(userId, DateTime.Now, null, null, cancellationToken);
 
 		var allResults = signals.Strategies
 			.SelectMany(s => s.Tickers)
@@ -41,6 +43,7 @@ public class TradeResultsService(
 		int userId,
 		DateTime? startDate,
 		DateTime? endDate,
+		SignalSortRequest? sortRequest,
 		CancellationToken cancellationToken)
 	{
 		// startDate work only with out time or with T00:00:00 time
@@ -83,24 +86,48 @@ public class TradeResultsService(
 			}
 		}
 
-		return new StrategyResultResponse
-		{
-			Strategies = allResults
-				.GroupBy(x => x.StrategyName)
-				.Select(g => new StrategyData
-				{
-					Name = g.Key,
-					Tickers = g.GroupBy(x => x.TradeCode)
-						.Select(t => new TickerResults
+		var sortOrder = sortRequest?.SortOrder ?? SignalSortOrder.NewestFirst;
+
+		var strategies = allResults
+			.GroupBy(x => x.StrategyName)
+			.Select(g =>
+			{
+				var tickers = g
+					.GroupBy(x => x.TradeCode)
+					.Select(t =>
+					{
+						var results = sortOrder switch
+						{
+							SignalSortOrder.OldestFirst => t.Select(x => x.Item).OrderBy(r => r.Date).ToList(),
+							_ => t.Select(x => x.Item).OrderByDescending(r => r.Date).ToList()
+						};
+
+						return new TickerResults
 						{
 							TradeCode = t.Key,
-							Results = t.Select(x => x.Item).ToList(),
+							Results = results,
 							Accuracy = t.Select(x => x.Accuracy).FirstOrDefault()
-						})
-						.ToList()
-				})
-				.ToList()
-		};
+						};
+					});
+
+				tickers = sortOrder switch
+				{
+					SignalSortOrder.AssetAscending => tickers.OrderBy(t => t.TradeCode),
+					SignalSortOrder.AssetDescending => tickers.OrderByDescending(t => t.TradeCode),
+					SignalSortOrder.AccuracyDescending => tickers.OrderByDescending(t => t.Accuracy ?? 0),
+					SignalSortOrder.AccuracyAscending => tickers.OrderBy(t => t.Accuracy ?? 0),
+					_ => tickers
+				};
+
+				return new StrategyData
+				{
+					Name = g.Key,
+					Tickers = tickers.ToList()
+				};
+			})
+			.ToList();
+
+		return new StrategyResultResponse { Strategies = strategies };
 	}
 
 	public async Task<StrategyResultResponse> GetStrategyResultByCodeAsync(

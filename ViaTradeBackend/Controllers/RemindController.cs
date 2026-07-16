@@ -5,6 +5,7 @@ using Domain.Models.Dto;
 using Domain.Models.Dto.NoteRemind;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Pagination;
+using Domain.Models.Sort;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -52,10 +53,13 @@ public class RemindController(
 	[Authorize]
 	[HttpGet("byuser")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<TradeRemindDto>>> GetUserReminders([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<ActionResult<PagedResult<TradeRemindDto>>> GetUserReminders(
+		[FromQuery] PaginationRequest paginationRequest,
+		[FromQuery] RemindSortRequest? sortRequest,
+		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var userReminders = await _tradeRemindService.GetByUserPagedAsync(userId, paginationRequest, cancellationToken);
+		var userReminders = await _tradeRemindService.GetByUserPagedAsync(userId, paginationRequest, sortRequest, cancellationToken);
 		return Ok(userReminders);
 	}
 
@@ -64,11 +68,12 @@ public class RemindController(
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	public async Task<ActionResult<PagedResult<TradeRemindDto>>> GetUserRemindersByInstrument(
 		[FromQuery] PaginationRequest paginationRequest,
+		[FromQuery] RemindSortRequest? sortRequest,
 		[Required, FromRoute] int idInstrument,
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var reminders = await _tradeRemindService.GetByUserAndTradeCodePagedAsync(userId, idInstrument, paginationRequest, cancellationToken);
+		var reminders = await _tradeRemindService.GetByUserAndTradeCodePagedAsync(userId, idInstrument, paginationRequest, sortRequest, cancellationToken);
 		return Ok(reminders);
 	}
 

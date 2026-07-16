@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using ViaTradeBackend.BackgroundServices;
 using ViaTradeBackend.Handler;
@@ -131,6 +132,9 @@ builder.Services
 	{
 		options.JsonSerializerOptions.DefaultIgnoreCondition =
 			JsonIgnoreCondition.WhenWritingNull;
+
+		options.JsonSerializerOptions.Converters.Add(
+			new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
 	});
 
 builder.Services.AddEndpointsApiExplorer();

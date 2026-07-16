@@ -1,7 +1,9 @@
 using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
+using Domain.Enums;
 using Domain.Models.Dto.Trade;
 using Domain.Models.Pagination;
+using Domain.Models.Sort;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -27,16 +29,21 @@ public class TradeCodeRepository(AppDbContext context) : GenericRepository<Trade
 			.FirstOrDefaultAsync(cancellationToken);
 	}
 
-	public async Task<PagedResult<TradeCodeDto>> GetCodesPagedAsync(PaginationRequest paginationRequest, CancellationToken cancellationToken = default)
+	public async Task<PagedResult<TradeCodeDto>> GetCodesPagedAsync(PaginationRequest paginationRequest, StockSortRequest? sortRequest = null, CancellationToken cancellationToken = default)
 	{
-		return await _dbSet
-			.Select(e => new TradeCodeDto
-			{
-				Id = e.Id,
-				ExchangeId = e.ExchangeId,
-				Description = e.Description
-			})
-			.OrderBy(e => e.Id)
-			.ToPagedAsync(paginationRequest, cancellationToken);
+		var query = _dbSet.Select(e => new TradeCodeDto
+		{
+			Id = e.Id,
+			ExchangeId = e.ExchangeId,
+			Description = e.Description
+		});
+
+		query = sortRequest?.SortOrder switch
+		{
+			StockSortOrder.NameDescending => query.OrderByDescending(e => e.ExchangeId),
+			_ => query.OrderBy(e => e.ExchangeId)
+		};
+
+		return await query.ToPagedAsync(paginationRequest, cancellationToken);
 	}
 }

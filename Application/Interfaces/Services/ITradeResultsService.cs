@@ -1,4 +1,5 @@
-﻿using Domain.Models.Dto.Statistic;
+using Domain.Models.Dto.Statistic;
+using Domain.Models.Sort;
 using Domain.Models.TradeLogic;
 
 namespace Application.Interfaces;
@@ -13,7 +14,9 @@ public interface ITradeResultsService
 		int userId,
 		DateTime? startDate,
 		DateTime? endDate,
+		SignalSortRequest? sortRequest,
 		CancellationToken cancellationToken);
+
 	Task<StrategyResultResponse> GetStrategyResultByCodeAsync(
 		int userId,
 		string strategyName,

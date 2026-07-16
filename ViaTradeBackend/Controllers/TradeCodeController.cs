@@ -3,6 +3,7 @@ using Domain.Entities.CSV;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Dto.Trade;
 using Domain.Models.Pagination;
+using Domain.Models.Sort;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
@@ -26,9 +27,12 @@ public class TradeCodeController(ITradeCodeService tradeService) : ControllerBas
 
 	[HttpGet("stocks")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<TradeCodeDto>>> GetStockCodes([FromQuery] PaginationRequest paginationRequest)
+	public async Task<ActionResult<PagedResult<TradeCodeDto>>> GetStockCodes(
+		[FromQuery] PaginationRequest paginationRequest,
+		[FromQuery] StockSortRequest? sortRequest,
+		CancellationToken cancellationToken)
 	{
-		var result = await _tradeService.GetCodesPagedAsync(paginationRequest);
+		var result = await _tradeService.GetCodesPagedAsync(paginationRequest, sortRequest, cancellationToken);
 		return Ok(result);
 	}
 

@@ -5,6 +5,7 @@ using Domain.Models.Dto;
 using Domain.Models.Dto.NoteRemind;
 using Domain.Models.Dto.Statistic;
 using Domain.Models.Pagination;
+using Domain.Models.Sort;
 
 namespace Application.Services;
 
@@ -37,14 +38,14 @@ public class TradeRemindService(
 		await _tradeRemindRepository.ExecuteDeleteAsync(r => r.Id == remindId, cancellationToken);
 	}
 
-	public async Task<PagedResult<TradeRemindDto>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<TradeRemindDto>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, RemindSortRequest? sortRequest = null, CancellationToken cancellationToken = default)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
 
-		return await _tradeRemindRepository.GetByUserPagedAsync(userId, paginationRequest, cancellationToken);
+		return await _tradeRemindRepository.GetByUserPagedAsync(userId, paginationRequest, sortRequest, cancellationToken);
 	}
 
-	public async Task<PagedResult<TradeRemindDto>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<TradeRemindDto>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, RemindSortRequest? sortRequest = null, CancellationToken cancellationToken = default)
 	{
 		await _userService.EnsureUserAsync(userId, cancellationToken);
 
@@ -53,7 +54,7 @@ public class TradeRemindService(
 		if (tradeCode is null)
 			throw new KeyNotFoundException($"TradeCode with id: {tradeCodeId} not found");
 
-		return await _tradeRemindRepository.GetByUserAndTradeCodePagedAsync(userId, tradeCodeId, paginationRequest, cancellationToken);
+		return await _tradeRemindRepository.GetByUserAndTradeCodePagedAsync(userId, tradeCodeId, paginationRequest, sortRequest, cancellationToken);
 	}
 
 	public async Task<TradeRemind> GetByIdAsync(int remindId, int userId, CancellationToken cancellationToken)

@@ -13,7 +13,7 @@ public class CamelCaseParameterFilter : IOperationFilter
 
 		foreach (var parameter in operation.Parameters)
 		{
-			if (parameter.In != ParameterLocation.Query || parameter is not OpenApiParameter openApiParameter)
+			if (parameter is not OpenApiParameter openApiParameter)
 				continue;
 
 			var apiParameter = context.ApiDescription.ParameterDescriptions

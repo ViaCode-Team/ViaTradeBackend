@@ -17,7 +17,8 @@ public sealed class PagedResult<T>(
 
 	private static int CalculateTotalPages(int totalCount, int pageSize)
 	{
-		ArgumentOutOfRangeException.ThrowIfLessThan(pageSize, 1);
+		if (pageSize < 1)
+			throw new ArgumentException("PageSize must be a positive integer.", nameof(pageSize));
 
 		if (totalCount == 0)
 			return 0;
@@ -31,7 +32,8 @@ public sealed class PagedResult<T>(
 
 	public PagedResult<TResult> Map<TResult>(Func<T, TResult> mapFunc)
 	{
-		ArgumentNullException.ThrowIfNull(mapFunc);
+		if (mapFunc == null) 
+			throw new KeyNotFoundException(nameof(mapFunc));
 
 		return new PagedResult<TResult>(
 			Items.Select(mapFunc).ToList(),
