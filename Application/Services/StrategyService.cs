@@ -61,15 +61,16 @@ public class StrategyService(
 
 	public async Task CreateUserStrategyCodeAsync(UserStrategyTradeCodeRequest request, int userId, CancellationToken cancellationToken)
 	{
-
-		var existing = await _userStrategyTradeCodeRepository.FindAsync(
+		bool isUserStrategyCodeExist = await _userStrategyTradeCodeRepository.ExistsAsync(
 			e => e.UserId == userId &&
-				 e.StrategyId == request.StrategyId &&
-				 e.TradeCodeId == request.TradeCodeId,
+			e.StrategyId == request.StrategyId &&
+			e.TradeCodeId == request.TradeCodeId,
 			cancellationToken);
 
-		if (existing.Any())
+		if (isUserStrategyCodeExist)
+		{
 			throw new InvalidOperationException("User strategy code already exists");
+		}
 
 		var newUserStrategyCode = new UserStrategyTradeCode
 		{
@@ -103,12 +104,9 @@ public class StrategyService(
 
 	public async Task CreateUserStrategyAsync(CreateUserStrategyRequest request, int userId, CancellationToken cancellationToken)
 	{
+		var isUserExist = await _userTradeStrategyRepository.ExistsAsync(e => e.UserId == userId && e.TradeStrategyId == request.StrategyId, cancellationToken);
 
-		var existing = await _userTradeStrategyRepository.FindAsync(
-			e => e.UserId == userId && e.TradeStrategyId == request.StrategyId,
-			cancellationToken);
-
-		if (existing.Any())
+		if (isUserExist)
 			throw new InvalidOperationException("User strategy already exists");
 
 		var strategyLink = new UserTradeStrategy

@@ -9,8 +9,7 @@ public class UserRepository(AppDbContext context) : GenericRepository<User, User
 {
 	public async Task<User?> GetByLoginAsync(string login, CancellationToken cancellationToken = default)
 	{
-		return await _dbSet
-			.FirstOrDefaultAsync(u => u.Login == login, cancellationToken);
+		return await _dbSet.FirstOrDefaultAsync(u => u.Login == login, cancellationToken);
 	}
 
 	public async Task<IEnumerable<User>> GetAllWithTgLinkAsync(CancellationToken cancellationToken = default)

@@ -54,7 +54,6 @@ public class TradeRemindService(
 
 	public async Task<TradeRemind> GetByIdAsync(int remindId, int userId, CancellationToken cancellationToken)
 	{
-
 		var reminder = await _tradeRemindRepository.GetByIdAsync(remindId, cancellationToken);
 		if (reminder == null || reminder.UserId != userId)
 			throw new KeyNotFoundException();
@@ -64,9 +63,8 @@ public class TradeRemindService(
 
 	public async Task CreateAsync(int userId, int tradeCodeId, TradeRemindRequest request, CancellationToken cancellationToken)
 	{
-
-		var tradeCode = await _tradeCodeRepository.GetByIdAsync(tradeCodeId, cancellationToken);
-		if (tradeCode == null)
+		bool isTradeCodeExist = await _tradeCodeRepository.ExistsAsync(c => c.Id == tradeCodeId, cancellationToken);
+		if (!isTradeCodeExist)
 			throw new KeyNotFoundException();
 
 		var remind = new TradeRemind
@@ -88,8 +86,7 @@ public class TradeRemindService(
 		if (remind == null || remind.UserId != userId)
 			throw new KeyNotFoundException();
 
-		var tradeCode = await _tradeCodeRepository.GetByIdAsync(remind.TradeCodeId, cancellationToken);
-		if (tradeCode == null)
+		if (!await _tradeCodeRepository.ExistsAsync(c => c.Id == remind.TradeCodeId, cancellationToken))
 			throw new KeyNotFoundException();
 
 		remind.TextRemind = request.TextRemind;

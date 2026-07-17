@@ -113,8 +113,7 @@ public class AuthService(
 		string password,
 		CancellationToken cancellationToken = default)
 	{
-		var existingUser = await _userRepository.GetByLoginAsync(login, cancellationToken);
-		if (existingUser != null)
+		if (await _userRepository.ExistsAsync(u => u.Login == login, cancellationToken))
 			throw new InvalidOperationException();
 
 		var user = new User

@@ -35,15 +35,19 @@ public class TradeService(
 		var trade = await _tradeRepository.GetByIdAsync(id, cancellationToken);
 		if (trade == null || trade.UserId != userId)
 			throw new KeyNotFoundException();
+
 		return trade;
 	}
 
 	public async Task<Trade> CreateTradeAsync(TradeRequest request, int userId, CancellationToken cancellationToken)
 	{
-		_ = await _tradeCodeRepository.GetByIdAsync(request.TradeCodeId, cancellationToken)
-			?? throw new KeyNotFoundException();
-		_ = await _tradeTypeRepository.GetByIdAsync(request.TradeTypeId, cancellationToken)
-			?? throw new ArgumentException($"TradeType {request.TradeTypeId} not found");
+		bool isTradeCodeExist = await _tradeCodeRepository.ExistsAsync(c => c.Id == request.TradeCodeId, cancellationToken);
+		if (!isTradeCodeExist)
+			throw new KeyNotFoundException();
+
+		bool isTradeTypeExist = await _tradeTypeRepository.ExistsAsync(t => t.Id == request.TradeTypeId, cancellationToken);
+		if (!isTradeTypeExist)
+			throw new ArgumentException($"TradeType {request.TradeTypeId} not found");
 
 		var trade = new Trade
 		{
@@ -62,6 +66,7 @@ public class TradeService(
 
 		await _tradeRepository.AddAsync(trade, cancellationToken);
 		await _tradeRepository.SaveChangesAsync(cancellationToken);
+
 		return trade;
 	}
 
@@ -71,10 +76,13 @@ public class TradeService(
 		if (trade == null || trade.UserId != userId)
 			throw new KeyNotFoundException();
 
-		_ = await _tradeCodeRepository.GetByIdAsync(request.TradeCodeId, cancellationToken)
-			?? throw new KeyNotFoundException();
-		_ = await _tradeTypeRepository.GetByIdAsync(request.TradeTypeId, cancellationToken)
-			?? throw new ArgumentException($"TradeType {request.TradeTypeId} not found");
+		bool isTradeCodeExist = await _tradeCodeRepository.ExistsAsync(c => c.Id == request.TradeCodeId, cancellationToken);
+		if (!isTradeCodeExist)
+			throw new KeyNotFoundException();
+
+		bool isTradeTypeExist = await _tradeTypeRepository.ExistsAsync(t => t.Id == request.TradeTypeId, cancellationToken);
+		if (!isTradeTypeExist)
+			throw new ArgumentException($"TradeType {request.TradeTypeId} not found");
 
 		trade.DateOpen = request.DateOpen;
 		trade.DateClose = request.DateClose;
@@ -94,10 +102,8 @@ public class TradeService(
 
 	public async Task DeleteTradeAsync(int id, int userId, CancellationToken cancellationToken)
 	{
-		var trade = await _tradeRepository.GetByIdAsync(id, cancellationToken);
-		if (trade == null)
-			throw new KeyNotFoundException();
-
+		var trade = await _tradeRepository.GetByIdAsync(id, cancellationToken) 
+			?? throw new KeyNotFoundException();
 		if (trade.UserId != userId)
 			throw new UnauthorizedAccessException();
 

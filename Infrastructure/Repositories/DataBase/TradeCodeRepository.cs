@@ -29,6 +29,14 @@ public class TradeCodeRepository(AppDbContext context) : GenericRepository<Trade
 			.FirstOrDefaultAsync(cancellationToken);
 	}
 
+	public async Task<int?> GetIdByExchangeIdAsync(string code, CancellationToken cancellationToken = default)
+	{
+		return await _dbSet
+			.Where(e => e.ExchangeId == code)
+			.Select(e => (int?)e.Id)
+			.FirstOrDefaultAsync(cancellationToken);
+	}
+
 	public async Task<PagedResult<TradeCodeDto>> GetCodesPagedAsync(PaginationRequest paginationRequest, StockSortRequest? sortRequest = null, CancellationToken cancellationToken = default)
 	{
 		var query = _dbSet.Select(e => new TradeCodeDto

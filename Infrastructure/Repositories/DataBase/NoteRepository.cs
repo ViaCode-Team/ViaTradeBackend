@@ -13,18 +13,24 @@ public class NoteRepository(AppDbContext context) : GenericRepository<Note, Note
 {
 	public async Task<NoteStatistic> GetNoteStatisticAsync(int userId, CancellationToken cancellationToken = default)
 	{
-		var stats = await _dbSet
-			.Where(n => n.UserId == userId)
-			.GroupBy(n => 1)
-			.Select(g => new NoteStatistic
-			{
-				TotalNotes = g.Count(),
-				StockNotes = g.Count(n => n.TradeCodeId != null),
-				StrategyNotes = g.Count(n => n.TradeStrategyId != null)
-			})
-			.FirstOrDefaultAsync(cancellationToken);
+		var baseQuery = _dbSet.Where(n => n.UserId == userId);
 
-		return stats ?? new NoteStatistic { TotalNotes = 0, StockNotes = 0, StrategyNotes = 0 };
+		var totalNotes = await baseQuery.CountAsync(cancellationToken);
+
+		if (totalNotes == 0)
+		{
+			return new NoteStatistic { TotalNotes = 0, StockNotes = 0, StrategyNotes = 0 };
+		}
+
+		var stockNotes = await baseQuery.CountAsync(n => n.TradeCodeId != null, cancellationToken);
+		var strategyNotes = await baseQuery.CountAsync(n => n.TradeStrategyId != null, cancellationToken);
+
+		return new NoteStatistic
+		{
+			TotalNotes = totalNotes,
+			StockNotes = stockNotes,
+			StrategyNotes = strategyNotes
+		};
 	}
 
 	public async Task<PagedResult<NoteDto>> GetPagedFilteredAsync(IQuerySpecification<Note> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken)

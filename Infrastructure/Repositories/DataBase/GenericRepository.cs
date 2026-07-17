@@ -42,9 +42,8 @@ public class GenericRepository<TEntity, TDto> : IRepository<TEntity, TDto>
 		var query = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
 		// Default order by Id if none is provided
 		if (spec.SortExpressions.Count == 0)
-		{
 			query = query.OrderBy(e => e.Id);
-		}
+
 		return await query.ToPagedAsync(paginationRequest, ct);
 	}
 
@@ -61,6 +60,13 @@ public class GenericRepository<TEntity, TDto> : IRepository<TEntity, TDto>
 		CancellationToken ct = default)
 	{
 		return await _dbSet.Where(predicate).OrderBy(e => e.Id).ToPagedAsync(paginationRequest, ct);
+	}
+
+	public async Task<bool> ExistsAsync(
+		Expression<Func<TEntity, bool>> predicate,
+		CancellationToken ct = default)
+	{
+		return await _dbSet.AnyAsync(predicate, ct);
 	}
 
 	public async Task AddAsync(TEntity entity, CancellationToken ct = default)
@@ -81,9 +87,7 @@ public class GenericRepository<TEntity, TDto> : IRepository<TEntity, TDto>
 		Expression<Func<TEntity, TDto>> projection,
 		CancellationToken ct = default)
 	{
-		return await _dbSet
-						   .Select(projection)
-						   .ToListAsync(ct);
+		return await _dbSet.Select(projection).ToListAsync(ct);
 	}
 
 	public async Task<int> ExecuteDeleteAsync(

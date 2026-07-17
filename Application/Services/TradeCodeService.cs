@@ -73,24 +73,14 @@ public class TradeCodeService(
 		{
 			exchangeId = tradeIdString;
 
-			var dbEntities = await _tradeCodeRepository.FindAsync(
-				c => c.ExchangeId == exchangeId,
-				cancellationToken);
-
-			dbId = dbEntities.FirstOrDefault()?.Id;
+			dbId = await _tradeCodeRepository.GetIdByExchangeIdAsync(exchangeId, cancellationToken);
 		}
 
 		var fileCodes = _tradefileReader.GetTradeCodes(dataType, [exchangeId]);
 		var fileCode = fileCodes.FirstOrDefault()
 			?? throw new KeyNotFoundException($"No file data found for trade code '{exchangeId}'");
 
-		if (dbId == null)
-		{
-			var dbEntities = await _tradeCodeRepository.FindAsync(
-				c => c.ExchangeId == fileCode.TradeCode,
-				cancellationToken);
-			dbId = dbEntities.FirstOrDefault()?.Id;
-		}
+		dbId ??= await _tradeCodeRepository.GetIdByExchangeIdAsync(fileCode.TradeCode, cancellationToken);
 
 		if (dbId == null)
 			throw new KeyNotFoundException($"TradeCode '{exchangeId}' is not registered in database");

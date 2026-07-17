@@ -15,10 +15,11 @@ public class TradeRepository(AppDbContext context)
 {
 	public async Task<GlobalStatistic> GetGlobalStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
-		var query = _dbSet.Where(t => t.UserId == userId);
-		var statsData = await TradeStatisticsCalcService.CalculateAggregate(query).FirstOrDefaultAsync(cancellationToken);
+		var baseQuery = _dbSet.Where(t => t.UserId == userId && t.NetIncome.HasValue);
 
-		if (statsData == null)
+		var totalTrades = await baseQuery.CountAsync(cancellationToken);
+
+		if (totalTrades == 0)
 		{
 			return new GlobalStatistic
 			{
@@ -28,23 +29,30 @@ public class TradeRepository(AppDbContext context)
 			};
 		}
 
+		var winTrades = await baseQuery.CountAsync(t => t.NetIncome > 0, cancellationToken);
+		var loseTrades = await baseQuery.CountAsync(t => t.NetIncome < 0, cancellationToken);
+
+		var totalAbsoluteIncome = await baseQuery.SumAsync(TradeStatisticsCalcService.AbsoluteIncomeExpression, cancellationToken);
+		var totalProfit = await baseQuery.Where(t => t.NetIncome > 0).SumAsync(TradeStatisticsCalcService.AbsoluteIncomeAbsExpression, cancellationToken);
+		var totalLoss = await baseQuery.Where(t => t.NetIncome < 0).SumAsync(TradeStatisticsCalcService.AbsoluteIncomeAbsExpression, cancellationToken);
+
 		var resultTrade = new TradeStatistic
 		{
-			TotalTrades = statsData.TotalTrades,
-			WinTrades = statsData.WinTrades,
-			LoseTrades = statsData.LoseTrades,
+			TotalTrades = totalTrades,
+			WinTrades = winTrades,
+			LoseTrades = loseTrades,
 		};
 
 		var incomeStatistic = new IncomeTradeStatistic
 		{
-			TotalIncome = Math.Round((decimal)statsData.TotalAbsoluteIncome, 2),
-			AverageIncome = TradeStatisticsCalcService.CalculateAverageIncome((decimal)statsData.TotalAbsoluteIncome, statsData.TotalTrades),
+			TotalIncome = Math.Round((decimal)totalAbsoluteIncome, 2),
+			AverageIncome = TradeStatisticsCalcService.CalculateAverageIncome((decimal)totalAbsoluteIncome, totalTrades),
 		};
 
 		var winrateStatistic = new WinrateTradeStatistic
 		{
-			TotalWinrate = TradeStatisticsCalcService.CalculateWinrate(statsData.WinTrades, statsData.TotalTrades),
-			ProfitFactor = TradeStatisticsCalcService.CalculateProfitFactor(statsData.TotalProfit, statsData.TotalLoss)
+			TotalWinrate = TradeStatisticsCalcService.CalculateWinrate(winTrades, totalTrades),
+			ProfitFactor = TradeStatisticsCalcService.CalculateProfitFactor(totalProfit, totalLoss)
 		};
 
 		return new GlobalStatistic

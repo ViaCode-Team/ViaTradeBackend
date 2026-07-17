@@ -15,35 +15,7 @@ public class TradeGroupAggregation
 
 public static class TradeStatisticsCalcService
 {
-	public static IQueryable<TradeGroupAggregation> CalculateAggregate(IQueryable<Trade> query)
-	{
-		return query
-			.Where(t => t.NetIncome.HasValue)
-			.Select(t => new
-			{
-				IsWin = t.NetIncome > 0,
-				IsLose = t.NetIncome < 0,
-				AbsoluteIncome = ((t.TradeClose ?? 0) - t.TradeOpen) * t.Count * (int)t.TradeSignal
-			})
-			.Select(t => new
-			{
-				t.IsWin,
-				t.IsLose,
-				t.AbsoluteIncome,
-				Profit = Convert.ToInt32(t.IsWin) * Math.Abs((double)t.AbsoluteIncome),
-				Loss = Convert.ToInt32(t.IsLose) * Math.Abs((double)t.AbsoluteIncome)
-			})
-			.GroupBy(t => 1)
-			.Select(g => new TradeGroupAggregation
-			{
-				TotalTrades = g.Count(),
-				WinTrades = g.Count(t => t.IsWin),
-				LoseTrades = g.Count(t => t.IsLose),
-				TotalAbsoluteIncome = g.Sum(t => t.AbsoluteIncome),
-				TotalProfit = g.Sum(t => t.Profit),
-				TotalLoss = g.Sum(t => t.Loss)
-			});
-	}
+
 
 	// Expression for LINQ (translation to SQL)
 	public static Expression<Func<Trade, double>> AbsoluteIncomeExpression =>
