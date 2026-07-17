@@ -15,6 +15,8 @@ public static class SwaggerMiddlewareExtensions
 				options.SwaggerEndpoint("/swagger/v1/swagger.json", "ViaTrade API v1 json");
 				options.RoutePrefix = string.Empty;
 				options.ConfigObject.AdditionalItems.Add("withCredentials", true);
+				options.DisplayRequestDuration();
+				options.DisplayOperationId();
 			});
 		}
 		return app;

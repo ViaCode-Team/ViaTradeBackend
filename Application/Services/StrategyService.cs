@@ -22,14 +22,12 @@ public class StrategyService(
 
 	public async Task<PagedResult<TradeStrategyDto>> GetStrategiesPagedAsync(int userId, StrategyFilterRequest? filterRequest, StrategySortRequest? sortRequest, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
 	{
-
 		var spec = new StrategyQuerySpecification(userId, filterRequest, sortRequest);
 		return await _tradeStrategyRepository.GetPagedFilteredAsync(userId, spec, paginationRequest, cancellationToken);
 	}
 
 	public async Task<StrategyStatistic> GetStrategyStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
-
 		var totalStrategiesTask = _tradeStrategyRepository.CountAsync(cancellationToken);
 		var activeStrategiesTask = _userTradeStrategyRepository.CountByUserAsync(userId, cancellationToken);
 
@@ -55,7 +53,6 @@ public class StrategyService(
 
 	public async Task<PagedResult<UserStrategyTradeCodeDto>> GetUserStrategyCodesPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
-
 		return await _userStrategyTradeCodeRepository.GetPagedAsync(userId, paginationRequest, cancellationToken);
 	}
 
@@ -85,7 +82,6 @@ public class StrategyService(
 
 	public async Task DeleteUserStrategyCodeAsync(int strategyId, int tradeCodeId, int userId, CancellationToken cancellationToken)
 	{
-
 		var affectedRows = await _userStrategyTradeCodeRepository.ExecuteDeleteAsync(
 			e => e.UserId == userId &&
 				 e.StrategyId == strategyId &&
@@ -98,7 +94,6 @@ public class StrategyService(
 
 	public async Task<PagedResult<UserTradeStrategyDto>> GetUserStrategiesPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
-
 		return await _userTradeStrategyRepository.GetByUserPagedAsync(userId, paginationRequest, cancellationToken);
 	}
 
@@ -121,7 +116,6 @@ public class StrategyService(
 
 	public async Task DeleteUserStrategyAsync(int strategyId, int userId, CancellationToken cancellationToken)
 	{
-
 		var affectedRows = await _userTradeStrategyRepository.ExecuteDeleteAsync(
 			e => e.UserId == userId && e.TradeStrategyId == strategyId,
 			cancellationToken);
