@@ -45,8 +45,7 @@ public class TradeRemindService(
 	{
 
 		var tradeCode = await _tradeCodeRepository.GetByIdAsync(tradeCodeId, cancellationToken);
-
-		if (tradeCode is null)
+		if (tradeCode == null)
 			throw new KeyNotFoundException($"TradeCode with id: {tradeCodeId} not found");
 
 		return await _tradeRemindRepository.GetByUserAndTradeCodePagedAsync(userId, tradeCodeId, paginationRequest, sortRequest, cancellationToken);
@@ -81,29 +80,20 @@ public class TradeRemindService(
 
 	public async Task UpdateAsync(int remindId, int userId, TradeRemindRequest request, CancellationToken cancellationToken)
 	{
-
-		var remind = await _tradeRemindRepository.GetByIdAsync(remindId, cancellationToken);
-		if (remind == null || remind.UserId != userId)
+		var affectedRows = await _tradeRemindRepository.UpdateUserRemindAsync(remindId, userId, request.TextRemind, request.DateTime, cancellationToken);
+		if (affectedRows == 0)
 			throw new KeyNotFoundException();
-
-		if (!await _tradeCodeRepository.ExistsAsync(c => c.Id == remind.TradeCodeId, cancellationToken))
-			throw new KeyNotFoundException();
-
-		remind.TextRemind = request.TextRemind;
-		remind.DateTime = request.DateTime;
-
-		_tradeRemindRepository.Update(remind);
-		await _tradeRemindRepository.SaveChangesAsync(cancellationToken);
 	}
 
 	public async Task DeleteAsync(int remindId, int userId, CancellationToken cancellationToken)
 	{
-
-		var remind = await _tradeRemindRepository.GetByIdAsync(remindId, cancellationToken);
-		if (remind == null || remind.UserId != userId)
+		var affectedRows = await _tradeRemindRepository.ExecuteDeleteAsync(r => r.Id == remindId && r.UserId == userId, cancellationToken);
+		if (affectedRows == 0)
+		{
+			bool exists = await _tradeRemindRepository.ExistsAsync(r => r.Id == remindId, cancellationToken);
+			if (exists)
+				throw new UnauthorizedAccessException();
 			throw new KeyNotFoundException();
-
-		_tradeRemindRepository.Remove(remind);
-		await _tradeRemindRepository.SaveChangesAsync(cancellationToken);
+		}
 	}
 }

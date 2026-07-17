@@ -83,13 +83,6 @@ public class GenericRepository<TEntity, TDto> : IRepository<TEntity, TDto>
 		return await _context.SaveChangesAsync(ct);
 	}
 
-	public async Task<IEnumerable<TDto>> GetProjectedAsync(
-		Expression<Func<TEntity, TDto>> projection,
-		CancellationToken ct = default)
-	{
-		return await _dbSet.Select(projection).ToListAsync(ct);
-	}
-
 	public async Task<int> ExecuteDeleteAsync(
 		Expression<Func<TEntity, bool>> predicate,
 		CancellationToken ct = default)

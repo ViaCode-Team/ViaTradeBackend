@@ -54,4 +54,14 @@ public class TradeRemindRepository(AppDbContext context)
 			})
 			.ToPagedAsync(paginationRequest, cancellationToken);
 	}
+
+	public async Task<int> UpdateUserRemindAsync(int remindId, int userId, string textRemind, DateTime dateTime, CancellationToken cancellationToken = default)
+	{
+		return await _dbSet
+			.Where(r => r.Id == remindId && r.UserId == userId)
+			.ExecuteUpdateAsync(s => s
+				.SetProperty(r => r.TextRemind, textRemind)
+				.SetProperty(r => r.DateTime, dateTime), 
+				cancellationToken);
+	}
 }

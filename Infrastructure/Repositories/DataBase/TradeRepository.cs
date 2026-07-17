@@ -7,6 +7,7 @@ using Domain.Models.Pagination;
 using Domain.Services;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using ViaTradeBackend.Models.Trade;
 
 namespace Infrastructure.Repositories.DataBase;
 
@@ -130,5 +131,23 @@ public class TradeRepository(AppDbContext context)
 				UserId = t.UserId
 			})
 			.ToPagedAsync(paginationRequest, cancellationToken);
+	}
+
+	public async Task<int> UpdateUserTradeAsync(int id, int userId, TradeRequest request, double? netIncome, decimal price, CancellationToken cancellationToken = default)
+	{
+		return await _dbSet
+			.Where(t => t.Id == id && t.UserId == userId)
+			.ExecuteUpdateAsync(s => s
+				.SetProperty(t => t.DateOpen, request.DateOpen)
+				.SetProperty(t => t.DateClose, request.DateClose)
+				.SetProperty(t => t.TradeOpen, request.TradeOpen)
+				.SetProperty(t => t.TradeClose, request.TradeClose)
+				.SetProperty(t => t.NetIncome, netIncome)
+				.SetProperty(t => t.Count, request.Count)
+				.SetProperty(t => t.TradeSignal, request.TradeSignal)
+				.SetProperty(t => t.Price, price)
+				.SetProperty(t => t.TradeTypeId, request.TradeTypeId)
+				.SetProperty(t => t.TradeCodeId, request.TradeCodeId),
+				cancellationToken);
 	}
 }

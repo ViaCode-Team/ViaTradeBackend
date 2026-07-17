@@ -16,4 +16,18 @@ public class UserRepository(AppDbContext context) : GenericRepository<User, User
 	{
 		return await _dbSet.Where(u => u.TgId != null).ToListAsync(cancellationToken);
 	}
+
+	public async Task<int> UpdateTgIdAsync(int userId, string tgId, CancellationToken cancellationToken = default)
+	{
+		return await _dbSet
+			.Where(u => u.Id == userId)
+			.ExecuteUpdateAsync(s => s.SetProperty(u => u.TgId, tgId), cancellationToken);
+	}
+
+	public async Task<int> UpdateLastLoginDateAsync(int userId, DateTime lastLoginDate, CancellationToken cancellationToken = default)
+	{
+		return await _dbSet
+			.Where(u => u.Id == userId)
+			.ExecuteUpdateAsync(s => s.SetProperty(u => u.LastLoginDate, lastLoginDate), cancellationToken);
+	}
 }

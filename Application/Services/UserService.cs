@@ -64,22 +64,13 @@ public class UserService(
 		var userId = await GetUserId(tgToken)
 			?? throw new NullReferenceException(nameof(tgToken));
 
-		var user = await _userRepository.GetByIdAsync(userId, cancellationToken)
-			?? throw new NullReferenceException(nameof(tgToken));
-
-		user.TgId = tgId;
-		_userRepository.Update(user);
-		await _userRepository.SaveChangesAsync(cancellationToken);
+		var affectedRows = await _userRepository.UpdateTgIdAsync(userId, tgId, cancellationToken);
+		if (affectedRows == 0)
+			throw new NullReferenceException(nameof(tgToken));
 	}
 
 	public async Task UpdateLastLoginDateAsync(int userId, CancellationToken cancellationToken)
 	{
-		var user = await _userRepository.GetByIdAsync(userId, cancellationToken);
-		if (user != null)
-		{
-			user.LastLoginDate = DateTime.UtcNow;
-			_userRepository.Update(user);
-			await _userRepository.SaveChangesAsync(cancellationToken);
-		}
+		await _userRepository.UpdateLastLoginDateAsync(userId, DateTime.UtcNow, cancellationToken);
 	}
 }
