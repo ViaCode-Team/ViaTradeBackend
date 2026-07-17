@@ -9,5 +9,5 @@ public interface ITradeStrategyRepository : IRepository<TradeStrategy, TradeStra
 {
 	Task<int> CountAsync(CancellationToken cancellationToken = default);
 	Task<TradeStrategyDto?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
-	Task<PagedResult<TradeStrategyDto>> GetPagedFilteredAsync(int userId, ISpecification<TradeStrategy> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken = default);
+	Task<PagedResult<TradeStrategyDto>> GetPagedFilteredAsync(int userId, IQuerySpecification<TradeStrategy> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken = default);
 }

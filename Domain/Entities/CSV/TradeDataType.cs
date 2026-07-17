@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities.CSV;
+namespace Domain.Entities.CSV;
 
 public enum TradeDataType
 {

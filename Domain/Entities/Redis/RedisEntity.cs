@@ -1,4 +1,4 @@
-﻿namespace Domain.Entities.Redis;
+namespace Domain.Entities.Redis;
 
 public abstract class RedisEntity
 {

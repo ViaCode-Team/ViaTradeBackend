@@ -3,11 +3,10 @@ using Domain.Models.Filters;
 
 namespace Application.Specifications;
 
-public class NoteSpecification : BaseSpecification<Note>
+public class NoteQuerySpecification : BaseQuerySpecification<Note>
 {
-	public NoteSpecification(int userId, NoteFilterRequest? request)
+	public NoteQuerySpecification(int userId, NoteFilterRequest? request)
 	{
-		ApplyNoTracking();
 		AddCriteria(x => x.UserId == userId);
 
 		if (request == null) return;

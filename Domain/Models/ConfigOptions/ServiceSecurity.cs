@@ -1,4 +1,4 @@
-﻿namespace Domain.Models.ConfigOptions;
+namespace Domain.Models.ConfigOptions;
 
 public class ServiceSecurity
 {

@@ -1,4 +1,4 @@
-﻿using Domain.Entities.CSV;
+using Domain.Entities.CSV;
 
 namespace Domain.Models.TradeLogic;
 

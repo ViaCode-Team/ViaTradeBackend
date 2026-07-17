@@ -11,11 +11,13 @@
 2. **Verify & Thoroughness**: Never guess facts/outcomes. Read files to verify states. Double-check directly/indirectly affected code. Ensure features work before claiming success. NEVER leave tasks half-finished. ALWAYS run `grep_search` to find dangling references for removed code. Clean up unused variables immediately.
 3. **User Edits**: Respect manual user code changes. Ask before reverting user-authored code.
 4. **Proactive Rules**: Propose `AGENTS.md` updates if users repeatedly ask for specific behaviors.
+5. **Complete Refactoring & Dead Code Removal**: When replacing an existing feature, property, or logic with a new implementation, you MUST thoroughly search for and delete the old, superseded code across the entire codebase. Never leave the old implementation alongside the new one, as it creates confusion and technical debt.
 
 ## Mandatory Agent Workflow
 1. **Build Verification**: After making ANY code changes, you MUST run `dotnet build` to verify the project compiles without errors.
 2. **Error Resolution**: If the build fails, you MUST fix all compilation errors and rebuild until the build succeeds.
 3. **Warning Resolution**: Whenever possible, fix compiler warnings as well.
+4. **Code Replacement Accuracy**: NEVER guess or hallucinate the `TargetContent` for the `replace_file_content` tool. ALWAYS use `view_file` or `grep_search` to read the exact lines from the file first. Providing inaccurate target content causes the fuzzy matcher to make unintended, destructive changes to the code.
 
 ## Strict Security (CRITICAL)
 1. **Prevent IDOR**: NEVER query/update/delete by ID alone. ALL DB actions MUST verify ownership (`&& e.UserId == currentUserId`).
@@ -29,3 +31,4 @@
 2. **Fields/Blocks**: Group related fields (NO empty lines between them). Use empty lines between execution stages (e.g. validation -> save -> return).
 3. **Syntax Constraints**: Use modern syntax (switch expressions). NO ternary operators (`? :`); use `if/else` or `switch`. NO spread collections `[..]` for fluent methods (prefer `.ToList()`). Regular collections `[]` allowed.
 4. **Clean Code**: Avoid unnecessary braces for single-line statements. Comments must be minimal, in English, and only for highly complex code.
+5. **Entity Framework**: The DbContext is globally configured with `QueryTrackingBehavior.NoTracking`. All read operations are untracked by default. DO NOT add `.AsNoTracking()` explicitly. When updating entities using `SaveChangesAsync()`, you MUST explicitly call `_dbSet.Update(entity)` beforehand. Prefer `ExecuteUpdateAsync/ExecuteDeleteAsync` where possible.

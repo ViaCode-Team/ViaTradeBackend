@@ -1,4 +1,4 @@
-﻿using Domain.Models.TradeLogic;
+using Domain.Models.TradeLogic;
 
 namespace Application.Interfaces.Utils;
 

@@ -8,58 +8,62 @@ public static class SpecificationEvaluator
 {
 	public static IQueryable<TEntity> GetQuery<TEntity>(
 		IQueryable<TEntity> query,
-		ISpecification<TEntity> specification) where TEntity : BaseEntity
+		IQuerySpecification<TEntity> specification) where TEntity : BaseEntity
 	{
-		foreach (var criterion in specification.Criteria)
-		{
-			query = query.Where(criterion);
-		}
+		query = ApplyCriteria(query, specification);
+		query = ApplyIncludes(query, specification);
+		query = ApplySorting(query, specification);
 
-		query = specification.Includes.Aggregate(query,
-			(current, include) => current.Include(include));
-
-		query = specification.IncludeStrings.Aggregate(query,
-			(current, include) => current.Include(include));
-
-		if (specification.SortExpressions.Count > 0)
-		{
-			IOrderedQueryable<TEntity>? orderedQuery = null;
-			foreach (var (KeySelector, IsDescending) in specification.SortExpressions)
-			{
-				if (orderedQuery == null)
-				{
-					orderedQuery = IsDescending
-						? query.OrderByDescending(KeySelector)
-						: query.OrderBy(KeySelector);
-				}
-				else
-				{
-					orderedQuery = IsDescending
-						? orderedQuery.ThenByDescending(KeySelector)
-						: orderedQuery.ThenBy(KeySelector);
-				}
-			}
-			query = orderedQuery ?? query;
-		}
-		else if (specification.OrderBy != null)
-		{
-			query = query.OrderBy(specification.OrderBy);
-		}
-		else if (specification.OrderByDescending != null)
-		{
-			query = query.OrderByDescending(specification.OrderByDescending);
-		}
-
-		if (specification.GroupBy != null)
-		{
-			query = query.GroupBy(specification.GroupBy).SelectMany(x => x);
-		}
-
-		if (specification.IsNoTracking)
-		{
-			query = query.AsNoTracking();
-		}
+		if (specification.IsSplitQuery)
+			query = query.AsSplitQuery();
 
 		return query;
+	}
+
+	private static IQueryable<TEntity> ApplyCriteria<TEntity>(
+		IQueryable<TEntity> query,
+		IQuerySpecification<TEntity> specification) where TEntity : BaseEntity
+	{
+		foreach (var criterion in specification.Criteria)
+			query = query.Where(criterion);
+
+		return query;
+	}
+
+	private static IQueryable<TEntity> ApplyIncludes<TEntity>(
+		IQueryable<TEntity> query,
+		IQuerySpecification<TEntity> specification) where TEntity : BaseEntity
+	{
+		foreach (var include in specification.Includes)
+			query = query.Include(include);
+
+		return query;
+	}
+
+	private static IQueryable<TEntity> ApplySorting<TEntity>(
+		IQueryable<TEntity> query,
+		IQuerySpecification<TEntity> specification) where TEntity : BaseEntity
+	{
+		if (specification.SortExpressions.Count == 0)
+			return query;
+
+		var firstSort = specification.SortExpressions[0];
+		IOrderedQueryable<TEntity> orderedQuery;
+
+		if (firstSort.IsDescending)
+			orderedQuery = query.OrderByDescending(firstSort.KeySelector);
+		else
+			orderedQuery = query.OrderBy(firstSort.KeySelector);
+
+		return specification.SortExpressions
+			.Skip(1)
+			.Aggregate(orderedQuery,
+				(current, sort) =>
+				{
+					if (sort.IsDescending)
+						return current.ThenByDescending(sort.KeySelector);
+
+					return current.ThenBy(sort.KeySelector);
+				});
 	}
 }

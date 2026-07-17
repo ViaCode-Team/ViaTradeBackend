@@ -26,7 +26,7 @@ public class TradeService(
 
 	public async Task<PagedResult<TradeDto>> GetByUserPagedAsync(int userId, TradeFilterRequest? filterRequest, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
 	{
-		var spec = new TradeSpecification(userId, filterRequest);
+		var spec = new TradeQuerySpecification(userId, filterRequest);
 		return await _tradeRepository.GetPagedFilteredAsync(spec, paginationRequest, cancellationToken);
 	}
 

@@ -5,12 +5,10 @@ using Domain.Models.Sort;
 
 namespace Application.Specifications;
 
-public class StrategySpecification : BaseSpecification<TradeStrategy>
+public class StrategyQuerySpecification : BaseQuerySpecification<TradeStrategy>
 {
-	public StrategySpecification(int userId, StrategyFilterRequest? filter, StrategySortRequest? sort)
+	public StrategyQuerySpecification(int userId, StrategyFilterRequest? filter, StrategySortRequest? sort)
 	{
-		ApplyNoTracking();
-
 		if (filter?.IsActive is bool isActive)
 		{
 			if (isActive)

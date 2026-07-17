@@ -27,7 +27,7 @@ public class NoteRepository(AppDbContext context) : GenericRepository<Note, Note
 		return stats ?? new NoteStatistic { TotalNotes = 0, StockNotes = 0, StrategyNotes = 0 };
 	}
 
-	public async Task<PagedResult<NoteDto>> GetPagedFilteredAsync(ISpecification<Note> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<NoteDto>> GetPagedFilteredAsync(IQuerySpecification<Note> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
 	{
 		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
 
@@ -92,26 +92,35 @@ public class NoteRepository(AppDbContext context) : GenericRepository<Note, Note
 
 	public async Task UpdateUserNoteAsync(int id, NoteType noteType, NoteDto dto, CancellationToken cancellationToken)
 	{
-		var note = await ResolveNoteAsync(id, dto.UserId, noteType, cancellationToken)
-			?? throw new KeyNotFoundException();
+		int affectedRows = noteType switch
+		{
+			NoteType.TradeCodeNote => await _dbSet
+				.Where(n => n.TradeCodeId == id && n.UserId == dto.UserId)
+				.ExecuteUpdateAsync(s => s.SetProperty(n => n.NoteText, dto.NoteText), cancellationToken),
+			NoteType.TradeStrategyNote => await _dbSet
+				.Where(n => n.TradeStrategyId == id && n.UserId == dto.UserId)
+				.ExecuteUpdateAsync(s => s.SetProperty(n => n.NoteText, dto.NoteText), cancellationToken),
+			_ => throw new KeyNotFoundException()
+		};
 
-		note.NoteText = dto.NoteText;
-		await SaveChangesAsync(cancellationToken);
+		if (affectedRows == 0)
+			throw new KeyNotFoundException();
 	}
 
 	public async Task DeleteUserNoteAsync(int id, int userId, NoteType noteType, CancellationToken cancellationToken)
 	{
-		var note = await ResolveNoteAsync(id, userId, noteType, cancellationToken)
-			?? throw new KeyNotFoundException();
+		int affectedRows = noteType switch
+		{
+			NoteType.TradeCodeNote => await _dbSet
+				.Where(n => n.TradeCodeId == id && n.UserId == userId)
+				.ExecuteDeleteAsync(cancellationToken),
+			NoteType.TradeStrategyNote => await _dbSet
+				.Where(n => n.TradeStrategyId == id && n.UserId == userId)
+				.ExecuteDeleteAsync(cancellationToken),
+			_ => throw new KeyNotFoundException()
+		};
 
-		_dbSet.Remove(note);
-		await SaveChangesAsync(cancellationToken);
+		if (affectedRows == 0)
+			throw new KeyNotFoundException();
 	}
-
-	private async Task<Note?> ResolveNoteAsync(int id, int userId, NoteType noteType, CancellationToken cancellationToken) => noteType switch
-	{
-		NoteType.TradeCodeNote => await _dbSet.FirstOrDefaultAsync(n => n.TradeCodeId == id && n.UserId == userId, cancellationToken),
-		NoteType.TradeStrategyNote => await _dbSet.FirstOrDefaultAsync(n => n.TradeStrategyId == id && n.UserId == userId, cancellationToken),
-		_ => throw new KeyNotFoundException()
-	};
 }

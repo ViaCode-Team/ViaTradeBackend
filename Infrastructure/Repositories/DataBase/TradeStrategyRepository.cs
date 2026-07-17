@@ -35,7 +35,7 @@ public class TradeStrategyRepository(AppDbContext context) : GenericRepository<T
 			.FirstOrDefaultAsync(cancellationToken);
 	}
 
-	public async Task<PagedResult<TradeStrategyDto>> GetPagedFilteredAsync(int userId, ISpecification<TradeStrategy> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken = default)
+	public async Task<PagedResult<TradeStrategyDto>> GetPagedFilteredAsync(int userId, IQuerySpecification<TradeStrategy> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken = default)
 	{
 		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
 

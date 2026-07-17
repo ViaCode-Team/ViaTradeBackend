@@ -1,4 +1,4 @@
-﻿namespace Domain.Models.Dto.NoteRemind;
+namespace Domain.Models.Dto.NoteRemind;
 
 public class TradeRemindDto
 {

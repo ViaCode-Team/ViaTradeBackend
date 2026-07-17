@@ -107,7 +107,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 		connectionString,
 		ServerVersion.AutoDetect(connectionString),
 		mySqlOptions => mySqlOptions.EnableStringComparisonTranslations()
-	);
+	).UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
 
 // AUTHENTICATION (JWT)

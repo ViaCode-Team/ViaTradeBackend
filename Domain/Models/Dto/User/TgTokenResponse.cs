@@ -1,4 +1,4 @@
-﻿namespace Domain.Models.Dto.User;
+namespace Domain.Models.Dto.User;
 
 public class TgTokenResponse
 {

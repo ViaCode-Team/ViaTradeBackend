@@ -101,7 +101,7 @@ public class TradeRepository(AppDbContext context)
 			.ToPagedAsync(paginationRequest, cancellationToken);
 	}
 
-	public async Task<PagedResult<TradeDto>> GetPagedFilteredAsync(ISpecification<Trade> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<TradeDto>> GetPagedFilteredAsync(IQuerySpecification<Trade> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
 	{
 		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
 

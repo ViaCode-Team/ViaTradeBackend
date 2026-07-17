@@ -78,6 +78,7 @@ public class UserService(
 		if (user != null)
 		{
 			user.LastLoginDate = DateTime.UtcNow;
+			_userRepository.Update(user);
 			await _userRepository.SaveChangesAsync(cancellationToken);
 		}
 	}

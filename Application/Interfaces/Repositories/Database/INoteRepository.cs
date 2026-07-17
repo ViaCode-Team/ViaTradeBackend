@@ -9,7 +9,7 @@ namespace Application.Interfaces.Repositories.Database;
 public interface INoteRepository : IRepository<Note, NoteDto>
 {
 	Task<NoteStatistic> GetNoteStatisticAsync(int userId, CancellationToken cancellationToken = default);
-	Task<PagedResult<NoteDto>> GetPagedFilteredAsync(ISpecification<Note> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken);
+	Task<PagedResult<NoteDto>> GetPagedFilteredAsync(IQuerySpecification<Note> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken);
 	Task<Note> GetUserNoteByProp(int id, int userId, NoteType noteType, CancellationToken cancellationToken);
 	Task AddUserNoteAsync(int relatedId, NoteType noteType, NoteDto dto, CancellationToken cancellationToken);
 	Task UpdateUserNoteAsync(int id, NoteType noteType, NoteDto dto, CancellationToken cancellationToken);

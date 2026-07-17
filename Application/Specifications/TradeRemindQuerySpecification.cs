@@ -4,12 +4,10 @@ using Domain.Models.Sort;
 
 namespace Application.Specifications;
 
-public class TradeRemindSpecification : BaseSpecification<TradeRemind>
+public class TradeRemindQuerySpecification : BaseQuerySpecification<TradeRemind>
 {
-	public TradeRemindSpecification(int userId, int? tradeCodeId = null, RemindSortRequest? sort = null)
+	public TradeRemindQuerySpecification(int userId, int? tradeCodeId = null, RemindSortRequest? sort = null)
 	{
-		ApplyNoTracking();
-
 		AddCriteria(r => r.UserId == userId);
 
 		if (tradeCodeId.HasValue)

@@ -4,11 +4,10 @@ using Domain.Models.Filters;
 
 namespace Application.Specifications;
 
-public class TradeSpecification : BaseSpecification<Trade>
+public class TradeQuerySpecification : BaseQuerySpecification<Trade>
 {
-	public TradeSpecification(int userId, TradeFilterRequest? request)
+	public TradeQuerySpecification(int userId, TradeFilterRequest? request)
 	{
-		ApplyNoTracking();
 		AddCriteria(x => x.UserId == userId);
 		AddInclude(x => x.TradeType!);
 		AddInclude(x => x.TradeCode!);

@@ -19,10 +19,8 @@ public class TradeResultsService(
 	private readonly IUserTradeStrategyRepository _userTradeStrategyRepository = userTradeStrategyRepository;
 	private readonly ITradeStrategyRepository _tradeStrategyRepository = tradeStrategyRepository;
 
-
 	public async Task<SignalStatistic> GetStrategyResultStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
-
 
 		var signals = await GetStrategyResultAsync(userId, DateTime.Now, null, null, cancellationToken);
 

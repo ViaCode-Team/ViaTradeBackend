@@ -18,7 +18,7 @@ public class TradeRemindRepository(AppDbContext context)
 
 	public async Task<PagedResult<TradeRemindDto>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, RemindSortRequest? sortRequest = null, CancellationToken cancellationToken = default)
 	{
-		var spec = new TradeRemindSpecification(userId, null, sortRequest);
+		var spec = new TradeRemindQuerySpecification(userId, null, sortRequest);
 		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
 
 		return await queryable
@@ -40,7 +40,7 @@ public class TradeRemindRepository(AppDbContext context)
 
 	public async Task<PagedResult<TradeRemindDto>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, RemindSortRequest? sortRequest = null, CancellationToken cancellationToken = default)
 	{
-		var spec = new TradeRemindSpecification(userId, tradeCodeId, sortRequest);
+		var spec = new TradeRemindQuerySpecification(userId, tradeCodeId, sortRequest);
 		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
 
 		return await queryable

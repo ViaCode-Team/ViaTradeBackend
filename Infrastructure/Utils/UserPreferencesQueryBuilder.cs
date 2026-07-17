@@ -1,6 +1,5 @@
 using Domain.Entities.DataBase;
 using Infrastructure.Repositories.DataBase;
-using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Utils;
 
@@ -9,7 +8,6 @@ public static class UserPreferencesQueryBuilder
 	public static IQueryable<UserStrategyTradeCode> GetUserCodesQuery(this AppDbContext context, int userId)
 	{
 		return context.UserStrategyTradeCodes
-			.AsNoTracking()
 			.Where(ustc => ustc.UserId == userId);
 	}
 

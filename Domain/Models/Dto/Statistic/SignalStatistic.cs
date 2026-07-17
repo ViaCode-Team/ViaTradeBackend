@@ -1,4 +1,4 @@
-﻿namespace Domain.Models.Dto.Statistic;
+namespace Domain.Models.Dto.Statistic;
 
 public class SignalStatistic
 {

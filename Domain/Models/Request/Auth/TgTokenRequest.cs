@@ -1,4 +1,4 @@
-﻿namespace Domain.Models.Request.Auth;
+namespace Domain.Models.Request.Auth;
 
 public class TgTokenRequest
 {

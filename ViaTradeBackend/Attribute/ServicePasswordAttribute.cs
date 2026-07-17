@@ -1,4 +1,4 @@
-﻿using Domain.Models.ConfigOptions;
+using Domain.Models.ConfigOptions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;

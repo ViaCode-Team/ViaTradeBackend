@@ -1,4 +1,4 @@
-﻿using Domain.Entities.Redis;
+using Domain.Entities.Redis;
 
 namespace Application.Interfaces.Repositories.Redis;
 
