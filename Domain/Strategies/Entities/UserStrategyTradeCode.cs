@@ -1,24 +1,19 @@
-using Domain.Users.Entities;
-using Domain.Strategies.Entities;
 using Domain.Common;
-using Domain.Entities.DataBase; // For User
-using System.Text.Json.Serialization;
+using Domain.TradeCodes.Entities;
+using Domain.Users.Entities;
 
 namespace Domain.Strategies.Entities;
 
-public class UserStrategyTradeCode : AggregateRoot
+public sealed class UserStrategyTradeCode : AggregateRoot<int>
 {
 	public int UserId { get; private set; }
 	public int TradeCodeId { get; private set; }
 	public int StrategyId { get; private set; }
 
-	[JsonIgnore]
 	public User? User { get; private set; }
-	
-	[JsonIgnore]
-	public Domain.TradeCodes.Entities.TradeCode? TradeCode { get; private set; }
-	
-	[JsonIgnore]
+
+	public TradeCode? TradeCode { get; private set; }
+
 	public TradeStrategy? TradeStrategy { get; private set; }
 
 	private UserStrategyTradeCode() { }

@@ -1,5 +1,5 @@
-using Application.Interfaces.Repositories.Database;
-using Application.Models.Statistic;
+using Application.Statistics.Models;
+using Application.Strategies.Interfaces;
 using MediatR;
 
 namespace Application.Strategies.Queries;
@@ -8,7 +8,7 @@ public record GetStrategyStatisticQuery(int UserId) : IRequest<StrategyStatistic
 
 public class GetStrategyStatisticQueryHandler(
 	ITradeStrategyRepository tradeStrategyRepository,
-	IUserTradeStrategyRepository userTradeStrategyRepository) 
+	IUserTradeStrategyRepository userTradeStrategyRepository)
 	: IRequestHandler<GetStrategyStatisticQuery, StrategyStatisticReadModel>
 {
 	private readonly ITradeStrategyRepository _tradeStrategyRepository = tradeStrategyRepository;

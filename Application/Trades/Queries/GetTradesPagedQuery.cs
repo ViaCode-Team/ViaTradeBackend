@@ -1,7 +1,7 @@
-using Application.Interfaces.Repositories.Database;
-using Application.Specifications;
-using Domain.Models.Filters;
-using Domain.Models.Pagination;
+using Application.Common.Models.Filters;
+using Application.Common.Models.Pagination;
+using Application.Common.Specifications;
+using Application.Trades.Interfaces;
 using Domain.Trades.Entities;
 using MediatR;
 
@@ -9,7 +9,7 @@ namespace Application.Trades.Queries;
 
 public record GetTradesPagedQuery(int UserId, TradeFilterRequest? FilterRequest, PaginationRequest? PaginationRequest) : IRequest<PagedResult<Trade>>;
 
-public class GetTradesPagedQueryHandler(ITradeRepository tradeRepository) 
+public class GetTradesPagedQueryHandler(ITradeRepository tradeRepository)
 	: IRequestHandler<GetTradesPagedQuery, PagedResult<Trade>>
 {
 	private readonly ITradeRepository _tradeRepository = tradeRepository;

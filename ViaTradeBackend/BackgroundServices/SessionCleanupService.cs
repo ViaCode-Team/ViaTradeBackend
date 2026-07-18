@@ -1,5 +1,5 @@
-using Application.Interfaces.Repositories.Redis;
-using Domain.Models.ConfigOptions;
+using Application.Auth.Interfaces;
+using Infrastructure.Configuration;
 using Microsoft.Extensions.Options;
 
 namespace ViaTradeBackend.BackgroundServices;

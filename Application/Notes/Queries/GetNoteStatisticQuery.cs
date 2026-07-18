@@ -1,5 +1,5 @@
-using Application.Interfaces.Repositories.Database;
-using Application.Models.Statistic;
+using Application.Notes.Interfaces;
+using Application.Statistics.Models;
 using MediatR;
 
 namespace Application.Notes.Queries;
@@ -8,8 +8,8 @@ public record GetNoteStatisticQuery(int UserId) : IRequest<NoteStatisticReadMode
 
 public class GetNoteStatisticQueryHandler(INoteRepository noteRepository) : IRequestHandler<GetNoteStatisticQuery, NoteStatisticReadModel>
 {
-    public async Task<NoteStatisticReadModel> Handle(GetNoteStatisticQuery request, CancellationToken cancellationToken)
-    {
-        return await noteRepository.GetNoteStatisticAsync(request.UserId, cancellationToken);
-    }
+	public async Task<NoteStatisticReadModel> Handle(GetNoteStatisticQuery request, CancellationToken cancellationToken)
+	{
+		return await noteRepository.GetNoteStatisticAsync(request.UserId, cancellationToken);
+	}
 }

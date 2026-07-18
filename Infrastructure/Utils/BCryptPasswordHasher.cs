@@ -1,5 +1,4 @@
-using Application.Interfaces.Utils;
-
+using Application.Auth.Interfaces;
 namespace Infrastructure.Utils;
 
 public class BCryptPasswordHasher : IPasswordHasher

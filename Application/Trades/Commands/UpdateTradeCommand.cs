@@ -1,7 +1,7 @@
-using Application.Contracts.Dto.Requests.Trade;
-using Application.Interfaces.Repositories.Database;
+using Application.TradeCodes.Interfaces;
+using Application.Trades.Interfaces;
+using Application.Trades.Models;
 using Domain.Trades.Entities;
-using Domain.Trades.Enums;
 using MediatR;
 
 namespace Application.Trades.Commands;
@@ -11,7 +11,7 @@ public record UpdateTradeCommand(int Id, int UserId, TradeCreateDto Request) : I
 public class UpdateTradeCommandHandler(
 	ITradeRepository tradeRepository,
 	ITradeCodeRepository tradeCodeRepository,
-	ITradeTypeRepository tradeTypeRepository) 
+	ITradeTypeRepository tradeTypeRepository)
 	: IRequestHandler<UpdateTradeCommand, Trade>
 {
 	private readonly ITradeRepository _tradeRepository = tradeRepository;

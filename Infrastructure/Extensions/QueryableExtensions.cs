@@ -1,4 +1,4 @@
-using Domain.Models.Pagination;
+using Application.Common.Models.Pagination;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Extensions;

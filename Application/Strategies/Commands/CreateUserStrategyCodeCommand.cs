@@ -1,12 +1,12 @@
-using Domain.Users.Entities;
-using Application.Interfaces.Repositories.Database;
+using Application.Strategies.Interfaces;
+using Domain.Strategies.Entities;
 using MediatR;
 
 namespace Application.Strategies.Commands;
 
 public record CreateUserStrategyCodeCommand(int UserId, int StrategyId, int TradeCodeId) : IRequest;
 
-public class CreateUserStrategyCodeCommandHandler(IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository) 
+public class CreateUserStrategyCodeCommandHandler(IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository)
 	: IRequestHandler<CreateUserStrategyCodeCommand>
 {
 	private readonly IUserStrategyTradeCodeRepository _userStrategyTradeCodeRepository = userStrategyTradeCodeRepository;
@@ -22,7 +22,7 @@ public class CreateUserStrategyCodeCommandHandler(IUserStrategyTradeCodeReposito
 		if (isUserStrategyCodeExist)
 			throw new InvalidOperationException("User strategy code already exists");
 
-		var newUserStrategyCode = new Domain.Strategies.Entities.UserStrategyTradeCode(
+		var newUserStrategyCode = new UserStrategyTradeCode(
 			request.UserId,
 			request.TradeCodeId,
 			request.StrategyId

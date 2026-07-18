@@ -1,7 +1,6 @@
-using Application.Interfaces.Utils;
-using Domain.Entities.CSV;
-using Domain.Models.ConfigOptions;
-using Domain.Models.TradeLogic;
+using Application.Auth.Interfaces;
+using Domain.Trades.Entities;
+using Infrastructure.Configuration;
 using Microsoft.Extensions.Options;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -128,7 +127,7 @@ public class TradeFileReader : IFileReader
 		var fileName = Path.GetFileNameWithoutExtension(filePath);
 		var parts = fileName.Split('_');
 
-		// Ищем последнюю дату в формате YYYY-MM-DD
+		// Find the latest date in YYYY-MM-DD format
 		var lastDateIndex = Array.FindLastIndex(parts, p =>
 			Regex.IsMatch(p, @"^\d{4}-\d{2}-\d{2}$"));
 

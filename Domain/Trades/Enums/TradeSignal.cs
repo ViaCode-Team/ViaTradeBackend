@@ -1,5 +1,3 @@
-using Domain.Trades.Enums;
-using Domain.Trades.Entities;
 namespace Domain.Trades.Enums;
 
 public enum TradeSignal

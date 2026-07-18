@@ -1,6 +1,6 @@
-using Application.Interfaces.Repositories.Database;
-using Application.Interfaces.Utils;
-using Application.Models;
+using Application.Auth.Interfaces;
+using Application.Common.Models;
+using Application.Users.Interfaces;
 using Domain.Users.Entities;
 using MediatR;
 
@@ -9,7 +9,7 @@ namespace Application.Auth.Commands;
 public class RegisterCommandHandler(
 	IUserRepository userRepository,
 	IPasswordHasher passwordHasher,
-	ISender sender) 
+	ISender sender)
 	: IRequestHandler<RegisterCommand, AuthInternalResult>
 {
 	private readonly IUserRepository _userRepository = userRepository;

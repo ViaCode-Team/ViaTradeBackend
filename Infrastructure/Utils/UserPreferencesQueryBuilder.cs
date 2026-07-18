@@ -1,5 +1,4 @@
 using Domain.Strategies.Entities;
-using Domain.Entities.DataBase;
 using Infrastructure.Repositories.DataBase;
 
 namespace Infrastructure.Utils;

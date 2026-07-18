@@ -1,4 +1,4 @@
-using Application.Interfaces.Repositories.Database;
+using Application.Reminds.Interfaces;
 using Domain.Reminds.Entities;
 using MediatR;
 
@@ -9,9 +9,9 @@ public record GetActualRemindQuery() : IRequest<List<TradeRemind>>;
 
 public class GetActualRemindQueryHandler(ITradeRemindRepository repository) : IRequestHandler<GetActualRemindQuery, List<TradeRemind>>
 {
-    public async Task<List<TradeRemind>> Handle(GetActualRemindQuery request, CancellationToken cancellationToken)
-    {
-        var reminds = await repository.FindAsync(x => x.DateTime <= DateTime.UtcNow, cancellationToken);
-        return reminds.ToList();
-    }
+	public async Task<List<TradeRemind>> Handle(GetActualRemindQuery request, CancellationToken cancellationToken)
+	{
+		var reminds = await repository.FindAsync(x => x.DateTime <= DateTime.UtcNow, cancellationToken);
+		return reminds.ToList();
+	}
 }

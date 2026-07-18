@@ -1,5 +1,4 @@
-using Domain.Users.Entities;
-using Domain.Entities.Redis;
+using Infrastructure.Redis.Entities;
 using StackExchange.Redis;
 
 namespace Infrastructure.Repositories.Redis;

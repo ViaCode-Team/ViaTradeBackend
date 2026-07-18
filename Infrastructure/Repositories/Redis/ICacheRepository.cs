@@ -1,0 +1,10 @@
+using Infrastructure.Redis.Entities;
+namespace Infrastructure.Repositories.Redis;
+
+public interface ICacheRepository<T> where T : RedisEntity
+{
+	Task<T?> GetAsync(string id);
+	Task SetAsync(T entity, TimeSpan? expiry = null);
+	Task RemoveAsync(string id);
+	Task<IEnumerable<T>> GetAllAsync();
+}

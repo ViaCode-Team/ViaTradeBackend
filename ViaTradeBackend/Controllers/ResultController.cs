@@ -1,8 +1,7 @@
-using Domain.Users.Entities;
+using Application.Auth.Interfaces;
+using Application.Common.Models.Sort;
 using Application.Interfaces;
-using Application.Interfaces.Utils;
-using Domain.Models.Sort;
-using Domain.Models.TradeLogic;
+using Domain.Trades.Entities;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;

@@ -1,11 +1,14 @@
+using Application.Auth.Interfaces;
 using Application.Interfaces;
-using Application.Interfaces.Repositories.Database;
-using Application.Interfaces.Repositories.Redis;
-using Application.Interfaces.Utils;
 using Application.Mappings;
-using Application.Services;
-using Domain.Entities.Redis;
-using Domain.Models.ConfigOptions;
+using Application.Notes.Interfaces;
+using Application.Reminds.Interfaces;
+using Application.Strategies.Interfaces;
+using Application.TradeCodes.Interfaces;
+using Application.Trades.Interfaces;
+using Application.Trades.Services;
+using Application.Users.Interfaces;
+using Infrastructure.Configuration;
 using Infrastructure.Repositories.DataBase;
 using Infrastructure.Repositories.Redis;
 using Infrastructure.Services;
@@ -72,18 +75,24 @@ builder.Services.AddMapster();
 
 // Repositories
 builder.Services.AddScoped<UserRedisRepository>();
-builder.Services.AddScoped<IRedisRepository<TgTokenEntity>, TgTokenRepository>();
-builder.Services.AddScoped<ISessionRepository, SessionRepository>();
-builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
-builder.Services.AddScoped<ITradeRepository, TradeRepository>();
-builder.Services.AddScoped<ITradeTypeRepository, TradeTypeRepository>();
-builder.Services.AddScoped<ITradeRemindRepository, TradeRemindRepository>();
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserTradeStrategyRepository, UserTradeStrategyRepository>();
-builder.Services.AddScoped<IUserStrategyTradeCodeRepository, UserStrategyTradeCodeRepository>();
-builder.Services.AddScoped<ITradeStrategyRepository, TradeStrategyRepository>();
-builder.Services.AddScoped<ITradeCodeRepository, TradeCodeRepository>();
-builder.Services.AddScoped<INoteRepository, NoteRepository>();
+builder.Services.AddScoped<ITgTokenRepository, TgTokenRedisRepository>();
+builder.Services.AddScoped<ISessionRepository, SessionRedisRepository>();
+builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRedisRepository>();
+builder.Services.AddScoped<ITradeRepository, TradeEfRepository>();
+builder.Services.AddScoped<ITradeTypeRepository, TradeTypeEfRepository>();
+builder.Services.AddScoped<ITradeRemindRepository, TradeRemindEfRepository>();
+builder.Services.AddScoped<IUserRepository, UserEfRepository>();
+builder.Services.AddScoped<IUserTradeStrategyRepository, UserTradeStrategyEfRepository>();
+builder.Services.AddScoped<IUserStrategyTradeCodeRepository, UserStrategyTradeCodeEfRepository>();
+builder.Services.AddScoped<ITradeStrategyRepository, TradeStrategyEfRepository>();
+builder.Services.AddScoped<ITradeCodeRepository, TradeCodeEfRepository>();
+builder.Services.AddScoped<INoteRepository, NoteEfRepository>();
+
+// MediatR
+builder.Services.AddMediatR(cfg =>
+{
+	cfg.RegisterServicesFromAssembly(typeof(TradeResultsService).Assembly);
+});
 
 // Application services
 builder.Services.AddScoped<ITradeResultsService, TradeResultsService>();

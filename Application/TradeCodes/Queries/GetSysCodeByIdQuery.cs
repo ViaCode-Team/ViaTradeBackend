@@ -1,10 +1,7 @@
-using Domain.Trades.Enums;
+using Application.Auth.Interfaces;
+using Application.TradeCodes.Interfaces;
+using Application.Trades.Models;
 using Domain.Trades.Entities;
-using Application.Interfaces.Utils;
-using Application.Contracts.Dto.Trade;
-using Application.Interfaces;
-using Application.Interfaces.Repositories.Database;
-using Domain.Entities.CSV;
 using MediatR;
 
 namespace Application.TradeCodes.Queries;
@@ -13,7 +10,7 @@ public record GetSysCodeByIdQuery(TradeDataType DataType, string TradeIdString) 
 
 public class GetSysCodeByIdQueryHandler(
 	IFileReader tradefileReader,
-	ITradeCodeRepository tradeCodeRepository) 
+	ITradeCodeRepository tradeCodeRepository)
 	: IRequestHandler<GetSysCodeByIdQuery, TradeCodeFileDto>
 {
 	private readonly IFileReader _tradefileReader = tradefileReader;

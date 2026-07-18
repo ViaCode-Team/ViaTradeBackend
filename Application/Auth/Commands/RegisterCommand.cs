@@ -1,4 +1,4 @@
-using Application.Models;
+using Application.Common.Models;
 using MediatR;
 
 namespace Application.Auth.Commands;

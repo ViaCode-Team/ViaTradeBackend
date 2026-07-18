@@ -1,7 +1,6 @@
+using Application.Auth.Interfaces;
 using Domain.Users.Entities;
-using Application.Interfaces.Utils;
-using Domain.Entities.DataBase;
-using Domain.Models.ConfigOptions;
+using Infrastructure.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

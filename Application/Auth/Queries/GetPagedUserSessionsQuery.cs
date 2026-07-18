@@ -1,13 +1,13 @@
-using Application.Contracts.Dto.User;
-using Application.Interfaces.Repositories.Redis;
-using Domain.Models.Pagination;
+using Application.Auth.Interfaces;
+using Application.Common.Models.Pagination;
+using Application.Users.Models;
 using MediatR;
 
 namespace Application.Auth.Queries;
 
 public record GetPagedUserSessionsQuery(int UserId, PaginationRequest PaginationRequest) : IRequest<PagedResult<UserSessionDto>>;
 
-public class GetPagedUserSessionsQueryHandler(ISessionRepository sessionRepository) 
+public class GetPagedUserSessionsQueryHandler(ISessionRepository sessionRepository)
 	: IRequestHandler<GetPagedUserSessionsQuery, PagedResult<UserSessionDto>>
 {
 	private readonly ISessionRepository _sessionRepository = sessionRepository;

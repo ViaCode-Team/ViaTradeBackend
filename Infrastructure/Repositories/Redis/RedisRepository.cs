@@ -1,11 +1,10 @@
-using Application.Interfaces.Repositories.Redis;
-using Domain.Entities.Redis;
+using Infrastructure.Redis.Entities;
 using StackExchange.Redis;
 using System.Text.Json;
 
 namespace Infrastructure.Repositories.Redis;
 
-public class RedisRepository<T>(IConnectionMultiplexer redis, string prefix) : IRedisRepository<T> where T : RedisEntity
+public class RedisRepository<T>(IConnectionMultiplexer redis, string prefix) : ICacheRepository<T> where T : RedisEntity
 {
 	protected readonly IDatabase _db = redis.GetDatabase();
 	protected readonly string _prefix = prefix;
@@ -42,7 +41,7 @@ public class RedisRepository<T>(IConnectionMultiplexer redis, string prefix) : I
 		var server = _db.Multiplexer.GetServer(_db.Multiplexer.GetEndPoints()[0]);
 		var keys = server.Keys(pattern: $"{_prefix}*");
 
-		var result = new List<T>();
+		List<T> result = [];
 		foreach (var key in keys)
 		{
 			var value = await _db.StringGetAsync(key);

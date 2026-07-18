@@ -1,4 +1,4 @@
-using Application.Interfaces.Repositories.Database;
+using Application.Users.Interfaces;
 using Domain.Users.Entities;
 using MediatR;
 
@@ -6,7 +6,7 @@ namespace Application.Users.Queries;
 
 public record GetAllUsersWithTgLinkQuery() : IRequest<IEnumerable<User>>;
 
-public class GetAllUsersWithTgLinkQueryHandler(IUserRepository userRepository) 
+public class GetAllUsersWithTgLinkQueryHandler(IUserRepository userRepository)
 	: IRequestHandler<GetAllUsersWithTgLinkQuery, IEnumerable<User>>
 {
 	private readonly IUserRepository _userRepository = userRepository;

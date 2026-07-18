@@ -1,10 +1,9 @@
-using Domain.Users.Entities;
-using Domain.Strategies.Entities;
-using Domain.Trades.Enums;
-using Domain.Trades.Entities;
 using Domain.Notes.Entities;
 using Domain.Reminds.Entities;
-using Domain.Entities.DataBase;
+using Domain.Strategies.Entities;
+using Domain.TradeCodes.Entities;
+using Domain.Trades.Entities;
+using Domain.Users.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase;
@@ -23,6 +22,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
+		modelBuilder.Ignore<Domain.Common.DomainEvent>();
+
 		modelBuilder.Entity<TradeCode>()
 			.HasIndex(x => x.ExchangeId)
 			.IsUnique();
@@ -62,44 +63,52 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 			entity.HasIndex(x => x.UserId);
 		});
 
-		modelBuilder.Entity<Trade>()
-			.HasIndex(x => x.UserId);
+		modelBuilder.Entity<Trade>(entity =>
+		{
+			entity.HasIndex(x => x.UserId);
+			entity.Property(t => t.Price).HasColumnType("decimal(18,2)");
+			entity.Ignore(t => t.NetIncome);
+		});
 
-		// Base Data
 		modelBuilder.Entity<TradeStrategy>().HasData(
-			new {
+			new
+			{
 				Id = 1,
 				Name = "TrendFollowingStrategy",
-				Description = "Базовая стратегия следования биржевому тренду инструмента. Минамальный риск, редкие сигналы.",
+				Description = "Basic trend-following strategy for an asset. Minimal risk, rare signals.",
 				Accuracy = 81,
-				SignalFrequency = "1-2 раза в месяц",
-				InvestmentHorizon = "1-3 недели",
-				LogicDesc = "Анализ длительного времение гшрафика для подтвержеденгия движдениея",
-				UseDesc = "Следовать основному тренду, при низкой или средней валотильности",
-				LimitDesc = "Стратегия исключительно для слелования тренду"
+				SignalFrequency = "1-2 times a month",
+				InvestmentHorizon = "1-3 weeks",
+				LogicDesc = "Analysis of a long-term chart to confirm movement",
+				UseDesc = "Follow the main trend, during low or medium volatility",
+				LimitDesc = "Strategy exclusively for following the trend",
+				CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+				IsActive = true
 			},
-			new {
+			new
+			{
 				Id = 2,
 				Name = "Test",
-				Description = "Тестовая стратегия. 100000% прибыли в наносекунду",
+				Description = "Test strategy. 100000% profit per nanosecond",
 				Accuracy = 99,
-				SignalFrequency = "3 раза в месяц",
-				InvestmentHorizon = "до 1 недели",
-				LogicDesc = "Ващё чётко",
-				UseDesc = "Как по кайфу так и используй",
-				LimitDesc = "СуперСтарта"
+				SignalFrequency = "3 times a month",
+				InvestmentHorizon = "up to 1 week",
+				LogicDesc = "Very clear",
+				UseDesc = "Use it however you like",
+				LimitDesc = "SuperStart",
+				CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+				IsActive = true
 			}
 		);
 
 		modelBuilder.Entity<TradeCode>().HasData(
-			new TradeCode { Id = 1, ExchangeId = "GAZP", Description = "Газпром" },
-			new TradeCode { Id = 2, ExchangeId = "GMKN", Description = "Норникель" }
+			new { Id = 1, ExchangeId = "GAZP", Description = "Gazprom", CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+			new { Id = 2, ExchangeId = "GMKN", Description = "Nornickel", CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
 		);
 
 		modelBuilder.Entity<TradeType>().HasData(
-			new { Id = 1, Name = "Акция" },
-			new { Id = 2, Name = "Фьючерс" }
+			new { Id = 1, Name = "Stock", CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
+			new { Id = 2, Name = "Futures", CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
 		);
-
 	}
 }

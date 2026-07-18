@@ -1,14 +1,11 @@
-using Domain.Users.Entities;
-using Domain.Trades.Entities;
 using Domain.Common;
-using Domain.Entities.DataBase; // For TradeCode and User (temporary)
+using Domain.TradeCodes.Entities;
 using Domain.Trades.Enums;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
+using Domain.Users.Entities;
 
 namespace Domain.Trades.Entities;
 
-public class Trade : AggregateRoot
+public sealed class Trade : AggregateRoot<int>
 {
 	public DateTime DateOpen { get; private set; }
 	public DateTime? DateClose { get; private set; }
@@ -17,7 +14,6 @@ public class Trade : AggregateRoot
 	public double? NetIncome { get; private set; }
 	public int Count { get; private set; }
 
-	[Column(TypeName = "decimal(18,2)")]
 	public decimal Price { get; private set; }
 
 	public int TradeTypeId { get; private set; }
@@ -25,19 +21,19 @@ public class Trade : AggregateRoot
 	public int UserId { get; private set; }
 	public TradeSignal TradeSignal { get; private set; }
 
-	[JsonIgnore]
 	public TradeType? TradeType { get; private set; }
-	
-	[JsonIgnore]
-	public Domain.TradeCodes.Entities.TradeCode? TradeCode { get; private set; }
-	
-	[JsonIgnore]
+
+	public TradeCode? TradeCode { get; private set; }
+
 	public User? User { get; private set; }
 
 	private Trade() { }
 
 	public Trade(DateTime dateOpen, double tradeOpen, int count, decimal price, int tradeTypeId, int tradeCodeId, int userId, TradeSignal tradeSignal)
 	{
+		if (count <= 0) throw new ArgumentException("Count must be greater than zero.", nameof(count));
+		if (price < 0) throw new ArgumentException("Price cannot be negative.", nameof(price));
+
 		DateOpen = dateOpen;
 		TradeOpen = tradeOpen;
 		Count = count;
@@ -50,6 +46,8 @@ public class Trade : AggregateRoot
 
 	public void Update(DateTime dateOpen, DateTime? dateClose, double tradeOpen, double? tradeClose, int count, int tradeTypeId, int tradeCodeId, TradeSignal tradeSignal)
 	{
+		if (count <= 0) throw new ArgumentException("Count must be greater than zero.", nameof(count));
+
 		DateOpen = dateOpen;
 		DateClose = dateClose;
 		TradeOpen = tradeOpen;

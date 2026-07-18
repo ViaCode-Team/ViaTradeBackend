@@ -1,5 +1,3 @@
-using Domain.Trades.Enums;
-using Domain.Trades.Entities;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable

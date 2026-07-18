@@ -1,8 +1,7 @@
-using Application.Contracts.Dto.User;
-using Application.Interfaces.Repositories.Database;
-using Application.Interfaces.Repositories.Redis;
-using Application.Interfaces.Utils;
-using Application.Models;
+using Application.Auth.Interfaces;
+using Application.Common.Models;
+using Application.Users.Interfaces;
+using Application.Users.Models;
 using MediatR;
 
 namespace Application.Auth.Commands;
@@ -12,7 +11,7 @@ public class LoginCommandHandler(
 	IPasswordHasher passwordHasher,
 	IJwtHelper jwtHelper,
 	ISessionRepository sessionRepository,
-	IRefreshTokenRepository refreshTokenRepository) 
+	IRefreshTokenRepository refreshTokenRepository)
 	: IRequestHandler<LoginCommand, AuthInternalResult>
 {
 	private readonly IUserRepository _userRepository = userRepository;

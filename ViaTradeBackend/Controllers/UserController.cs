@@ -1,4 +1,4 @@
-using Application.Interfaces.Utils;
+using Application.Auth.Interfaces;
 using Application.Users.Commands;
 using Application.Users.Queries;
 using Mapster;
@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using ViaTradeBackend.Attribute;
 using ViaTradeBackend.Contracts.Users;
-using ViaTradeBackend.Contracts.Auth;
 
 namespace ViaTradeBackend.Controllers;
 
@@ -33,7 +32,7 @@ public class UserController(
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var query = new GetUserByIdQuery(userId);
 		var user = await _sender.Send(query, cancellationToken);
-		
+
 		if (user == null)
 			return TypedResults.NotFound();
 

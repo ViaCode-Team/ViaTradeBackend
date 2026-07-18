@@ -1,11 +1,11 @@
-using Application.Interfaces.Repositories.Database;
+using Application.Users.Interfaces;
 using MediatR;
 
 namespace Application.Users.Commands;
 
 public record UpdateLastLoginDateCommand(int UserId) : IRequest;
 
-public class UpdateLastLoginDateCommandHandler(IUserRepository userRepository) 
+public class UpdateLastLoginDateCommandHandler(IUserRepository userRepository)
 	: IRequestHandler<UpdateLastLoginDateCommand>
 {
 	private readonly IUserRepository _userRepository = userRepository;

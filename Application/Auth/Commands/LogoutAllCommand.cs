@@ -1,4 +1,4 @@
-using Application.Interfaces.Repositories.Redis;
+using Application.Auth.Interfaces;
 using MediatR;
 
 namespace Application.Auth.Commands;
@@ -7,7 +7,7 @@ public record LogoutAllCommand(int UserId) : IRequest;
 
 public class LogoutAllCommandHandler(
 	ISessionRepository sessionRepository,
-	IRefreshTokenRepository refreshTokenRepository) 
+	IRefreshTokenRepository refreshTokenRepository)
 	: IRequestHandler<LogoutAllCommand>
 {
 	private readonly ISessionRepository _sessionRepository = sessionRepository;

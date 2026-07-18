@@ -1,4 +1,4 @@
-using Application.Interfaces.Repositories.Database;
+using Application.Trades.Interfaces;
 using Domain.Trades.Entities;
 using MediatR;
 
@@ -6,7 +6,7 @@ namespace Application.Trades.Queries;
 
 public record GetTradeByIdQuery(int Id, int UserId) : IRequest<Trade>;
 
-public class GetTradeByIdQueryHandler(ITradeRepository tradeRepository) 
+public class GetTradeByIdQueryHandler(ITradeRepository tradeRepository)
 	: IRequestHandler<GetTradeByIdQuery, Trade>
 {
 	private readonly ITradeRepository _tradeRepository = tradeRepository;

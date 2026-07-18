@@ -1,11 +1,9 @@
-using Domain.Users.Entities;
-using Domain.Strategies.Entities;
 using Domain.Common;
-using Domain.Entities.DataBase; // For User (temporary)
+using Domain.Users.Entities;
 
 namespace Domain.Strategies.Entities;
 
-public class UserTradeStrategy : AggregateRoot
+public sealed class UserTradeStrategy : AggregateRoot<int>
 {
 	public int UserId { get; private set; }
 	public int TradeStrategyId { get; private set; }

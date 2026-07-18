@@ -1,5 +1,5 @@
-using Application.Interfaces.Repositories.Database;
-using Domain.Models.Pagination;
+using Application.Common.Models.Pagination;
+using Application.Strategies.Interfaces;
 using Domain.Strategies.Entities;
 using MediatR;
 
@@ -7,7 +7,7 @@ namespace Application.Strategies.Queries;
 
 public record GetUserStrategiesPagedQuery(int UserId, PaginationRequest PaginationRequest) : IRequest<PagedResult<UserTradeStrategy>>;
 
-public class GetUserStrategiesPagedQueryHandler(IUserTradeStrategyRepository userTradeStrategyRepository) 
+public class GetUserStrategiesPagedQueryHandler(IUserTradeStrategyRepository userTradeStrategyRepository)
 	: IRequestHandler<GetUserStrategiesPagedQuery, PagedResult<UserTradeStrategy>>
 {
 	private readonly IUserTradeStrategyRepository _userTradeStrategyRepository = userTradeStrategyRepository;

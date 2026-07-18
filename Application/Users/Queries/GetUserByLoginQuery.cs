@@ -1,4 +1,4 @@
-using Application.Interfaces.Repositories.Database;
+using Application.Users.Interfaces;
 using Domain.Users.Entities;
 using MediatR;
 
@@ -6,7 +6,7 @@ namespace Application.Users.Queries;
 
 public record GetUserByLoginQuery(string Login) : IRequest<User?>;
 
-public class GetUserByLoginQueryHandler(IUserRepository userRepository) 
+public class GetUserByLoginQueryHandler(IUserRepository userRepository)
 	: IRequestHandler<GetUserByLoginQuery, User?>
 {
 	private readonly IUserRepository _userRepository = userRepository;

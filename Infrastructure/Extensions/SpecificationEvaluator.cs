@@ -1,5 +1,5 @@
-using Domain.Entities.DataBase;
-using Domain.Interfaces;
+using Application.Common.Interfaces;
+using Domain.Common;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Extensions;
@@ -8,7 +8,7 @@ public static class SpecificationEvaluator
 {
 	public static IQueryable<TEntity> GetQuery<TEntity>(
 		IQueryable<TEntity> query,
-		IQuerySpecification<TEntity> specification) where TEntity : BaseEntity
+		IQuerySpecification<TEntity> specification) where TEntity : DomainEntity<int>
 	{
 		query = ApplyCriteria(query, specification);
 		query = ApplyIncludes(query, specification);
@@ -22,7 +22,7 @@ public static class SpecificationEvaluator
 
 	private static IQueryable<TEntity> ApplyCriteria<TEntity>(
 		IQueryable<TEntity> query,
-		IQuerySpecification<TEntity> specification) where TEntity : BaseEntity
+		IQuerySpecification<TEntity> specification) where TEntity : DomainEntity<int>
 	{
 		foreach (var criterion in specification.Criteria)
 			query = query.Where(criterion);
@@ -32,7 +32,7 @@ public static class SpecificationEvaluator
 
 	private static IQueryable<TEntity> ApplyIncludes<TEntity>(
 		IQueryable<TEntity> query,
-		IQuerySpecification<TEntity> specification) where TEntity : BaseEntity
+		IQuerySpecification<TEntity> specification) where TEntity : DomainEntity<int>
 	{
 		foreach (var include in specification.Includes)
 			query = query.Include(include);
@@ -42,7 +42,7 @@ public static class SpecificationEvaluator
 
 	private static IQueryable<TEntity> ApplySorting<TEntity>(
 		IQueryable<TEntity> query,
-		IQuerySpecification<TEntity> specification) where TEntity : BaseEntity
+		IQuerySpecification<TEntity> specification) where TEntity : DomainEntity<int>
 	{
 		if (specification.SortExpressions.Count == 0)
 			return query;

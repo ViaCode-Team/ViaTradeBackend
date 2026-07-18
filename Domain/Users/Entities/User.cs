@@ -1,33 +1,34 @@
-using Domain.Users.Entities;
 using Domain.Common;
 using Domain.Strategies.Entities;
 using Domain.Trades.Entities;
-using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Users.Entities;
 
-public class User : AggregateRoot
+public sealed class User : AggregateRoot<int>
 {
-	[MaxLength(64)]
 	public string Login { get; private set; }
 
-	[MaxLength(512)]
 	public string HashPassword { get; private set; }
 
 	public DateTime LastLoginDate { get; private set; } = DateTime.UtcNow;
 
 	public DateTime RegisterDate { get; private set; }
 
-	[MaxLength(512)]
 	public string? TgId { get; private set; }
 
-	public ICollection<Trade>? Trades { get; private set; }
-	public ICollection<UserTradeStrategy>? UserTradeStrategies { get; private set; }
+	private readonly List<Trade> _trades = [];
+	public IReadOnlyCollection<Trade> Trades => _trades.AsReadOnly();
+
+	private readonly List<UserTradeStrategy> _userTradeStrategies = [];
+	public IReadOnlyCollection<UserTradeStrategy> UserTradeStrategies => _userTradeStrategies.AsReadOnly();
 
 	private User() { }
 
 	public User(string login, string hashPassword, DateTime registerDate)
 	{
+		if (string.IsNullOrWhiteSpace(login)) throw new ArgumentException("Login cannot be empty.", nameof(login));
+		if (string.IsNullOrWhiteSpace(hashPassword)) throw new ArgumentException("Password hash cannot be empty.", nameof(hashPassword));
+
 		Login = login;
 		HashPassword = hashPassword;
 		RegisterDate = registerDate;

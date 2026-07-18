@@ -1,25 +1,24 @@
-using Application.Interfaces.Repositories.Redis;
-using Domain.Entities.Redis;
+using Application.Users.Interfaces;
 using MediatR;
 
 namespace Application.Users.Queries;
 
 public record GetUserIdByTgTokenQuery(string TgToken) : IRequest<int?>;
 
-public class GetUserIdByTgTokenQueryHandler(IRedisRepository<TgTokenEntity> tgTokenRepository) 
+public class GetUserIdByTgTokenQueryHandler(ITgTokenRepository tgTokenRepository)
 	: IRequestHandler<GetUserIdByTgTokenQuery, int?>
 {
-	private readonly IRedisRepository<TgTokenEntity> _tgTokenRepository = tgTokenRepository;
+	private readonly ITgTokenRepository _tgTokenRepository = tgTokenRepository;
 
 	public async Task<int?> Handle(GetUserIdByTgTokenQuery request, CancellationToken cancellationToken)
 	{
-		var entity = await _tgTokenRepository.GetAsync(request.TgToken);
+		var userId = await _tgTokenRepository.GetUserIdAsync(request.TgToken);
 
-		if (entity == null)
+		if (userId == null)
 			return null;
 
 		await _tgTokenRepository.RemoveAsync(request.TgToken);
 
-		return entity.UserId;
+		return userId;
 	}
 }

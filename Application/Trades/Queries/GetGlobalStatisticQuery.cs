@@ -1,12 +1,12 @@
-using Application.Interfaces.Repositories.Database;
-using Application.Models.Statistic;
+using Application.Statistics.Models;
+using Application.Trades.Interfaces;
 using MediatR;
 
 namespace Application.Trades.Queries;
 
 public record GetGlobalStatisticQuery(int UserId) : IRequest<GlobalStatisticReadModel>;
 
-public class GetGlobalStatisticQueryHandler(ITradeRepository tradeRepository) 
+public class GetGlobalStatisticQueryHandler(ITradeRepository tradeRepository)
 	: IRequestHandler<GetGlobalStatisticQuery, GlobalStatisticReadModel>
 {
 	private readonly ITradeRepository _tradeRepository = tradeRepository;

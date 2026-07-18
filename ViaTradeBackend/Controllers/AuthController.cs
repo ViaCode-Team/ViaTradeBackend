@@ -1,9 +1,9 @@
 using Application.Auth.Commands;
+using Application.Auth.Interfaces;
 using Application.Auth.Queries;
-using Application.Interfaces.Utils;
-using Application.Models;
-using Domain.Models.ConfigOptions;
-using Domain.Models.Pagination;
+using Application.Common.Models;
+using Application.Common.Models.Pagination;
+using Infrastructure.Configuration;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

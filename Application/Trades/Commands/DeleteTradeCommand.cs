@@ -1,4 +1,4 @@
-using Application.Interfaces.Repositories.Database;
+using Application.Trades.Interfaces;
 using MediatR;
 
 namespace Application.Trades.Commands;

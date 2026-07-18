@@ -1,9 +1,9 @@
-using Domain.Users.Entities;
-using Application.Interfaces.Utils;
+using Application.Auth.Interfaces;
+using Application.Common.Models.Filters;
+using Application.Common.Models.Pagination;
 using Application.Notes.Commands;
 using Application.Notes.Queries;
-using Domain.Models.Filters;
-using Domain.Models.Pagination;
+using Domain.Notes.Enums;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using ViaTradeBackend.Contracts.Notes;
 using ViaTradeBackend.Contracts.Statistics;
-using Domain.Notes.Enums;
 
 namespace ViaTradeBackend.Controllers;
 

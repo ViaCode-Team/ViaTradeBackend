@@ -1,11 +1,9 @@
-using Domain.Users.Entities;
-using Application.Contracts.Dto.Requests.Trade;
-using Application.Interfaces.Utils;
+using Application.Auth.Interfaces;
+using Application.Common.Models.Filters;
+using Application.Common.Models.Pagination;
+using Application.Common.Models.Sort;
 using Application.Strategies.Commands;
 using Application.Strategies.Queries;
-using Domain.Models.Filters;
-using Domain.Models.Pagination;
-using Domain.Models.Sort;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -63,7 +61,7 @@ public class StrategyController(
 	[HttpGet("byuser/instrumentslink")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	public async Task<Ok<PagedResult<UserStrategyTradeCodeResponse>>> GetUserStrategyTradeCodes(
-		[FromQuery] PaginationRequest paginationRequest, 
+		[FromQuery] PaginationRequest paginationRequest,
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);

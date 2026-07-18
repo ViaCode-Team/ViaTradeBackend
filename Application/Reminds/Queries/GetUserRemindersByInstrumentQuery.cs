@@ -1,8 +1,8 @@
-using Application.Interfaces.Repositories.Database;
-using Application.Specifications;
+using Application.Common.Models.Pagination;
+using Application.Common.Models.Sort;
+using Application.Common.Specifications;
+using Application.Reminds.Interfaces;
 using Domain.Reminds.Entities;
-using Domain.Models.Pagination;
-using Domain.Models.Sort;
 using MediatR;
 
 namespace Application.Reminds.Queries;
@@ -11,9 +11,9 @@ public record GetUserRemindersByInstrumentQuery(int UserId, int TradeCodeId, Pag
 
 public class GetUserRemindersByInstrumentQueryHandler(ITradeRemindRepository repository) : IRequestHandler<GetUserRemindersByInstrumentQuery, PagedResult<TradeRemind>>
 {
-    public async Task<PagedResult<TradeRemind>> Handle(GetUserRemindersByInstrumentQuery request, CancellationToken cancellationToken)
-    {
-        var spec = new TradeRemindQuerySpecification(request.UserId, request.TradeCodeId, request.SortRequest);
-        return await repository.GetPagedAsync(spec, request.PaginationRequest, cancellationToken);
-    }
+	public async Task<PagedResult<TradeRemind>> Handle(GetUserRemindersByInstrumentQuery request, CancellationToken cancellationToken)
+	{
+		var spec = new TradeRemindQuerySpecification(request.UserId, request.TradeCodeId, request.SortRequest);
+		return await repository.GetPagedAsync(spec, request.PaginationRequest, cancellationToken);
+	}
 }

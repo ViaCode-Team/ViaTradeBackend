@@ -2,6 +2,6 @@ namespace Domain.Notes.Enums;
 
 public enum NoteType
 {
-    TradeCodeNote,
-    TradeStrategyNote
+	TradeCodeNote,
+	TradeStrategyNote
 }

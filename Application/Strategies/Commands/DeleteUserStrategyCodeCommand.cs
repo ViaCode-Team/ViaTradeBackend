@@ -1,12 +1,11 @@
-using Domain.Users.Entities;
-using Application.Interfaces.Repositories.Database;
+using Application.Strategies.Interfaces;
 using MediatR;
 
 namespace Application.Strategies.Commands;
 
 public record DeleteUserStrategyCodeCommand(int UserId, int StrategyId, int TradeCodeId) : IRequest;
 
-public class DeleteUserStrategyCodeCommandHandler(IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository) 
+public class DeleteUserStrategyCodeCommandHandler(IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository)
 	: IRequestHandler<DeleteUserStrategyCodeCommand>
 {
 	private readonly IUserStrategyTradeCodeRepository _userStrategyTradeCodeRepository = userStrategyTradeCodeRepository;

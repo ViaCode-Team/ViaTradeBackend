@@ -1,4 +1,4 @@
-using Domain.Models.ConfigOptions;
+using Infrastructure.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;

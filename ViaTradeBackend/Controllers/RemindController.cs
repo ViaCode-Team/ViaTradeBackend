@@ -1,10 +1,8 @@
-using Domain.Users.Entities;
+using Application.Auth.Interfaces;
+using Application.Common.Models.Pagination;
+using Application.Common.Models.Sort;
 using Application.Reminds.Commands;
 using Application.Reminds.Queries;
-using Application.Interfaces.Utils;
-using Domain.Reminds.Entities;
-using Domain.Models.Pagination;
-using Domain.Models.Sort;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -12,9 +10,8 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using ViaTradeBackend.Attribute;
-using ViaTradeBackend.Contracts.Statistics;
-using Application.Contracts.Dto.Requests.Remind;
 using ViaTradeBackend.Contracts.Reminds;
+using ViaTradeBackend.Contracts.Statistics;
 
 namespace ViaTradeBackend.Controllers;
 

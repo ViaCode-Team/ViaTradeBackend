@@ -1,10 +1,9 @@
-using Domain.Users.Entities;
-using Application.Contracts.Dto.Requests.Trade;
-using Application.Interfaces.Utils;
+using Application.Auth.Interfaces;
+using Application.Common.Models.Filters;
+using Application.Common.Models.Pagination;
 using Application.Trades.Commands;
+using Application.Trades.Models;
 using Application.Trades.Queries;
-using Domain.Models.Filters;
-using Domain.Models.Pagination;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

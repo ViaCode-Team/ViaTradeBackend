@@ -1,7 +1,7 @@
-using Application.Contracts.Dto.Requests.Trade;
-using Application.Interfaces.Repositories.Database;
+using Application.TradeCodes.Interfaces;
+using Application.Trades.Interfaces;
+using Application.Trades.Models;
 using Domain.Trades.Entities;
-using Domain.Trades.Enums;
 using MediatR;
 
 namespace Application.Trades.Commands;
@@ -11,7 +11,7 @@ public record CreateTradeCommand(int UserId, TradeCreateDto Request) : IRequest<
 public class CreateTradeCommandHandler(
 	ITradeRepository tradeRepository,
 	ITradeCodeRepository tradeCodeRepository,
-	ITradeTypeRepository tradeTypeRepository) 
+	ITradeTypeRepository tradeTypeRepository)
 	: IRequestHandler<CreateTradeCommand, Trade>
 {
 	private readonly ITradeRepository _tradeRepository = tradeRepository;
@@ -29,7 +29,7 @@ public class CreateTradeCommandHandler(
 			throw new ArgumentException($"TradeType {request.Request.TradeTypeId} not found");
 
 		var req = request.Request;
-		
+
 		var trade = new Trade(
 			req.DateOpen,
 			req.TradeOpen,
@@ -40,8 +40,6 @@ public class CreateTradeCommandHandler(
 			request.UserId,
 			req.TradeSignal
 		);
-		
-		var netIncome = Trade.CalculateNetIncome(req.TradeOpen, req.TradeClose, req.TradeSignal);
 		trade.Update(
 			req.DateOpen,
 			req.DateClose,

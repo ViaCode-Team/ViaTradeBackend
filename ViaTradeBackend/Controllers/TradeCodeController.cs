@@ -1,7 +1,7 @@
+using Application.Common.Models.Pagination;
+using Application.Common.Models.Sort;
 using Application.TradeCodes.Queries;
-using Domain.Entities.CSV;
-using Domain.Models.Pagination;
-using Domain.Models.Sort;
+using Domain.Trades.Entities;
 using Mapster;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

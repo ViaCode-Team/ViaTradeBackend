@@ -1,4 +1,4 @@
-using Application.Interfaces.Repositories.Database;
+using Application.Reminds.Interfaces;
 using MediatR;
 
 
@@ -10,9 +10,9 @@ public record GetRemindStatisticQuery(int UserId) : IRequest<TradeRemindStatisti
 
 public class GetRemindStatisticQueryHandler(ITradeRemindRepository repository) : IRequestHandler<GetRemindStatisticQuery, TradeRemindStatisticReadModel>
 {
-    public async Task<TradeRemindStatisticReadModel> Handle(GetRemindStatisticQuery request, CancellationToken cancellationToken)
-    {
-        var total = await repository.FindAsync(x => x.UserId == request.UserId, cancellationToken);
-        return new TradeRemindStatisticReadModel(total.Count());
-    }
+	public async Task<TradeRemindStatisticReadModel> Handle(GetRemindStatisticQuery request, CancellationToken cancellationToken)
+	{
+		var total = await repository.FindAsync(x => x.UserId == request.UserId, cancellationToken);
+		return new TradeRemindStatisticReadModel(total.Count());
+	}
 }
