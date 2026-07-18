@@ -87,7 +87,6 @@ builder.Services.AddScoped<ITradeCodeRepository, TradeCodeRepository>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
 
 // Application services
-builder.Services.AddScoped<IStrategyService, StrategyService>();
 builder.Services.AddScoped<ITradeResultsService, TradeResultsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();

@@ -1,3 +1,4 @@
+using Domain.Strategies.Entities;
 using Domain.Notes.Entities;
 using System.ComponentModel.DataAnnotations;
 using Domain.Common;

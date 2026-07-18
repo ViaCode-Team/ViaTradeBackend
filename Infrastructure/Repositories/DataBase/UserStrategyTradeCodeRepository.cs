@@ -1,3 +1,4 @@
+using Domain.Strategies.Entities;
 using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
 using Domain.Models.Pagination;

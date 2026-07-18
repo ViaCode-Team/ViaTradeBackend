@@ -1,29 +1,29 @@
-using Domain.Trades.Enums;
-using Domain.Trades.Entities;
-using Application.Interfaces;
+using Application.Contracts.Dto.Requests.Trade;
 using Application.Interfaces.Utils;
+using Application.Strategies.Commands;
+using Application.Strategies.Queries;
 using Domain.Models.Filters;
 using Domain.Models.Pagination;
 using Domain.Models.Sort;
 using Mapster;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
 using ViaTradeBackend.Contracts.Statistics;
-
-using Application.Contracts.Dto.Requests.Trade;
 using ViaTradeBackend.Contracts.Strategies;
 
 namespace ViaTradeBackend.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
 public class StrategyController(
-	IStrategyService strategyService,
+	ISender sender,
 	IJwtHelper jwtHelper) : ControllerBase
 {
-	private readonly IStrategyService _strategyService = strategyService;
+	private readonly ISender _sender = sender;
 	private readonly IJwtHelper _jwtHelper = jwtHelper;
 
 	[HttpGet("statistics")]
@@ -31,7 +31,8 @@ public class StrategyController(
 	public async Task<Ok<StrategyStatisticResponse>> GetStrategyStatistics(CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var response = await _strategyService.GetStrategyStatisticAsync(userId, cancellationToken);
+		var query = new GetStrategyStatisticQuery(userId);
+		var response = await _sender.Send(query, cancellationToken);
 		return TypedResults.Ok(response.Adapt<StrategyStatisticResponse>());
 	}
 
@@ -44,7 +45,8 @@ public class StrategyController(
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var response = await _strategyService.GetStrategiesPagedAsync(userId, filterRequest, sortRequest, paginationRequest, cancellationToken);
+		var query = new GetStrategiesPagedQuery(userId, filterRequest, sortRequest, paginationRequest);
+		var response = await _sender.Send(query, cancellationToken);
 		return TypedResults.Ok(response.Map(x => x.Adapt<TradeStrategyResponse>()));
 	}
 
@@ -52,7 +54,8 @@ public class StrategyController(
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	public async Task<Ok<TradeStrategyResponse>> GetStrategyById([Required] int strategyId, CancellationToken cancellationToken)
 	{
-		var response = await _strategyService.GetStrategyByIdAsync(strategyId, cancellationToken);
+		var query = new GetStrategyByIdQuery(strategyId);
+		var response = await _sender.Send(query, cancellationToken);
 		return TypedResults.Ok(response.Adapt<TradeStrategyResponse>());
 	}
 
@@ -63,18 +66,20 @@ public class StrategyController(
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var response = await _strategyService.GetUserStrategyCodesPagedAsync(userId, paginationRequest, cancellationToken);
+		var query = new GetUserStrategyCodesPagedQuery(userId, paginationRequest);
+		var response = await _sender.Send(query, cancellationToken);
 		return TypedResults.Ok(response.Map(x => x.Adapt<UserStrategyTradeCodeResponse>()));
 	}
 
 	[HttpPost("byuser/instrumentslink")]
 	[ProducesResponseType(StatusCodes.Status201Created)]
 	public async Task<Created> CreateUserStrategyTradeCode(
-		[FromBody, Required] CreateUserStrategyTradeCodeRequest CreateUserStrategyTradeCodeRequest,
+		[FromBody, Required] CreateUserStrategyTradeCodeRequest request,
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		await _strategyService.CreateUserStrategyCodeAsync(CreateUserStrategyTradeCodeRequest.Adapt<UserStrategyTradeCodeCreateDto>(), userId, cancellationToken);
+		var command = new CreateUserStrategyCodeCommand(userId, request.StrategyId, request.TradeCodeId);
+		await _sender.Send(command, cancellationToken);
 		return TypedResults.Created();
 	}
 
@@ -86,7 +91,8 @@ public class StrategyController(
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		await _strategyService.DeleteUserStrategyCodeAsync(strategyId, tradeCodeId, userId, cancellationToken);
+		var command = new DeleteUserStrategyCodeCommand(userId, strategyId, tradeCodeId);
+		await _sender.Send(command, cancellationToken);
 		return TypedResults.NoContent();
 	}
 
@@ -95,7 +101,8 @@ public class StrategyController(
 	public async Task<Ok<PagedResult<UserTradeStrategyResponse>>> GetUserStrategies([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var response = await _strategyService.GetUserStrategiesPagedAsync(userId, paginationRequest, cancellationToken);
+		var query = new GetUserStrategiesPagedQuery(userId, paginationRequest);
+		var response = await _sender.Send(query, cancellationToken);
 		return TypedResults.Ok(response.Map(x => x.Adapt<UserTradeStrategyResponse>()));
 	}
 
@@ -104,7 +111,8 @@ public class StrategyController(
 	public async Task<Created> CreateUserStrategy([FromBody, Required] CreateUserStrategyRequest userStrategyRequest, CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		await _strategyService.CreateUserStrategyAsync(userStrategyRequest.Adapt<CreateUserStrategyCreateDto>(), userId, cancellationToken);
+		var command = new CreateUserStrategyCommand(userId, userStrategyRequest.StrategyId);
+		await _sender.Send(command, cancellationToken);
 		return TypedResults.Created();
 	}
 
@@ -113,9 +121,8 @@ public class StrategyController(
 	public async Task<NoContent> DeleteUserStrategy([FromQuery, Required] int strategyId, CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		await _strategyService.DeleteUserStrategyAsync(strategyId, userId, cancellationToken);
+		var command = new DeleteUserStrategyCommand(userId, strategyId);
+		await _sender.Send(command, cancellationToken);
 		return TypedResults.NoContent();
 	}
 }
-
-

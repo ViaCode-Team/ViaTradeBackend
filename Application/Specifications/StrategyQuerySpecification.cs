@@ -1,3 +1,4 @@
+using Domain.Strategies.Entities;
 using Domain.Entities.DataBase;
 using Domain.Enums;
 using Domain.Models.Filters;

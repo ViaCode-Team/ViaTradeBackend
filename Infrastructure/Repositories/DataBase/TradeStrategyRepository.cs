@@ -1,3 +1,4 @@
+using Domain.Strategies.Entities;
 using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
 using Domain.Interfaces;
@@ -39,7 +40,7 @@ public class TradeStrategyRepository(AppDbContext context) : GenericRepository<T
 
 		return pagedTuple.Map(t =>
 		{
-			t.Strategy.IsActive = t.IsActive;
+			t.Strategy.SetActive(t.IsActive);
 			return t.Strategy;
 		});
 	}

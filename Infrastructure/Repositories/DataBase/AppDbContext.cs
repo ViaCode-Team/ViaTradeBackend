@@ -1,3 +1,4 @@
+using Domain.Strategies.Entities;
 using Domain.Trades.Enums;
 using Domain.Trades.Entities;
 using Domain.Notes.Entities;
@@ -65,8 +66,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
 		// Base Data
 		modelBuilder.Entity<TradeStrategy>().HasData(
-			new TradeStrategy
-			{
+			new {
 				Id = 1,
 				Name = "TrendFollowingStrategy",
 				Description = "Базовая стратегия следования биржевому тренду инструмента. Минамальный риск, редкие сигналы.",
@@ -77,8 +77,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 				UseDesc = "Следовать основному тренду, при низкой или средней валотильности",
 				LimitDesc = "Стратегия исключительно для слелования тренду"
 			},
-			new TradeStrategy
-			{
+			new {
 				Id = 2,
 				Name = "Test",
 				Description = "Тестовая стратегия. 100000% прибыли в наносекунду",
