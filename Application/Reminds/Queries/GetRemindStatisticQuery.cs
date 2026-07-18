@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.Reminds.Interfaces;
 using MediatR;
 
@@ -6,7 +7,7 @@ namespace Application.Reminds.Queries;
 
 public record TradeRemindStatisticReadModel(int TotalReminds);
 
-public record GetRemindStatisticQuery(int UserId) : IRequest<TradeRemindStatisticReadModel>;
+public record GetRemindStatisticQuery(int UserId) : IQuery<TradeRemindStatisticReadModel>;
 
 public class GetRemindStatisticQueryHandler(ITradeRemindRepository repository) : IRequestHandler<GetRemindStatisticQuery, TradeRemindStatisticReadModel>
 {

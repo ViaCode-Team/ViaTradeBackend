@@ -1,4 +1,6 @@
 using Application.Auth.Interfaces;
+using Application.Common.Behaviors;
+using Application.Common.Interfaces;
 using Application.Interfaces;
 using Application.Mappings;
 using Application.Notes.Interfaces;
@@ -13,6 +15,7 @@ using Infrastructure.Repositories.DataBase;
 using Infrastructure.Repositories.Redis;
 using Infrastructure.Services;
 using Infrastructure.Utils;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -92,7 +95,16 @@ builder.Services.AddScoped<INoteRepository, NoteEfRepository>();
 builder.Services.AddMediatR(cfg =>
 {
 	cfg.RegisterServicesFromAssembly(typeof(TradeResultsService).Assembly);
+	cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+	cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+	cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>));
 });
+
+// Domain Events
+builder.Services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
+
+// Unit of Work
+builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 
 // Application services
 builder.Services.AddScoped<ITradeResultsService, TradeResultsService>();

@@ -1,10 +1,11 @@
+using Application.Common.Interfaces;
 using Application.Strategies.Interfaces;
 using Domain.Strategies.Entities;
 using MediatR;
 
 namespace Application.Strategies.Queries;
 
-public record GetStrategyByIdQuery(int StrategyId) : IRequest<TradeStrategy>;
+public record GetStrategyByIdQuery(int StrategyId) : IQuery<TradeStrategy>;
 
 public class GetStrategyByIdQueryHandler(ITradeStrategyRepository tradeStrategyRepository)
 	: IRequestHandler<GetStrategyByIdQuery, TradeStrategy>

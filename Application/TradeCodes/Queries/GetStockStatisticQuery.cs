@@ -1,10 +1,11 @@
+using Application.Common.Interfaces;
 using Application.Statistics.Models;
 using Application.TradeCodes.Interfaces;
 using MediatR;
 
 namespace Application.TradeCodes.Queries;
 
-public record GetStockStatisticQuery : IRequest<StockStatisticReadModel>;
+public record GetStockStatisticQuery : IQuery<StockStatisticReadModel>;
 
 public class GetStockStatisticQueryHandler(ITradeCodeRepository tradeCodeRepository)
 	: IRequestHandler<GetStockStatisticQuery, StockStatisticReadModel>

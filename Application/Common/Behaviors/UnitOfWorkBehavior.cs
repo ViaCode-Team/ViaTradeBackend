@@ -1,19 +1,20 @@
+using Application.Common.Interfaces;
 using MediatR;
-using Microsoft.Extensions.Logging;
 
 namespace Application.Common.Behaviors;
 
-public class LoggingBehavior<TRequest, TResponse>(ILogger<LoggingBehavior<TRequest, TResponse>> logger)
+public class UnitOfWorkBehavior<TRequest, TResponse>(IUnitOfWork unitOfWork)
 	: IPipelineBehavior<TRequest, TResponse>
 	where TRequest : notnull
 {
 	public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
 	{
-		var requestName = typeof(TRequest).Name;
+		if (request is not (ICommand or ICommand<TResponse>) || request is ICommandWithoutUoW or ICommandWithoutUoW<TResponse>)
+			return await next(cancellationToken);
 
-		logger.LogInformation("Handling {RequestName}", requestName);
 		var response = await next(cancellationToken);
-		logger.LogInformation("Handled {RequestName}", requestName);
+
+		await unitOfWork.SaveChangesAsync(cancellationToken);
 
 		return response;
 	}

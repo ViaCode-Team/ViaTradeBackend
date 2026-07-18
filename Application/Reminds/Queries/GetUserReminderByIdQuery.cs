@@ -1,10 +1,11 @@
+using Application.Common.Interfaces;
 using Application.Reminds.Interfaces;
 using Domain.Reminds.Entities;
 using MediatR;
 
 namespace Application.Reminds.Queries;
 
-public record GetUserReminderByIdQuery(int RemindId, int UserId) : IRequest<TradeRemind>;
+public record GetUserReminderByIdQuery(int RemindId, int UserId) : IQuery<TradeRemind>;
 
 public class GetUserReminderByIdQueryHandler(ITradeRemindRepository repository) : IRequestHandler<GetUserReminderByIdQuery, TradeRemind>
 {

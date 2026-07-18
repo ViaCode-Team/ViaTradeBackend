@@ -10,11 +10,11 @@ public interface IRepository<TEntity> where TEntity : Domain.Common.DomainEntity
 	Task<PagedResult<TEntity>> GetPagedAsync(PaginationRequest? paginationRequest, CancellationToken ct = default);
 	Task<PagedResult<TEntity>> GetPagedAsync(IQuerySpecification<TEntity> spec, PaginationRequest? paginationRequest, CancellationToken ct = default);
 	Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
+	Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
 	Task<PagedResult<TEntity>> FindPagedAsync(Expression<Func<TEntity, bool>> predicate, PaginationRequest? paginationRequest, CancellationToken ct = default);
 	Task AddAsync(TEntity entity, CancellationToken ct = default);
 	void Update(TEntity entity);
 	void Remove(TEntity entity);
-	Task<int> SaveChangesAsync(CancellationToken ct = default);
 	Task<int> ExecuteDeleteAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
 	Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
 }

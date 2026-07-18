@@ -1,11 +1,12 @@
 using Application.Auth.Interfaces;
+using Application.Common.Interfaces;
 using Application.Common.Models.Pagination;
 using Application.Users.Models;
 using MediatR;
 
 namespace Application.Auth.Queries;
 
-public record GetPagedUserSessionsQuery(int UserId, PaginationRequest PaginationRequest) : IRequest<PagedResult<UserSessionDto>>;
+public record GetPagedUserSessionsQuery(int UserId, PaginationRequest PaginationRequest) : IQuery<PagedResult<UserSessionDto>>;
 
 public class GetPagedUserSessionsQueryHandler(ISessionRepository sessionRepository)
 	: IRequestHandler<GetPagedUserSessionsQuery, PagedResult<UserSessionDto>>

@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.Notes.Interfaces;
 using Domain.Notes.Entities;
 using Domain.Notes.Enums;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace Application.Notes.Commands;
 
-public record AddUserNoteCommand(int RelatedId, NoteType NoteType, int UserId, string NoteText) : IRequest;
+public record AddUserNoteCommand(int RelatedId, NoteType NoteType, int UserId, string NoteText) : ICommand;
 
 public class AddUserNoteValidator : AbstractValidator<AddUserNoteCommand>
 {
@@ -28,11 +29,8 @@ public class AddUserNoteCommandHandler(INoteRepository noteRepository) : IReques
 			cancellationToken);
 
 		var existingNote = existingNotes.FirstOrDefault();
-
 		if (existingNote != null)
-		{
 			throw new Exception("Note already exists. Use update.");
-		}
 
 		var note = new Note(
 			request.UserId,

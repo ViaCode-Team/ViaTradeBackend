@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.Notes.Interfaces;
 using Domain.Notes.Enums;
 using FluentValidation;
@@ -5,7 +6,7 @@ using MediatR;
 
 namespace Application.Notes.Commands;
 
-public record UpdateUserNoteCommand(int RelatedId, NoteType NoteType, int UserId, string NoteText) : IRequest;
+public record UpdateUserNoteCommand(int RelatedId, NoteType NoteType, int UserId, string NoteText) : ICommandWithoutUoW;
 
 public class UpdateUserNoteValidator : AbstractValidator<UpdateUserNoteCommand>
 {
@@ -21,20 +22,18 @@ public class UpdateUserNoteCommandHandler(INoteRepository noteRepository) : IReq
 {
 	public async Task Handle(UpdateUserNoteCommand request, CancellationToken cancellationToken)
 	{
-		var existingNotes = await noteRepository.FindAsync(x =>
-				x.UserId == request.UserId &&
-				(request.NoteType == NoteType.TradeCodeNote ? x.TradeCodeId == request.RelatedId : x.TradeStrategyId == request.RelatedId),
-			cancellationToken);
-
-		var existingNote = existingNotes.FirstOrDefault();
-
-		if (existingNote == null)
+		try
+		{
+			await noteRepository.UpdateUserNoteAsync(
+				request.RelatedId,
+				request.NoteType,
+				request.UserId,
+				request.NoteText,
+				cancellationToken);
+		}
+		catch (KeyNotFoundException)
 		{
 			throw new Exception("Note not found.");
 		}
-
-		existingNote.UpdateText(request.NoteText);
-		noteRepository.Update(existingNote);
-		await noteRepository.SaveChangesAsync(cancellationToken);
 	}
 }

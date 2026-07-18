@@ -51,6 +51,13 @@ public class GenericEfRepository<TEntity> : IRepository<TEntity>
 		return await _dbSet.Where(predicate).ToListAsync(ct);
 	}
 
+	public async Task<TEntity?> FirstOrDefaultAsync(
+		Expression<Func<TEntity, bool>> predicate,
+		CancellationToken ct = default)
+	{
+		return await _dbSet.FirstOrDefaultAsync(predicate, ct);
+	}
+
 	public async Task<PagedResult<TEntity>> FindPagedAsync(
 		Expression<Func<TEntity, bool>> predicate,
 		PaginationRequest? paginationRequest,
@@ -74,11 +81,6 @@ public class GenericEfRepository<TEntity> : IRepository<TEntity>
 	public void Update(TEntity entity) => _dbSet.Update(entity);
 
 	public void Remove(TEntity entity) => _dbSet.Remove(entity);
-
-	public async Task<int> SaveChangesAsync(CancellationToken ct = default)
-	{
-		return await _context.SaveChangesAsync(ct);
-	}
 
 	public async Task<int> ExecuteDeleteAsync(
 		Expression<Func<TEntity, bool>> predicate,

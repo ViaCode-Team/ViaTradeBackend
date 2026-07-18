@@ -1,4 +1,5 @@
 using Application.Auth.Interfaces;
+using Application.Common.Interfaces;
 using Application.TradeCodes.Interfaces;
 using Application.Trades.Models;
 using Domain.Trades.Entities;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace Application.TradeCodes.Queries;
 
-public record GetSysCodeByIdQuery(TradeDataType DataType, string TradeIdString) : IRequest<TradeCodeFileDto>;
+public record GetSysCodeByIdQuery(TradeDataType DataType, string TradeIdString) : IQuery<TradeCodeFileDto>;
 
 public class GetSysCodeByIdQueryHandler(
 	IFileReader tradefileReader,

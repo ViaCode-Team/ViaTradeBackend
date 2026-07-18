@@ -1,4 +1,5 @@
 using Application.Auth.Interfaces;
+using Application.Common.Interfaces;
 using Application.Common.Models;
 using Application.Users.Interfaces;
 using Application.Users.Models;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace Application.Auth.Commands;
 
-public record LoginCommand(string Login, string Password, string UserAgent) : IRequest<AuthInternalResult>;
+public record LoginCommand(string Login, string Password, string UserAgent) : ICommandWithoutUoW<AuthInternalResult>;
 
 public class LoginCommandHandler(
 	IUserRepository userRepository,

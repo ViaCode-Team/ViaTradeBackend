@@ -9,14 +9,12 @@ public class TgTokenRedisRepository(IConnectionMultiplexer redis) : RedisReposit
 	public async Task SetAsync(string token, int userId, TimeSpan expiry)
 	{
 		var entity = new TgTokenEntity { Id = token, UserId = userId };
-		await base.SetAsync(entity, expiry);
+		await SetAsync(entity, expiry);
 	}
 
 	public async Task<int?> GetUserIdAsync(string token)
 	{
-		var entity = await base.GetAsync(token);
+		var entity = await GetAsync(token);
 		return entity?.UserId;
 	}
-
-	// RemoveAsync(string id) is already inherited from RedisRepository
 }

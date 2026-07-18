@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.Common.Models.Filters;
 using Application.Common.Models.Pagination;
 using Application.Common.Models.Sort;
@@ -8,7 +9,7 @@ using MediatR;
 
 namespace Application.Strategies.Queries;
 
-public record GetStrategiesPagedQuery(int UserId, StrategyFilterRequest? FilterRequest, StrategySortRequest? SortRequest, PaginationRequest? PaginationRequest) : IRequest<PagedResult<TradeStrategy>>;
+public record GetStrategiesPagedQuery(int UserId, StrategyFilterRequest? FilterRequest, StrategySortRequest? SortRequest, PaginationRequest? PaginationRequest) : IQuery<PagedResult<TradeStrategy>>;
 
 public class GetStrategiesPagedQueryHandler(ITradeStrategyRepository tradeStrategyRepository)
 	: IRequestHandler<GetStrategiesPagedQuery, PagedResult<TradeStrategy>>

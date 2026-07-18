@@ -1,22 +1,20 @@
+using Application.Common.Interfaces;
 using Application.Reminds.Interfaces;
 using MediatR;
 
 namespace Application.Reminds.Commands;
 
-public record DeleteActualRemindCommand(int RemindId) : IRequest;
+public record DeleteActualRemindCommand(int RemindId) : ICommandWithoutUoW;
 
 public class DeleteActualRemindCommandHandler(ITradeRemindRepository repository) : IRequestHandler<DeleteActualRemindCommand>
 {
 	public async Task Handle(DeleteActualRemindCommand request, CancellationToken cancellationToken)
 	{
-		var remind = await repository.GetByIdAsync(request.RemindId, cancellationToken);
+		var rows = await repository.ExecuteDeleteAsync(
+			x => x.Id == request.RemindId,
+			cancellationToken);
 
-		if (remind == null)
-		{
+		if (rows == 0)
 			throw new Exception("Remind not found.");
-		}
-
-		repository.Remove(remind);
-		await repository.SaveChangesAsync(cancellationToken);
 	}
 }

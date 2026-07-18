@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.Reminds.Interfaces;
 using Domain.Reminds.Entities;
 using FluentValidation;
@@ -5,7 +6,7 @@ using MediatR;
 
 namespace Application.Reminds.Commands;
 
-public record CreateTradeRemindCommand(int UserId, int TradeCodeId, string TextRemind, DateTime DateTime) : IRequest;
+public record CreateTradeRemindCommand(int UserId, int TradeCodeId, string TextRemind, DateTime DateTime) : ICommand;
 
 public class CreateTradeRemindValidator : AbstractValidator<CreateTradeRemindCommand>
 {

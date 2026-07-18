@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.Common.Models.Filters;
 using Application.Common.Models.Pagination;
 using Application.Common.Specifications;
@@ -7,7 +8,7 @@ using MediatR;
 
 namespace Application.Notes.Queries;
 
-public record GetUserNotePagedQuery(int UserId, NoteFilterRequest? FilterRequest, PaginationRequest? PaginationRequest) : IRequest<PagedResult<Note>>;
+public record GetUserNotePagedQuery(int UserId, NoteFilterRequest? FilterRequest, PaginationRequest? PaginationRequest) : IQuery<PagedResult<Note>>;
 
 public class GetUserNotePagedQueryHandler(INoteRepository noteRepository) : IRequestHandler<GetUserNotePagedQuery, PagedResult<Note>>
 {

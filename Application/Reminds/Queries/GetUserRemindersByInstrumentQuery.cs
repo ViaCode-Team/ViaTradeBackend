@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.Common.Models.Pagination;
 using Application.Common.Models.Sort;
 using Application.Common.Specifications;
@@ -7,7 +8,7 @@ using MediatR;
 
 namespace Application.Reminds.Queries;
 
-public record GetUserRemindersByInstrumentQuery(int UserId, int TradeCodeId, PaginationRequest PaginationRequest, RemindSortRequest? SortRequest) : IRequest<PagedResult<TradeRemind>>;
+public record GetUserRemindersByInstrumentQuery(int UserId, int TradeCodeId, PaginationRequest PaginationRequest, RemindSortRequest? SortRequest) : IQuery<PagedResult<TradeRemind>>;
 
 public class GetUserRemindersByInstrumentQueryHandler(ITradeRemindRepository repository) : IRequestHandler<GetUserRemindersByInstrumentQuery, PagedResult<TradeRemind>>
 {

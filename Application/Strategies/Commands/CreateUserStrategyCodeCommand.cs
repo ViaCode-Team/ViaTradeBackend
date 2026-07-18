@@ -1,10 +1,11 @@
+using Application.Common.Interfaces;
 using Application.Strategies.Interfaces;
 using Domain.Strategies.Entities;
 using MediatR;
 
 namespace Application.Strategies.Commands;
 
-public record CreateUserStrategyCodeCommand(int UserId, int StrategyId, int TradeCodeId) : IRequest;
+public record CreateUserStrategyCodeCommand(int UserId, int StrategyId, int TradeCodeId) : ICommand;
 
 public class CreateUserStrategyCodeCommandHandler(IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository)
 	: IRequestHandler<CreateUserStrategyCodeCommand>
@@ -29,6 +30,5 @@ public class CreateUserStrategyCodeCommandHandler(IUserStrategyTradeCodeReposito
 		);
 
 		await _userStrategyTradeCodeRepository.AddAsync(newUserStrategyCode, cancellationToken);
-		await _userStrategyTradeCodeRepository.SaveChangesAsync(cancellationToken);
 	}
 }

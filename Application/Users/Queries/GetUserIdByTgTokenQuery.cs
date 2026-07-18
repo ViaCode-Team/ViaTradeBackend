@@ -1,9 +1,10 @@
+using Application.Common.Interfaces;
 using Application.Users.Interfaces;
 using MediatR;
 
 namespace Application.Users.Queries;
 
-public record GetUserIdByTgTokenQuery(string TgToken) : IRequest<int?>;
+public record GetUserIdByTgTokenQuery(string TgToken) : IQuery<int?>;
 
 public class GetUserIdByTgTokenQueryHandler(ITgTokenRepository tgTokenRepository)
 	: IRequestHandler<GetUserIdByTgTokenQuery, int?>

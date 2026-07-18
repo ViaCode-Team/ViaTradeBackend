@@ -1,10 +1,11 @@
+using Application.Common.Interfaces;
 using Application.Reminds.Interfaces;
 using FluentValidation;
 using MediatR;
 
 namespace Application.Reminds.Commands;
 
-public record UpdateTradeRemindCommand(int RemindId, int UserId, string TextRemind, DateTime DateTime) : IRequest;
+public record UpdateTradeRemindCommand(int RemindId, int UserId, string TextRemind, DateTime DateTime) : ICommandWithoutUoW;
 
 public class UpdateTradeRemindValidator : AbstractValidator<UpdateTradeRemindCommand>
 {
@@ -21,16 +22,14 @@ public class UpdateTradeRemindCommandHandler(ITradeRemindRepository repository) 
 {
 	public async Task Handle(UpdateTradeRemindCommand request, CancellationToken cancellationToken)
 	{
-		var reminds = await repository.FindAsync(x => x.Id == request.RemindId && x.UserId == request.UserId, cancellationToken);
-		var remind = reminds.FirstOrDefault();
+		var rows = await repository.UpdateUserRemindAsync(
+			request.RemindId,
+			request.UserId,
+			request.TextRemind,
+			request.DateTime,
+			cancellationToken);
 
-		if (remind == null)
-		{
+		if (rows == 0)
 			throw new Exception("Remind not found.");
-		}
-
-		remind.Update(request.TextRemind, request.DateTime);
-		repository.Update(remind);
-		await repository.SaveChangesAsync(cancellationToken);
 	}
 }

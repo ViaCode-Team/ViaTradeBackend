@@ -1,9 +1,10 @@
+using Application.Common.Interfaces;
 using Application.Strategies.Interfaces;
 using MediatR;
 
 namespace Application.Strategies.Commands;
 
-public record DeleteUserStrategyCommand(int UserId, int StrategyId) : IRequest;
+public record DeleteUserStrategyCommand(int UserId, int StrategyId) : ICommandWithoutUoW;
 
 public class DeleteUserStrategyCommandHandler(IUserTradeStrategyRepository userTradeStrategyRepository)
 	: IRequestHandler<DeleteUserStrategyCommand>

@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.TradeCodes.Interfaces;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace Application.Trades.Commands;
 
-public record UpdateTradeCommand(int Id, int UserId, TradeCreateDto Request) : IRequest<Trade>;
+public record UpdateTradeCommand(int Id, int UserId, TradeCreateDto Request) : ICommand<Trade>;
 
 public class UpdateTradeCommandHandler(
 	ITradeRepository tradeRepository,
@@ -28,15 +29,25 @@ public class UpdateTradeCommandHandler(
 		if (!isTradeTypeExist)
 			throw new ArgumentException($"TradeType {request.Request.TradeTypeId} not found");
 
-		var req = request.Request;
-		var netIncome = Trade.CalculateNetIncome(req.TradeOpen, req.TradeClose, req.TradeSignal);
-		var price = (decimal)req.TradeOpen * req.Count;
-
-		var affectedRows = await _tradeRepository.UpdateUserTradeAsync(request.Id, request.UserId, req, netIncome, price, cancellationToken);
-
-		if (affectedRows == 0)
+		var trade = await _tradeRepository.GetByIdAsync(request.Id, cancellationToken);
+		if (trade == null || trade.UserId != request.UserId)
 			throw new KeyNotFoundException();
 
-		return (await _tradeRepository.GetByIdAsync(request.Id, cancellationToken))!;
+		var req = request.Request;
+
+		trade.Update(
+			req.DateOpen,
+			req.DateClose,
+			req.TradeOpen,
+			req.TradeClose,
+			req.Count,
+			req.TradeTypeId,
+			req.TradeCodeId,
+			req.TradeSignal
+		);
+
+		_tradeRepository.Update(trade);
+
+		return trade;
 	}
 }

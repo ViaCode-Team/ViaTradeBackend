@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.TradeCodes.Interfaces;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
@@ -6,7 +7,7 @@ using MediatR;
 
 namespace Application.Trades.Commands;
 
-public record CreateTradeCommand(int UserId, TradeCreateDto Request) : IRequest<Trade>;
+public record CreateTradeCommand(int UserId, TradeCreateDto Request) : ICommand<Trade>;
 
 public class CreateTradeCommandHandler(
 	ITradeRepository tradeRepository,
@@ -52,7 +53,6 @@ public class CreateTradeCommandHandler(
 		);
 
 		await _tradeRepository.AddAsync(trade, cancellationToken);
-		await _tradeRepository.SaveChangesAsync(cancellationToken);
 
 		return trade;
 	}

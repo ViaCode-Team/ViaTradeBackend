@@ -54,7 +54,6 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 		var note = new Note(userId, noteText, tradeCodeId, tradeStrategyId);
 
 		_dbSet.Add(note);
-		await SaveChangesAsync(cancellationToken);
 	}
 
 	public async Task UpdateUserNoteAsync(int id, NoteType noteType, int userId, string noteText, CancellationToken cancellationToken)

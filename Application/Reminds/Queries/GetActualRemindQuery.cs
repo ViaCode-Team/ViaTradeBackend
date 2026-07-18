@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.Reminds.Interfaces;
 using Domain.Reminds.Entities;
 using MediatR;
@@ -5,7 +6,7 @@ using MediatR;
 
 namespace Application.Reminds.Queries;
 
-public record GetActualRemindQuery() : IRequest<List<TradeRemind>>;
+public record GetActualRemindQuery() : IQuery<List<TradeRemind>>;
 
 public class GetActualRemindQueryHandler(ITradeRemindRepository repository) : IRequestHandler<GetActualRemindQuery, List<TradeRemind>>
 {

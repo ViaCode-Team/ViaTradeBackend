@@ -1,9 +1,10 @@
 using Application.Auth.Interfaces;
+using Application.Common.Interfaces;
 using MediatR;
 
 namespace Application.Auth.Commands;
 
-public record LogoutAllCommand(int UserId) : IRequest;
+public record LogoutAllCommand(int UserId) : ICommandWithoutUoW;
 
 public class LogoutAllCommandHandler(
 	ISessionRepository sessionRepository,

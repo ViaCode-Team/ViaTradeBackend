@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.Common.Models.Pagination;
 using Application.Common.Models.Sort;
 using Application.TradeCodes.Interfaces;
@@ -8,7 +9,7 @@ namespace Application.TradeCodes.Queries;
 
 public record GetCodesPagedQuery(
 	PaginationRequest PaginationRequest,
-	StockSortRequest? SortRequest) : IRequest<PagedResult<TradeCode>>;
+	StockSortRequest? SortRequest) : IQuery<PagedResult<TradeCode>>;
 
 public class GetCodesPagedQueryHandler(ITradeCodeRepository tradeCodeRepository)
 	: IRequestHandler<GetCodesPagedQuery, PagedResult<TradeCode>>

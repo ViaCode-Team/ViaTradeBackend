@@ -1,9 +1,10 @@
 using Application.Auth.Interfaces;
+using Application.Common.Interfaces;
 using MediatR;
 
 namespace Application.Auth.Commands;
 
-public record LogoutSessionCommand(string RefreshToken) : IRequest;
+public record LogoutSessionCommand(string RefreshToken) : ICommandWithoutUoW;
 
 public class LogoutSessionCommandHandler(
 	ISessionRepository sessionRepository,

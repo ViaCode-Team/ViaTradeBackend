@@ -1,10 +1,11 @@
+using Application.Common.Interfaces;
 using Application.Users.Interfaces;
 using MediatR;
 using System.Security.Cryptography;
 
 namespace Application.Users.Commands;
 
-public record GenerateTgLinkCommand(int UserId) : IRequest<string>;
+public record GenerateTgLinkCommand(int UserId) : ICommandWithoutUoW<string>;
 
 public class GenerateTgLinkCommandHandler(ITgTokenRepository tgTokenRepository)
 	: IRequestHandler<GenerateTgLinkCommand, string>

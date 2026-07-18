@@ -1,9 +1,10 @@
+using Application.Common.Interfaces;
 using Application.Users.Interfaces;
 using MediatR;
 
 namespace Application.Users.Commands;
 
-public record UpdateLastLoginDateCommand(int UserId) : IRequest;
+public record UpdateLastLoginDateCommand(int UserId) : ICommandWithoutUoW;
 
 public class UpdateLastLoginDateCommandHandler(IUserRepository userRepository)
 	: IRequestHandler<UpdateLastLoginDateCommand>

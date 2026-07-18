@@ -1,9 +1,10 @@
+using Application.Common.Interfaces;
 using Application.Users.Interfaces;
 using MediatR;
 
 namespace Application.Users.Commands;
 
-public record LinkTelegramCommand(string TgToken, string TgId) : IRequest;
+public record LinkTelegramCommand(string TgToken, string TgId) : ICommandWithoutUoW;
 
 public class LinkTelegramCommandHandler(
 	IUserRepository userRepository,

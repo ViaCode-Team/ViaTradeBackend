@@ -1,11 +1,12 @@
 using Application.Auth.Interfaces;
+using Application.Common.Interfaces;
 using Application.Common.Models;
 using Application.Users.Interfaces;
 using MediatR;
 
 namespace Application.Auth.Commands;
 
-public record RefreshTokenCommand(string RefreshToken) : IRequest<AuthInternalResult>;
+public record RefreshTokenCommand(string RefreshToken) : ICommandWithoutUoW<AuthInternalResult>;
 
 public class RefreshTokenCommandHandler(
 	IUserRepository userRepository,
