@@ -41,12 +41,12 @@ public class AuthController(
 	}
 
 	[HttpPost("register")]
-	[ProducesResponseType(StatusCodes.Status201Created)]
 	public async Task<Created> Register(
 		[FromBody, Required] RegisterRequest request,
 		CancellationToken cancellationToken)
 	{
-		var command = new RegisterCommand(request.Login, request.Password);
+		var userAgent = Request.Headers.UserAgent.ToString();
+		var command = new RegisterCommand(request.Login, request.Password, userAgent);
 		var result = await _sender.Send(command, cancellationToken);
 
 		SetAuthCookies(result);
@@ -98,7 +98,6 @@ public class AuthController(
 
 	[HttpGet("sessions")]
 	[Authorize]
-	[ProducesResponseType(StatusCodes.Status200OK)]
 	public async Task<Ok<PagedResult<UserSessionResponse>>> GetUserSessions([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
