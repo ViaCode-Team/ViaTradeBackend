@@ -1,3 +1,4 @@
+using Domain.Users.Entities;
 using Domain.Trades.Entities;
 using Domain.Common;
 using Domain.Entities.DataBase; // For TradeCode and User (temporary)

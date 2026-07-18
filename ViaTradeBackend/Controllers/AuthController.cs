@@ -1,27 +1,29 @@
-using Application.Interfaces.Services;
+using Application.Auth.Commands;
+using Application.Auth.Queries;
 using Application.Interfaces.Utils;
 using Application.Models;
 using Domain.Models.ConfigOptions;
 using Domain.Models.Pagination;
 using Mapster;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
+using ViaTradeBackend.Contracts.Auth;
 using ViaTradeBackend.Contracts.Users;
 
-using ViaTradeBackend.Contracts.Auth;
-
 namespace ViaTradeBackend.Controllers;
+
 [Route("api/[controller]")]
 [ApiController]
 public class AuthController(
-	IAuthService authService,
+	ISender sender,
 	IJwtHelper jwtHelper,
 	IOptions<AuthCookieOptions> authOptions) : ControllerBase
 {
-	private readonly IAuthService _authService = authService;
+	private readonly ISender _sender = sender;
 	private readonly IJwtHelper _jwtHelper = jwtHelper;
 	private readonly AuthCookieOptions _authCookiOptions = authOptions.Value;
 
@@ -31,12 +33,8 @@ public class AuthController(
 		CancellationToken cancellationToken)
 	{
 		var userAgent = Request.Headers.UserAgent.ToString();
-
-		var result = await _authService.LoginAsync(
-			request.Login,
-			request.Password,
-			userAgent,
-			cancellationToken);
+		var command = new LoginCommand(request.Login, request.Password, userAgent);
+		var result = await _sender.Send(command, cancellationToken);
 
 		SetAuthCookies(result);
 		return TypedResults.NoContent();
@@ -48,10 +46,8 @@ public class AuthController(
 		[FromBody, Required] RegisterRequest request,
 		CancellationToken cancellationToken)
 	{
-		var result = await _authService.RegisterAsync(
-			request.Login,
-			request.Password,
-			cancellationToken);
+		var command = new RegisterCommand(request.Login, request.Password);
+		var result = await _sender.Send(command, cancellationToken);
 
 		SetAuthCookies(result);
 		return TypedResults.Created();
@@ -63,9 +59,8 @@ public class AuthController(
 		if (!Request.Cookies.TryGetValue(_authCookiOptions.RefreshTokenCookie, out var refreshToken))
 			throw new UnauthorizedAccessException();
 
-		var result = await _authService.RefreshTokenAsync(
-			refreshToken,
-			cancellationToken);
+		var command = new RefreshTokenCommand(refreshToken);
+		var result = await _sender.Send(command, cancellationToken);
 
 		SetAuthCookies(result);
 		return TypedResults.NoContent();
@@ -76,7 +71,10 @@ public class AuthController(
 	public async Task<NoContent> Logout()
 	{
 		if (Request.Cookies.TryGetValue(_authCookiOptions.RefreshTokenCookie, out var refreshToken))
-			await _authService.LogoutSessionAsync(refreshToken);
+		{
+			var command = new LogoutSessionCommand(refreshToken);
+			await _sender.Send(command);
+		}
 
 		Response.Cookies.Delete(_authCookiOptions.AccessTokenCookie);
 		Response.Cookies.Delete(_authCookiOptions.RefreshTokenCookie);
@@ -89,8 +87,8 @@ public class AuthController(
 	public async Task<NoContent> LogoutAll()
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-
-		await _authService.LogoutAllAsync(userId);
+		var command = new LogoutAllCommand(userId);
+		await _sender.Send(command);
 
 		Response.Cookies.Delete(_authCookiOptions.AccessTokenCookie);
 		Response.Cookies.Delete(_authCookiOptions.RefreshTokenCookie);
@@ -101,11 +99,11 @@ public class AuthController(
 	[HttpGet("sessions")]
 	[Authorize]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<Ok<PagedResult<UserSessionResponse>>> GetUserSessions([FromQuery] PaginationRequest paginationRequest)
+	public async Task<Ok<PagedResult<UserSessionResponse>>> GetUserSessions([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-
-		var pagedSessions = await _authService.GetPagedUserSessionsAsync(userId, paginationRequest);
+		var query = new GetPagedUserSessionsQuery(userId, paginationRequest);
+		var pagedSessions = await _sender.Send(query, cancellationToken);
 
 		return TypedResults.Ok(pagedSessions.Map(s => s.Adapt<UserSessionResponse>()));
 	}
@@ -137,4 +135,3 @@ public class AuthController(
 			});
 	}
 }
-

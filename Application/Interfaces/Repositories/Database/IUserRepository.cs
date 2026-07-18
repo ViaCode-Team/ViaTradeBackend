@@ -1,3 +1,4 @@
+using Domain.Users.Entities;
 using Application.Models;
 using Domain.Entities.DataBase;
 

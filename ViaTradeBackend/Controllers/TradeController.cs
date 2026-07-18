@@ -1,3 +1,4 @@
+using Domain.Users.Entities;
 using Application.Contracts.Dto.Requests.Trade;
 using Application.Interfaces.Utils;
 using Application.Trades.Commands;

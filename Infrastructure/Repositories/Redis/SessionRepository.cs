@@ -1,3 +1,4 @@
+using Domain.Users.Entities;
 using Application.Contracts.Dto.User;
 using Application.Interfaces.Repositories.Redis;
 using Domain.Models.Pagination;

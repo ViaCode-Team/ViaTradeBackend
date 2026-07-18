@@ -1,3 +1,4 @@
+using Domain.Users.Entities;
 using Application.Interfaces.Utils;
 using Application.Notes.Commands;
 using Application.Notes.Queries;

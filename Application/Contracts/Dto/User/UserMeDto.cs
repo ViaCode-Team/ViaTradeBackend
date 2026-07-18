@@ -1,3 +1,4 @@
+using Domain.Users.Entities;
 namespace Application.Contracts.Dto.User;
 
 public class UserMeDto

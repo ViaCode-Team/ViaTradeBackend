@@ -1,3 +1,4 @@
+using Domain.Users.Entities;
 using Application.Reminds.Commands;
 using Application.Reminds.Queries;
 using Application.Interfaces.Utils;

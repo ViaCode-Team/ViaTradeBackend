@@ -1,3 +1,4 @@
+using Domain.Users.Entities;
 using Domain.Reminds.Entities;
 using Domain.Common;
 using Domain.Entities.DataBase;

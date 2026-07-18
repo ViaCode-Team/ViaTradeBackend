@@ -1,3 +1,4 @@
+using Domain.Users.Entities;
 using Domain.Entities.DataBase;
 using System.Security.Claims;
 

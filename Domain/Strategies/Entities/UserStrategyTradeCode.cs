@@ -1,3 +1,4 @@
+using Domain.Users.Entities;
 using Domain.Strategies.Entities;
 using Domain.Common;
 using Domain.Entities.DataBase; // For User

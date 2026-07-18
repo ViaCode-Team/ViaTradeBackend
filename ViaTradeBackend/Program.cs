@@ -1,7 +1,6 @@
 using Application.Interfaces;
 using Application.Interfaces.Repositories.Database;
 using Application.Interfaces.Repositories.Redis;
-using Application.Interfaces.Services;
 using Application.Interfaces.Utils;
 using Application.Mappings;
 using Application.Services;
@@ -88,8 +87,6 @@ builder.Services.AddScoped<INoteRepository, NoteRepository>();
 
 // Application services
 builder.Services.AddScoped<ITradeResultsService, TradeResultsService>();
-builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddScoped<IFileReader, TradeFileReader>();

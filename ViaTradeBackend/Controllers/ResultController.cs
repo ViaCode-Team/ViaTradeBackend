@@ -1,3 +1,4 @@
+using Domain.Users.Entities;
 using Application.Interfaces;
 using Application.Interfaces.Utils;
 using Domain.Models.Sort;

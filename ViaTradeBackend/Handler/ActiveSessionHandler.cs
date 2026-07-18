@@ -1,3 +1,4 @@
+using Domain.Users.Entities;
 using Application.Interfaces.Repositories.Redis;
 using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;

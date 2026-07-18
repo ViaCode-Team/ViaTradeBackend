@@ -1,3 +1,4 @@
+using Domain.Users.Entities;
 namespace Domain.Entities.DataBase;
 
 public class UserTradeCode : BaseEntity
