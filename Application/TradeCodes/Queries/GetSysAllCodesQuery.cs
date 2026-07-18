@@ -1,3 +1,5 @@
+using Domain.Trades.Enums;
+using Domain.Trades.Entities;
 using Application.Interfaces.Utils;
 using Application.Contracts.Dto.Trade;
 using Application.Interfaces;

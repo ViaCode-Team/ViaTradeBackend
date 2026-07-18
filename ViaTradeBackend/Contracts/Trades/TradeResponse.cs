@@ -1,3 +1,5 @@
+using Domain.Trades.Enums;
+using Domain.Trades.Entities;
 using Domain.Entities.DataBase;
 
 namespace ViaTradeBackend.Contracts.Trades;

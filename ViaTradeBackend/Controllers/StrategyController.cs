@@ -1,3 +1,5 @@
+using Domain.Trades.Enums;
+using Domain.Trades.Entities;
 using Application.Interfaces;
 using Application.Interfaces.Utils;
 using Domain.Models.Filters;

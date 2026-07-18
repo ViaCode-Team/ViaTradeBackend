@@ -1,3 +1,5 @@
+using Domain.Trades.Enums;
+using Domain.Trades.Entities;
 namespace Application.Contracts.Dto.Requests.Trade;
 
 public class UserStrategyTradeCodeCreateDto

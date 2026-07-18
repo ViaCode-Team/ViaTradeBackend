@@ -1,9 +1,11 @@
 using Application.Contracts.Dto.Requests.Trade;
-using Application.Interfaces;
 using Application.Interfaces.Utils;
+using Application.Trades.Commands;
+using Application.Trades.Queries;
 using Domain.Models.Filters;
 using Domain.Models.Pagination;
 using Mapster;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -17,10 +19,10 @@ namespace ViaTradeBackend.Controllers;
 [ApiController]
 [Authorize]
 public class TradeController(
-	ITradeService tradeService,
+	ISender sender,
 	IJwtHelper jwtHelper) : ControllerBase
 {
-	private readonly ITradeService _tradeService = tradeService;
+	private readonly ISender _sender = sender;
 	private readonly IJwtHelper _jwtHelper = jwtHelper;
 
 	[HttpGet("statistics")]
@@ -28,7 +30,8 @@ public class TradeController(
 	public async Task<Ok<GlobalStatisticResponse>> GetTradeStatistics(CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var tradeStatistics = await _tradeService.GetGlobalStatisticAsync(userId, cancellationToken);
+		var query = new GetGlobalStatisticQuery(userId);
+		var tradeStatistics = await _sender.Send(query, cancellationToken);
 		return TypedResults.Ok(tradeStatistics.Adapt<GlobalStatisticResponse>());
 	}
 
@@ -40,7 +43,8 @@ public class TradeController(
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var userTrades = await _tradeService.GetByUserPagedAsync(userId, filterRequest, paginationRequest, cancellationToken);
+		var query = new GetTradesPagedQuery(userId, filterRequest, paginationRequest);
+		var userTrades = await _sender.Send(query, cancellationToken);
 		return TypedResults.Ok(userTrades.Map(t => t.Adapt<TradeResponse>()));
 	}
 
@@ -51,7 +55,8 @@ public class TradeController(
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var trade = await _tradeService.GetTradeByIdAsync(id, userId, cancellationToken);
+		var query = new GetTradeByIdQuery(id, userId);
+		var trade = await _sender.Send(query, cancellationToken);
 		return TypedResults.Ok(trade.Adapt<TradeResponse>());
 	}
 
@@ -62,7 +67,8 @@ public class TradeController(
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var trade = await _tradeService.CreateTradeAsync(request.Adapt<TradeCreateDto>(), userId, cancellationToken);
+		var command = new CreateTradeCommand(userId, request.Adapt<TradeCreateDto>());
+		var trade = await _sender.Send(command, cancellationToken);
 		return TypedResults.Created($"/api/Trade/{trade.Id}", trade.Adapt<TradeResponse>());
 	}
 
@@ -74,7 +80,8 @@ public class TradeController(
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		await _tradeService.UpdateTradeAsync(id, request.Adapt<TradeCreateDto>(), userId, cancellationToken);
+		var command = new UpdateTradeCommand(id, userId, request.Adapt<TradeCreateDto>());
+		await _sender.Send(command, cancellationToken);
 		return TypedResults.NoContent();
 	}
 
@@ -85,12 +92,8 @@ public class TradeController(
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		await _tradeService.DeleteTradeAsync(id, userId, cancellationToken);
+		var command = new DeleteTradeCommand(id, userId);
+		await _sender.Send(command, cancellationToken);
 		return TypedResults.NoContent();
 	}
 }
-
-
-
-
-

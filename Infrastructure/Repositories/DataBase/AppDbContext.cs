@@ -1,3 +1,5 @@
+using Domain.Trades.Enums;
+using Domain.Trades.Entities;
 using Domain.Notes.Entities;
 using Domain.Reminds.Entities;
 using Domain.Entities.DataBase;
@@ -95,8 +97,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 		);
 
 		modelBuilder.Entity<TradeType>().HasData(
-			new TradeType { Id = 1, Name = "Акция" },
-			new TradeType { Id = 2, Name = "Фьючерс" }
+			new { Id = 1, Name = "Акция" },
+			new { Id = 2, Name = "Фьючерс" }
 		);
 
 	}

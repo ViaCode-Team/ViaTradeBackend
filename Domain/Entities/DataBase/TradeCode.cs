@@ -1,3 +1,5 @@
+using Domain.Trades.Enums;
+using Domain.Trades.Entities;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 

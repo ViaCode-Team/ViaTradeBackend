@@ -1,3 +1,5 @@
+using Domain.Trades.Enums;
+using Domain.Trades.Entities;
 using Domain.Entities.CSV;
 using Domain.Models.TradeLogic;
 
