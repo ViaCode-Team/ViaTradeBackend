@@ -2,9 +2,9 @@ using Domain.Enums;
 
 namespace Domain.Models.Sort;
 
-public class RemindSortRequest : BaseSortRequest<RemindSortField>
+public record RemindSortRequest() : BaseSortRequest<RemindSortField>
 {
-	public RemindSortRequest()
+	public RemindSortRequest(bool _) : this()
 	{
 		SortBy = [RemindSortField.DateTimeDesc];
 	}

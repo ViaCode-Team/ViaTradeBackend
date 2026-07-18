@@ -7,7 +7,7 @@ namespace ViaTradeBackend.BackgroundServices;
 public class SessionCleanupService(
 	IServiceProvider services,
 	ILogger<SessionCleanupService> logger,
-	IOptions<AuthCookiOptions> options) : BackgroundService
+	IOptions<AuthCookieOptions> options) : BackgroundService
 {
 	private readonly IServiceProvider _services = services;
 	private readonly ILogger<SessionCleanupService> _logger = logger;

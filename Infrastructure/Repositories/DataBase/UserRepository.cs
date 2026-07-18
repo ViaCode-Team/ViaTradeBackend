@@ -1,11 +1,11 @@
 using Application.Interfaces.Repositories.Database;
+using Application.Models;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto.User;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase;
 
-public class UserRepository(AppDbContext context) : GenericRepository<User, UserDto>(context), IUserRepository
+public class UserRepository(AppDbContext context) : GenericRepository<User, UserInternalDto>(context), IUserRepository
 {
 	public async Task<User?> GetByLoginAsync(string login, CancellationToken cancellationToken = default)
 	{

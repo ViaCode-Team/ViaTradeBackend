@@ -1,20 +1,20 @@
+using Application.Contracts.Dto.Requests.Trade;
+using Application.Contracts.Dto.Statistic;
+using Application.Contracts.Dto.Trade;
 using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
 using Domain.Interfaces;
-using Domain.Models.Dto.Statistic;
-using Domain.Models.Dto.Trade;
 using Domain.Models.Pagination;
 using Domain.Services;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
-using ViaTradeBackend.Models.Trade;
 
 namespace Infrastructure.Repositories.DataBase;
 
 public class TradeRepository(AppDbContext context)
 	: GenericRepository<Trade, TradeDto>(context), ITradeRepository
 {
-	public async Task<GlobalStatistic> GetGlobalStatisticAsync(int userId, CancellationToken cancellationToken)
+	public async Task<GlobalStatisticDto> GetGlobalStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
 		var baseQuery = _dbSet.Where(t => t.UserId == userId && t.NetIncome.HasValue);
 
@@ -22,11 +22,11 @@ public class TradeRepository(AppDbContext context)
 
 		if (totalTrades == 0)
 		{
-			return new GlobalStatistic
+			return new GlobalStatisticDto
 			{
-				TradeStatistic = new TradeStatistic { TotalTrades = 0, WinTrades = 0, LoseTrades = 0 },
-				IncomeStatistic = new IncomeTradeStatistic { TotalIncome = 0, AverageIncome = 0 },
-				WinrateStatistic = new WinrateTradeStatistic { TotalWinrate = 0, ProfitFactor = 0 }
+				TradeStatisticDto = new TradeStatisticDto { TotalTrades = 0, WinTrades = 0, LoseTrades = 0 },
+				IncomeStatistic = new IncomeTradeStatisticDto { TotalIncome = 0, AverageIncome = 0 },
+				WinrateStatistic = new WinrateTradeStatisticDto { TotalWinrate = 0, ProfitFactor = 0 }
 			};
 		}
 
@@ -37,28 +37,28 @@ public class TradeRepository(AppDbContext context)
 		var totalProfit = await baseQuery.Where(t => t.NetIncome > 0).SumAsync(TradeStatisticsCalcService.AbsoluteIncomeAbsExpression, cancellationToken);
 		var totalLoss = await baseQuery.Where(t => t.NetIncome < 0).SumAsync(TradeStatisticsCalcService.AbsoluteIncomeAbsExpression, cancellationToken);
 
-		var resultTrade = new TradeStatistic
+		var resultTrade = new TradeStatisticDto
 		{
 			TotalTrades = totalTrades,
 			WinTrades = winTrades,
 			LoseTrades = loseTrades,
 		};
 
-		var incomeStatistic = new IncomeTradeStatistic
+		var incomeStatistic = new IncomeTradeStatisticDto
 		{
 			TotalIncome = Math.Round((decimal)totalAbsoluteIncome, 2),
 			AverageIncome = TradeStatisticsCalcService.CalculateAverageIncome((decimal)totalAbsoluteIncome, totalTrades),
 		};
 
-		var winrateStatistic = new WinrateTradeStatistic
+		var winrateStatistic = new WinrateTradeStatisticDto
 		{
 			TotalWinrate = TradeStatisticsCalcService.CalculateWinrate(winTrades, totalTrades),
 			ProfitFactor = TradeStatisticsCalcService.CalculateProfitFactor(totalProfit, totalLoss)
 		};
 
-		return new GlobalStatistic
+		return new GlobalStatisticDto
 		{
-			TradeStatistic = resultTrade,
+			TradeStatisticDto = resultTrade,
 			IncomeStatistic = incomeStatistic,
 			WinrateStatistic = winrateStatistic
 		};
@@ -133,7 +133,7 @@ public class TradeRepository(AppDbContext context)
 			.ToPagedAsync(paginationRequest, cancellationToken);
 	}
 
-	public async Task<int> UpdateUserTradeAsync(int id, int userId, TradeRequest request, double? netIncome, decimal price, CancellationToken cancellationToken = default)
+	public async Task<int> UpdateUserTradeAsync(int id, int userId, TradeCreateDto request, double? netIncome, decimal price, CancellationToken cancellationToken = default)
 	{
 		return await _dbSet
 			.Where(t => t.Id == id && t.UserId == userId)

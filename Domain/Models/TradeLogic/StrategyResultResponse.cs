@@ -1,6 +1,8 @@
 namespace Domain.Models.TradeLogic;
 
-public class StrategyResultResponse
+public record StrategyResultResponse(
+	List<StrategyData> Strategies
+)
 {
-	public List<StrategyData> Strategies { get; set; } = [];
+	public StrategyResultResponse() : this([]) { }
 }

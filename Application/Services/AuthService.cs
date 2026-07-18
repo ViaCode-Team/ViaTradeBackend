@@ -1,9 +1,10 @@
+using Application.Contracts.Dto.User;
 using Application.Interfaces.Repositories.Database;
 using Application.Interfaces.Repositories.Redis;
 using Application.Interfaces.Services;
 using Application.Interfaces.Utils;
+using Application.Models;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto.User;
 using Domain.Models.Pagination;
 
 namespace Application.Services;
@@ -23,7 +24,7 @@ public class AuthService(
 
 	private readonly TimeSpan _sessionTtl = TimeSpan.FromDays(7);
 
-	public async Task<AuthResult> LoginAsync(
+	public async Task<AuthInternalResult> LoginAsync(
 		string login,
 		string password,
 		string userAgent,
@@ -36,7 +37,7 @@ public class AuthService(
 
 		var sessionId = Guid.NewGuid().ToString();
 
-		var session = new UserSession
+		var session = new UserSessionDto
 		{
 			Id = sessionId,
 			UserId = user.Id,
@@ -52,14 +53,14 @@ public class AuthService(
 
 		await _refreshTokenRepository.StoreAsync(sessionId, refreshToken, _sessionTtl);
 
-		return new AuthResult
+		return new AuthInternalResult
 		{
 			AccessToken = accessToken,
 			RefreshToken = refreshToken
 		};
 	}
 
-	public async Task<AuthResult> RefreshTokenAsync(
+	public async Task<AuthInternalResult> RefreshTokenAsync(
 		string refreshToken,
 		CancellationToken cancellationToken = default)
 	{
@@ -80,7 +81,7 @@ public class AuthService(
 
 		await _refreshTokenRepository.RotateAsync(sessionId, newRefreshToken, _sessionTtl);
 
-		return new AuthResult
+		return new AuthInternalResult
 		{
 			AccessToken = newAccessToken,
 			RefreshToken = newRefreshToken
@@ -108,7 +109,7 @@ public class AuthService(
 		}
 	}
 
-	public async Task<AuthResult> RegisterAsync(
+	public async Task<AuthInternalResult> RegisterAsync(
 		string login,
 		string password,
 		CancellationToken cancellationToken = default)
@@ -130,12 +131,12 @@ public class AuthService(
 		return await LoginAsync(login, password, "initial", cancellationToken);
 	}
 
-	public async Task<IEnumerable<UserSession>> GetUserSessionsAsync(int userId)
+	public async Task<IEnumerable<UserSessionDto>> GetUserSessionsAsync(int userId)
 	{
 		return await _sessionRepository.GetUserSessionsAsync(userId);
 	}
 
-	public async Task<PagedResult<UserSession>> GetPagedUserSessionsAsync(int userId, PaginationRequest paginationRequest)
+	public async Task<PagedResult<UserSessionDto>> GetPagedUserSessionsAsync(int userId, PaginationRequest paginationRequest)
 	{
 		return await _sessionRepository.GetPagedUserSessionsAsync(userId, paginationRequest);
 	}

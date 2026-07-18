@@ -1,15 +1,15 @@
+using Application.Contracts.Dto.Statistic;
+using Application.Contracts.Dto.Trade;
 using Application.Interfaces;
 using Application.Interfaces.Repositories.Database;
 using Application.Specifications;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto.Statistic;
-using Domain.Models.Dto.Trade;
 using Domain.Models.Filters;
 using Domain.Models.Pagination;
-using ViaTradeBackend.Models.Trade;
+
+using Application.Contracts.Dto.Requests.Trade;
 
 namespace Application.Services;
-
 public class TradeService(
 	ITradeRepository tradeRepository,
 	ITradeCodeRepository tradeCodeRepository,
@@ -19,7 +19,7 @@ public class TradeService(
 	private readonly ITradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
 	private readonly ITradeTypeRepository _tradeTypeRepository = tradeTypeRepository;
 
-	public async Task<GlobalStatistic> GetGlobalStatisticAsync(int userId, CancellationToken cancellationToken)
+	public async Task<GlobalStatisticDto> GetGlobalStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
 		return await _tradeRepository.GetGlobalStatisticAsync(userId, cancellationToken);
 	}
@@ -39,7 +39,7 @@ public class TradeService(
 		return trade;
 	}
 
-	public async Task<Trade> CreateTradeAsync(TradeRequest request, int userId, CancellationToken cancellationToken)
+	public async Task<Trade> CreateTradeAsync(TradeCreateDto request, int userId, CancellationToken cancellationToken)
 	{
 		bool isTradeCodeExist = await _tradeCodeRepository.ExistsAsync(c => c.Id == request.TradeCodeId, cancellationToken);
 		if (!isTradeCodeExist)
@@ -70,7 +70,7 @@ public class TradeService(
 		return trade;
 	}
 
-	public async Task<Trade> UpdateTradeAsync(int id, TradeRequest request, int userId, CancellationToken cancellationToken)
+	public async Task<Trade> UpdateTradeAsync(int id, TradeCreateDto request, int userId, CancellationToken cancellationToken)
 	{
 		bool isTradeCodeExist = await _tradeCodeRepository.ExistsAsync(c => c.Id == request.TradeCodeId, cancellationToken);
 		if (!isTradeCodeExist)
@@ -84,7 +84,7 @@ public class TradeService(
 		var price = (decimal)request.TradeOpen * request.Count;
 
 		var affectedRows = await _tradeRepository.UpdateUserTradeAsync(id, userId, request, netIncome, price, cancellationToken);
-		
+
 		if (affectedRows == 0)
 			throw new KeyNotFoundException();
 

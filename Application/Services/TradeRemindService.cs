@@ -1,14 +1,14 @@
+using Application.Contracts.Dto.NoteRemind;
+using Application.Contracts.Dto.Statistic;
 using Application.Interfaces;
 using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto;
-using Domain.Models.Dto.NoteRemind;
-using Domain.Models.Dto.Statistic;
 using Domain.Models.Pagination;
 using Domain.Models.Sort;
 
-namespace Application.Services;
+using Application.Contracts.Dto.Requests.Remind;
 
+namespace Application.Services;
 public class TradeRemindService(
 	ITradeRemindRepository tradeRemindRepository,
 	ITradeCodeRepository tradeCodeRepository) : ITradeRemindService
@@ -21,10 +21,10 @@ public class TradeRemindService(
 		return await _tradeRemindRepository.GetActualRemind(cancellationToken);
 	}
 
-	public async Task<TradeRemindStatistic> GetRemindStatisticAsync(int userId, CancellationToken cancellationToken)
+	public async Task<TradeRemindStatisticDto> GetRemindStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
 
-		return new TradeRemindStatistic
+		return new TradeRemindStatisticDto
 		{
 			TotalReminds = await _tradeRemindRepository.CountByUserAsync(userId, cancellationToken)
 		};
@@ -60,7 +60,7 @@ public class TradeRemindService(
 		return reminder;
 	}
 
-	public async Task CreateAsync(int userId, int tradeCodeId, TradeRemindRequest request, CancellationToken cancellationToken)
+	public async Task CreateAsync(int userId, int tradeCodeId, TradeRemindCreateDto request, CancellationToken cancellationToken)
 	{
 		bool isTradeCodeExist = await _tradeCodeRepository.ExistsAsync(c => c.Id == tradeCodeId, cancellationToken);
 		if (!isTradeCodeExist)
@@ -78,7 +78,7 @@ public class TradeRemindService(
 		await _tradeRemindRepository.SaveChangesAsync(cancellationToken);
 	}
 
-	public async Task UpdateAsync(int remindId, int userId, TradeRemindRequest request, CancellationToken cancellationToken)
+	public async Task UpdateAsync(int remindId, int userId, TradeRemindCreateDto request, CancellationToken cancellationToken)
 	{
 		var affectedRows = await _tradeRemindRepository.UpdateUserRemindAsync(remindId, userId, request.TextRemind, request.DateTime, cancellationToken);
 		if (affectedRows == 0)

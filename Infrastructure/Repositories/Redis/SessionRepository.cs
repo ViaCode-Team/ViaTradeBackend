@@ -1,5 +1,5 @@
+using Application.Contracts.Dto.User;
 using Application.Interfaces.Repositories.Redis;
-using Domain.Models.Dto.User;
 using Domain.Models.Pagination;
 using StackExchange.Redis;
 using System.Text.Json;
@@ -14,7 +14,7 @@ public class SessionRepository(IConnectionMultiplexer redis) : ISessionRepositor
 
 	private static string UserSessionsKey(int userId) => $"user:sessions:{userId}";
 
-	public async Task CreateAsync(UserSession session, TimeSpan ttl)
+	public async Task CreateAsync(UserSessionDto session, TimeSpan ttl)
 	{
 		var json = JsonSerializer.Serialize(session);
 
@@ -27,13 +27,13 @@ public class SessionRepository(IConnectionMultiplexer redis) : ISessionRepositor
 			throw new Exception("Failed to create session in Redis.");
 	}
 
-	public async Task<UserSession?> GetAsync(string sessionId)
+	public async Task<UserSessionDto?> GetAsync(string sessionId)
 	{
 		var value = await _db.StringGetAsync(SessionKey(sessionId));
 		if (value.IsNullOrEmpty)
 			return null;
 
-		return JsonSerializer.Deserialize<UserSession>(value.ToString());
+		return JsonSerializer.Deserialize<UserSessionDto>(value.ToString());
 	}
 
 	public async Task RemoveAsync(string sessionId)
@@ -50,10 +50,10 @@ public class SessionRepository(IConnectionMultiplexer redis) : ISessionRepositor
 			throw new Exception("Failed to remove session in Redis.");
 	}
 
-	public async Task<IEnumerable<UserSession>> GetUserSessionsAsync(int userId)
+	public async Task<IEnumerable<UserSessionDto>> GetUserSessionsAsync(int userId)
 	{
 		var sessionIds = await _db.SortedSetRangeByRankAsync(UserSessionsKey(userId), 0, -1);
-		var result = new List<UserSession>();
+		var result = new List<UserSessionDto>();
 		if (sessionIds.Length == 0) return result;
 
 		var keys = sessionIds
@@ -66,7 +66,7 @@ public class SessionRepository(IConnectionMultiplexer redis) : ISessionRepositor
 		{
 			if (!value.IsNullOrEmpty)
 			{
-				var item = JsonSerializer.Deserialize<UserSession>(value.ToString());
+				var item = JsonSerializer.Deserialize<UserSessionDto>(value.ToString());
 				if (item != null)
 				{
 					result.Add(item);
@@ -77,7 +77,7 @@ public class SessionRepository(IConnectionMultiplexer redis) : ISessionRepositor
 		return result;
 	}
 
-	public async Task<PagedResult<UserSession>> GetPagedUserSessionsAsync(int userId, PaginationRequest paginationRequest)
+	public async Task<PagedResult<UserSessionDto>> GetPagedUserSessionsAsync(int userId, PaginationRequest paginationRequest)
 	{
 		var totalCount = await _db.SortedSetLengthAsync(UserSessionsKey(userId));
 
@@ -85,7 +85,7 @@ public class SessionRepository(IConnectionMultiplexer redis) : ISessionRepositor
 		int stop = start + paginationRequest.PageSize - 1;
 
 		var sessionIds = await _db.SortedSetRangeByRankAsync(UserSessionsKey(userId), start, stop, Order.Descending);
-		var result = new List<UserSession>();
+		var result = new List<UserSessionDto>();
 		if (sessionIds.Length > 0)
 		{
 			var keys = sessionIds
@@ -98,7 +98,7 @@ public class SessionRepository(IConnectionMultiplexer redis) : ISessionRepositor
 			{
 				if (!value.IsNullOrEmpty)
 				{
-					var item = JsonSerializer.Deserialize<UserSession>(value.ToString());
+					var item = JsonSerializer.Deserialize<UserSessionDto>(value.ToString());
 					if (item != null)
 					{
 						result.Add(item);
@@ -107,7 +107,7 @@ public class SessionRepository(IConnectionMultiplexer redis) : ISessionRepositor
 			}
 		}
 
-		return new PagedResult<UserSession>(result, (int)totalCount, paginationRequest.Page, paginationRequest.PageSize);
+		return new PagedResult<UserSessionDto>(result, (int)totalCount, paginationRequest.Page, paginationRequest.PageSize);
 	}
 
 	// Cleaning old records from User`s Session SET <user:sessions:{userId}>

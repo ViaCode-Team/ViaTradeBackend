@@ -1,30 +1,32 @@
 using Application.Interfaces.Services;
 using Application.Interfaces.Utils;
-using Domain.Models;
+using Application.Models;
 using Domain.Models.ConfigOptions;
-using Domain.Models.Dto.User;
 using Domain.Models.Pagination;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using System.ComponentModel.DataAnnotations;
-using ViaTradeBackend.Models.Auth;
+using ViaTradeBackend.Contracts.Users;
+
+using ViaTradeBackend.Contracts.Auth;
 
 namespace ViaTradeBackend.Controllers;
-
 [Route("api/[controller]")]
 [ApiController]
 public class AuthController(
 	IAuthService authService,
 	IJwtHelper jwtHelper,
-	IOptions<AuthCookiOptions> authOptions) : ControllerBase
+	IOptions<AuthCookieOptions> authOptions) : ControllerBase
 {
 	private readonly IAuthService _authService = authService;
 	private readonly IJwtHelper _jwtHelper = jwtHelper;
-	private readonly AuthCookiOptions _authCookiOptions = authOptions.Value;
+	private readonly AuthCookieOptions _authCookiOptions = authOptions.Value;
 
 	[HttpPost("login")]
-	public async Task<ActionResult> Login(
+	public async Task<NoContent> Login(
 		[FromBody, Required] LoginRequest request,
 		CancellationToken cancellationToken)
 	{
@@ -37,12 +39,12 @@ public class AuthController(
 			cancellationToken);
 
 		SetAuthCookies(result);
-		return NoContent();
+		return TypedResults.NoContent();
 	}
 
 	[HttpPost("register")]
 	[ProducesResponseType(StatusCodes.Status201Created)]
-	public async Task<ActionResult> Register(
+	public async Task<Created> Register(
 		[FromBody, Required] RegisterRequest request,
 		CancellationToken cancellationToken)
 	{
@@ -52,12 +54,11 @@ public class AuthController(
 			cancellationToken);
 
 		SetAuthCookies(result);
-		return Created();
+		return TypedResults.Created();
 	}
 
 	[HttpPost("refresh")]
-	public async Task<ActionResult> RefreshToken(
-		CancellationToken cancellationToken)
+	public async Task<NoContent> RefreshToken(CancellationToken cancellationToken)
 	{
 		if (!Request.Cookies.TryGetValue(_authCookiOptions.RefreshTokenCookie, out var refreshToken))
 			throw new UnauthorizedAccessException();
@@ -67,12 +68,12 @@ public class AuthController(
 			cancellationToken);
 
 		SetAuthCookies(result);
-		return NoContent();
+		return TypedResults.NoContent();
 	}
 
 	[HttpPost("logout")]
 	[Authorize]
-	public async Task<ActionResult> Logout()
+	public async Task<NoContent> Logout()
 	{
 		if (Request.Cookies.TryGetValue(_authCookiOptions.RefreshTokenCookie, out var refreshToken))
 			await _authService.LogoutSessionAsync(refreshToken);
@@ -80,12 +81,12 @@ public class AuthController(
 		Response.Cookies.Delete(_authCookiOptions.AccessTokenCookie);
 		Response.Cookies.Delete(_authCookiOptions.RefreshTokenCookie);
 
-		return NoContent();
+		return TypedResults.NoContent();
 	}
 
 	[HttpPost("logout-all")]
 	[Authorize]
-	public async Task<ActionResult> LogoutAll()
+	public async Task<NoContent> LogoutAll()
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 
@@ -94,30 +95,22 @@ public class AuthController(
 		Response.Cookies.Delete(_authCookiOptions.AccessTokenCookie);
 		Response.Cookies.Delete(_authCookiOptions.RefreshTokenCookie);
 
-		return NoContent();
+		return TypedResults.NoContent();
 	}
 
 	[HttpGet("sessions")]
 	[Authorize]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<UserSessionDto>>> GetUserSessions([FromQuery] PaginationRequest paginationRequest)
+	public async Task<Ok<PagedResult<UserSessionResponse>>> GetUserSessions([FromQuery] PaginationRequest paginationRequest)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 
 		var pagedSessions = await _authService.GetPagedUserSessionsAsync(userId, paginationRequest);
 
-		var result = pagedSessions.Map(s => new UserSessionDto
-		{
-			Id = s.Id,
-			UserAgent = s.UserAgent,
-			CreatedAt = s.CreatedAt,
-			LastSeen = s.LastSeen
-		});
-
-		return Ok(result);
+		return TypedResults.Ok(pagedSessions.Map(s => s.Adapt<UserSessionResponse>()));
 	}
 
-	private void SetAuthCookies(AuthResult result)
+	private void SetAuthCookies(AuthInternalResult result)
 	{
 		Response.Cookies.Append(
 			_authCookiOptions.AccessTokenCookie,
@@ -144,3 +137,4 @@ public class AuthController(
 			});
 	}
 }
+

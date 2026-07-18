@@ -27,7 +27,7 @@
 5. **Secrets & DOS**: NEVER hardcode secrets/connection strings. Enforce pagination/limits to prevent resource exhaustion.
 
 ## C# Coding Guidelines (C# 12+)
-1. **General**: File-scoped namespaces. Exactly 1 empty line after `namespace`, `using` directives, between methods, between fields/methods, and at EOF.
+1. **General**: File-scoped namespaces. **`using` directives MUST be placed BEFORE the `namespace` declaration**. Exactly 1 empty line after `using` directives, after `namespace`, between methods, between fields/methods, and at EOF.
 2. **Fields/Blocks**: Group related fields (NO empty lines between them). Use empty lines between execution stages (e.g. validation -> save -> return).
 3. **Syntax Constraints**: Use modern syntax (switch expressions). NO ternary operators (`? :`); use `if/else` or `switch`. NO spread collections `[..]` for fluent methods (prefer `.ToList()`). Regular collections `[]` allowed.
 4. **Clean Code**: Avoid unnecessary braces for single-line statements. Comments must be minimal, in English, and only for highly complex code.

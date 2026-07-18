@@ -1,7 +1,7 @@
+using Application.Contracts.Dto.Trade;
 using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
 using Domain.Enums;
-using Domain.Models.Dto.Trade;
 using Domain.Models.Pagination;
 using Domain.Models.Sort;
 using Infrastructure.Extensions;

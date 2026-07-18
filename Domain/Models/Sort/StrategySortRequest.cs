@@ -2,9 +2,9 @@ using Domain.Enums;
 
 namespace Domain.Models.Sort;
 
-public class StrategySortRequest : BaseSortRequest<StrategySortField>
+public record StrategySortRequest() : BaseSortRequest<StrategySortField>
 {
-	public StrategySortRequest()
+	public StrategySortRequest(bool _) : this()
 	{
 		SortBy = [StrategySortField.NameAsc];
 	}

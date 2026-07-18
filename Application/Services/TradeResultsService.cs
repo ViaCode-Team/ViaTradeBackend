@@ -1,9 +1,9 @@
+using Application.Contracts.Dto.Statistic;
 using Application.Interfaces;
 using Application.Interfaces.Repositories.Database;
 using Application.Interfaces.Utils;
 using Domain.Entities.CSV;
 using Domain.Enums;
-using Domain.Models.Dto.Statistic;
 using Domain.Models.Sort;
 using Domain.Models.TradeLogic;
 using Domain.Services;
@@ -19,7 +19,7 @@ public class TradeResultsService(
 	private readonly IUserTradeStrategyRepository _userTradeStrategyRepository = userTradeStrategyRepository;
 	private readonly ITradeStrategyRepository _tradeStrategyRepository = tradeStrategyRepository;
 
-	public async Task<SignalStatistic> GetStrategyResultStatisticAsync(int userId, CancellationToken cancellationToken)
+	public async Task<SignalStatisticDto> GetStrategyResultStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
 
 		var signals = await GetStrategyResultAsync(userId, DateTime.Now, null, null, cancellationToken);
@@ -28,7 +28,7 @@ public class TradeResultsService(
 			.SelectMany(s => s.Tickers)
 			.SelectMany(t => t.Results);
 
-		return new SignalStatistic
+		return new SignalStatisticDto
 		{
 			TotalSignals = SignalStatisticsCalcService.CountTotalSignals(allResults),
 			BuySignals = SignalStatisticsCalcService.CountBuySignals(allResults),

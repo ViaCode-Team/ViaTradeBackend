@@ -1,11 +1,13 @@
 using Application.Interfaces;
 using Application.Interfaces.Utils;
-using Domain.Models.Dto.Statistic;
 using Domain.Models.Sort;
 using Domain.Models.TradeLogic;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using ViaTradeBackend.Contracts.Statistics;
 
 namespace ViaTradeBackend.Controllers;
 
@@ -21,16 +23,16 @@ public class ResultController(
 
 	[HttpGet("statistics")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<SignalStatistic>> GetStrategyResultStatistics(CancellationToken cancellationToken)
+	public async Task<Ok<SignalStatisticResponse>> GetStrategyResultStatistics(CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var signalStatistics = await _tradeResultsService.GetStrategyResultStatisticAsync(userId, cancellationToken);
-		return Ok(signalStatistics);
+		return TypedResults.Ok(signalStatistics.Adapt<SignalStatisticResponse>());
 	}
 
 	[HttpGet("strategy")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<StrategyResultResponse>> GetStrategyResults(
+	public async Task<Ok<StrategyResultResponse>> GetStrategyResults(
 		[FromQuery] DateTime? startDate,
 		[FromQuery] DateTime? endTime,
 		[FromQuery] SignalSortRequest? sortRequest,
@@ -38,12 +40,12 @@ public class ResultController(
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var response = await _tradeResultsService.GetStrategyResultAsync(userId, startDate, endTime, sortRequest, cancellationToken);
-		return Ok(response);
+		return TypedResults.Ok(response);
 	}
 
 	[HttpGet("strategy/{strategyName}/{tradeCode}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<StrategyResultResponse>> GetStrategyResultsByCode(
+	public async Task<Ok<StrategyResultResponse>> GetStrategyResultsByCode(
 		[FromRoute, Required] string strategyName,
 		[FromRoute, Required] string tradeCode,
 		[FromQuery] DateTime? startDate,
@@ -52,6 +54,7 @@ public class ResultController(
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var response = await _tradeResultsService.GetStrategyResultByCodeAsync(userId, strategyName, tradeCode, startDate, endTime, cancellationToken);
-		return Ok(response);
+		return TypedResults.Ok(response);
 	}
 }
+

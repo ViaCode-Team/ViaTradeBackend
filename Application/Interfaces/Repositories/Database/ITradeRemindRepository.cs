@@ -1,5 +1,5 @@
+using Application.Contracts.Dto.NoteRemind;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto.NoteRemind;
 using Domain.Models.Pagination;
 using Domain.Models.Sort;
 

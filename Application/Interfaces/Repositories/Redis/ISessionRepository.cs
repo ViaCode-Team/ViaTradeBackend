@@ -1,15 +1,15 @@
-using Domain.Models.Dto.User;
+using Application.Contracts.Dto.User;
 using Domain.Models.Pagination;
 
 namespace Application.Interfaces.Repositories.Redis;
 
 public interface ISessionRepository
 {
-	Task CreateAsync(UserSession session, TimeSpan ttl);
-	Task<UserSession?> GetAsync(string sessionId);
+	Task CreateAsync(UserSessionDto session, TimeSpan ttl);
+	Task<UserSessionDto?> GetAsync(string sessionId);
 	Task RemoveAsync(string sessionId);
-	Task<IEnumerable<UserSession>> GetUserSessionsAsync(int userId);
-	Task<PagedResult<UserSession>> GetPagedUserSessionsAsync(int userId, PaginationRequest paginationRequest);
+	Task<IEnumerable<UserSessionDto>> GetUserSessionsAsync(int userId);
+	Task<PagedResult<UserSessionDto>> GetPagedUserSessionsAsync(int userId, PaginationRequest paginationRequest);
 	IEnumerable<int> GetAllUserIdsWithSessions();
 	Task<int> CleanupExpiredSessionsAsync(DateTime threshold);
 }

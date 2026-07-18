@@ -1,9 +1,9 @@
+using Application.Contracts.Dto.NoteRemind;
+using Application.Contracts.Dto.Statistic;
 using Application.Interfaces;
 using Application.Interfaces.Repositories.Database;
 using Application.Specifications;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto.NoteRemind;
-using Domain.Models.Dto.Statistic;
 using Domain.Models.Filters;
 using Domain.Models.Pagination;
 
@@ -18,7 +18,7 @@ public class NoteService(
 	private readonly ITradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
 	private readonly ITradeStrategyRepository _tradeStrategyRepository = tradeStrategyRepository;
 
-	public async Task<NoteStatistic> GetNoteStatisticAsync(int userId, CancellationToken cancellationToken)
+	public async Task<NoteStatisticDto> GetNoteStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
 
 		return await _noteRepository.GetNoteStatisticAsync(userId, cancellationToken);

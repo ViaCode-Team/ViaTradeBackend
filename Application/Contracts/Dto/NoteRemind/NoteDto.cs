@@ -1,0 +1,17 @@
+using System.ComponentModel.DataAnnotations;
+
+namespace Application.Contracts.Dto.NoteRemind;
+
+public class NoteDto
+{
+	public int Id { get; set; }
+
+	public required int UserId { get; set; }
+
+	[StringLength(1024)]
+	public required string NoteText { get; set; }
+
+	public int? TradeCodeId { get; set; }
+
+	public int? TradeStrategyId { get; set; }
+}

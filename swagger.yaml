@@ -22,8 +22,8 @@ paths:
               $ref: '#/components/schemas/LoginRequest'
         required: true
       responses:
-        '200':
-          description: OK
+        '204':
+          description: No Content
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -204,8 +204,8 @@ paths:
         - Auth
       operationId: RefreshToken
       responses:
-        '200':
-          description: OK
+        '204':
+          description: No Content
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -289,8 +289,8 @@ paths:
         - Auth
       operationId: Logout
       responses:
-        '200':
-          description: OK
+        '204':
+          description: No Content
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -374,8 +374,8 @@ paths:
         - Auth
       operationId: LogoutAll
       responses:
-        '200':
-          description: OK
+        '204':
+          description: No Content
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -462,32 +462,16 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
-            minimum: 1
             type: integer
             format: int32
-            default: 1
         - name: pageSize
           in: query
           schema:
-            maximum: 100
-            minimum: 1
             type: integer
             format: int32
-            default: 20
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/UserSessionDtoPagedResult'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserSessionDtoPagedResult'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/UserSessionDtoPagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -573,16 +557,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/NoteStatistic'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NoteStatistic'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/NoteStatistic'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -673,32 +647,16 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
-            minimum: 1
             type: integer
             format: int32
-            default: 1
         - name: pageSize
           in: query
           schema:
-            maximum: 100
-            minimum: 1
             type: integer
             format: int32
-            default: 20
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/NoteDtoPagedResult'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/NoteDtoPagedResult'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/NoteDtoPagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -791,16 +749,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/Note'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Note'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/Note'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -893,13 +841,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NoteRequest'
+              $ref: '#/components/schemas/CreateNoteRequest'
           text/json:
             schema:
-              $ref: '#/components/schemas/NoteRequest'
+              $ref: '#/components/schemas/CreateNoteRequest'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/NoteRequest'
+              $ref: '#/components/schemas/CreateNoteRequest'
         required: true
       responses:
         '201':
@@ -996,13 +944,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NoteRequest'
+              $ref: '#/components/schemas/CreateNoteRequest'
           text/json:
             schema:
-              $ref: '#/components/schemas/NoteRequest'
+              $ref: '#/components/schemas/CreateNoteRequest'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/NoteRequest'
+              $ref: '#/components/schemas/CreateNoteRequest'
         required: true
       responses:
         '204':
@@ -1190,16 +1138,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/Note'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Note'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/Note'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -1292,13 +1230,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NoteRequest'
+              $ref: '#/components/schemas/CreateNoteRequest'
           text/json:
             schema:
-              $ref: '#/components/schemas/NoteRequest'
+              $ref: '#/components/schemas/CreateNoteRequest'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/NoteRequest'
+              $ref: '#/components/schemas/CreateNoteRequest'
         required: true
       responses:
         '201':
@@ -1395,13 +1333,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NoteRequest'
+              $ref: '#/components/schemas/CreateNoteRequest'
           text/json:
             schema:
-              $ref: '#/components/schemas/NoteRequest'
+              $ref: '#/components/schemas/CreateNoteRequest'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/NoteRequest'
+              $ref: '#/components/schemas/CreateNoteRequest'
         required: true
       responses:
         '204':
@@ -1582,16 +1520,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/TradeRemindStatistic'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TradeRemindStatistic'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/TradeRemindStatistic'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -1677,22 +1605,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeRemind'
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeRemind'
-            text/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeRemind'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -1871,19 +1783,13 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
-            minimum: 1
             type: integer
             format: int32
-            default: 1
         - name: pageSize
           in: query
           schema:
-            maximum: 100
-            minimum: 1
             type: integer
             format: int32
-            default: 20
         - name: sortBy
           in: query
           schema:
@@ -1893,16 +1799,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/TradeRemindDtoPagedResult'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TradeRemindDtoPagedResult'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/TradeRemindDtoPagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -1989,19 +1885,13 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
-            minimum: 1
             type: integer
             format: int32
-            default: 1
         - name: pageSize
           in: query
           schema:
-            maximum: 100
-            minimum: 1
             type: integer
             format: int32
-            default: 20
         - name: sortBy
           in: query
           schema:
@@ -2017,16 +1907,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/TradeRemindDtoPagedResult'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TradeRemindDtoPagedResult'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/TradeRemindDtoPagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -2119,13 +1999,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TradeRemindRequest'
+              $ref: '#/components/schemas/CreateTradeRemindRequest'
           text/json:
             schema:
-              $ref: '#/components/schemas/TradeRemindRequest'
+              $ref: '#/components/schemas/CreateTradeRemindRequest'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/TradeRemindRequest'
+              $ref: '#/components/schemas/CreateTradeRemindRequest'
         required: true
       responses:
         '201':
@@ -2222,16 +2102,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/TradeRemind'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TradeRemind'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/TradeRemind'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -2324,13 +2194,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TradeRemindRequest'
+              $ref: '#/components/schemas/UpdateTradeRemindRequest'
           text/json:
             schema:
-              $ref: '#/components/schemas/TradeRemindRequest'
+              $ref: '#/components/schemas/UpdateTradeRemindRequest'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/TradeRemindRequest'
+              $ref: '#/components/schemas/UpdateTradeRemindRequest'
         required: true
       responses:
         '204':
@@ -2511,16 +2381,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/SignalStatistic'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/SignalStatistic'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/SignalStatistic'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -2623,16 +2483,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/StrategyResultResponse'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StrategyResultResponse'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/StrategyResultResponse'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -2739,16 +2589,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/StrategyResultResponse'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StrategyResultResponse'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/StrategyResultResponse'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -2834,16 +2674,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/StrategyStatistic'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StrategyStatistic'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/StrategyStatistic'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -2940,32 +2770,16 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
-            minimum: 1
             type: integer
             format: int32
-            default: 1
         - name: pageSize
           in: query
           schema:
-            maximum: 100
-            minimum: 1
             type: integer
             format: int32
-            default: 20
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/TradeStrategyDtoPagedResult'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TradeStrategyDtoPagedResult'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/TradeStrategyDtoPagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3058,16 +2872,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/TradeStrategy'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TradeStrategy'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/TradeStrategy'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3154,32 +2958,16 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
-            minimum: 1
             type: integer
             format: int32
-            default: 1
         - name: pageSize
           in: query
           schema:
-            maximum: 100
-            minimum: 1
             type: integer
             format: int32
-            default: 20
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/UserStrategyTradeCodeDtoPagedResult'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserStrategyTradeCodeDtoPagedResult'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/UserStrategyTradeCodeDtoPagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3265,13 +3053,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UserStrategyTradeCodeRequest'
+              $ref: '#/components/schemas/CreateUserStrategyTradeCodeRequest'
           text/json:
             schema:
-              $ref: '#/components/schemas/UserStrategyTradeCodeRequest'
+              $ref: '#/components/schemas/CreateUserStrategyTradeCodeRequest'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/UserStrategyTradeCodeRequest'
+              $ref: '#/components/schemas/CreateUserStrategyTradeCodeRequest'
         required: true
       responses:
         '201':
@@ -3459,32 +3247,16 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
-            minimum: 1
             type: integer
             format: int32
-            default: 1
         - name: pageSize
           in: query
           schema:
-            maximum: 100
-            minimum: 1
             type: integer
             format: int32
-            default: 20
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/UserTradeStrategyDtoPagedResult'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserTradeStrategyDtoPagedResult'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/UserTradeStrategyDtoPagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3757,16 +3529,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/GlobalStatistic'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GlobalStatistic'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/GlobalStatistic'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3875,32 +3637,16 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
-            minimum: 1
             type: integer
             format: int32
-            default: 1
         - name: pageSize
           in: query
           schema:
-            maximum: 100
-            minimum: 1
             type: integer
             format: int32
-            default: 20
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/TradeDtoPagedResult'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TradeDtoPagedResult'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/TradeDtoPagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3986,27 +3732,17 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TradeRequest'
+              $ref: '#/components/schemas/CreateTradeRequest'
           text/json:
             schema:
-              $ref: '#/components/schemas/TradeRequest'
+              $ref: '#/components/schemas/CreateTradeRequest'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/TradeRequest'
+              $ref: '#/components/schemas/CreateTradeRequest'
         required: true
       responses:
         '201':
           description: Created
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/Trade'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Trade'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/Trade'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4099,16 +3835,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/Trade'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Trade'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/Trade'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4202,13 +3928,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TradeRequest'
+              $ref: '#/components/schemas/UpdateTradeRequest'
           text/json:
             schema:
-              $ref: '#/components/schemas/TradeRequest'
+              $ref: '#/components/schemas/UpdateTradeRequest'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/TradeRequest'
+              $ref: '#/components/schemas/UpdateTradeRequest'
         required: true
       responses:
         '204':
@@ -4389,16 +4115,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/StockStatistic'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/StockStatistic'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/StockStatistic'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4485,19 +4201,13 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
-            minimum: 1
             type: integer
             format: int32
-            default: 1
         - name: pageSize
           in: query
           schema:
-            maximum: 100
-            minimum: 1
             type: integer
             format: int32
-            default: 20
         - name: sortBy
           in: query
           schema:
@@ -4507,16 +4217,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/TradeCodeDtoPagedResult'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TradeCodeDtoPagedResult'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/TradeCodeDtoPagedResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4602,22 +4302,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeCodeFileDto'
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeCodeFileDto'
-            text/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TradeCodeFileDto'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4709,16 +4393,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/TradeCodeFileDto'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TradeCodeFileDto'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/TradeCodeFileDto'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4804,16 +4478,8 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/MeDto'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/MeDto'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/MeDto'
+        '404':
+          description: Not Found
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4846,17 +4512,6 @@ paths:
                 type: https://httpstatuses.com/403
                 title: Forbidden
                 status: 403
-                detail: Specific error details here
-        '404':
-          description: Not Found - Resource does not exist
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.com/404
-                title: Not Found
-                status: 404
                 detail: Specific error details here
         '408':
           description: Timeout - Server timeout
@@ -4899,16 +4554,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                $ref: '#/components/schemas/TgTokenResponse'
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TgTokenResponse'
-            text/json:
-              schema:
-                $ref: '#/components/schemas/TgTokenResponse'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4994,13 +4639,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TgTokenRequest'
+              $ref: '#/components/schemas/LinkTelegramRequest'
           text/json:
             schema:
-              $ref: '#/components/schemas/TgTokenRequest'
+              $ref: '#/components/schemas/LinkTelegramRequest'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/TgTokenRequest'
+              $ref: '#/components/schemas/LinkTelegramRequest'
         required: true
       responses:
         '202':
@@ -5090,22 +4735,6 @@ paths:
       responses:
         '200':
           description: OK
-          content:
-            text/plain:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
-            text/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/User'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -5185,6 +4814,60 @@ paths:
                 detail: Specific error details here
 components:
   schemas:
+    CreateNoteRequest:
+      required:
+        - noteText
+      type: object
+      properties:
+        noteText:
+          type: string
+      additionalProperties: false
+    CreateTradeRemindRequest:
+      required:
+        - dateTime
+        - textRemind
+      type: object
+      properties:
+        textRemind:
+          type: string
+        dateTime:
+          type: string
+          format: date-time
+      additionalProperties: false
+    CreateTradeRequest:
+      required:
+        - count
+        - dateOpen
+        - tradeCodeId
+        - tradeOpen
+        - tradeSignal
+        - tradeTypeId
+      type: object
+      properties:
+        dateOpen:
+          type: string
+          format: date-time
+        dateClose:
+          type: string
+          format: date-time
+        tradeOpen:
+          type: number
+          format: double
+        tradeClose:
+          type: number
+          format: double
+        tradeSignal:
+          $ref: '#/components/schemas/TradeSignal'
+        count:
+          type: integer
+          format: int32
+        tradeTypeId:
+          type: integer
+          format: int32
+        tradeCodeId:
+          type: integer
+          format: int32
+      additionalProperties: false
     CreateUserStrategyRequest:
       required:
         - strategyId
@@ -5194,32 +4877,29 @@ components:
           type: integer
           format: int32
       additionalProperties: false
-    GlobalStatistic:
+    CreateUserStrategyTradeCodeRequest:
       required:
-        - incomeStatistic
-        - tradeStatistic
-        - winrateStatistic
+        - strategyId
+        - tradeCodeId
       type: object
       properties:
-        tradeStatistic:
-          $ref: '#/components/schemas/TradeStatistic'
-        incomeStatistic:
-          $ref: '#/components/schemas/IncomeTradeStatistic'
-        winrateStatistic:
-          $ref: '#/components/schemas/WinrateTradeStatistic'
+        tradeCodeId:
+          type: integer
+          format: int32
+        strategyId:
+          type: integer
+          format: int32
       additionalProperties: false
-    IncomeTradeStatistic:
+    LinkTelegramRequest:
       required:
-        - averageIncome
-        - totalIncome
+        - tgId
+        - tgToken
       type: object
       properties:
-        totalIncome:
-          type: number
-          format: double
-        averageIncome:
-          type: number
-          format: double
+        tgToken:
+          type: string
+        tgId:
+          type: string
       additionalProperties: false
     LoginRequest:
       required:
@@ -5231,122 +4911,6 @@ components:
           type: string
         password:
           type: string
-      additionalProperties: false
-    MeDto:
-      required:
-        - id
-        - lastLoginDate
-        - login
-        - registerDate
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        login:
-          type: string
-        lastLoginDate:
-          type: string
-          format: date-time
-        registerDate:
-          type: string
-          format: date-time
-        tgId:
-          type: string
-      additionalProperties: false
-    Note:
-      required:
-        - id
-        - noteText
-        - userId
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        userId:
-          type: integer
-          format: int32
-        noteText:
-          maxLength: 1024
-          minLength: 0
-          type: string
-        tradeCodeId:
-          type: integer
-          format: int32
-        tradeStrategyId:
-          type: integer
-          format: int32
-      additionalProperties: false
-    NoteDto:
-      required:
-        - id
-        - noteText
-        - userId
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        userId:
-          type: integer
-          format: int32
-        noteText:
-          maxLength: 1024
-          minLength: 0
-          type: string
-        tradeCodeId:
-          type: integer
-          format: int32
-        tradeStrategyId:
-          type: integer
-          format: int32
-      additionalProperties: false
-    NoteDtoPagedResult:
-      required:
-        - items
-        - totalCount
-        - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/NoteDto'
-        totalCount:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-          readOnly: true
-      additionalProperties: false
-    NoteRequest:
-      required:
-        - noteText
-      type: object
-      properties:
-        noteText:
-          maxLength: 1024
-          minLength: 0
-          type: string
-      additionalProperties: false
-    NoteStatistic:
-      required:
-        - stockNotes
-        - strategyNotes
-        - totalNotes
-      type: object
-      properties:
-        totalNotes:
-          type: integer
-          format: int32
-        stockNotes:
-          type: integer
-          format: int32
-        strategyNotes:
-          type: integer
-          format: int32
       additionalProperties: false
     NoteType:
       enum:
@@ -5401,76 +4965,11 @@ components:
         - accuracyAsc
         - accuracyDesc
       type: string
-    SignalStatistic:
-      required:
-        - buySignals
-        - sellSignals
-        - totalSignals
-      type: object
-      properties:
-        totalSignals:
-          type: integer
-          format: int32
-        buySignals:
-          type: integer
-          format: int32
-        sellSignals:
-          type: integer
-          format: int32
-      additionalProperties: false
     StockSortField:
       enum:
         - nameAsc
         - nameDesc
       type: string
-    StockStatistic:
-      required:
-        - totalStocks
-      type: object
-      properties:
-        totalStocks:
-          type: integer
-          format: int32
-      additionalProperties: false
-    StrategyData:
-      required:
-        - name
-        - tickers
-      type: object
-      properties:
-        name:
-          type: string
-        tickers:
-          type: array
-          items:
-            $ref: '#/components/schemas/TickerResults'
-      additionalProperties: false
-    StrategyResult:
-      required:
-        - closePrice
-        - date
-        - signal
-      type: object
-      properties:
-        date:
-          type: string
-          format: date-time
-        closePrice:
-          type: number
-          format: double
-        signal:
-          type: string
-      additionalProperties: false
-    StrategyResultResponse:
-      required:
-        - strategies
-      type: object
-      properties:
-        strategies:
-          type: array
-          items:
-            $ref: '#/components/schemas/StrategyData'
-      additionalProperties: false
     StrategySortField:
       enum:
         - nameAsc
@@ -5478,701 +4977,62 @@ components:
         - accuracyAsc
         - accuracyDesc
       type: string
-    StrategyStatistic:
-      required:
-        - activeStrategies
-        - disabledStrategies
-        - totalStrategies
-      type: object
-      properties:
-        totalStrategies:
-          type: integer
-          format: int32
-        activeStrategies:
-          type: integer
-          format: int32
-        disabledStrategies:
-          type: integer
-          format: int32
-      additionalProperties: false
-    TgTokenRequest:
-      required:
-        - tgId
-        - tgToken
-      type: object
-      properties:
-        tgToken:
-          type: string
-        tgId:
-          type: string
-      additionalProperties: false
-    TgTokenResponse:
-      required:
-        - tgToken
-      type: object
-      properties:
-        tgToken:
-          type: string
-      additionalProperties: false
-    TickerResults:
-      required:
-        - results
-        - tradeCode
-      type: object
-      properties:
-        tradeCode:
-          type: string
-        accuracy:
-          type: integer
-          format: int32
-        results:
-          type: array
-          items:
-            $ref: '#/components/schemas/StrategyResult'
-      additionalProperties: false
-    Trade:
-      required:
-        - count
-        - dateOpen
-        - id
-        - price
-        - tradeCodeId
-        - tradeOpen
-        - tradeSignal
-        - tradeTypeId
-        - userId
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        dateOpen:
-          type: string
-          format: date-time
-        dateClose:
-          type: string
-          format: date-time
-        tradeOpen:
-          type: number
-          format: double
-        tradeClose:
-          type: number
-          format: double
-        netIncome:
-          type: number
-          format: double
-        count:
-          type: integer
-          format: int32
-        price:
-          type: number
-          format: double
-        tradeTypeId:
-          type: integer
-          format: int32
-        tradeCodeId:
-          type: integer
-          format: int32
-        userId:
-          type: integer
-          format: int32
-        tradeSignal:
-          $ref: '#/components/schemas/TradeSignal'
-      additionalProperties: false
-    TradeCode:
-      required:
-        - exchangeId
-        - id
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        exchangeId:
-          maxLength: 128
-          type: string
-        description:
-          maxLength: 512
-          type: string
-      additionalProperties: false
-    TradeCodeDto:
-      required:
-        - exchangeId
-        - id
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        exchangeId:
-          type: string
-        description:
-          type: string
-      additionalProperties: false
-    TradeCodeDtoPagedResult:
-      required:
-        - items
-        - totalCount
-        - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/TradeCodeDto'
-        totalCount:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-          readOnly: true
-      additionalProperties: false
-    TradeCodeFileDto:
-      required:
-        - endDate
-        - exchangeId
-        - id
-        - startDate
-        - timeFrame
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        exchangeId:
-          type: string
-        timeFrame:
-          type: string
-        startDate:
-          type: string
-          format: date-time
-        endDate:
-          type: string
-          format: date-time
-      additionalProperties: false
-    TradeDto:
-      required:
-        - count
-        - dateOpen
-        - id
-        - price
-        - tradeCodeId
-        - tradeOpen
-        - tradeSignal
-        - tradeTypeId
-        - userId
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        dateOpen:
-          type: string
-          format: date-time
-        dateClose:
-          type: string
-          format: date-time
-        tradeOpen:
-          type: number
-          format: double
-        tradeClose:
-          type: number
-          format: double
-        netIncome:
-          type: number
-          format: double
-        count:
-          type: integer
-          format: int32
-        price:
-          type: number
-          format: double
-        tradeSignal:
-          $ref: '#/components/schemas/TradeSignal'
-        tradeTypeId:
-          type: integer
-          format: int32
-        tradeCodeId:
-          type: integer
-          format: int32
-        userId:
-          type: integer
-          format: int32
-      additionalProperties: false
-    TradeDtoPagedResult:
-      required:
-        - items
-        - totalCount
-        - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/TradeDto'
-        totalCount:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-          readOnly: true
-      additionalProperties: false
-    TradeRemind:
-      required:
-        - dateTime
-        - id
-        - textRemind
-        - tradeCodeId
-        - userId
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        textRemind:
-          maxLength: 1024
-          minLength: 0
-          type: string
-        dateTime:
-          type: string
-          format: date-time
-        tradeCodeId:
-          type: integer
-          format: int32
-        userId:
-          type: integer
-          format: int32
-      additionalProperties: false
-    TradeRemindDto:
-      required:
-        - dateTime
-        - id
-        - textRemind
-        - tradeCodeId
-        - userId
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        textRemind:
-          type: string
-        dateTime:
-          type: string
-          format: date-time
-        tradeCodeId:
-          type: integer
-          format: int32
-        userId:
-          type: integer
-          format: int32
-      additionalProperties: false
-    TradeRemindDtoPagedResult:
-      required:
-        - items
-        - totalCount
-        - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/TradeRemindDto'
-        totalCount:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-          readOnly: true
-      additionalProperties: false
-    TradeRemindRequest:
-      required:
-        - dateTime
-        - textRemind
-      type: object
-      properties:
-        textRemind:
-          maxLength: 1024
-          minLength: 0
-          type: string
-        dateTime:
-          type: string
-          format: date-time
-      additionalProperties: false
-    TradeRemindStatistic:
-      required:
-        - totalReminds
-      type: object
-      properties:
-        totalReminds:
-          type: integer
-          format: int32
-      additionalProperties: false
-    TradeRequest:
-      required:
-        - count
-        - dateOpen
-        - tradeCodeId
-        - tradeOpen
-        - tradeSignal
-        - tradeTypeId
-      type: object
-      properties:
-        dateOpen:
-          type: string
-          format: date-time
-        dateClose:
-          type: string
-          format: date-time
-        tradeOpen:
-          type: number
-          format: double
-        tradeClose:
-          type: number
-          format: double
-        tradeSignal:
-          $ref: '#/components/schemas/TradeSignal'
-        count:
-          maximum: 2147483647
-          minimum: 0
-          type: integer
-          format: int32
-        tradeTypeId:
-          type: integer
-          format: int32
-        tradeCodeId:
-          type: integer
-          format: int32
-      additionalProperties: false
     TradeSignal:
       enum:
         - hold
         - buy
         - sell
       type: string
-    TradeStatistic:
-      required:
-        - loseTrades
-        - totalTrades
-        - winTrades
-      type: object
-      properties:
-        totalTrades:
-          type: integer
-          format: int32
-        winTrades:
-          type: integer
-          format: int32
-        loseTrades:
-          type: integer
-          format: int32
-      additionalProperties: false
     TradeStatus:
       enum:
         - open
         - closed
       type: string
-    TradeStrategy:
+    UpdateTradeRemindRequest:
       required:
-        - id
-        - name
+        - dateTime
+        - textRemind
       type: object
       properties:
-        id:
-          type: integer
-          format: int32
-        name:
-          maxLength: 128
+        textRemind:
           type: string
-        description:
-          maxLength: 256
-          type: string
-        accuracy:
-          type: integer
-          format: int32
-        signalFrequency:
-          maxLength: 128
-          type: string
-        investmentHorizon:
-          maxLength: 128
-          type: string
-        logicDesc:
-          maxLength: 256
-          type: string
-        useDesc:
-          maxLength: 256
-          type: string
-        limitDesc:
-          maxLength: 256
-          type: string
-      additionalProperties: false
-    TradeStrategyDto:
-      required:
-        - id
-        - isActive
-        - name
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        name:
-          type: string
-        description:
-          type: string
-        accuracy:
-          type: integer
-          format: int32
-        signalFrequency:
-          type: string
-        investmentHorizon:
-          type: string
-        logicDesc:
-          type: string
-        useDesc:
-          type: string
-        limitDesc:
-          type: string
-        isActive:
-          type: boolean
-      additionalProperties: false
-    TradeStrategyDtoPagedResult:
-      required:
-        - items
-        - totalCount
-        - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/TradeStrategyDto'
-        totalCount:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-          readOnly: true
-      additionalProperties: false
-    User:
-      required:
-        - hashPassword
-        - id
-        - lastLoginDate
-        - login
-        - registerDate
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        login:
-          maxLength: 64
-          type: string
-        hashPassword:
-          maxLength: 512
-          type: string
-        lastLoginDate:
-          type: string
-          format: date-time
-        registerDate:
-          type: string
-          format: date-time
-        tgId:
-          maxLength: 512
-          type: string
-        trades:
-          type: array
-          items:
-            $ref: '#/components/schemas/Trade'
-        userTradeCodes:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserTradeCode'
-        userTradeStrategies:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserTradeStrategy'
-      additionalProperties: false
-    UserSessionDto:
-      required:
-        - createdAt
-        - id
-        - lastSeen
-        - userAgent
-      type: object
-      properties:
-        id:
-          type: string
-        userAgent:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        lastSeen:
+        dateTime:
           type: string
           format: date-time
       additionalProperties: false
-    UserSessionDtoPagedResult:
+    UpdateTradeRequest:
       required:
-        - items
-        - totalCount
-        - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserSessionDto'
-        totalCount:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-          readOnly: true
-      additionalProperties: false
-    UserStrategyTradeCodeDto:
-      required:
-        - strategyId
+        - count
+        - dateOpen
         - tradeCodeId
-        - userId
+        - tradeOpen
+        - tradeSignal
+        - tradeTypeId
       type: object
       properties:
-        userId:
-          type: integer
-          format: int32
-        tradeCodeId:
-          type: integer
-          format: int32
-        strategyId:
-          type: integer
-          format: int32
-      additionalProperties: false
-    UserStrategyTradeCodeDtoPagedResult:
-      required:
-        - items
-        - totalCount
-        - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserStrategyTradeCodeDto'
-        totalCount:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-          readOnly: true
-      additionalProperties: false
-    UserStrategyTradeCodeRequest:
-      required:
-        - strategyId
-        - tradeCodeId
-      type: object
-      properties:
-        tradeCodeId:
-          type: integer
-          format: int32
-        strategyId:
-          type: integer
-          format: int32
-      additionalProperties: false
-    UserTradeCode:
-      required:
-        - id
-        - tradeCode
-        - tradeCodeId
-        - user
-        - userId
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        userId:
-          type: integer
-          format: int32
-        tradeCodeId:
-          type: integer
-          format: int32
-        user:
-          $ref: '#/components/schemas/User'
-        tradeCode:
-          $ref: '#/components/schemas/TradeCode'
-      additionalProperties: false
-    UserTradeStrategy:
-      required:
-        - id
-        - tradeStrategyId
-        - userId
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        userId:
-          type: integer
-          format: int32
-        tradeStrategyId:
-          type: integer
-          format: int32
-      additionalProperties: false
-    UserTradeStrategyDto:
-      required:
-        - id
-        - tradeStrategyId
-        - userId
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        userId:
-          type: integer
-          format: int32
-        tradeStrategyId:
-          type: integer
-          format: int32
-      additionalProperties: false
-    UserTradeStrategyDtoPagedResult:
-      required:
-        - items
-        - totalCount
-        - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserTradeStrategyDto'
-        totalCount:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-          readOnly: true
-      additionalProperties: false
-    WinrateTradeStatistic:
-      required:
-        - profitFactor
-        - totalWinrate
-      type: object
-      properties:
-        totalWinrate:
+        dateOpen:
+          type: string
+          format: date-time
+        dateClose:
+          type: string
+          format: date-time
+        tradeOpen:
           type: number
-          format: float
-        profitFactor:
+          format: double
+        tradeClose:
           type: number
-          format: float
+          format: double
+        tradeSignal:
+          $ref: '#/components/schemas/TradeSignal'
+        count:
+          type: integer
+          format: int32
+        tradeTypeId:
+          type: integer
+          format: int32
+        tradeCodeId:
+          type: integer
+          format: int32
       additionalProperties: false
 tags:
   - name: Auth

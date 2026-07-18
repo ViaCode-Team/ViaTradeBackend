@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Domain.Models.Sort;
 
-public abstract class BaseSortRequest<TEnum> : IValidatableObject where TEnum : struct, Enum
+public abstract record BaseSortRequest<TEnum> : IValidatableObject where TEnum : struct, Enum
 {
 	public List<TEnum> SortBy { get; init; } = [];
 

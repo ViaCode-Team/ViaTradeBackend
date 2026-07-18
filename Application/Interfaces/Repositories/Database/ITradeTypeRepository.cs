@@ -1,5 +1,5 @@
+using Application.Contracts.Dto.Trade;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto.Trade;
 
 namespace Application.Interfaces.Repositories.Database;
 

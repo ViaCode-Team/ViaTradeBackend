@@ -1,6 +1,6 @@
+using Application.Contracts.Dto.Trade;
 using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto.Trade;
 
 namespace Infrastructure.Repositories.DataBase;
 

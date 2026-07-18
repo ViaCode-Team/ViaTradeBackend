@@ -1,6 +1,6 @@
+using Application.Contracts.Dto.Strategy;
 using Domain.Entities.DataBase;
 using Domain.Interfaces;
-using Domain.Models.Dto.Strategy;
 using Domain.Models.Pagination;
 
 namespace Application.Interfaces.Repositories.Database;

@@ -8,5 +8,5 @@ public class TickerResults
 
 	public int? Accuracy { get; set; }
 
-	public List<StrategyResult> Results { get; set; } = new();
+	public List<StrategyResult> Results { get; set; } = [];
 }

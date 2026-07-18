@@ -1,14 +1,15 @@
+using Application.Contracts.Dto.Requests.Trade;
 using Application.Interfaces;
 using Application.Interfaces.Utils;
-using Domain.Entities.DataBase;
-using Domain.Models.Dto.Statistic;
-using Domain.Models.Dto.Trade;
 using Domain.Models.Filters;
 using Domain.Models.Pagination;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
-using ViaTradeBackend.Models.Trade;
+using ViaTradeBackend.Contracts.Statistics;
+using ViaTradeBackend.Contracts.Trades;
 
 namespace ViaTradeBackend.Controllers;
 
@@ -24,67 +25,72 @@ public class TradeController(
 
 	[HttpGet("statistics")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<GlobalStatistic>> GetTradeStatistics(CancellationToken cancellationToken)
+	public async Task<Ok<GlobalStatisticResponse>> GetTradeStatistics(CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var tradeStatistics = await _tradeService.GetGlobalStatisticAsync(userId, cancellationToken);
-		return Ok(tradeStatistics);
+		return TypedResults.Ok(tradeStatistics.Adapt<GlobalStatisticResponse>());
 	}
 
 	[HttpGet("byuser")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<PagedResult<TradeDto>>> GetUserTrades(
+	public async Task<Ok<PagedResult<TradeResponse>>> GetUserTrades(
 		[FromQuery] TradeFilterRequest? filterRequest,
 		[FromQuery] PaginationRequest? paginationRequest,
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var userTrades = await _tradeService.GetByUserPagedAsync(userId, filterRequest, paginationRequest, cancellationToken);
-		return Ok(userTrades);
+		return TypedResults.Ok(userTrades.Map(t => t.Adapt<TradeResponse>()));
 	}
 
 	[HttpGet("{id}")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<ActionResult<Trade>> GetTradeById(
+	public async Task<Ok<TradeResponse>> GetTradeById(
 		[Required] int id,
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		var trade = await _tradeService.GetTradeByIdAsync(id, userId, cancellationToken);
-		return Ok(trade);
+		return TypedResults.Ok(trade.Adapt<TradeResponse>());
 	}
 
 	[HttpPost("byuser")]
 	[ProducesResponseType(StatusCodes.Status201Created)]
-	public async Task<ActionResult<Trade>> CreateUserTrade(
-		[FromBody, Required] TradeRequest request,
+	public async Task<Created<TradeResponse>> CreateUserTrade(
+		[FromBody, Required] CreateTradeRequest request,
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		var trade = await _tradeService.CreateTradeAsync(request, userId, cancellationToken);
-		return CreatedAtAction(nameof(GetTradeById), new { id = trade.Id }, trade);
+		var trade = await _tradeService.CreateTradeAsync(request.Adapt<TradeCreateDto>(), userId, cancellationToken);
+		return TypedResults.Created($"/api/Trade/{trade.Id}", trade.Adapt<TradeResponse>());
 	}
 
 	[HttpPut("byuser/{id}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
-	public async Task<ActionResult> UpdateUserTrade(
+	public async Task<NoContent> UpdateUserTrade(
 		[Required, FromRoute] int id,
-		[FromBody, Required] TradeRequest request,
+		[FromBody, Required] UpdateTradeRequest request,
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
-		await _tradeService.UpdateTradeAsync(id, request, userId, cancellationToken);
-		return NoContent();
+		await _tradeService.UpdateTradeAsync(id, request.Adapt<TradeCreateDto>(), userId, cancellationToken);
+		return TypedResults.NoContent();
 	}
 
 	[HttpDelete("byuser/{id}")]
 	[ProducesResponseType(StatusCodes.Status204NoContent)]
-	public async Task<ActionResult> DeleteUserTrade(
+	public async Task<NoContent> DeleteUserTrade(
 		[Required, FromRoute] int id,
 		CancellationToken cancellationToken)
 	{
 		var userId = _jwtHelper.GetUserIdFromClaims(User);
 		await _tradeService.DeleteTradeAsync(id, userId, cancellationToken);
-		return NoContent();
+		return TypedResults.NoContent();
 	}
 }
+
+
+
+
+

@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
-using ViaTradeBackend.Models.Exceptions;
+using ViaTradeBackend.Exceptions;
 
 namespace ViaTradeBackend.Middleware;
 

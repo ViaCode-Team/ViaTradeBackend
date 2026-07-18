@@ -3,6 +3,7 @@ using Application.Interfaces.Repositories.Database;
 using Application.Interfaces.Repositories.Redis;
 using Application.Interfaces.Services;
 using Application.Interfaces.Utils;
+using Application.Mappings;
 using Application.Services;
 using Domain.Entities.Redis;
 using Domain.Models.ConfigOptions;
@@ -45,7 +46,7 @@ builder.Services.Configure<ServiceSecurity>(
 	builder.Configuration.GetSection("ServiceSecurity")
 );
 
-builder.Services.Configure<AuthCookiOptions>(
+builder.Services.Configure<AuthCookieOptions>(
 	builder.Configuration.GetSection("AuthCookies")
 );
 
@@ -68,6 +69,7 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
 builder.Services.AddHostedService<SessionCleanupService>();
 
 // SERVICES REGISTRATION
+builder.Services.ConfigureMapster();
 // Repositories
 builder.Services.AddScoped<UserRedisRepository>();
 builder.Services.AddScoped<IRedisRepository<TgTokenEntity>, TgTokenRepository>();

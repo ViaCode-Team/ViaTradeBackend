@@ -1,4 +1,4 @@
-using Domain.Models.Dto.Statistic;
+using Application.Contracts.Dto.Statistic;
 using Domain.Models.Sort;
 using Domain.Models.TradeLogic;
 
@@ -6,7 +6,7 @@ namespace Application.Interfaces;
 
 public interface ITradeResultsService
 {
-	Task<SignalStatistic> GetStrategyResultStatisticAsync(
+	Task<SignalStatisticDto> GetStrategyResultStatisticAsync(
 		int userId,
 		CancellationToken cancellationToken);
 

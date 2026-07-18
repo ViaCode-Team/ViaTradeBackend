@@ -1,6 +1,6 @@
+using Application.Contracts.Dto.Strategy;
 using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto.Strategy;
 using Domain.Models.Pagination;
 using Infrastructure.Extensions;
 

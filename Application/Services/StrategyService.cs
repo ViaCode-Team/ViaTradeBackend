@@ -1,13 +1,13 @@
+using Application.Contracts.Dto.Requests.Trade;
+using Application.Contracts.Dto.Statistic;
+using Application.Contracts.Dto.Strategy;
 using Application.Interfaces;
 using Application.Interfaces.Repositories.Database;
 using Application.Specifications;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto.Statistic;
-using Domain.Models.Dto.Strategy;
 using Domain.Models.Filters;
 using Domain.Models.Pagination;
 using Domain.Models.Sort;
-using ViaTradeBackend.Models.Trade;
 
 namespace Application.Services;
 
@@ -26,7 +26,7 @@ public class StrategyService(
 		return await _tradeStrategyRepository.GetPagedFilteredAsync(userId, spec, paginationRequest, cancellationToken);
 	}
 
-	public async Task<StrategyStatistic> GetStrategyStatisticAsync(int userId, CancellationToken cancellationToken)
+	public async Task<StrategyStatisticDto> GetStrategyStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
 		var totalStrategiesTask = _tradeStrategyRepository.CountAsync(cancellationToken);
 		var activeStrategiesTask = _userTradeStrategyRepository.CountByUserAsync(userId, cancellationToken);
@@ -36,7 +36,7 @@ public class StrategyService(
 		var totalStrategies = totalStrategiesTask.Result;
 		var activeStrategies = activeStrategiesTask.Result;
 
-		return new StrategyStatistic
+		return new StrategyStatisticDto
 		{
 			TotalStrategies = totalStrategies,
 			ActiveStrategies = activeStrategies,
@@ -46,9 +46,8 @@ public class StrategyService(
 
 	public async Task<TradeStrategy> GetStrategyByIdAsync(int strategyId, CancellationToken cancellationToken)
 	{
-		var strategy = await _tradeStrategyRepository.GetByIdAsync(strategyId, cancellationToken)
+		return await _tradeStrategyRepository.GetByIdAsync(strategyId, cancellationToken)
 			?? throw new KeyNotFoundException();
-		return strategy;
 	}
 
 	public async Task<PagedResult<UserStrategyTradeCodeDto>> GetUserStrategyCodesPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
@@ -56,7 +55,7 @@ public class StrategyService(
 		return await _userStrategyTradeCodeRepository.GetPagedAsync(userId, paginationRequest, cancellationToken);
 	}
 
-	public async Task CreateUserStrategyCodeAsync(UserStrategyTradeCodeRequest request, int userId, CancellationToken cancellationToken)
+	public async Task CreateUserStrategyCodeAsync(UserStrategyTradeCodeCreateDto request, int userId, CancellationToken cancellationToken)
 	{
 		bool isUserStrategyCodeExist = await _userStrategyTradeCodeRepository.ExistsAsync(
 			e => e.UserId == userId &&
@@ -65,9 +64,7 @@ public class StrategyService(
 			cancellationToken);
 
 		if (isUserStrategyCodeExist)
-		{
 			throw new InvalidOperationException("User strategy code already exists");
-		}
 
 		var newUserStrategyCode = new UserStrategyTradeCode
 		{
@@ -97,7 +94,7 @@ public class StrategyService(
 		return await _userTradeStrategyRepository.GetByUserPagedAsync(userId, paginationRequest, cancellationToken);
 	}
 
-	public async Task CreateUserStrategyAsync(CreateUserStrategyRequest request, int userId, CancellationToken cancellationToken)
+	public async Task CreateUserStrategyAsync(CreateUserStrategyCreateDto request, int userId, CancellationToken cancellationToken)
 	{
 		var isUserExist = await _userTradeStrategyRepository.ExistsAsync(e => e.UserId == userId && e.TradeStrategyId == request.StrategyId, cancellationToken);
 

@@ -2,9 +2,9 @@ using Domain.Enums;
 
 namespace Domain.Models.Sort;
 
-public class StockSortRequest : BaseSortRequest<StockSortField>
+public record StockSortRequest() : BaseSortRequest<StockSortField>
 {
-	public StockSortRequest()
+	public StockSortRequest(bool _) : this()
 	{
 		SortBy = [StockSortField.NameAsc];
 	}

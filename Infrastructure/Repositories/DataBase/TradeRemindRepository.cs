@@ -1,7 +1,7 @@
+using Application.Contracts.Dto.NoteRemind;
 using Application.Interfaces.Repositories.Database;
 using Application.Specifications;
 using Domain.Entities.DataBase;
-using Domain.Models.Dto.NoteRemind;
 using Domain.Models.Pagination;
 using Domain.Models.Sort;
 using Infrastructure.Extensions;
@@ -61,7 +61,7 @@ public class TradeRemindRepository(AppDbContext context)
 			.Where(r => r.Id == remindId && r.UserId == userId)
 			.ExecuteUpdateAsync(s => s
 				.SetProperty(r => r.TextRemind, textRemind)
-				.SetProperty(r => r.DateTime, dateTime), 
+				.SetProperty(r => r.DateTime, dateTime),
 				cancellationToken);
 	}
 }

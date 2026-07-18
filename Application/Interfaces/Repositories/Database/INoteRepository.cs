@@ -1,14 +1,14 @@
+using Application.Contracts.Dto.NoteRemind;
+using Application.Contracts.Dto.Statistic;
 using Domain.Entities.DataBase;
 using Domain.Interfaces;
-using Domain.Models.Dto.NoteRemind;
-using Domain.Models.Dto.Statistic;
 using Domain.Models.Pagination;
 
 namespace Application.Interfaces.Repositories.Database;
 
 public interface INoteRepository : IRepository<Note, NoteDto>
 {
-	Task<NoteStatistic> GetNoteStatisticAsync(int userId, CancellationToken cancellationToken = default);
+	Task<NoteStatisticDto> GetNoteStatisticAsync(int userId, CancellationToken cancellationToken = default);
 	Task<PagedResult<NoteDto>> GetPagedFilteredAsync(IQuerySpecification<Note> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken);
 	Task<Note> GetUserNoteByProp(int id, int userId, NoteType noteType, CancellationToken cancellationToken);
 	Task AddUserNoteAsync(int relatedId, NoteType noteType, NoteDto dto, CancellationToken cancellationToken);
