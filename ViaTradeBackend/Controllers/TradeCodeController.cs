@@ -1,8 +1,9 @@
-using Application.Interfaces;
+using Application.TradeCodes.Queries;
 using Domain.Entities.CSV;
 using Domain.Models.Pagination;
 using Domain.Models.Sort;
 using Mapster;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -15,15 +16,16 @@ namespace ViaTradeBackend.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class TradeCodeController(ITradeCodeService tradeService) : ControllerBase
+public class TradeCodeController(ISender sender) : ControllerBase
 {
-	private readonly ITradeCodeService _tradeService = tradeService;
+	private readonly ISender _sender = sender;
 
 	[HttpGet("stocks/statistics")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
 	public async Task<Ok<StockStatisticResponse>> GetStockStatistics(CancellationToken cancellationToken)
 	{
-		var result = await _tradeService.GetStockStatisticAsync(cancellationToken);
+		var query = new GetStockStatisticQuery();
+		var result = await _sender.Send(query, cancellationToken);
 		return TypedResults.Ok(result.Adapt<StockStatisticResponse>());
 	}
 
@@ -34,15 +36,17 @@ public class TradeCodeController(ITradeCodeService tradeService) : ControllerBas
 		[FromQuery] StockSortRequest? sortRequest,
 		CancellationToken cancellationToken)
 	{
-		var result = await _tradeService.GetCodesPagedAsync(paginationRequest, sortRequest, cancellationToken);
+		var query = new GetCodesPagedQuery(paginationRequest, sortRequest);
+		var result = await _sender.Send(query, cancellationToken);
 		return TypedResults.Ok(result.Map(c => c.Adapt<TradeCodeResponse>()));
 	}
 
 	[HttpGet("sys/stocks")]
 	[ProducesResponseType(StatusCodes.Status200OK)]
-	public async Task<Ok<List<TradeCodeFileResponse>>> GetSysStockCodes()
+	public async Task<Ok<List<TradeCodeFileResponse>>> GetSysStockCodes(CancellationToken cancellationToken)
 	{
-		var result = await _tradeService.GetSysAllCodesAsync(TradeDataType.Stocks);
+		var query = new GetSysAllCodesQuery(TradeDataType.Stocks);
+		var result = await _sender.Send(query, cancellationToken);
 		return TypedResults.Ok(result.Adapt<List<TradeCodeFileResponse>>());
 	}
 
@@ -52,8 +56,8 @@ public class TradeCodeController(ITradeCodeService tradeService) : ControllerBas
 		[FromRoute, Required] string tradeIdString,
 		CancellationToken cancellationToken)
 	{
-		var result = await _tradeService.GetSysCodeByIdAsync(TradeDataType.Stocks, tradeIdString, cancellationToken);
+		var query = new GetSysCodeByIdQuery(TradeDataType.Stocks, tradeIdString);
+		var result = await _sender.Send(query, cancellationToken);
 		return TypedResults.Ok(result.Adapt<TradeCodeFileResponse>());
 	}
 }
-
