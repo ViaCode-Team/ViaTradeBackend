@@ -1,4 +1,3 @@
-using Application.Contracts.Dto.Strategy;
 using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
 using Domain.Models.Pagination;
@@ -8,21 +7,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase;
 
-public class UserTradeStrategyRepository(AppDbContext context) : GenericRepository<UserTradeStrategy, UserTradeStrategyDto>(context),
+public class UserTradeStrategyRepository(AppDbContext context) : GenericRepository<UserTradeStrategy>(context),
 	IUserTradeStrategyRepository
 {
-	public async Task<PagedResult<UserTradeStrategyDto>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<UserTradeStrategy>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
-		return await _context.UserTradeStrategies
-			.Where(e => e.UserId == userId)
-			.Select(e => new UserTradeStrategyDto
-			{
-				Id = e.Id,
-				UserId = e.UserId,
-				TradeStrategyId = e.TradeStrategyId
-			})
-			.OrderBy(e => e.Id)
-			.ToPagedAsync(paginationRequest, cancellationToken);
+		return await FindPagedAsync(e => e.UserId == userId, paginationRequest, cancellationToken);
 	}
 
 	public async Task<int> CountByUserAsync(int userId, CancellationToken cancellationToken)

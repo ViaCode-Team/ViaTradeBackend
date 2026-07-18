@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 
 namespace Application.Interfaces.Repositories.Database;
 
-public interface IRepository<TEntity, TDto> where TEntity : BaseEntity where TDto : class
+public interface IRepository<TEntity> where TEntity : BaseEntity
 {
 	Task<TEntity?> GetByIdAsync(int id, CancellationToken ct = default);
 	Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken ct = default);

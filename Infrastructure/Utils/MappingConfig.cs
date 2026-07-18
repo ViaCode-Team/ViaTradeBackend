@@ -7,18 +7,15 @@ namespace Application.Mappings;
 
 public static class MappingConfig
 {
-	public static void ConfigureMapster(this IServiceCollection services)
+	public static IServiceCollection AddMapster(this IServiceCollection services)
 	{
-		var config = TypeAdapterConfig.GlobalSettings;
+		var config = new TypeAdapterConfig();
 
-		// Scan the assembly for any IRegister implementations
 		config.Scan(Assembly.GetExecutingAssembly());
-
-		// We can add specific global configurations here if needed
-		// For example, if we wanted to globally ignore HashPassword:
-		//config.Default.Ignore("HashPassword");
 
 		services.AddSingleton(config);
 		services.AddScoped<IMapper, ServiceMapper>();
+
+		return services;
 	}
 }

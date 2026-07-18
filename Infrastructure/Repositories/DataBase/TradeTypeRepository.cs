@@ -4,6 +4,6 @@ using Domain.Entities.DataBase;
 
 namespace Infrastructure.Repositories.DataBase;
 
-public class TradeTypeRepository(AppDbContext context) : GenericRepository<TradeType, TradeTypeDto>(context), ITradeTypeRepository
+public class TradeTypeRepository(AppDbContext context) : GenericRepository<TradeType>(context), ITradeTypeRepository
 {
 }

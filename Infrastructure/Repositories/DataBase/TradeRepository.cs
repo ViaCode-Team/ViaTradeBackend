@@ -1,5 +1,5 @@
 using Application.Contracts.Dto.Requests.Trade;
-using Application.Contracts.Dto.Statistic;
+using Application.Models.Statistic;
 using Application.Contracts.Dto.Trade;
 using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
@@ -12,9 +12,9 @@ using Microsoft.EntityFrameworkCore;
 namespace Infrastructure.Repositories.DataBase;
 
 public class TradeRepository(AppDbContext context)
-	: GenericRepository<Trade, TradeDto>(context), ITradeRepository
+	: GenericRepository<Trade>(context), ITradeRepository
 {
-	public async Task<GlobalStatisticDto> GetGlobalStatisticAsync(int userId, CancellationToken cancellationToken)
+	public async Task<GlobalStatisticReadModel> GetGlobalStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
 		var baseQuery = _dbSet.Where(t => t.UserId == userId && t.NetIncome.HasValue);
 
@@ -22,11 +22,11 @@ public class TradeRepository(AppDbContext context)
 
 		if (totalTrades == 0)
 		{
-			return new GlobalStatisticDto
+			return new GlobalStatisticReadModel
 			{
-				TradeStatisticDto = new TradeStatisticDto { TotalTrades = 0, WinTrades = 0, LoseTrades = 0 },
-				IncomeStatistic = new IncomeTradeStatisticDto { TotalIncome = 0, AverageIncome = 0 },
-				WinrateStatistic = new WinrateTradeStatisticDto { TotalWinrate = 0, ProfitFactor = 0 }
+				TradeStatisticReadModel = new TradeStatisticReadModel { TotalTrades = 0, WinTrades = 0, LoseTrades = 0 },
+				IncomeStatistic = new IncomeTradeStatisticReadModel { TotalIncome = 0, AverageIncome = 0 },
+				WinrateStatistic = new WinrateTradeStatisticReadModel { TotalWinrate = 0, ProfitFactor = 0 }
 			};
 		}
 
@@ -37,100 +37,46 @@ public class TradeRepository(AppDbContext context)
 		var totalProfit = await baseQuery.Where(t => t.NetIncome > 0).SumAsync(TradeStatisticsCalcService.AbsoluteIncomeAbsExpression, cancellationToken);
 		var totalLoss = await baseQuery.Where(t => t.NetIncome < 0).SumAsync(TradeStatisticsCalcService.AbsoluteIncomeAbsExpression, cancellationToken);
 
-		var resultTrade = new TradeStatisticDto
+		var resultTrade = new TradeStatisticReadModel
 		{
 			TotalTrades = totalTrades,
 			WinTrades = winTrades,
 			LoseTrades = loseTrades,
 		};
 
-		var incomeStatistic = new IncomeTradeStatisticDto
+		var incomeStatistic = new IncomeTradeStatisticReadModel
 		{
 			TotalIncome = Math.Round((decimal)totalAbsoluteIncome, 2),
 			AverageIncome = TradeStatisticsCalcService.CalculateAverageIncome((decimal)totalAbsoluteIncome, totalTrades),
 		};
 
-		var winrateStatistic = new WinrateTradeStatisticDto
+		var winrateStatistic = new WinrateTradeStatisticReadModel
 		{
 			TotalWinrate = TradeStatisticsCalcService.CalculateWinrate(winTrades, totalTrades),
 			ProfitFactor = TradeStatisticsCalcService.CalculateProfitFactor(totalProfit, totalLoss)
 		};
 
-		return new GlobalStatisticDto
+		return new GlobalStatisticReadModel
 		{
-			TradeStatisticDto = resultTrade,
+			TradeStatisticReadModel = resultTrade,
 			IncomeStatistic = incomeStatistic,
 			WinrateStatistic = winrateStatistic
 		};
 	}
 
-	public async Task<PagedResult<TradeDto>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<Trade>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
-		return await _dbSet
-			.Where(t => t.UserId == userId)
-			.Select(t => new TradeDto
-			{
-				Id = t.Id,
-				DateOpen = t.DateOpen,
-				DateClose = t.DateClose,
-				TradeOpen = t.TradeOpen,
-				TradeClose = t.TradeClose,
-				NetIncome = t.NetIncome,
-				Count = t.Count,
-				Price = t.Price,
-				TradeSignal = t.TradeSignal,
-				TradeTypeId = t.TradeTypeId,
-				TradeCodeId = t.TradeCodeId,
-				UserId = t.UserId
-			})
-			.OrderBy(t => t.Id)
-			.ToPagedAsync(paginationRequest, cancellationToken);
+		return await FindPagedAsync(t => t.UserId == userId, paginationRequest, cancellationToken);
 	}
 
-	public async Task<PagedResult<TradeDto>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<Trade>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
-		return await _dbSet
-			.Where(t => t.UserId == userId && t.TradeCodeId == tradeCodeId)
-			.Select(t => new TradeDto
-			{
-				Id = t.Id,
-				DateOpen = t.DateOpen,
-				DateClose = t.DateClose,
-				TradeOpen = t.TradeOpen,
-				TradeClose = t.TradeClose,
-				NetIncome = t.NetIncome,
-				Count = t.Count,
-				Price = t.Price,
-				TradeSignal = t.TradeSignal,
-				TradeTypeId = t.TradeTypeId,
-				TradeCodeId = t.TradeCodeId,
-				UserId = t.UserId
-			})
-			.OrderBy(t => t.Id)
-			.ToPagedAsync(paginationRequest, cancellationToken);
+		return await FindPagedAsync(t => t.UserId == userId && t.TradeCodeId == tradeCodeId, paginationRequest, cancellationToken);
 	}
 
-	public async Task<PagedResult<TradeDto>> GetPagedFilteredAsync(IQuerySpecification<Trade> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<Trade>> GetPagedFilteredAsync(IQuerySpecification<Trade> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
 	{
-		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
-
-		return await queryable
-			.Select(t => new TradeDto
-			{
-				Id = t.Id,
-				DateOpen = t.DateOpen,
-				DateClose = t.DateClose,
-				TradeOpen = t.TradeOpen,
-				TradeClose = t.TradeClose,
-				NetIncome = t.NetIncome,
-				Count = t.Count,
-				Price = t.Price,
-				TradeSignal = t.TradeSignal,
-				TradeTypeId = t.TradeTypeId,
-				TradeCodeId = t.TradeCodeId,
-				UserId = t.UserId
-			})
-			.ToPagedAsync(paginationRequest, cancellationToken);
+		return await GetPagedAsync(spec, paginationRequest, cancellationToken);
 	}
 
 	public async Task<int> UpdateUserTradeAsync(int id, int userId, TradeCreateDto request, double? netIncome, decimal price, CancellationToken cancellationToken = default)

@@ -1,3 +1,5 @@
+using Domain.Notes.Entities;
+using Domain.Reminds.Entities;
 using Domain.Entities.DataBase;
 using Microsoft.EntityFrameworkCore;
 

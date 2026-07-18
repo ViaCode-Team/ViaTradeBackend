@@ -1,4 +1,3 @@
-using Application.Contracts.Dto.Strategy;
 using Application.Interfaces.Repositories.Database;
 using Domain.Entities.DataBase;
 using Domain.Interfaces;
@@ -8,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase;
 
-public class TradeStrategyRepository(AppDbContext context) : GenericRepository<TradeStrategy, TradeStrategyDto>(context),
+public class TradeStrategyRepository(AppDbContext context) : GenericRepository<TradeStrategy>(context),
 	ITradeStrategyRepository
 {
 	public async Task<int> CountAsync(CancellationToken cancellationToken = default)
@@ -16,43 +15,32 @@ public class TradeStrategyRepository(AppDbContext context) : GenericRepository<T
 		return await _dbSet.CountAsync(cancellationToken);
 	}
 
-	public async Task<TradeStrategyDto?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
+	public async Task<TradeStrategy?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
 	{
 		return await _dbSet
 			.Where(tradeStrategy => tradeStrategy.Name == name)
-			.Select(tradeStrategy => new TradeStrategyDto
-			{
-				Id = tradeStrategy.Id,
-				Name = tradeStrategy.Name,
-				Description = tradeStrategy.Description,
-				Accuracy = tradeStrategy.Accuracy,
-				SignalFrequency = tradeStrategy.SignalFrequency,
-				InvestmentHorizon = tradeStrategy.InvestmentHorizon,
-				LogicDesc = tradeStrategy.LogicDesc,
-				UseDesc = tradeStrategy.UseDesc,
-				LimitDesc = tradeStrategy.LimitDesc
-			})
 			.FirstOrDefaultAsync(cancellationToken);
 	}
 
-	public async Task<PagedResult<TradeStrategyDto>> GetPagedFilteredAsync(int userId, IQuerySpecification<TradeStrategy> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken = default)
+	public async Task<PagedResult<TradeStrategy>> GetPagedFilteredAsync(int userId, IQuerySpecification<TradeStrategy> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken = default)
 	{
 		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
 
-		return await queryable
-			.Select(tradeStrategy => new TradeStrategyDto
+		if (spec.SortExpressions.Count == 0)
+			queryable = queryable.OrderBy(e => e.Id);
+
+		var pagedTuple = await queryable
+			.Select(tradeStrategy => new
 			{
-				Id = tradeStrategy.Id,
-				Name = tradeStrategy.Name,
-				Description = tradeStrategy.Description,
-				Accuracy = tradeStrategy.Accuracy,
-				SignalFrequency = tradeStrategy.SignalFrequency,
-				InvestmentHorizon = tradeStrategy.InvestmentHorizon,
-				LogicDesc = tradeStrategy.LogicDesc,
-				UseDesc = tradeStrategy.UseDesc,
-				LimitDesc = tradeStrategy.LimitDesc,
+				Strategy = tradeStrategy,
 				IsActive = tradeStrategy.UserTradeStrategies!.Any(uts => uts.UserId == userId)
 			})
 			.ToPagedAsync(paginationRequest, cancellationToken);
+
+		return pagedTuple.Map(t =>
+		{
+			t.Strategy.IsActive = t.IsActive;
+			return t.Strategy;
+		});
 	}
 }

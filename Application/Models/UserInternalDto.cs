@@ -13,6 +13,7 @@ public class UserInternalDto
 	public DateTime LastLoginDate { get; set; } = DateTime.UtcNow;
 
 	public required DateTime RegisterDate { get; set; }
+
 	[MaxLength(512)]
 	public string? TgId { get; set; }
 }

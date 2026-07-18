@@ -1,4 +1,4 @@
-using Application.Contracts.Dto.Statistic;
+using Application.Models.Statistic;
 using Application.Contracts.Dto.Trade;
 using Application.Interfaces;
 using Application.Interfaces.Repositories.Database;
@@ -19,12 +19,12 @@ public class TradeService(
 	private readonly ITradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
 	private readonly ITradeTypeRepository _tradeTypeRepository = tradeTypeRepository;
 
-	public async Task<GlobalStatisticDto> GetGlobalStatisticAsync(int userId, CancellationToken cancellationToken)
+	public async Task<GlobalStatisticReadModel> GetGlobalStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
 		return await _tradeRepository.GetGlobalStatisticAsync(userId, cancellationToken);
 	}
 
-	public async Task<PagedResult<TradeDto>> GetByUserPagedAsync(int userId, TradeFilterRequest? filterRequest, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<Trade>> GetByUserPagedAsync(int userId, TradeFilterRequest? filterRequest, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
 	{
 		var spec = new TradeQuerySpecification(userId, filterRequest);
 		return await _tradeRepository.GetPagedFilteredAsync(spec, paginationRequest, cancellationToken);

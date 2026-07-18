@@ -1,4 +1,4 @@
-using Application.Contracts.Dto.Statistic;
+using Application.Models.Statistic;
 using Application.Interfaces;
 using Application.Interfaces.Repositories.Database;
 using Application.Interfaces.Utils;
@@ -19,7 +19,7 @@ public class TradeResultsService(
 	private readonly IUserTradeStrategyRepository _userTradeStrategyRepository = userTradeStrategyRepository;
 	private readonly ITradeStrategyRepository _tradeStrategyRepository = tradeStrategyRepository;
 
-	public async Task<SignalStatisticDto> GetStrategyResultStatisticAsync(int userId, CancellationToken cancellationToken)
+	public async Task<SignalStatisticReadModel> GetStrategyResultStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
 
 		var signals = await GetStrategyResultAsync(userId, DateTime.Now, null, null, cancellationToken);
@@ -28,7 +28,7 @@ public class TradeResultsService(
 			.SelectMany(s => s.Tickers)
 			.SelectMany(t => t.Results);
 
-		return new SignalStatisticDto
+		return new SignalStatisticReadModel
 		{
 			TotalSignals = SignalStatisticsCalcService.CountTotalSignals(allResults),
 			BuySignals = SignalStatisticsCalcService.CountBuySignals(allResults),

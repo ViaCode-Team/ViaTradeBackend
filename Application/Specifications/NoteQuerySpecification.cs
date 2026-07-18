@@ -1,4 +1,5 @@
-using Domain.Entities.DataBase;
+using Domain.Notes.Enums;
+using Domain.Notes.Entities;
 using Domain.Models.Filters;
 
 namespace Application.Specifications;
@@ -9,10 +10,12 @@ public class NoteQuerySpecification : BaseQuerySpecification<Note>
 	{
 		AddCriteria(x => x.UserId == userId);
 
-		if (request == null) return;
+		if (request == null) 
+			return;
 
-		if (request.Target is NoteType target)
+		if (request.Target.HasValue)
 		{
+			var target = request.Target.Value;
 			if (target == NoteType.TradeCodeNote)
 				AddCriteria(x => x.TradeCodeId != null);
 			else if (target == NoteType.TradeStrategyNote)

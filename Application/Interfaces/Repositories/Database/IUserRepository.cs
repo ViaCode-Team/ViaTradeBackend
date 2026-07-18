@@ -3,7 +3,7 @@ using Domain.Entities.DataBase;
 
 namespace Application.Interfaces.Repositories.Database;
 
-public interface IUserRepository : IRepository<User, UserInternalDto>
+public interface IUserRepository : IRepository<User>
 {
 	Task<User?> GetByLoginAsync(string login, CancellationToken cancellationToken = default);
 	Task<IEnumerable<User>> GetAllWithTgLinkAsync(CancellationToken cancellationToken = default);

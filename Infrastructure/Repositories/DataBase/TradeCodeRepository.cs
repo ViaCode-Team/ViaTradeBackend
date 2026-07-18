@@ -9,23 +9,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase;
 
-public class TradeCodeRepository(AppDbContext context) : GenericRepository<TradeCode, TradeCodeDto>(context), ITradeCodeRepository
+public class TradeCodeRepository(AppDbContext context) : GenericRepository<TradeCode>(context), ITradeCodeRepository
 {
 	public async Task<int> CountAsync(CancellationToken cancellationToken = default)
 	{
 		return await _dbSet.CountAsync(cancellationToken);
 	}
 
-	public async Task<TradeCodeDto?> GetByExchangeIdAsync(string code, CancellationToken cancellationToken = default)
+	public async Task<TradeCode?> GetByExchangeIdAsync(string code, CancellationToken cancellationToken = default)
 	{
 		return await _dbSet
 			.Where(e => e.ExchangeId == code)
-			.Select(e => new TradeCodeDto
-			{
-				Id = e.Id,
-				ExchangeId = e.ExchangeId,
-				Description = e.Description
-			})
 			.FirstOrDefaultAsync(cancellationToken);
 	}
 
@@ -37,18 +31,13 @@ public class TradeCodeRepository(AppDbContext context) : GenericRepository<Trade
 			.FirstOrDefaultAsync(cancellationToken);
 	}
 
-	public async Task<PagedResult<TradeCodeDto>> GetCodesPagedAsync(PaginationRequest paginationRequest, StockSortRequest? sortRequest = null, CancellationToken cancellationToken = default)
+	public async Task<PagedResult<TradeCode>> GetCodesPagedAsync(PaginationRequest paginationRequest, StockSortRequest? sortRequest = null, CancellationToken cancellationToken = default)
 	{
-		var query = _dbSet.Select(e => new TradeCodeDto
-		{
-			Id = e.Id,
-			ExchangeId = e.ExchangeId,
-			Description = e.Description
-		});
+		var query = _dbSet.AsQueryable();
 
 		if (sortRequest?.SortBy != null && sortRequest.SortBy.Count > 0)
 		{
-			IOrderedQueryable<TradeCodeDto>? orderedQuery = null;
+			IOrderedQueryable<TradeCode>? orderedQuery = null;
 			foreach (var field in sortRequest.SortBy)
 			{
 				if (orderedQuery == null)
@@ -69,6 +58,10 @@ public class TradeCodeRepository(AppDbContext context) : GenericRepository<Trade
 				}
 			}
 			query = orderedQuery ?? query;
+		}
+		else
+		{
+			query = query.OrderBy(e => e.Id);
 		}
 
 		return await query.ToPagedAsync(paginationRequest, cancellationToken);

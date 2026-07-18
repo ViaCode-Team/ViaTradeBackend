@@ -9,9 +9,8 @@ using System.Linq.Expressions;
 
 namespace Infrastructure.Repositories.DataBase;
 
-public class GenericRepository<TEntity, TDto> : IRepository<TEntity, TDto>
+public class GenericRepository<TEntity> : IRepository<TEntity>
 	where TEntity : BaseEntity
-	where TDto : class
 {
 	protected readonly AppDbContext _context;
 	protected readonly DbSet<TEntity> _dbSet;

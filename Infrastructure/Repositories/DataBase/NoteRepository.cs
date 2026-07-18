@@ -1,7 +1,7 @@
-using Application.Contracts.Dto.NoteRemind;
-using Application.Contracts.Dto.Statistic;
+using Domain.Notes.Enums;
+using Domain.Notes.Entities;
+using Application.Models.Statistic;
 using Application.Interfaces.Repositories.Database;
-using Domain.Entities.DataBase;
 using Domain.Interfaces;
 using Domain.Models.Pagination;
 using Infrastructure.Extensions;
@@ -9,41 +9,25 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase;
 
-public class NoteRepository(AppDbContext context) : GenericRepository<Note, NoteDto>(context), INoteRepository
+public class NoteRepository(AppDbContext context) : GenericRepository<Note>(context), INoteRepository
 {
-	public async Task<NoteStatisticDto> GetNoteStatisticAsync(int userId, CancellationToken cancellationToken = default)
+	public async Task<NoteStatisticReadModel> GetNoteStatisticAsync(int userId, CancellationToken cancellationToken = default)
 	{
 		var baseQuery = _dbSet.Where(n => n.UserId == userId);
 
 		var totalNotes = await baseQuery.CountAsync(cancellationToken);
 		if (totalNotes == 0)
-			return new NoteStatisticDto { TotalNotes = 0, StockNotes = 0, StrategyNotes = 0 };
+			return new NoteStatisticReadModel { TotalNotes = 0, StockNotes = 0, StrategyNotes = 0 };
 
 		var stockNotes = await baseQuery.CountAsync(n => n.TradeCodeId != null, cancellationToken);
 		var strategyNotes = await baseQuery.CountAsync(n => n.TradeStrategyId != null, cancellationToken);
 
-		return new NoteStatisticDto
+		return new NoteStatisticReadModel
 		{
 			TotalNotes = totalNotes,
 			StockNotes = stockNotes,
 			StrategyNotes = strategyNotes
 		};
-	}
-
-	public async Task<PagedResult<NoteDto>> GetPagedFilteredAsync(IQuerySpecification<Note> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
-	{
-		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
-
-		return await queryable
-			.Select(n => new NoteDto
-			{
-				Id = n.Id,
-				UserId = n.UserId,
-				NoteText = n.NoteText,
-				TradeCodeId = n.TradeCodeId,
-				TradeStrategyId = n.TradeStrategyId
-			})
-			.ToPagedAsync(paginationRequest, cancellationToken);
 	}
 
 	public async Task<Note?> FindUserNoteByEntityAsync(int userId, int relatedId, NoteType noteType, CancellationToken cancellationToken) => noteType switch
@@ -56,54 +40,37 @@ public class NoteRepository(AppDbContext context) : GenericRepository<Note, Note
 	public async Task<Note> GetUserNoteByProp(int id, int userId, NoteType noteType, CancellationToken cancellationToken)
 	{
 		Note? found = noteType switch
-
 		{
 			NoteType.TradeCodeNote => await _dbSet.FirstOrDefaultAsync(n => n.TradeCodeId == id && n.UserId == userId, cancellationToken),
 			NoteType.TradeStrategyNote => await _dbSet.FirstOrDefaultAsync(n => n.TradeStrategyId == id && n.UserId == userId, cancellationToken),
 			_ => throw new KeyNotFoundException()
 		};
 
-		return found
-			?? throw new KeyNotFoundException();
+		return found ?? throw new KeyNotFoundException();
 	}
 
-	public async Task AddUserNoteAsync(int relatedId, NoteType noteType, NoteDto dto, CancellationToken cancellationToken)
+	public async Task AddUserNoteAsync(int relatedId, NoteType noteType, int userId, string noteText, CancellationToken cancellationToken)
 	{
-		int? tradeCodeId = null;
-		if (noteType == NoteType.TradeCodeNote)
-		{
-			tradeCodeId = relatedId;
-		}
+		int? tradeCodeId = noteType == NoteType.TradeCodeNote ? relatedId : null;
+		int? tradeStrategyId = noteType == NoteType.TradeStrategyNote ? relatedId : null;
 
-		int? tradeStrategyId = null;
-		if (noteType == NoteType.TradeStrategyNote)
-		{
-			tradeStrategyId = relatedId;
-		}
-
-		var note = new Note
-		{
-			UserId = dto.UserId,
-			NoteText = dto.NoteText,
-			TradeCodeId = tradeCodeId,
-			TradeStrategyId = tradeStrategyId
-		};
+		var note = new Note(userId, noteText, tradeCodeId, tradeStrategyId);
 
 		_dbSet.Add(note);
 		await SaveChangesAsync(cancellationToken);
 	}
 
-	public async Task UpdateUserNoteAsync(int id, NoteType noteType, NoteDto dto, CancellationToken cancellationToken)
+	public async Task UpdateUserNoteAsync(int id, NoteType noteType, int userId, string noteText, CancellationToken cancellationToken)
 	{
 		int affectedRows = noteType switch
 		{
 			NoteType.TradeCodeNote => await _dbSet
-				.Where(n => n.TradeCodeId == id && n.UserId == dto.UserId)
-				.ExecuteUpdateAsync(s => s.SetProperty(n => n.NoteText, dto.NoteText), cancellationToken),
+				.Where(n => n.TradeCodeId == id && n.UserId == userId)
+				.ExecuteUpdateAsync(s => s.SetProperty(n => n.NoteText, noteText), cancellationToken),
 
 			NoteType.TradeStrategyNote => await _dbSet
-				.Where(n => n.TradeStrategyId == id && n.UserId == dto.UserId)
-				.ExecuteUpdateAsync(s => s.SetProperty(n => n.NoteText, dto.NoteText), cancellationToken),
+				.Where(n => n.TradeStrategyId == id && n.UserId == userId)
+				.ExecuteUpdateAsync(s => s.SetProperty(n => n.NoteText, noteText), cancellationToken),
 
 			_ => throw new KeyNotFoundException()
 		};

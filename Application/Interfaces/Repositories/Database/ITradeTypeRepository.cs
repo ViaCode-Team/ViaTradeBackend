@@ -3,6 +3,6 @@ using Domain.Entities.DataBase;
 
 namespace Application.Interfaces.Repositories.Database;
 
-public interface ITradeTypeRepository : IRepository<TradeType, TradeTypeDto>
+public interface ITradeTypeRepository : IRepository<TradeType>
 {
 }

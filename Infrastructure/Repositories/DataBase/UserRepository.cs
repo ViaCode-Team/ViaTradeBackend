@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase;
 
-public class UserRepository(AppDbContext context) : GenericRepository<User, UserInternalDto>(context), IUserRepository
+public class UserRepository(AppDbContext context) : GenericRepository<User>(context), IUserRepository
 {
 	public async Task<User?> GetByLoginAsync(string login, CancellationToken cancellationToken = default)
 	{

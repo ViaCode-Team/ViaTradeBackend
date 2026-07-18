@@ -462,13 +462,19 @@ paths:
         - name: page
           in: query
           schema:
+            maximum: 2147483647
+            minimum: 1
             type: integer
             format: int32
+            default: 1
         - name: pageSize
           in: query
           schema:
+            maximum: 100
+            minimum: 1
             type: integer
             format: int32
+            default: 20
       responses:
         '200':
           description: OK
@@ -557,6 +563,10 @@ paths:
       responses:
         '200':
           description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteStatisticResponse'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -647,13 +657,19 @@ paths:
         - name: page
           in: query
           schema:
+            maximum: 2147483647
+            minimum: 1
             type: integer
             format: int32
+            default: 1
         - name: pageSize
           in: query
           schema:
+            maximum: 100
+            minimum: 1
             type: integer
             format: int32
+            default: 20
       responses:
         '200':
           description: OK
@@ -738,7 +754,7 @@ paths:
     get:
       tags:
         - Note
-      operationId: GetUserTradeCodeNoteById
+      operationId: GetUserInstrumentNote
       parameters:
         - name: idInstrument
           in: path
@@ -829,7 +845,7 @@ paths:
     post:
       tags:
         - Note
-      operationId: CreateUserTradeCodeNote
+      operationId: AddUserInstrumentNote
       parameters:
         - name: idInstrument
           in: path
@@ -932,7 +948,7 @@ paths:
     put:
       tags:
         - Note
-      operationId: UpdateUserTradeCodeNote
+      operationId: UpdateUserInstrumentNote
       parameters:
         - name: idInstrument
           in: path
@@ -944,13 +960,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateNoteRequest'
+              $ref: '#/components/schemas/UpdateNoteRequest'
           text/json:
             schema:
-              $ref: '#/components/schemas/CreateNoteRequest'
+              $ref: '#/components/schemas/UpdateNoteRequest'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/CreateNoteRequest'
+              $ref: '#/components/schemas/UpdateNoteRequest'
         required: true
       responses:
         '204':
@@ -1035,7 +1051,7 @@ paths:
     delete:
       tags:
         - Note
-      operationId: DeleteUserTradeCodeNote
+      operationId: DeleteUserInstrumentNote
       parameters:
         - name: idInstrument
           in: path
@@ -1127,7 +1143,7 @@ paths:
     get:
       tags:
         - Note
-      operationId: GetUserStrategyNoteById
+      operationId: GetUserStrategyNote
       parameters:
         - name: idStrategy
           in: path
@@ -1218,7 +1234,7 @@ paths:
     post:
       tags:
         - Note
-      operationId: CreateUserStrategyNote
+      operationId: AddUserStrategyNote
       parameters:
         - name: idStrategy
           in: path
@@ -1333,13 +1349,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateNoteRequest'
+              $ref: '#/components/schemas/UpdateNoteRequest'
           text/json:
             schema:
-              $ref: '#/components/schemas/CreateNoteRequest'
+              $ref: '#/components/schemas/UpdateNoteRequest'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/CreateNoteRequest'
+              $ref: '#/components/schemas/UpdateNoteRequest'
         required: true
       responses:
         '204':
@@ -1783,13 +1799,19 @@ paths:
         - name: page
           in: query
           schema:
+            maximum: 2147483647
+            minimum: 1
             type: integer
             format: int32
+            default: 1
         - name: pageSize
           in: query
           schema:
+            maximum: 100
+            minimum: 1
             type: integer
             format: int32
+            default: 20
         - name: sortBy
           in: query
           schema:
@@ -1885,13 +1907,19 @@ paths:
         - name: page
           in: query
           schema:
+            maximum: 2147483647
+            minimum: 1
             type: integer
             format: int32
+            default: 1
         - name: pageSize
           in: query
           schema:
+            maximum: 100
+            minimum: 1
             type: integer
             format: int32
+            default: 20
         - name: sortBy
           in: query
           schema:
@@ -2770,13 +2798,19 @@ paths:
         - name: page
           in: query
           schema:
+            maximum: 2147483647
+            minimum: 1
             type: integer
             format: int32
+            default: 1
         - name: pageSize
           in: query
           schema:
+            maximum: 100
+            minimum: 1
             type: integer
             format: int32
+            default: 20
       responses:
         '200':
           description: OK
@@ -2958,13 +2992,19 @@ paths:
         - name: page
           in: query
           schema:
+            maximum: 2147483647
+            minimum: 1
             type: integer
             format: int32
+            default: 1
         - name: pageSize
           in: query
           schema:
+            maximum: 100
+            minimum: 1
             type: integer
             format: int32
+            default: 20
       responses:
         '200':
           description: OK
@@ -3247,13 +3287,19 @@ paths:
         - name: page
           in: query
           schema:
+            maximum: 2147483647
+            minimum: 1
             type: integer
             format: int32
+            default: 1
         - name: pageSize
           in: query
           schema:
+            maximum: 100
+            minimum: 1
             type: integer
             format: int32
+            default: 20
       responses:
         '200':
           description: OK
@@ -3637,13 +3683,19 @@ paths:
         - name: page
           in: query
           schema:
+            maximum: 2147483647
+            minimum: 1
             type: integer
             format: int32
+            default: 1
         - name: pageSize
           in: query
           schema:
+            maximum: 100
+            minimum: 1
             type: integer
             format: int32
+            default: 20
       responses:
         '200':
           description: OK
@@ -4201,13 +4253,19 @@ paths:
         - name: page
           in: query
           schema:
+            maximum: 2147483647
+            minimum: 1
             type: integer
             format: int32
+            default: 1
         - name: pageSize
           in: query
           schema:
+            maximum: 100
+            minimum: 1
             type: integer
             format: int32
+            default: 20
         - name: sortBy
           in: query
           schema:
@@ -4912,6 +4970,23 @@ components:
         password:
           type: string
       additionalProperties: false
+    NoteStatisticResponse:
+      required:
+        - stockNotes
+        - strategyNotes
+        - totalNotes
+      type: object
+      properties:
+        totalNotes:
+          type: integer
+          format: int32
+        stockNotes:
+          type: integer
+          format: int32
+        strategyNotes:
+          type: integer
+          format: int32
+      additionalProperties: false
     NoteType:
       enum:
         - tradeCodeNote
@@ -4988,6 +5063,14 @@ components:
         - open
         - closed
       type: string
+    UpdateNoteRequest:
+      required:
+        - noteText
+      type: object
+      properties:
+        noteText:
+          type: string
+      additionalProperties: false
     UpdateTradeRemindRequest:
       required:
         - dateTime

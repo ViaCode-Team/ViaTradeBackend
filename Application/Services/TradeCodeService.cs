@@ -1,9 +1,10 @@
-using Application.Contracts.Dto.Statistic;
+using Application.Models.Statistic;
 using Application.Contracts.Dto.Trade;
 using Application.Interfaces;
 using Application.Interfaces.Repositories.Database;
 using Application.Interfaces.Utils;
 using Domain.Entities.CSV;
+using Domain.Entities.DataBase;
 using Domain.Models.Pagination;
 using Domain.Models.Sort;
 
@@ -16,15 +17,15 @@ public class TradeCodeService(
 	private readonly IFileReader _tradefileReader = tradefileReader;
 	private readonly ITradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
 
-	public async Task<StockStatisticDto> GetStockStatisticAsync(CancellationToken cancellationToken = default)
+	public async Task<StockStatisticReadModel> GetStockStatisticAsync(CancellationToken cancellationToken = default)
 	{
-		return new StockStatisticDto
+		return new StockStatisticReadModel
 		{
 			TotalStocks = await _tradeCodeRepository.CountAsync(cancellationToken)
 		};
 	}
 
-	public async Task<PagedResult<TradeCodeDto>> GetCodesPagedAsync(PaginationRequest paginationRequest, StockSortRequest? sortRequest = null, CancellationToken cancellationToken = default)
+	public async Task<PagedResult<TradeCode>> GetCodesPagedAsync(PaginationRequest paginationRequest, StockSortRequest? sortRequest = null, CancellationToken cancellationToken = default)
 	{
 		return await _tradeCodeRepository.GetCodesPagedAsync(paginationRequest, sortRequest, cancellationToken);
 	}

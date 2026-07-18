@@ -1,6 +1,5 @@
 using Application.Contracts.Dto.Requests.Trade;
-using Application.Contracts.Dto.Statistic;
-using Application.Contracts.Dto.Strategy;
+using Application.Models.Statistic;
 using Application.Interfaces;
 using Application.Interfaces.Repositories.Database;
 using Application.Specifications;
@@ -20,13 +19,13 @@ public class StrategyService(
 	private readonly IUserTradeStrategyRepository _userTradeStrategyRepository = userTradeStrategyRepository;
 	private readonly IUserStrategyTradeCodeRepository _userStrategyTradeCodeRepository = userStrategyTradeCodeRepository;
 
-	public async Task<PagedResult<TradeStrategyDto>> GetStrategiesPagedAsync(int userId, StrategyFilterRequest? filterRequest, StrategySortRequest? sortRequest, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<TradeStrategy>> GetStrategiesPagedAsync(int userId, StrategyFilterRequest? filterRequest, StrategySortRequest? sortRequest, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
 	{
 		var spec = new StrategyQuerySpecification(userId, filterRequest, sortRequest);
 		return await _tradeStrategyRepository.GetPagedFilteredAsync(userId, spec, paginationRequest, cancellationToken);
 	}
 
-	public async Task<StrategyStatisticDto> GetStrategyStatisticAsync(int userId, CancellationToken cancellationToken)
+	public async Task<StrategyStatisticReadModel> GetStrategyStatisticAsync(int userId, CancellationToken cancellationToken)
 	{
 		var totalStrategiesTask = _tradeStrategyRepository.CountAsync(cancellationToken);
 		var activeStrategiesTask = _userTradeStrategyRepository.CountByUserAsync(userId, cancellationToken);
@@ -36,7 +35,7 @@ public class StrategyService(
 		var totalStrategies = totalStrategiesTask.Result;
 		var activeStrategies = activeStrategiesTask.Result;
 
-		return new StrategyStatisticDto
+		return new StrategyStatisticReadModel
 		{
 			TotalStrategies = totalStrategies,
 			ActiveStrategies = activeStrategies,
@@ -50,7 +49,7 @@ public class StrategyService(
 			?? throw new KeyNotFoundException();
 	}
 
-	public async Task<PagedResult<UserStrategyTradeCodeDto>> GetUserStrategyCodesPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<UserStrategyTradeCode>> GetUserStrategyCodesPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		return await _userStrategyTradeCodeRepository.GetPagedAsync(userId, paginationRequest, cancellationToken);
 	}
@@ -89,7 +88,7 @@ public class StrategyService(
 			throw new KeyNotFoundException("User strategy code not found");
 	}
 
-	public async Task<PagedResult<UserTradeStrategyDto>> GetUserStrategiesPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<UserTradeStrategy>> GetUserStrategiesPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
 		return await _userTradeStrategyRepository.GetByUserPagedAsync(userId, paginationRequest, cancellationToken);
 	}

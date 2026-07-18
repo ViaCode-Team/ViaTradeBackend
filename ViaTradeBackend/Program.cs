@@ -69,7 +69,8 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
 builder.Services.AddHostedService<SessionCleanupService>();
 
 // SERVICES REGISTRATION
-builder.Services.ConfigureMapster();
+builder.Services.AddMapster();
+
 // Repositories
 builder.Services.AddScoped<UserRedisRepository>();
 builder.Services.AddScoped<IRedisRepository<TgTokenEntity>, TgTokenRepository>();
@@ -86,14 +87,12 @@ builder.Services.AddScoped<ITradeCodeRepository, TradeCodeRepository>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
 
 // Application services
-builder.Services.AddScoped<ITradeRemindService, TradeRemindService>();
 builder.Services.AddScoped<IStrategyService, StrategyService>();
 builder.Services.AddScoped<ITradeService, TradeService>();
 builder.Services.AddScoped<ITradeCodeService, TradeCodeService>();
 builder.Services.AddScoped<ITradeResultsService, TradeResultsService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<INoteService, NoteService>();
 builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddScoped<IFileReader, TradeFileReader>();

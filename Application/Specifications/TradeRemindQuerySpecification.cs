@@ -1,4 +1,4 @@
-using Domain.Entities.DataBase;
+using Domain.Reminds.Entities;
 using Domain.Enums;
 using Domain.Models.Sort;
 
