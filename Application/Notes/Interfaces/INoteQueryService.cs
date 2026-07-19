@@ -10,5 +10,5 @@ public interface INoteQueryService
 {
 	Task<NoteStatisticReadModel> GetStatisticsAsync(int userId, CancellationToken ct);
 	Task<Note> GetAsync(int relatedId, int userId, NoteType noteType, CancellationToken ct);
-	Task<PagedResult<Note>> GetAsync(int userId, NoteFilterRequest? filterRequest, PaginationRequest paginationRequest, CancellationToken ct);
+	Task<PagedResult<Note>> GetAsync(int userId, NoteFilterRequest filterRequest, PaginationRequest paginationRequest, CancellationToken ct);
 }

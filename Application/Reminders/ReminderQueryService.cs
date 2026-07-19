@@ -34,7 +34,7 @@ public class ReminderQueryService(IReminderRepository remindRepository) : IRemin
 		int userId,
 		int tradeCodeId,
 		PaginationRequest paginationRequest,
-		ReminderSortRequest? sortRequest,
+		ReminderSortRequest sortRequest,
 		CancellationToken ct)
 	{
 		var spec = new TradeRemindQuerySpecification(userId, tradeCodeId, sortRequest);
@@ -44,7 +44,7 @@ public class ReminderQueryService(IReminderRepository remindRepository) : IRemin
 	public async Task<PagedResult<Reminder>> GetAsync(
 		int userId,
 		PaginationRequest paginationRequest,
-		ReminderSortRequest? sortRequest,
+		ReminderSortRequest sortRequest,
 		CancellationToken ct)
 	{
 		var spec = new TradeRemindQuerySpecification(userId, null, sortRequest);

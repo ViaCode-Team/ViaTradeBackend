@@ -1,5 +1,4 @@
 using Domain.Strategies.Enums;
-using Domain.Trades.Enums;
 using System.ComponentModel;
 
 namespace Application.Common.Models.Sort;

@@ -32,8 +32,8 @@ public class StrategiesController(
 
 	[HttpGet]
 	public async Task<Ok<PagedResult<TradeStrategyResponse>>> GetStrategies(
-		[FromQuery] StrategyFilterRequest? filterRequest,
-		[FromQuery] StrategySortRequest? sortRequest,
+		[FromQuery] StrategyFilterRequest filterRequest,
+		[FromQuery] StrategySortRequest sortRequest,
 		[FromQuery] PaginationRequest paginationRequest,
 		CancellationToken ct)
 	{

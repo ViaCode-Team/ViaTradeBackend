@@ -1,4 +1,3 @@
-using Domain.Reminds.Enums;
 using Domain.Trades.Enums;
 using System.ComponentModel;
 

@@ -13,7 +13,7 @@ public class TradeCodeQueryService(
 	IFileReader tradefileReader,
 	ITradeCodeRepository tradeCodeRepository) : ITradeCodeQueryService
 {
-	public async Task<PagedResult<TradeCode>> GetAsync(PaginationRequest paginationRequest, StockSortRequest? sortRequest, CancellationToken ct)
+	public async Task<PagedResult<TradeCode>> GetAsync(PaginationRequest paginationRequest, StockSortRequest sortRequest, CancellationToken ct)
 	{
 		return await tradeCodeRepository.GetCodesPagedAsync(paginationRequest, sortRequest, ct);
 	}

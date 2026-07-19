@@ -29,7 +29,7 @@ public class ResultsController(ITradeResultsService tradeResultsService, IJwtHel
 	public async Task<Ok<StrategyResultResponse>> GetStrategyResults(
 		[FromQuery] DateTime? startDate,
 		[FromQuery] DateTime? endTime,
-		[FromQuery] SignalSortRequest? sortRequest,
+		[FromQuery] SignalSortRequest sortRequest,
 		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);

@@ -1,7 +1,10 @@
 namespace Application.Common.Models.Pagination;
 
 public sealed class PagedResult<T>(
-	IReadOnlyList<T> items, int totalCount, int pageNumber, int pageSize)
+	IReadOnlyList<T> items, 
+	int totalCount, 
+	int pageNumber, 
+	int pageSize)
 {
 	public IReadOnlyList<T> Items { get; } = items;
 

@@ -23,7 +23,7 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 		return trade;
 	}
 
-	public async Task<PagedResult<Trade>> GetAsync(int userId, TradeFilterRequest? filterRequest, PaginationRequest paginationRequest, CancellationToken ct)
+	public async Task<PagedResult<Trade>> GetAsync(int userId, TradeFilterRequest filterRequest, PaginationRequest paginationRequest, CancellationToken ct)
 	{
 		var spec = new TradeQuerySpecification(userId, filterRequest);
 		return await tradeRepository.GetPagedFilteredAsync(spec, paginationRequest, ct);

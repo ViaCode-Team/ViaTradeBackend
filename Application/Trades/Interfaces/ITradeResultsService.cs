@@ -14,7 +14,7 @@ public interface ITradeResultsService
 		int userId,
 		DateTime? startDate,
 		DateTime? endDate,
-		SignalSortRequest? sortRequest,
+		SignalSortRequest sortRequest,
 		CancellationToken ct);
 
 	Task<StrategyResultResponse> GetAsync(

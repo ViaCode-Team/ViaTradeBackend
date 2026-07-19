@@ -32,7 +32,7 @@ public class NoteQueryService(INoteRepository noteRepository) : INoteQueryServic
 		return existingNote;
 	}
 
-	public async Task<PagedResult<Note>> GetAsync(int userId, NoteFilterRequest? filterRequest, PaginationRequest paginationRequest, CancellationToken ct)
+	public async Task<PagedResult<Note>> GetAsync(int userId, NoteFilterRequest filterRequest, PaginationRequest paginationRequest, CancellationToken ct)
 	{
 		var spec = new NoteQuerySpecification(userId, filterRequest);
 		return await noteRepository.GetPagedAsync(spec, paginationRequest, ct);

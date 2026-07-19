@@ -6,13 +6,11 @@ namespace Application.Common.Specifications;
 
 public class TradeQuerySpecification : BaseQuerySpecification<Trade>
 {
-	public TradeQuerySpecification(int userId, TradeFilterRequest? request)
+	public TradeQuerySpecification(int userId, TradeFilterRequest request)
 	{
 		AddCriteria(x => x.UserId == userId);
 		AddInclude(x => x.TradeType!);
 		AddInclude(x => x.TradeCode!);
-
-		if (request == null) return;
 
 		if (request.Signal.HasValue)
 			AddCriteria(x => x.TradeSignal == request.Signal.Value);

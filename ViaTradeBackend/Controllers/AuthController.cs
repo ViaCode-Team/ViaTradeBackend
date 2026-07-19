@@ -90,7 +90,7 @@ public class AuthController(
 	[HttpGet("sessions")]
 	[Authorize]
 	public async Task<Ok<PagedResult<UserSessionResponse>>> GetUserSessions(
-		[FromQuery] PaginationRequest paginationRequest, 
+		[FromQuery] PaginationRequest paginationRequest,
 		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);

@@ -183,7 +183,7 @@ public static class DependencyInjection
 					.RequireAuthenticatedUser()
 					.AddRequirements(new ActiveSessionRequirement())
 					.Build());
-		
+
 		services.AddScoped<IAuthorizationHandler, ActiveSessionHandler>();
 
 		return services;

@@ -4,7 +4,6 @@ using Application.Common.Models.Pagination;
 using Domain.Common;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
 namespace Infrastructure.Repositories.DataBase;

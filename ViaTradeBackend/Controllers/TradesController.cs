@@ -32,7 +32,7 @@ public class TradesController(
 
 	[HttpGet("byuser")]
 	public async Task<Ok<PagedResult<TradeResponse>>> GetUserTrades(
-		[FromQuery] TradeFilterRequest? filterRequest,
+		[FromQuery] TradeFilterRequest filterRequest,
 		[FromQuery] PaginationRequest paginationRequest,
 		CancellationToken ct)
 	{

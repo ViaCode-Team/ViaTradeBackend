@@ -14,7 +14,7 @@ public class ReminderEfRepository(AppDbContext context)
 		return await _dbSet.Where(r => r.DateTime <= DateTime.Now).ToListAsync(ct);
 	}
 
-	public async Task<PagedResult<Reminder>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, ReminderSortRequest? sortRequest = null, CancellationToken ct = default)
+	public async Task<PagedResult<Reminder>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, ReminderSortRequest sortRequest, CancellationToken ct = default)
 	{
 		var spec = new TradeRemindQuerySpecification(userId, null, sortRequest);
 		return await GetPagedAsync(spec, paginationRequest, ct);
@@ -25,7 +25,7 @@ public class ReminderEfRepository(AppDbContext context)
 		return await _dbSet.CountAsync(r => r.UserId == userId, ct);
 	}
 
-	public async Task<PagedResult<Reminder>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, ReminderSortRequest? sortRequest = null, CancellationToken ct = default)
+	public async Task<PagedResult<Reminder>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, ReminderSortRequest sortRequest, CancellationToken ct = default)
 	{
 		var spec = new TradeRemindQuerySpecification(userId, tradeCodeId, sortRequest);
 		return await GetPagedAsync(spec, paginationRequest, ct);

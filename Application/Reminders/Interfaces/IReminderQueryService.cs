@@ -14,11 +14,11 @@ public interface IReminderQueryService
 		int userId,
 		int tradeCodeId,
 		PaginationRequest paginationRequest,
-		ReminderSortRequest? sortRequest,
+		ReminderSortRequest sortRequest,
 		CancellationToken ct);
 	Task<PagedResult<Reminder>> GetAsync(
 		int userId,
 		PaginationRequest paginationRequest,
-		ReminderSortRequest? sortRequest,
+		ReminderSortRequest sortRequest,
 		CancellationToken ct);
 }

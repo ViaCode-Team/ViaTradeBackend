@@ -30,11 +30,11 @@ public class TradeCodeEfRepository(AppDbContext context) : GenericEfRepository<T
 			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<PagedResult<TradeCode>> GetCodesPagedAsync(PaginationRequest paginationRequest, StockSortRequest? sortRequest = null, CancellationToken ct = default)
+	public async Task<PagedResult<TradeCode>> GetCodesPagedAsync(PaginationRequest paginationRequest, StockSortRequest sortRequest, CancellationToken ct = default)
 	{
 		var query = _dbSet.AsQueryable();
 
-		if (sortRequest?.SortBy != null && sortRequest.SortBy.Count > 0)
+		if (sortRequest.SortBy.Count > 0)
 		{
 			IOrderedQueryable<TradeCode>? orderedQuery = null;
 			foreach (var field in sortRequest.SortBy)

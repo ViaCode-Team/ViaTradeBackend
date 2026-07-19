@@ -6,7 +6,7 @@ namespace Application.Common.Specifications;
 
 public class TradeRemindQuerySpecification : BaseQuerySpecification<Reminder>
 {
-	public TradeRemindQuerySpecification(int userId, int? tradeCodeId = null, ReminderSortRequest? sort = null)
+	public TradeRemindQuerySpecification(int userId, int? tradeCodeId, ReminderSortRequest sort)
 	{
 		AddCriteria(r => r.UserId == userId);
 
@@ -15,23 +15,19 @@ public class TradeRemindQuerySpecification : BaseQuerySpecification<Reminder>
 			AddCriteria(r => r.TradeCodeId == tradeCodeId.Value);
 		}
 
-		if (sort != null)
+		var sortFields = sort.GetEffectiveSortBy();
+		foreach (var field in sortFields)
 		{
-			var sortFields = sort.GetEffectiveSortBy();
-			foreach (var field in sortFields)
+			switch (field)
 			{
-				switch (field)
-				{
-					case RemindSortField.DateTimeAsc:
-						AddOrderBy(r => r.DateTime, false);
-						break;
-					case RemindSortField.DateTimeDesc:
-					default:
-						AddOrderBy(r => r.DateTime, true);
-						break;
-				}
+				case RemindSortField.DateTimeAsc:
+					AddOrderBy(r => r.DateTime, false);
+					break;
+				case RemindSortField.DateTimeDesc:
+				default:
+					AddOrderBy(r => r.DateTime, true);
+					break;
 			}
 		}
-
 	}
 }

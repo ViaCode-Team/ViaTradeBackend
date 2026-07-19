@@ -15,7 +15,7 @@ public class TradeResultsService(
 {
 	public async Task<SignalStatisticReadModel> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		var signals = await GetAsync(userId, DateTime.Now, null, null, ct);
+		var signals = await GetAsync(userId, DateTime.Now, null, new SignalSortRequest(), ct);
 
 		var allResults = signals.Strategies
 			.SelectMany(s => s.Tickers)
@@ -33,7 +33,7 @@ public class TradeResultsService(
 		int userId,
 		DateTime? startDate,
 		DateTime? endDate,
-		SignalSortRequest? sortRequest,
+		SignalSortRequest sortRequest,
 		CancellationToken ct)
 	{
 		if (startDate != null)
@@ -76,7 +76,7 @@ public class TradeResultsService(
 			}
 		}
 
-		var sortFields = sortRequest?.GetEffectiveSortBy() ?? [SignalSortField.DateTimeDesc];
+		var sortFields = sortRequest.GetEffectiveSortBy();
 
 		var strategies = allResults
 			.GroupBy(x => x.StrategyName)

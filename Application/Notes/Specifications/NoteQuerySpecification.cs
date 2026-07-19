@@ -6,12 +6,9 @@ namespace Application.Common.Specifications;
 
 public class NoteQuerySpecification : BaseQuerySpecification<Note>
 {
-	public NoteQuerySpecification(int userId, NoteFilterRequest? request)
+	public NoteQuerySpecification(int userId, NoteFilterRequest request)
 	{
 		AddCriteria(x => x.UserId == userId);
-
-		if (request == null)
-			return;
 
 		if (request.Target.HasValue)
 		{
