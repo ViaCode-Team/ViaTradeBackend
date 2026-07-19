@@ -13,9 +13,9 @@ public class TradeResultsService(
 	ITradeStrategyRepository tradeStrategyRepository,
 	IUserTradeStrategyRepository userTradeStrategyRepository) : ITradeResultsService
 {
-	public async Task<SignalStatisticReadModel> GetStrategyResultStatisticAsync(int userId, CancellationToken ct)
+	public async Task<SignalStatisticReadModel> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		var signals = await GetStrategyResultAsync(userId, DateTime.Now, null, null, ct);
+		var signals = await GetAsync(userId, DateTime.Now, null, null, ct);
 
 		var allResults = signals.Strategies
 			.SelectMany(s => s.Tickers)
@@ -29,7 +29,7 @@ public class TradeResultsService(
 		};
 	}
 
-	public async Task<StrategyResultResponse> GetStrategyResultAsync(
+	public async Task<StrategyResultResponse> GetAsync(
 		int userId,
 		DateTime? startDate,
 		DateTime? endDate,
@@ -102,7 +102,7 @@ public class TradeResultsService(
 		return new StrategyResultResponse { Strategies = strategies };
 	}
 
-	public async Task<StrategyResultResponse> GetStrategyResultByCodeAsync(
+	public async Task<StrategyResultResponse> GetAsync(
 		int userId,
 		string strategyName,
 		string tradeCode,

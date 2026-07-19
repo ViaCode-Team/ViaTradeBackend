@@ -80,7 +80,6 @@ src
 * Entity Framework Core
 * PostgreSQL
 * AutoMapper
-* FluentValidation
 
 ### Аналитика
 

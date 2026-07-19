@@ -1,15 +1,15 @@
-﻿using Application.Common.Models.Pagination;
+using Application.Common.Models.Pagination;
 using Application.Common.Models.Sort;
 using Application.Common.Specifications;
-using Application.Reminds.Interfaces;
-using Application.Reminds.Models;
+using Application.Reminders.Interfaces;
+using Application.Reminders.Models;
 using Domain.Reminds.Entities;
 
-namespace Application.Reminds;
+namespace Application.Reminders;
 
-public class ReminderQueryService(ITradeRemindRepository remindRepository) : IRemindQueryService
+public class ReminderQueryService(IReminderRepository remindRepository) : IRemindQueryService
 {
-	public async Task<RemindStatisticDto> GetStatistics(int userId, CancellationToken ct)
+	public async Task<RemindStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
 		int total = await remindRepository.CountAsync(
 			x => x.UserId == userId, ct);
@@ -17,7 +17,7 @@ public class ReminderQueryService(ITradeRemindRepository remindRepository) : IRe
 		return new RemindStatisticDto(total);
 	}
 
-	public async Task<IEnumerable<Reminder>> GetActualAsync(CancellationToken ct)
+	public async Task<IEnumerable<Reminder>> GetAsync(CancellationToken ct)
 	{
 		return await remindRepository.FindAsync(
 			x => x.DateTime <= DateTime.UtcNow, ct);
@@ -30,7 +30,7 @@ public class ReminderQueryService(ITradeRemindRepository remindRepository) : IRe
 			?? throw new Exception("Remind not found.");
 	}
 
-	public async Task<PagedResult<Reminder>> GetPagedAsync(
+	public async Task<PagedResult<Reminder>> GetAsync(
 		int userId,
 		int tradeCodeId,
 		PaginationRequest paginationRequest,
@@ -41,7 +41,7 @@ public class ReminderQueryService(ITradeRemindRepository remindRepository) : IRe
 		return await remindRepository.GetPagedAsync(spec, paginationRequest, ct);
 	}
 
-	public async Task<PagedResult<Reminder>> GetPagedAsync(
+	public async Task<PagedResult<Reminder>> GetAsync(
 		int userId,
 		PaginationRequest paginationRequest,
 		RemindSortRequest? sortRequest,

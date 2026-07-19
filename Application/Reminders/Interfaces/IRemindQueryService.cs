@@ -1,22 +1,22 @@
-﻿using Application.Common.Models.Pagination;
+using Application.Common.Models.Pagination;
 using Application.Common.Models.Sort;
-using Application.Reminds.Models;
+using Application.Reminders.Models;
 using Domain.Reminds.Entities;
 
-namespace Application.Reminds.Interfaces;
+namespace Application.Reminders.Interfaces;
 
 public interface IRemindQueryService
 {
-	Task<RemindStatisticDto> GetStatistics(int userId, CancellationToken ct);
-	Task<IEnumerable<Reminder>> GetActualAsync(CancellationToken ct);
+	Task<RemindStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct);
+	Task<IEnumerable<Reminder>> GetAsync(CancellationToken ct);
 	Task<Reminder> GetAsync(int remindId, int userId, CancellationToken ct);
-	Task<PagedResult<Reminder>> GetPagedAsync(
+	Task<PagedResult<Reminder>> GetAsync(
 		int userId,
 		int tradeCodeId,
 		PaginationRequest paginationRequest,
 		RemindSortRequest? sortRequest,
 		CancellationToken ct);
-	Task<PagedResult<Reminder>> GetPagedAsync(
+	Task<PagedResult<Reminder>> GetAsync(
 		int userId,
 		PaginationRequest paginationRequest,
 		RemindSortRequest? sortRequest,

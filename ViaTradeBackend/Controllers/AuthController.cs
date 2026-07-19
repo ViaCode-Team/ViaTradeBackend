@@ -1,11 +1,8 @@
-using Application.Auth.Commands;
 using Application.Auth.Interfaces;
-using Application.Auth.Queries;
 using Application.Common.Models;
 using Application.Common.Models.Pagination;
 using Infrastructure.Configuration;
 using Mapster;
-using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
@@ -18,7 +15,11 @@ namespace ViaTradeBackend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AuthController(ISender sender, IJwtHelper jwtHelper, IOptions<AuthCookieOptions> authOptions) : ControllerBase
+public class AuthController(
+	IAuthCommandService authCommandService,
+	IAuthQueryService authQueryService,
+	IJwtHelper jwtHelper,
+	IOptions<AuthCookieOptions> authOptions) : ControllerBase
 {
 	private readonly AuthCookieOptions _authCookiOptions = authOptions.Value;
 
@@ -28,8 +29,7 @@ public class AuthController(ISender sender, IJwtHelper jwtHelper, IOptions<AuthC
 		CancellationToken ct)
 	{
 		var userAgent = Request.Headers.UserAgent.ToString();
-		var command = new LoginCommand(request.Login, request.Password, userAgent);
-		var result = await sender.Send(command, ct);
+		var result = await authCommandService.LoginAsync(request.Login, request.Password, userAgent, ct);
 
 		SetAuthCookies(result);
 		return TypedResults.NoContent();
@@ -41,8 +41,7 @@ public class AuthController(ISender sender, IJwtHelper jwtHelper, IOptions<AuthC
 		CancellationToken ct)
 	{
 		var userAgent = Request.Headers.UserAgent.ToString();
-		var command = new RegisterCommand(request.Login, request.Password, userAgent);
-		var result = await sender.Send(command, ct);
+		var result = await authCommandService.RegisterAsync(request.Login, request.Password, userAgent, ct);
 
 		SetAuthCookies(result);
 		return TypedResults.Created();
@@ -54,8 +53,7 @@ public class AuthController(ISender sender, IJwtHelper jwtHelper, IOptions<AuthC
 		if (!Request.Cookies.TryGetValue(_authCookiOptions.RefreshTokenCookie, out var refreshToken))
 			throw new UnauthorizedAccessException();
 
-		var command = new RefreshTokenCommand(refreshToken);
-		var result = await sender.Send(command, ct);
+		var result = await authCommandService.RefreshTokenAsync(refreshToken, ct);
 
 		SetAuthCookies(result);
 		return TypedResults.NoContent();
@@ -63,12 +61,11 @@ public class AuthController(ISender sender, IJwtHelper jwtHelper, IOptions<AuthC
 
 	[HttpPost("logout")]
 	[Authorize]
-	public async Task<NoContent> Logout()
+	public async Task<NoContent> Logout(CancellationToken ct)
 	{
 		if (Request.Cookies.TryGetValue(_authCookiOptions.RefreshTokenCookie, out var refreshToken))
 		{
-			var command = new LogoutSessionCommand(refreshToken);
-			await sender.Send(command);
+			await authCommandService.LogoutSessionAsync(refreshToken, ct);
 		}
 
 		Response.Cookies.Delete(_authCookiOptions.AccessTokenCookie);
@@ -79,11 +76,10 @@ public class AuthController(ISender sender, IJwtHelper jwtHelper, IOptions<AuthC
 
 	[HttpPost("logout-all")]
 	[Authorize]
-	public async Task<NoContent> LogoutAll()
+	public async Task<NoContent> LogoutAll(CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var command = new LogoutAllCommand(userId);
-		await sender.Send(command);
+		await authCommandService.LogoutAllAsync(userId, ct);
 
 		Response.Cookies.Delete(_authCookiOptions.AccessTokenCookie);
 		Response.Cookies.Delete(_authCookiOptions.RefreshTokenCookie);
@@ -96,10 +92,9 @@ public class AuthController(ISender sender, IJwtHelper jwtHelper, IOptions<AuthC
 	public async Task<Ok<PagedResult<UserSessionResponse>>> GetUserSessions([FromQuery] PaginationRequest paginationRequest, CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var query = new GetPagedUserSessionsQuery(userId, paginationRequest);
-		var pagedSessions = await sender.Send(query, ct);
+		var userSessions = await authQueryService.GetSessionsPagedAsync(userId, paginationRequest, ct);
 
-		return TypedResults.Ok(pagedSessions.Map(s => s.Adapt<UserSessionResponse>()));
+		return TypedResults.Ok(userSessions.Map(s => s.Adapt<UserSessionResponse>()));
 	}
 
 	private void SetAuthCookies(AuthInternalResult result)

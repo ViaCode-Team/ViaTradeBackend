@@ -62,7 +62,7 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 		_dbSet.Add(note);
 	}
 
-	public async Task UpdateUserNoteAsync(int id, NoteType noteType, int userId, string noteText, CancellationToken ct)
+	public async Task ExecuteUpdateUserNoteAsync(int id, NoteType noteType, int userId, string noteText, CancellationToken ct)
 	{
 		int affectedRows = noteType switch
 		{

@@ -6,18 +6,18 @@ namespace Application.Interfaces;
 
 public interface ITradeResultsService
 {
-	Task<SignalStatisticReadModel> GetStrategyResultStatisticAsync(
+	Task<SignalStatisticReadModel> GetStatisticsAsync(
 		int userId,
 		CancellationToken ct);
 
-	Task<StrategyResultResponse> GetStrategyResultAsync(
+	Task<StrategyResultResponse> GetAsync(
 		int userId,
 		DateTime? startDate,
 		DateTime? endDate,
 		SignalSortRequest? sortRequest,
 		CancellationToken ct);
 
-	Task<StrategyResultResponse> GetStrategyResultByCodeAsync(
+	Task<StrategyResultResponse> GetAsync(
 		int userId,
 		string strategyName,
 		string tradeCode,

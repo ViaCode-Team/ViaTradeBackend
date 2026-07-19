@@ -1,21 +1,26 @@
+using Application.Auth;
 using Application.Auth.Interfaces;
-using Application.Common.Behaviors;
 using Application.Common.Interfaces;
 using Application.Interfaces;
 using Application.Mappings;
+using Application.Notes;
 using Application.Notes.Interfaces;
-using Application.Reminds.Interfaces;
+using Application.Reminders;
+using Application.Reminders.Interfaces;
+using Application.Strategies;
 using Application.Strategies.Interfaces;
+using Application.TradeCodes;
 using Application.TradeCodes.Interfaces;
+using Application.Trades;
 using Application.Trades.Interfaces;
 using Application.Trades.Services;
+using Application.Users;
 using Application.Users.Interfaces;
 using Infrastructure.Configuration;
 using Infrastructure.Repositories.DataBase;
 using Infrastructure.Repositories.Redis;
 using Infrastructure.Services;
 using Infrastructure.Utils;
-using MediatR;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -83,7 +88,7 @@ builder.Services.AddScoped<ISessionRepository, SessionRedisRepository>();
 builder.Services.AddScoped<IRefreshTokenRepository, RefreshTokenRedisRepository>();
 builder.Services.AddScoped<ITradeRepository, TradeEfRepository>();
 builder.Services.AddScoped<ITradeTypeRepository, TradeTypeEfRepository>();
-builder.Services.AddScoped<ITradeRemindRepository, TradeRemindEfRepository>();
+builder.Services.AddScoped<IReminderRepository, ReminderEfRepository>();
 builder.Services.AddScoped<IUserRepository, UserEfRepository>();
 builder.Services.AddScoped<IUserTradeStrategyRepository, UserTradeStrategyEfRepository>();
 builder.Services.AddScoped<IUserStrategyTradeCodeRepository, UserStrategyTradeCodeEfRepository>();
@@ -91,14 +96,6 @@ builder.Services.AddScoped<ITradeStrategyRepository, TradeStrategyEfRepository>(
 builder.Services.AddScoped<ITradeCodeRepository, TradeCodeEfRepository>();
 builder.Services.AddScoped<INoteRepository, NoteEfRepository>();
 
-// MediatR
-builder.Services.AddMediatR(cfg =>
-{
-	cfg.RegisterServicesFromAssembly(typeof(TradeResultsService).Assembly);
-	cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
-	cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
-	cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>));
-});
 
 // Unit of Work
 builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
@@ -109,6 +106,21 @@ builder.Services.AddScoped<IJwtHelper, JwtHelper>();
 builder.Services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 builder.Services.AddScoped<IFileReader, TradeFileReader>();
 builder.Services.AddScoped<ITradeDataBuilder, TradeDataBuilder>();
+
+// Command & Query Services
+builder.Services.AddScoped<IAuthCommandService, AuthCommandService>();
+builder.Services.AddScoped<IAuthQueryService, AuthQueryService>();
+builder.Services.AddScoped<INoteCommandService, NoteCommandService>();
+builder.Services.AddScoped<INoteQueryService, NoteQueryService>();
+builder.Services.AddScoped<IReminderCommandService, ReminderCommandService>();
+builder.Services.AddScoped<IRemindQueryService, ReminderQueryService>();
+builder.Services.AddScoped<IStrategyCommandService, StrategyCommandService>();
+builder.Services.AddScoped<IStrategyQueryService, StrategyQueryService>();
+builder.Services.AddScoped<ITradeCodeQueryService, TradeCodeQueryService>();
+builder.Services.AddScoped<ITradeCommandService, TradeCommandService>();
+builder.Services.AddScoped<ITradeQueryService, TradeQueryService>();
+builder.Services.AddScoped<IUserCommandService, UserCommandService>();
+builder.Services.AddScoped<IUserQueryService, UserQueryService>();
 
 // DATABASE SETUP (MySQL)
 var connectionString = builder.Configuration.GetConnectionString("MySql")
