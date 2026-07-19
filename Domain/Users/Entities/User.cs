@@ -4,45 +4,20 @@ using Domain.Trades.Entities;
 
 namespace Domain.Users.Entities;
 
-public sealed class User : AggregateRoot<int>
+public sealed class User : BaseEntity<int>
 {
-	public string Login { get; private set; }
+	public string Login { get; set; }
 
-	public string HashPassword { get; private set; }
+	public string HashPassword { get; set; }
 
-	public DateTime LastLoginDate { get; private set; } = DateTime.UtcNow;
+	public DateTime LastLoginDate { get; set; } = DateTime.UtcNow;
 
-	public DateTime RegisterDate { get; private set; }
+	public DateTime RegisterDate { get; set; }
 
-	public string? TgId { get; private set; }
+	public string? TgId { get; set; }
 
-	private readonly List<Trade> _trades = [];
-	public IReadOnlyCollection<Trade> Trades => _trades.AsReadOnly();
+	public ICollection<Trade> Trades { get; set; } = [];
 
-	private readonly List<UserTradeStrategy> _userTradeStrategies = [];
-	public IReadOnlyCollection<UserTradeStrategy> UserTradeStrategies => _userTradeStrategies.AsReadOnly();
+	public ICollection<UserTradeStrategy> UserTradeStrategies { get; set; } = [];
 
-	private User() { }
-
-	public User(string login, string hashPassword, DateTime registerDate)
-	{
-		if (string.IsNullOrWhiteSpace(login))
-			throw new ArgumentException("Login cannot be empty.", nameof(login));
-		if (string.IsNullOrWhiteSpace(hashPassword))
-			throw new ArgumentException("Password hash cannot be empty.", nameof(hashPassword));
-
-		Login = login;
-		HashPassword = hashPassword;
-		RegisterDate = registerDate;
-	}
-
-	public void UpdateLastLoginDate()
-	{
-		LastLoginDate = DateTime.UtcNow;
-	}
-
-	public void LinkTelegram(string tgId)
-	{
-		TgId = tgId;
-	}
 }

@@ -5,74 +5,26 @@ using Domain.Users.Entities;
 
 namespace Domain.Trades.Entities;
 
-public sealed class Trade : AggregateRoot<int>
+public sealed class Trade : BaseEntity<int>
 {
-	public DateTime DateOpen { get; private set; }
-	public DateTime? DateClose { get; private set; }
-	public double TradeOpen { get; private set; }
-	public double? TradeClose { get; private set; }
-	public double? NetIncome { get; private set; }
-	public int Count { get; private set; }
+	public DateTime DateOpen { get; set; }
+	public DateTime? DateClose { get; set; }
+	public double TradeOpen { get; set; }
+	public double? TradeClose { get; set; }
+	public double? NetIncome { get; set; }
+	public int Count { get; set; }
 
-	public decimal Price { get; private set; }
+	public decimal Price { get; set; }
 
-	public int TradeTypeId { get; private set; }
-	public int TradeCodeId { get; private set; }
-	public int UserId { get; private set; }
-	public TradeSignal TradeSignal { get; private set; }
+	public int TradeTypeId { get; set; }
+	public int TradeCodeId { get; set; }
+	public int UserId { get; set; }
+	public TradeSignal TradeSignal { get; set; }
 
-	public TradeType? TradeType { get; private set; }
+	public TradeType? TradeType { get; set; }
 
-	public TradeCode? TradeCode { get; private set; }
+	public TradeCode? TradeCode { get; set; }
 
-	public User? User { get; private set; }
+	public User? User { get; set; }
 
-	private Trade() { }
-
-	public Trade(
-		DateTime dateOpen,
-		DateTime? dateClose,
-		double tradeOpen,
-		double? tradeClose,
-		int count,
-		int tradeTypeId,
-		int tradeCodeId,
-		int userId,
-		TradeSignal tradeSignal)
-	{
-		UserId = userId;
-		Update(dateOpen, dateClose, tradeOpen, tradeClose, count, tradeTypeId, tradeCodeId, tradeSignal);
-	}
-
-	public void Update(DateTime dateOpen, DateTime? dateClose, double tradeOpen, double? tradeClose, int count, int tradeTypeId, int tradeCodeId, TradeSignal tradeSignal)
-	{
-		if (count <= 0)
-			throw new ArgumentException("Count must be greater than zero.", nameof(count));
-
-		DateOpen = dateOpen;
-		DateClose = dateClose;
-		TradeOpen = tradeOpen;
-		TradeClose = tradeClose;
-		NetIncome = CalculateNetIncome(tradeOpen, tradeClose, tradeSignal);
-		Count = count;
-		Price = (decimal)tradeOpen * count;
-		TradeTypeId = tradeTypeId;
-		TradeCodeId = tradeCodeId;
-		TradeSignal = tradeSignal;
-	}
-
-	public static double? CalculateNetIncome(double tradeOpen, double? tradeClose, TradeSignal tradeSignal)
-	{
-		if (tradeClose == null || tradeOpen == 0 || tradeSignal == TradeSignal.HOLD)
-			return null;
-
-		var basePercent = (tradeClose.Value - tradeOpen) / tradeOpen * 100;
-		double adjustedPercent = basePercent;
-		if (tradeSignal == TradeSignal.SELL)
-		{
-			adjustedPercent = -basePercent;
-		}
-
-		return Math.Round(adjustedPercent, 2);
-	}
 }

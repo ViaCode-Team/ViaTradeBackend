@@ -1,9 +1,10 @@
 using Application.Common.Models.Pagination;
+using Domain.Common;
 using System.Linq.Expressions;
 
 namespace Application.Common.Interfaces.Repositories;
 
-public interface IRepository<TEntity> where TEntity : Domain.Common.DomainEntity<int>
+public interface IRepository<TEntity> where TEntity : BaseEntity<int>
 {
 	Task<TEntity?> GetByIdAsync(int id, CancellationToken ct = default);
 	Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken ct = default);

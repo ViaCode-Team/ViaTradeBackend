@@ -14,25 +14,18 @@ namespace ViaTradeBackend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class UserController(
-	ISender sender,
-	IJwtHelper jwtHelper,
-	ILogger<UserController> logger) : ControllerBase
+public class UserController(ISender sender, IJwtHelper jwtHelper, ILogger<UserController> logger) : ControllerBase
 {
-	private readonly ISender _sender = sender;
-	private readonly IJwtHelper _jwtHelper = jwtHelper;
-	private readonly ILogger<UserController> _logger = logger;
-
 	[Authorize]
 	[HttpGet("me")]
 	public async Task<Results<Ok<UserMeResponse>, NotFound>> GetMe(CancellationToken cancellationToken)
 	{
-		_logger.LogInformation("Getting current user information");
+		logger.LogInformation("Getting current user information");
 
-		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var query = new GetUserByIdQuery(userId);
-		var user = await _sender.Send(query, cancellationToken);
+		var user = await sender.Send(query, cancellationToken);
 
 		if (user == null)
 			return TypedResults.NotFound();
@@ -44,12 +37,12 @@ public class UserController(
 	[HttpGet("tgToken")]
 	public async Task<Ok<TgTokenResponse>> GenerateTgToken(CancellationToken cancellationToken)
 	{
-		_logger.LogInformation("Generating Telegram token for user");
+		logger.LogInformation("Generating Telegram token for user");
 
-		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var command = new GenerateTgLinkCommand(userId);
-		var response = new TgTokenResponse(await _sender.Send(command, cancellationToken));
+		var response = new TgTokenResponse(await sender.Send(command, cancellationToken));
 
 		return TypedResults.Ok(response);
 	}
@@ -60,12 +53,12 @@ public class UserController(
 		[FromBody, Required] LinkTelegramRequest request,
 		CancellationToken cancellationToken)
 	{
-		_logger.LogInformation("Processing Telegram token for user");
+		logger.LogInformation("Processing Telegram token for user");
 
 		var command = new LinkTelegramCommand(request.TgToken, request.TgId);
-		await _sender.Send(command, cancellationToken);
+		await sender.Send(command, cancellationToken);
 
-		_logger.LogInformation("Telegram token processed successfully");
+		logger.LogInformation("Telegram token processed successfully");
 		return TypedResults.Accepted(string.Empty);
 	}
 
@@ -73,10 +66,10 @@ public class UserController(
 	[HttpGet("user")]
 	public async Task<Ok<List<UserTgResponse>>> GetUsersWithTgLink(CancellationToken cancellationToken)
 	{
-		_logger.LogInformation("Getting all users with Telegram links");
+		logger.LogInformation("Getting all users with Telegram links");
 
 		var query = new GetAllUsersWithTgLinkQuery();
-		var users = await _sender.Send(query, cancellationToken);
+		var users = await sender.Send(query, cancellationToken);
 
 		return TypedResults.Ok(users.Adapt<List<UserTgResponse>>());
 	}

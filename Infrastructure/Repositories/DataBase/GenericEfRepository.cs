@@ -1,6 +1,7 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models.Pagination;
+using Domain.Common;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
@@ -9,7 +10,7 @@ using System.Linq.Expressions;
 namespace Infrastructure.Repositories.DataBase;
 
 public class GenericEfRepository<TEntity> : IRepository<TEntity>
-	where TEntity : Domain.Common.DomainEntity<int>
+	where TEntity : BaseEntity<int>
 {
 	protected readonly AppDbContext _context;
 	protected readonly DbSet<TEntity> _dbSet;

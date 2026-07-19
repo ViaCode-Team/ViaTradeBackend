@@ -22,8 +22,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		modelBuilder.Ignore<Domain.Common.DomainEvent>();
-
 		modelBuilder.Entity<TradeCode>()
 			.HasIndex(x => x.ExchangeId)
 			.IsUnique();

@@ -10,10 +10,8 @@ public record GetUserSessionsQuery(int UserId) : IQuery<IEnumerable<UserSessionD
 public class GetUserSessionsQueryHandler(ISessionRepository sessionRepository)
 	: IRequestHandler<GetUserSessionsQuery, IEnumerable<UserSessionDto>>
 {
-	private readonly ISessionRepository _sessionRepository = sessionRepository;
-
 	public async Task<IEnumerable<UserSessionDto>> Handle(GetUserSessionsQuery request, CancellationToken cancellationToken)
 	{
-		return await _sessionRepository.GetUserSessionsAsync(request.UserId);
+		return await sessionRepository.GetUserSessionsAsync(request.UserId);
 	}
 }

@@ -39,7 +39,7 @@ public class TradeStrategyEfRepository(AppDbContext context) : GenericEfReposito
 
 		return pagedTuple.Map(t =>
 		{
-			t.Strategy.SetActive(t.IsActive);
+			t.Strategy.IsActive = t.IsActive;
 			return t.Strategy;
 		});
 	}

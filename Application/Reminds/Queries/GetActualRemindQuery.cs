@@ -3,7 +3,6 @@ using Application.Reminds.Interfaces;
 using Domain.Reminds.Entities;
 using MediatR;
 
-
 namespace Application.Reminds.Queries;
 
 public record GetActualRemindQuery() : IQuery<List<TradeRemind>>;

@@ -10,13 +10,11 @@ public record GetStockStatisticQuery : IQuery<StockStatisticReadModel>;
 public class GetStockStatisticQueryHandler(ITradeCodeRepository tradeCodeRepository)
 	: IRequestHandler<GetStockStatisticQuery, StockStatisticReadModel>
 {
-	private readonly ITradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
-
 	public async Task<StockStatisticReadModel> Handle(GetStockStatisticQuery request, CancellationToken cancellationToken)
 	{
 		return new StockStatisticReadModel
 		{
-			TotalStocks = await _tradeCodeRepository.CountAsync(cancellationToken)
+			TotalStocks = await tradeCodeRepository.CountAsync(cancellationToken)
 		};
 	}
 }

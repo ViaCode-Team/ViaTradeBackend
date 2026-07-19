@@ -5,5 +5,3 @@ public record CreateUserStrategyTradeCodeRequest(
 	int StrategyId
 );
 
-
-

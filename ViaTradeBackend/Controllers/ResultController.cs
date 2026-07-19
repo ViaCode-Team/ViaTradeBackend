@@ -14,19 +14,14 @@ namespace ViaTradeBackend.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class ResultController(
-	ITradeResultsService tradeResultsService,
-	IJwtHelper jwtHelper) : ControllerBase
+public class ResultController(ITradeResultsService tradeResultsService, IJwtHelper jwtHelper) : ControllerBase
 {
-	private readonly ITradeResultsService _tradeResultsService = tradeResultsService;
-	private readonly IJwtHelper _jwtHelper = jwtHelper;
-
 	[HttpGet("statistics")]
 	public async Task<Ok<SignalStatisticResponse>> GetStrategyResultStatistics(CancellationToken cancellationToken)
 	{
-		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var userId = jwtHelper.GetUserIdFromClaims(User);
 
-		var signalStatistics = await _tradeResultsService.GetStrategyResultStatisticAsync(userId, cancellationToken);
+		var signalStatistics = await tradeResultsService.GetStrategyResultStatisticAsync(userId, cancellationToken);
 
 		return TypedResults.Ok(signalStatistics.Adapt<SignalStatisticResponse>());
 	}
@@ -38,9 +33,9 @@ public class ResultController(
 		[FromQuery] SignalSortRequest? sortRequest,
 		CancellationToken cancellationToken)
 	{
-		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var userId = jwtHelper.GetUserIdFromClaims(User);
 
-		var response = await _tradeResultsService.GetStrategyResultAsync(userId, startDate, endTime, sortRequest, cancellationToken);
+		var response = await tradeResultsService.GetStrategyResultAsync(userId, startDate, endTime, sortRequest, cancellationToken);
 
 		return TypedResults.Ok(response);
 	}
@@ -53,9 +48,9 @@ public class ResultController(
 		[FromQuery] DateTime? endTime,
 		CancellationToken cancellationToken)
 	{
-		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var userId = jwtHelper.GetUserIdFromClaims(User);
 
-		var response = await _tradeResultsService.GetStrategyResultByCodeAsync(userId, strategyName, tradeCode, startDate, endTime, cancellationToken);
+		var response = await tradeResultsService.GetStrategyResultByCodeAsync(userId, strategyName, tradeCode, startDate, endTime, cancellationToken);
 
 		return TypedResults.Ok(response);
 	}

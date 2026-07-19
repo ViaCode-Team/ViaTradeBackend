@@ -100,9 +100,6 @@ builder.Services.AddMediatR(cfg =>
 	cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(UnitOfWorkBehavior<,>));
 });
 
-// Domain Events
-builder.Services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
-
 // Unit of Work
 builder.Services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 

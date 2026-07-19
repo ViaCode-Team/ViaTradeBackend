@@ -4,8 +4,5 @@ namespace Application.Common.Models.Sort;
 
 public record StrategySortRequest() : BaseSortRequest<StrategySortField>
 {
-	public StrategySortRequest(bool _) : this()
-	{
-		SortBy = [StrategySortField.NameAsc];
-	}
+	protected override List<StrategySortField> DefaultSortBy => [StrategySortField.NameAsc];
 }

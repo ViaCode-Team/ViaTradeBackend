@@ -2,7 +2,7 @@ using Domain.Common;
 using Domain.Users.Entities;
 namespace Domain.TradeCodes.Entities;
 
-public sealed class UserTradeCode : DomainEntity<int>
+public sealed class UserTradeCode : BaseEntity<int>
 {
 	public int UserId { get; set; }
 

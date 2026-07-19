@@ -1,14 +1,8 @@
 namespace Application.Common.Models.Pagination;
 
 public sealed class PagedResult<T>(
-	IReadOnlyList<T> items,
-	int totalCount,
-	int pageNumber,
-	int pageSize)
+	IReadOnlyList<T> items, int totalCount, int pageNumber, int pageSize)
 {
-	private readonly int _pageNumber = pageNumber;
-	private readonly int _pageSize = pageSize;
-
 	public IReadOnlyList<T> Items { get; } = items;
 
 	public int TotalCount { get; } = totalCount;
@@ -38,7 +32,7 @@ public sealed class PagedResult<T>(
 		return new PagedResult<TResult>(
 			Items.Select(mapFunc).ToList(),
 			TotalCount,
-			_pageNumber,
-			_pageSize);
+			pageNumber,
+			pageSize);
 	}
 }

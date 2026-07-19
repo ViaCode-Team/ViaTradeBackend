@@ -51,7 +51,13 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 		int? tradeCodeId = noteType == NoteType.TradeCodeNote ? relatedId : null;
 		int? tradeStrategyId = noteType == NoteType.TradeStrategyNote ? relatedId : null;
 
-		var note = new Note(userId, noteText, tradeCodeId, tradeStrategyId);
+		var note = new Note
+		{
+			UserId = userId,
+			NoteText = noteText,
+			TradeCodeId = tradeCodeId,
+			TradeStrategyId = tradeStrategyId
+		};
 
 		_dbSet.Add(note);
 	}

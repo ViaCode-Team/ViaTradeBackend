@@ -10,13 +10,9 @@ namespace Application.TradeCodes.Queries;
 public record GetSysCodeByIdQuery(TradeDataType DataType, string TradeIdString) : IQuery<TradeCodeFileDto>;
 
 public class GetSysCodeByIdQueryHandler(
-	IFileReader tradefileReader,
-	ITradeCodeRepository tradeCodeRepository)
+	IFileReader tradefileReader, ITradeCodeRepository tradeCodeRepository)
 	: IRequestHandler<GetSysCodeByIdQuery, TradeCodeFileDto>
 {
-	private readonly IFileReader _tradefileReader = tradefileReader;
-	private readonly ITradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
-
 	public async Task<TradeCodeFileDto> Handle(GetSysCodeByIdQuery request, CancellationToken cancellationToken)
 	{
 		string exchangeId;
@@ -24,7 +20,7 @@ public class GetSysCodeByIdQueryHandler(
 
 		if (int.TryParse(request.TradeIdString, out var tradeCodeId))
 		{
-			var dbEntity = await _tradeCodeRepository.GetByIdAsync(tradeCodeId, cancellationToken)
+			var dbEntity = await tradeCodeRepository.GetByIdAsync(tradeCodeId, cancellationToken)
 				?? throw new KeyNotFoundException($"TradeCode with Id {tradeCodeId} not found in database");
 
 			exchangeId = dbEntity.ExchangeId;
@@ -33,14 +29,14 @@ public class GetSysCodeByIdQueryHandler(
 		else
 		{
 			exchangeId = request.TradeIdString;
-			dbId = await _tradeCodeRepository.GetIdByExchangeIdAsync(exchangeId, cancellationToken);
+			dbId = await tradeCodeRepository.GetIdByExchangeIdAsync(exchangeId, cancellationToken);
 		}
 
-		var fileCodes = _tradefileReader.GetTradeCodes(request.DataType, [exchangeId]);
+		var fileCodes = tradefileReader.GetTradeCodes(request.DataType, [exchangeId]);
 		var fileCode = fileCodes.FirstOrDefault()
 			?? throw new KeyNotFoundException($"No file data found for trade code '{exchangeId}'");
 
-		dbId ??= await _tradeCodeRepository.GetIdByExchangeIdAsync(fileCode.TradeCode, cancellationToken);
+		dbId ??= await tradeCodeRepository.GetIdByExchangeIdAsync(fileCode.TradeCode, cancellationToken);
 
 		if (dbId == null)
 			throw new KeyNotFoundException($"TradeCode '{exchangeId}' is not registered in database");

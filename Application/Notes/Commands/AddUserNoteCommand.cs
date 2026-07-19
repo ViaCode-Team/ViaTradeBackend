@@ -32,12 +32,13 @@ public class AddUserNoteCommandHandler(INoteRepository noteRepository) : IReques
 		if (existingNote != null)
 			throw new Exception("Note already exists. Use update.");
 
-		var note = new Note(
-			request.UserId,
-			request.NoteText,
-			request.NoteType == NoteType.TradeCodeNote ? request.RelatedId : null,
-			request.NoteType == NoteType.TradeStrategyNote ? request.RelatedId : null
-		);
+		var note = new Note
+		{
+			UserId = request.UserId,
+			NoteText = request.NoteText,
+			TradeCodeId = request.NoteType == NoteType.TradeCodeNote ? request.RelatedId : null,
+			TradeStrategyId = request.NoteType == NoteType.TradeStrategyNote ? request.RelatedId : null
+		};
 
 		await noteRepository.AddAsync(note, cancellationToken);
 	}

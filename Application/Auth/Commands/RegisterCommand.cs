@@ -10,25 +10,24 @@ namespace Application.Auth.Commands;
 public record RegisterCommand(string Login, string Password, string UserAgent) : ITransactionalCommand<AuthInternalResult>;
 
 public class RegisterCommandHandler(
-	IUserRepository userRepository,
-	IPasswordHasher passwordHasher,
-	ISender sender)
+	IUserRepository userRepository, IPasswordHasher passwordHasher, ISender sender)
 	: IRequestHandler<RegisterCommand, AuthInternalResult>
 {
-	private readonly IUserRepository _userRepository = userRepository;
-	private readonly IPasswordHasher _passwordHasher = passwordHasher;
-	private readonly ISender _sender = sender;
-
 	public async Task<AuthInternalResult> Handle(RegisterCommand request, CancellationToken cancellationToken)
 	{
-		if (await _userRepository.ExistsAsync(u => u.Login == request.Login, cancellationToken))
+		if (await userRepository.ExistsAsync(u => u.Login == request.Login, cancellationToken))
 			throw new InvalidOperationException("User already exists");
 
-		var user = new User(request.Login, _passwordHasher.Hash(request.Password), DateTime.UtcNow);
+		var user = new User
+		{
+			Login = request.Login,
+			HashPassword = passwordHasher.Hash(request.Password),
+			RegisterDate = DateTime.UtcNow
+		};
 
-		await _userRepository.AddAsync(user, cancellationToken);
+		await userRepository.AddAsync(user, cancellationToken);
 
 		var loginCommand = new LoginCommand(request.Login, request.Password, request.UserAgent);
-		return await _sender.Send(loginCommand, cancellationToken);
+		return await sender.Send(loginCommand, cancellationToken);
 	}
 }

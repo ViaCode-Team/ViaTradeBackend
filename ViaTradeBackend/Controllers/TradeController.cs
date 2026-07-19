@@ -18,20 +18,15 @@ namespace ViaTradeBackend.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class TradeController(
-	ISender sender,
-	IJwtHelper jwtHelper) : ControllerBase
+public class TradeController(ISender sender, IJwtHelper jwtHelper) : ControllerBase
 {
-	private readonly ISender _sender = sender;
-	private readonly IJwtHelper _jwtHelper = jwtHelper;
-
 	[HttpGet("statistics")]
 	public async Task<Ok<GlobalStatisticResponse>> GetTradeStatistics(CancellationToken cancellationToken)
 	{
-		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var query = new GetGlobalStatisticQuery(userId);
-		var tradeStatistics = await _sender.Send(query, cancellationToken);
+		var tradeStatistics = await sender.Send(query, cancellationToken);
 
 		return TypedResults.Ok(tradeStatistics.Adapt<GlobalStatisticResponse>());
 	}
@@ -42,10 +37,10 @@ public class TradeController(
 		[FromQuery] PaginationRequest? paginationRequest,
 		CancellationToken cancellationToken)
 	{
-		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var query = new GetTradesPagedQuery(userId, filterRequest, paginationRequest);
-		var userTrades = await _sender.Send(query, cancellationToken);
+		var userTrades = await sender.Send(query, cancellationToken);
 
 		return TypedResults.Ok(userTrades.Map(t => t.Adapt<TradeResponse>()));
 	}
@@ -55,10 +50,10 @@ public class TradeController(
 		[Required] int id,
 		CancellationToken cancellationToken)
 	{
-		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var query = new GetTradeByIdQuery(id, userId);
-		var trade = await _sender.Send(query, cancellationToken);
+		var trade = await sender.Send(query, cancellationToken);
 
 		return TypedResults.Ok(trade.Adapt<TradeResponse>());
 	}
@@ -68,10 +63,10 @@ public class TradeController(
 		[FromBody, Required] CreateTradeRequest request,
 		CancellationToken cancellationToken)
 	{
-		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var command = new CreateTradeCommand(userId, request.Adapt<TradeCreateDto>());
-		var trade = await _sender.Send(command, cancellationToken);
+		var trade = await sender.Send(command, cancellationToken);
 
 		return TypedResults.Created($"/api/Trade/{trade.Id}", trade.Adapt<TradeResponse>());
 	}
@@ -82,10 +77,10 @@ public class TradeController(
 		[FromBody, Required] UpdateTradeRequest request,
 		CancellationToken cancellationToken)
 	{
-		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var command = new UpdateTradeCommand(id, userId, request.Adapt<TradeCreateDto>());
-		await _sender.Send(command, cancellationToken);
+		await sender.Send(command, cancellationToken);
 
 		return TypedResults.NoContent();
 	}
@@ -95,10 +90,10 @@ public class TradeController(
 		[Required, FromRoute] int id,
 		CancellationToken cancellationToken)
 	{
-		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var command = new DeleteTradeCommand(id, userId);
-		await _sender.Send(command, cancellationToken);
+		await sender.Send(command, cancellationToken);
 
 		return TypedResults.NoContent();
 	}

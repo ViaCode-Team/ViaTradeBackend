@@ -3,26 +3,14 @@ using Domain.Trades.Entities;
 
 namespace Domain.TradeCodes.Entities;
 
-public sealed class TradeCode : AggregateRoot<int>
+public sealed class TradeCode : BaseEntity<int>
 {
-	public string ExchangeId { get; private set; }
+	public string ExchangeId { get; set; }
 
-	public string? Description { get; private set; }
+	public string? Description { get; set; }
 
-	private readonly List<Trade> _trades = [];
-	public IReadOnlyCollection<Trade> Trades => _trades.AsReadOnly();
+	public ICollection<Trade> Trades { get; set; } = [];
 
-	private readonly List<UserTradeCode> _userTradeCodes = [];
-	public IReadOnlyCollection<UserTradeCode> UserTradeCodes => _userTradeCodes.AsReadOnly();
+	public ICollection<UserTradeCode> UserTradeCodes { get; set; } = [];
 
-	private TradeCode() { }
-
-	public TradeCode(string exchangeId, string? description = null)
-	{
-		if (string.IsNullOrWhiteSpace(exchangeId))
-			throw new ArgumentException("ExchangeId cannot be empty.", nameof(exchangeId));
-
-		ExchangeId = exchangeId;
-		Description = description;
-	}
 }

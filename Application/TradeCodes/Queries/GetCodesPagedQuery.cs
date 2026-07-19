@@ -14,10 +14,8 @@ public record GetCodesPagedQuery(
 public class GetCodesPagedQueryHandler(ITradeCodeRepository tradeCodeRepository)
 	: IRequestHandler<GetCodesPagedQuery, PagedResult<TradeCode>>
 {
-	private readonly ITradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
-
 	public async Task<PagedResult<TradeCode>> Handle(GetCodesPagedQuery request, CancellationToken cancellationToken)
 	{
-		return await _tradeCodeRepository.GetCodesPagedAsync(request.PaginationRequest, request.SortRequest, cancellationToken);
+		return await tradeCodeRepository.GetCodesPagedAsync(request.PaginationRequest, request.SortRequest, cancellationToken);
 	}
 }

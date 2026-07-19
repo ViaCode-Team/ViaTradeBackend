@@ -18,13 +18,8 @@ namespace ViaTradeBackend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AuthController(
-	ISender sender,
-	IJwtHelper jwtHelper,
-	IOptions<AuthCookieOptions> authOptions) : ControllerBase
+public class AuthController(ISender sender, IJwtHelper jwtHelper, IOptions<AuthCookieOptions> authOptions) : ControllerBase
 {
-	private readonly ISender _sender = sender;
-	private readonly IJwtHelper _jwtHelper = jwtHelper;
 	private readonly AuthCookieOptions _authCookiOptions = authOptions.Value;
 
 	[HttpPost("login")]
@@ -34,7 +29,7 @@ public class AuthController(
 	{
 		var userAgent = Request.Headers.UserAgent.ToString();
 		var command = new LoginCommand(request.Login, request.Password, userAgent);
-		var result = await _sender.Send(command, cancellationToken);
+		var result = await sender.Send(command, cancellationToken);
 
 		SetAuthCookies(result);
 		return TypedResults.NoContent();
@@ -47,7 +42,7 @@ public class AuthController(
 	{
 		var userAgent = Request.Headers.UserAgent.ToString();
 		var command = new RegisterCommand(request.Login, request.Password, userAgent);
-		var result = await _sender.Send(command, cancellationToken);
+		var result = await sender.Send(command, cancellationToken);
 
 		SetAuthCookies(result);
 		return TypedResults.Created();
@@ -60,7 +55,7 @@ public class AuthController(
 			throw new UnauthorizedAccessException();
 
 		var command = new RefreshTokenCommand(refreshToken);
-		var result = await _sender.Send(command, cancellationToken);
+		var result = await sender.Send(command, cancellationToken);
 
 		SetAuthCookies(result);
 		return TypedResults.NoContent();
@@ -73,7 +68,7 @@ public class AuthController(
 		if (Request.Cookies.TryGetValue(_authCookiOptions.RefreshTokenCookie, out var refreshToken))
 		{
 			var command = new LogoutSessionCommand(refreshToken);
-			await _sender.Send(command);
+			await sender.Send(command);
 		}
 
 		Response.Cookies.Delete(_authCookiOptions.AccessTokenCookie);
@@ -86,9 +81,9 @@ public class AuthController(
 	[Authorize]
 	public async Task<NoContent> LogoutAll()
 	{
-		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var command = new LogoutAllCommand(userId);
-		await _sender.Send(command);
+		await sender.Send(command);
 
 		Response.Cookies.Delete(_authCookiOptions.AccessTokenCookie);
 		Response.Cookies.Delete(_authCookiOptions.RefreshTokenCookie);
@@ -100,9 +95,9 @@ public class AuthController(
 	[Authorize]
 	public async Task<Ok<PagedResult<UserSessionResponse>>> GetUserSessions([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
 	{
-		var userId = _jwtHelper.GetUserIdFromClaims(User);
+		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var query = new GetPagedUserSessionsQuery(userId, paginationRequest);
-		var pagedSessions = await _sender.Send(query, cancellationToken);
+		var pagedSessions = await sender.Send(query, cancellationToken);
 
 		return TypedResults.Ok(pagedSessions.Map(s => s.Adapt<UserSessionResponse>()));
 	}

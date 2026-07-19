@@ -7,5 +7,3 @@ public record UpdateTradeRemindRequest(
 	DateTime DateTime
 );
 
-
-

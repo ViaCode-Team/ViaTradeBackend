@@ -10,25 +10,16 @@ namespace Application.Auth.Commands;
 public record LoginCommand(string Login, string Password, string UserAgent) : ICommand<AuthInternalResult>;
 
 public class LoginCommandHandler(
-	IUserRepository userRepository,
-	IPasswordHasher passwordHasher,
-	IJwtHelper jwtHelper,
-	ISessionRepository sessionRepository,
-	IRefreshTokenRepository refreshTokenRepository)
+	IUserRepository userRepository, IPasswordHasher passwordHasher, IJwtHelper jwtHelper, ISessionRepository sessionRepository, IRefreshTokenRepository refreshTokenRepository)
 	: IRequestHandler<LoginCommand, AuthInternalResult>
 {
-	private readonly IUserRepository _userRepository = userRepository;
-	private readonly IPasswordHasher _passwordHasher = passwordHasher;
-	private readonly IJwtHelper _jwtHelper = jwtHelper;
-	private readonly ISessionRepository _sessionRepository = sessionRepository;
-	private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
 	private readonly TimeSpan _sessionTtl = TimeSpan.FromDays(7);
 
 	public async Task<AuthInternalResult> Handle(LoginCommand request, CancellationToken cancellationToken)
 	{
-		var user = await _userRepository.GetByLoginAsync(request.Login, cancellationToken);
+		var user = await userRepository.GetByLoginAsync(request.Login, cancellationToken);
 
-		if (user == null || !_passwordHasher.Verify(request.Password, user.HashPassword))
+		if (user == null || !passwordHasher.Verify(request.Password, user.HashPassword))
 			throw new UnauthorizedAccessException();
 
 		var sessionId = Guid.NewGuid().ToString();
@@ -42,12 +33,12 @@ public class LoginCommandHandler(
 			LastSeen = DateTime.UtcNow
 		};
 
-		await _sessionRepository.CreateAsync(session, _sessionTtl);
+		await sessionRepository.CreateAsync(session, _sessionTtl);
 
-		var accessToken = _jwtHelper.GenerateAccessToken(user, sessionId);
-		var refreshToken = _jwtHelper.GenerateRefreshToken();
+		var accessToken = jwtHelper.GenerateAccessToken(user, sessionId);
+		var refreshToken = jwtHelper.GenerateRefreshToken();
 
-		await _refreshTokenRepository.StoreAsync(sessionId, refreshToken, _sessionTtl);
+		await refreshTokenRepository.StoreAsync(sessionId, refreshToken, _sessionTtl);
 
 		return new AuthInternalResult
 		{

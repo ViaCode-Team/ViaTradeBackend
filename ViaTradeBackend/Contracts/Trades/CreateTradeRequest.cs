@@ -14,5 +14,3 @@ public record CreateTradeRequest(
 	int TradeCodeId
 );
 
-
-

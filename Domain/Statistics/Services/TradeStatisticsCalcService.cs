@@ -1,4 +1,5 @@
 using Domain.Trades.Entities;
+using Domain.Trades.Enums;
 using System.Linq.Expressions;
 
 namespace Domain.Statistics.Services;
@@ -54,5 +55,20 @@ public static class TradeStatisticsCalcService
 			return 0m;
 
 		return Math.Round(totalIncome / totalTrades, 2);
+	}
+
+	public static double? CalculateNetIncome(double tradeOpen, double? tradeClose, TradeSignal tradeSignal)
+	{
+		if (tradeClose == null || tradeOpen == 0 || tradeSignal == TradeSignal.HOLD)
+			return null;
+
+		var basePercent = (tradeClose.Value - tradeOpen) / tradeOpen * 100;
+		double adjustedPercent = basePercent;
+		if (tradeSignal == TradeSignal.SELL)
+		{
+			adjustedPercent = -basePercent;
+		}
+
+		return Math.Round(adjustedPercent, 2);
 	}
 }

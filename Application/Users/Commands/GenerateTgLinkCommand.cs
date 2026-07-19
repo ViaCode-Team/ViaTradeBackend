@@ -10,8 +10,6 @@ public record GenerateTgLinkCommand(int UserId) : ICommand<string>;
 public class GenerateTgLinkCommandHandler(ITgTokenRepository tgTokenRepository)
 	: IRequestHandler<GenerateTgLinkCommand, string>
 {
-	private readonly ITgTokenRepository _tgTokenRepository = tgTokenRepository;
-
 	public async Task<string> Handle(GenerateTgLinkCommand request, CancellationToken cancellationToken)
 	{
 		var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(24))
@@ -19,7 +17,7 @@ public class GenerateTgLinkCommandHandler(ITgTokenRepository tgTokenRepository)
 			.Replace("/", "_")
 			.TrimEnd('=');
 
-		await _tgTokenRepository.SetAsync(token, request.UserId, TimeSpan.FromMinutes(5));
+		await tgTokenRepository.SetAsync(token, request.UserId, TimeSpan.FromMinutes(5));
 
 		return $"https://t.me/ViaTradeBot?start={token}";
 	}

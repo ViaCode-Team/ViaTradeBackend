@@ -17,9 +17,10 @@ public class StrategyQuerySpecification : BaseQuerySpecification<TradeStrategy>
 				AddCriteria(x => !x.UserTradeStrategies!.Any(uts => uts.UserId == userId));
 		}
 
-		if (sort?.SortBy != null && sort.SortBy.Count > 0)
+		if (sort != null)
 		{
-			foreach (var field in sort.SortBy)
+			var sortFields = sort.GetEffectiveSortBy();
+			foreach (var field in sortFields)
 			{
 				switch (field)
 				{
@@ -38,5 +39,6 @@ public class StrategyQuerySpecification : BaseQuerySpecification<TradeStrategy>
 				}
 			}
 		}
+
 	}
 }

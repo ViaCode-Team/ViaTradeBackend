@@ -3,8 +3,5 @@ namespace Application.Common.Models.Sort;
 
 public record RemindSortRequest() : BaseSortRequest<RemindSortField>
 {
-	public RemindSortRequest(bool _) : this()
-	{
-		SortBy = [RemindSortField.DateTimeDesc];
-	}
+	protected override List<RemindSortField> DefaultSortBy => [RemindSortField.DateTimeDesc];
 }

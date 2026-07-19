@@ -7,20 +7,16 @@ namespace Application.Auth.Commands;
 public record LogoutSessionCommand(string RefreshToken) : ICommand;
 
 public class LogoutSessionCommandHandler(
-	ISessionRepository sessionRepository,
-	IRefreshTokenRepository refreshTokenRepository)
+	ISessionRepository sessionRepository, IRefreshTokenRepository refreshTokenRepository)
 	: IRequestHandler<LogoutSessionCommand>
 {
-	private readonly ISessionRepository _sessionRepository = sessionRepository;
-	private readonly IRefreshTokenRepository _refreshTokenRepository = refreshTokenRepository;
-
 	public async Task Handle(LogoutSessionCommand request, CancellationToken cancellationToken)
 	{
-		var sessionId = await _refreshTokenRepository.GetSessionIdAsync(request.RefreshToken);
+		var sessionId = await refreshTokenRepository.GetSessionIdAsync(request.RefreshToken);
 		if (sessionId == null)
 			return;
 
-		await _refreshTokenRepository.RemoveAsync(sessionId);
-		await _sessionRepository.RemoveAsync(sessionId);
+		await refreshTokenRepository.RemoveAsync(sessionId);
+		await sessionRepository.RemoveAsync(sessionId);
 	}
 }

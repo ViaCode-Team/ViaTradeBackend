@@ -11,10 +11,8 @@ public record GetPagedUserSessionsQuery(int UserId, PaginationRequest Pagination
 public class GetPagedUserSessionsQueryHandler(ISessionRepository sessionRepository)
 	: IRequestHandler<GetPagedUserSessionsQuery, PagedResult<UserSessionDto>>
 {
-	private readonly ISessionRepository _sessionRepository = sessionRepository;
-
 	public async Task<PagedResult<UserSessionDto>> Handle(GetPagedUserSessionsQuery request, CancellationToken cancellationToken)
 	{
-		return await _sessionRepository.GetPagedUserSessionsAsync(request.UserId, request.PaginationRequest);
+		return await sessionRepository.GetPagedUserSessionsAsync(request.UserId, request.PaginationRequest);
 	}
 }

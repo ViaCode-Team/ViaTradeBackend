@@ -3,19 +3,12 @@ using Domain.Users.Entities;
 
 namespace Domain.Strategies.Entities;
 
-public sealed class UserTradeStrategy : AggregateRoot<int>
+public sealed class UserTradeStrategy : BaseEntity<int>
 {
-	public int UserId { get; private set; }
-	public int TradeStrategyId { get; private set; }
+	public int UserId { get; set; }
+	public int TradeStrategyId { get; set; }
 
-	public User? User { get; private set; }
-	public TradeStrategy? TradeStrategy { get; private set; }
+	public User? User { get; set; }
+	public TradeStrategy? TradeStrategy { get; set; }
 
-	private UserTradeStrategy() { }
-
-	public UserTradeStrategy(int userId, int tradeStrategyId)
-	{
-		UserId = userId;
-		TradeStrategyId = tradeStrategyId;
-	}
 }

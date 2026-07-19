@@ -7,5 +7,3 @@ public record CreateTradeRemindRequest(
 	DateTime DateTime
 );
 
-
-

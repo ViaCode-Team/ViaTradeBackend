@@ -2,16 +2,10 @@ using Domain.Common;
 
 namespace Domain.Trades.Entities;
 
-public sealed class TradeType : AggregateRoot<int>
+public sealed class TradeType : BaseEntity<int>
 {
-	public string Name { get; private set; }
+	public string Name { get; set; }
 
-	public ICollection<Trade>? Trades { get; private set; }
+	public ICollection<Trade>? Trades { get; set; }
 
-	private TradeType() { }
-
-	public TradeType(string name)
-	{
-		Name = name;
-	}
 }

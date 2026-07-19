@@ -5,43 +5,20 @@ using Domain.Users.Entities;
 
 namespace Domain.Notes.Entities;
 
-public sealed class Note : AggregateRoot<int>
+public sealed class Note : BaseEntity<int>
 {
-	public int UserId { get; private set; }
+	public int UserId { get; set; }
 
-	public string NoteText { get; private set; }
+	public string NoteText { get; set; }
 
-	public int? TradeCodeId { get; private set; }
+	public int? TradeCodeId { get; set; }
 
-	public int? TradeStrategyId { get; private set; }
-	public User? User { get; private set; }
-	public TradeCode? TradeCode { get; private set; }
-	public TradeStrategy? TradeStrategy { get; private set; }
+	public int? TradeStrategyId { get; set; }
 
-	private Note() { }
+	public User? User { get; set; }
 
-	public Note(int userId, string noteText, int? tradeCodeId = null, int? tradeStrategyId = null)
-	{
-		if (tradeCodeId.HasValue && tradeStrategyId.HasValue)
-			throw new ArgumentException("Note cannot belong to both TradeCode and TradeStrategy");
+	public TradeCode? TradeCode { get; set; }
 
-		if (!tradeCodeId.HasValue && !tradeStrategyId.HasValue)
-			throw new ArgumentException("Note must belong to either TradeCode or TradeStrategy");
+	public TradeStrategy? TradeStrategy { get; set; }
 
-		if (string.IsNullOrEmpty(noteText))
-			throw new ArgumentNullException(nameof(noteText));
-
-		UserId = userId;
-		NoteText = noteText;
-		TradeCodeId = tradeCodeId;
-		TradeStrategyId = tradeStrategyId;
-	}
-
-	public void UpdateText(string newText)
-	{
-		if (string.IsNullOrEmpty(newText))
-			throw new ArgumentNullException(nameof(newText));
-
-		NoteText = newText;
-	}
 }

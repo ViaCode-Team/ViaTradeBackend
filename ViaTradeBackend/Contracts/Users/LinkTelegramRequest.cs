@@ -5,5 +5,3 @@ public record LinkTelegramRequest(
 	string TgId
 );
 
-
-

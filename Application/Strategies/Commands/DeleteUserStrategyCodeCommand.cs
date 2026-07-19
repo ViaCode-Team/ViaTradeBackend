@@ -9,11 +9,9 @@ public record DeleteUserStrategyCodeCommand(int UserId, int StrategyId, int Trad
 public class DeleteUserStrategyCodeCommandHandler(IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository)
 	: IRequestHandler<DeleteUserStrategyCodeCommand>
 {
-	private readonly IUserStrategyTradeCodeRepository _userStrategyTradeCodeRepository = userStrategyTradeCodeRepository;
-
 	public async Task Handle(DeleteUserStrategyCodeCommand request, CancellationToken cancellationToken)
 	{
-		var affectedRows = await _userStrategyTradeCodeRepository.ExecuteDeleteAsync(
+		var affectedRows = await userStrategyTradeCodeRepository.ExecuteDeleteAsync(
 			e => e.UserId == request.UserId &&
 				 e.StrategyId == request.StrategyId &&
 				 e.TradeCodeId == request.TradeCodeId,

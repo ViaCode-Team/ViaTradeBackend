@@ -9,14 +9,12 @@ public class SessionCleanupService(
 	ILogger<SessionCleanupService> logger,
 	IOptions<AuthCookieOptions> options) : BackgroundService
 {
-	private readonly IServiceProvider _services = services;
-	private readonly ILogger<SessionCleanupService> _logger = logger;
 	private readonly TimeSpan _cleanupInterval = TimeSpan.FromHours(24);
 	private readonly int _sessionLifetimeDays = options.Value.RefreshTokenExpiryDays;
 
 	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 	{
-		_logger.LogInformation("SessionCleanupService started");
+		logger.LogInformation("SessionCleanupService started");
 
 		while (!stoppingToken.IsCancellationRequested)
 		{
@@ -24,16 +22,16 @@ public class SessionCleanupService(
 			{
 				await Task.Delay(_cleanupInterval, stoppingToken);
 
-				using var scope = _services.CreateScope();
+				using var scope = services.CreateScope();
 
 				var sessionRepo = scope.ServiceProvider.GetRequiredService<ISessionRepository>();
 
 				var threshold = DateTime.UtcNow.AddDays(-_sessionLifetimeDays);
-				_logger.LogInformation("Starting cleanup: sessions older than {Threshold}", threshold);
+				logger.LogInformation("Starting cleanup: sessions older than {Threshold}", threshold);
 
 				var deletedCount = await sessionRepo.CleanupExpiredSessionsAsync(threshold);
 
-				_logger.LogInformation("Cleanup finished: removed {Count} expired sessions", deletedCount);
+				logger.LogInformation("Cleanup finished: removed {Count} expired sessions", deletedCount);
 			}
 			catch (OperationCanceledException)
 			{
@@ -41,7 +39,7 @@ public class SessionCleanupService(
 			}
 			catch (Exception ex)
 			{
-				_logger.LogError(ex, "Error during cleanup cycle");
+				logger.LogError(ex, "Error during cleanup cycle");
 			}
 		}
 	}

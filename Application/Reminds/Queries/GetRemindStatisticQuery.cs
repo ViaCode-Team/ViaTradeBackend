@@ -2,7 +2,6 @@ using Application.Common.Interfaces;
 using Application.Reminds.Interfaces;
 using MediatR;
 
-
 namespace Application.Reminds.Queries;
 
 public record TradeRemindStatisticReadModel(int TotalReminds);

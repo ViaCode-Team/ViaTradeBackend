@@ -6,16 +6,27 @@ public abstract record BaseSortRequest<TEnum> : IValidatableObject where TEnum :
 {
 	public List<TEnum> SortBy { get; init; } = [];
 
+	protected virtual List<TEnum> DefaultSortBy => [];
+
+	public List<TEnum> GetEffectiveSortBy() => SortBy.Count > 0 ? SortBy : DefaultSortBy;
+
 	public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
 	{
-		if (SortBy == null || SortBy.Count <= 1) yield break;
+		var effectiveSort = GetEffectiveSortBy();
+		if (effectiveSort == null || effectiveSort.Count <= 1)
+			yield break;
 
-		var baseFields = SortBy.Select(x => x.ToString().Replace("Asc", "").Replace("Desc", "")).ToList();
+		var baseFields = effectiveSort
+			.Select(x => x
+				.ToString()
+				.Replace("Asc", "")
+				.Replace("Desc", ""))
+			.ToList();
 
 		if (baseFields.Distinct().Count() != baseFields.Count)
 		{
 			yield return new ValidationResult(
-				"В сортировке переданы дублирующиеся или взаимоисключающие поля (например, asc и desc для одного поля).",
+				"Duplicate or conflicting sort fields were provided (for example, both ascending and descending order for the same field).",
 				[nameof(SortBy)]
 			);
 		}

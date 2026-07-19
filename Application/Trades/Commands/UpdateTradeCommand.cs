@@ -2,7 +2,7 @@ using Application.Common.Interfaces;
 using Application.TradeCodes.Interfaces;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
-using Domain.Trades.Entities;
+using Domain.Statistics.Services;
 using MediatR;
 
 namespace Application.Trades.Commands;
@@ -10,33 +10,27 @@ namespace Application.Trades.Commands;
 public record UpdateTradeCommand(int Id, int UserId, TradeCreateDto Request) : ICommand;
 
 public class UpdateTradeCommandHandler(
-	ITradeRepository tradeRepository,
-	ITradeCodeRepository tradeCodeRepository,
-	ITradeTypeRepository tradeTypeRepository)
+	ITradeRepository tradeRepository, ITradeCodeRepository tradeCodeRepository, ITradeTypeRepository tradeTypeRepository)
 	: IRequestHandler<UpdateTradeCommand>
 {
-	private readonly ITradeRepository _tradeRepository = tradeRepository;
-	private readonly ITradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
-	private readonly ITradeTypeRepository _tradeTypeRepository = tradeTypeRepository;
-
 	public async Task Handle(UpdateTradeCommand request, CancellationToken cancellationToken)
 	{
-		bool isTradeCodeExist = await _tradeCodeRepository.ExistsAsync(c => c.Id == request.Request.TradeCodeId, cancellationToken);
+		bool isTradeCodeExist = await tradeCodeRepository.ExistsAsync(c => c.Id == request.Request.TradeCodeId, cancellationToken);
 		if (!isTradeCodeExist)
 			throw new KeyNotFoundException();
 
-		bool isTradeTypeExist = await _tradeTypeRepository.ExistsAsync(t => t.Id == request.Request.TradeTypeId, cancellationToken);
+		bool isTradeTypeExist = await tradeTypeRepository.ExistsAsync(t => t.Id == request.Request.TradeTypeId, cancellationToken);
 		if (!isTradeTypeExist)
 			throw new ArgumentException($"TradeType {request.Request.TradeTypeId} not found");
 
 		var req = request.Request;
-		var netIncome = Trade.CalculateNetIncome(req.TradeOpen, req.TradeClose, req.TradeSignal);
+		var netIncome = TradeStatisticsCalcService.CalculateNetIncome(req.TradeOpen, req.TradeClose, req.TradeSignal);
 		var price = (decimal)req.TradeOpen * req.Count;
 
-		var affectedRows = await _tradeRepository.UpdateAsync(request.Id, request.UserId, req, netIncome, price, cancellationToken);
+		var affectedRows = await tradeRepository.UpdateAsync(request.Id, request.UserId, req, netIncome, price, cancellationToken);
 		if (affectedRows == 0)
 		{
-			bool exists = await _tradeRepository.ExistsAsync(t => t.Id == request.Id, cancellationToken);
+			bool exists = await tradeRepository.ExistsAsync(t => t.Id == request.Id, cancellationToken);
 			if (exists)
 				throw new UnauthorizedAccessException();
 

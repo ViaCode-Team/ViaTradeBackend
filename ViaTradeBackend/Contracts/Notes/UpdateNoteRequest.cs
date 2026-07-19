@@ -6,5 +6,3 @@ public record UpdateNoteRequest(
 	[StringLength(1024)] string NoteText
 );
 
-
-

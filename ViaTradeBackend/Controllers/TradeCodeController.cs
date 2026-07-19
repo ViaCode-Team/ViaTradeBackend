@@ -18,13 +18,11 @@ namespace ViaTradeBackend.Controllers;
 [Authorize]
 public class TradeCodeController(ISender sender) : ControllerBase
 {
-	private readonly ISender _sender = sender;
-
 	[HttpGet("stocks/statistics")]
 	public async Task<Ok<StockStatisticResponse>> GetStockStatistics(CancellationToken cancellationToken)
 	{
 		var query = new GetStockStatisticQuery();
-		var result = await _sender.Send(query, cancellationToken);
+		var result = await sender.Send(query, cancellationToken);
 
 		return TypedResults.Ok(result.Adapt<StockStatisticResponse>());
 	}
@@ -36,7 +34,7 @@ public class TradeCodeController(ISender sender) : ControllerBase
 		CancellationToken cancellationToken)
 	{
 		var query = new GetCodesPagedQuery(paginationRequest, sortRequest);
-		var result = await _sender.Send(query, cancellationToken);
+		var result = await sender.Send(query, cancellationToken);
 
 		return TypedResults.Ok(result.Map(c => c.Adapt<TradeCodeResponse>()));
 	}
@@ -45,7 +43,7 @@ public class TradeCodeController(ISender sender) : ControllerBase
 	public async Task<Ok<List<TradeCodeFileResponse>>> GetSysStockCodes(CancellationToken cancellationToken)
 	{
 		var query = new GetSysAllCodesQuery(TradeDataType.Stocks);
-		var result = await _sender.Send(query, cancellationToken);
+		var result = await sender.Send(query, cancellationToken);
 
 		return TypedResults.Ok(result.Adapt<List<TradeCodeFileResponse>>());
 	}
@@ -56,7 +54,7 @@ public class TradeCodeController(ISender sender) : ControllerBase
 		CancellationToken cancellationToken)
 	{
 		var query = new GetSysCodeByIdQuery(TradeDataType.Stocks, tradeIdString);
-		var result = await _sender.Send(query, cancellationToken);
+		var result = await sender.Send(query, cancellationToken);
 
 		return TypedResults.Ok(result.Adapt<TradeCodeFileResponse>());
 	}

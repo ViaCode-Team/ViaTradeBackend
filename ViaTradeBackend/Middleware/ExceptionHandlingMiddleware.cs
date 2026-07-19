@@ -6,14 +6,11 @@ namespace ViaTradeBackend.Middleware;
 
 public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
 {
-	private readonly RequestDelegate _next = next;
-	private readonly ILogger<ExceptionHandlingMiddleware> _logger = logger;
-
 	public async Task Invoke(HttpContext context)
 	{
 		try
 		{
-			await _next(context);
+			await next(context);
 		}
 		catch (Exception ex)
 		{
@@ -78,7 +75,7 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
 		context.Response.StatusCode = problem.Status!.Value;
 		context.Response.ContentType = "application/problem+json";
 
-		_logger.LogInformation(
+		logger.LogInformation(
 			"Exception handled: Status={Status}, Path={Path}, Type={ExceptionType}",
 			problem.Status,
 			context.Request.Path,

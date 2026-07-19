@@ -23,7 +23,14 @@ public class CreateTradeRemindCommandHandler(ITradeRemindRepository repository) 
 {
 	public async Task Handle(CreateTradeRemindCommand request, CancellationToken cancellationToken)
 	{
-		var remind = new TradeRemind(request.TextRemind, request.DateTime, request.TradeCodeId, request.UserId);
+		var remind = new TradeRemind
+		{
+			TextRemind = request.TextRemind,
+			DateTime = request.DateTime,
+			TradeCodeId = request.TradeCodeId,
+			UserId = request.UserId
+		};
+
 		await repository.AddAsync(remind, cancellationToken);
 	}
 }
