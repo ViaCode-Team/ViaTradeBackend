@@ -9,12 +9,12 @@ public record DeleteUserNoteCommand(int RelatedId, int UserId, NoteType NoteType
 
 public class DeleteUserNoteCommandHandler(INoteRepository noteRepository) : IRequestHandler<DeleteUserNoteCommand>
 {
-	public async Task Handle(DeleteUserNoteCommand request, CancellationToken cancellationToken)
+	public async Task Handle(DeleteUserNoteCommand request, CancellationToken ct)
 	{
 		var rows = await noteRepository.ExecuteDeleteAsync(
 			x => x.UserId == request.UserId &&
 				 (request.NoteType == NoteType.TradeCodeNote ? x.TradeCodeId == request.RelatedId : x.TradeStrategyId == request.RelatedId),
-			cancellationToken);
+			ct);
 
 		if (rows == 0)
 			throw new Exception("Note not found.");

@@ -9,8 +9,8 @@ public record GetNoteStatisticQuery(int UserId) : IQuery<NoteStatisticReadModel>
 
 public class GetNoteStatisticQueryHandler(INoteRepository noteRepository) : IRequestHandler<GetNoteStatisticQuery, NoteStatisticReadModel>
 {
-	public async Task<NoteStatisticReadModel> Handle(GetNoteStatisticQuery request, CancellationToken cancellationToken)
+	public async Task<NoteStatisticReadModel> Handle(GetNoteStatisticQuery request, CancellationToken ct)
 	{
-		return await noteRepository.GetNoteStatisticAsync(request.UserId, cancellationToken);
+		return await noteRepository.GetNoteStatisticAsync(request.UserId, ct);
 	}
 }

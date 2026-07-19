@@ -13,9 +13,9 @@ public class TradeResultsService(
 	ITradeStrategyRepository tradeStrategyRepository,
 	IUserTradeStrategyRepository userTradeStrategyRepository) : ITradeResultsService
 {
-	public async Task<SignalStatisticReadModel> GetStrategyResultStatisticAsync(int userId, CancellationToken cancellationToken)
+	public async Task<SignalStatisticReadModel> GetStrategyResultStatisticAsync(int userId, CancellationToken ct)
 	{
-		var signals = await GetStrategyResultAsync(userId, DateTime.Now, null, null, cancellationToken);
+		var signals = await GetStrategyResultAsync(userId, DateTime.Now, null, null, ct);
 
 		var allResults = signals.Strategies
 			.SelectMany(s => s.Tickers)
@@ -34,17 +34,17 @@ public class TradeResultsService(
 		DateTime? startDate,
 		DateTime? endDate,
 		SignalSortRequest? sortRequest,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		if (startDate != null)
 		{
 			startDate = startDate.Value.Date;
 		}
 
-		var strategys = await tradeStrategyRepository.GetAllAsync(cancellationToken);
+		var strategys = await tradeStrategyRepository.GetAllAsync(ct);
 		var strategyAccuracyDict = strategys.ToDictionary(s => s.Name, s => s.Accuracy);
 
-		var userPreferences = await userTradeStrategyRepository.GetUserPreferencesAsync(userId, cancellationToken);
+		var userPreferences = await userTradeStrategyRepository.GetUserPreferencesAsync(userId, ct);
 		if (userPreferences.Count == 0)
 			return new StrategyResultResponse { Strategies = [] };
 
@@ -108,15 +108,15 @@ public class TradeResultsService(
 		string tradeCode,
 		DateTime? startDate,
 		DateTime? endDate,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
-		var userPreferences = await userTradeStrategyRepository.GetUserPreferencesAsync(userId, cancellationToken);
+		var userPreferences = await userTradeStrategyRepository.GetUserPreferencesAsync(userId, ct);
 		var preference = userPreferences.FirstOrDefault(x => x.Key == strategyName);
 
 		if (preference.Key == null || !preference.Value.Contains(tradeCode))
 			throw new KeyNotFoundException();
 
-		var strategy = await tradeStrategyRepository.GetByNameAsync(strategyName, cancellationToken);
+		var strategy = await tradeStrategyRepository.GetByNameAsync(strategyName, ct);
 		var accuracy = strategy?.Accuracy;
 
 		var results = tradefileReader.ReadDataByCodesWithStrategy<StrategyResult>(

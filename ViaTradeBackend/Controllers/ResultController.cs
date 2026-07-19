@@ -17,11 +17,11 @@ namespace ViaTradeBackend.Controllers;
 public class ResultController(ITradeResultsService tradeResultsService, IJwtHelper jwtHelper) : ControllerBase
 {
 	[HttpGet("statistics")]
-	public async Task<Ok<SignalStatisticResponse>> GetStrategyResultStatistics(CancellationToken cancellationToken)
+	public async Task<Ok<SignalStatisticResponse>> GetStrategyResultStatistics(CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
-		var signalStatistics = await tradeResultsService.GetStrategyResultStatisticAsync(userId, cancellationToken);
+		var signalStatistics = await tradeResultsService.GetStrategyResultStatisticAsync(userId, ct);
 
 		return TypedResults.Ok(signalStatistics.Adapt<SignalStatisticResponse>());
 	}
@@ -31,11 +31,11 @@ public class ResultController(ITradeResultsService tradeResultsService, IJwtHelp
 		[FromQuery] DateTime? startDate,
 		[FromQuery] DateTime? endTime,
 		[FromQuery] SignalSortRequest? sortRequest,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
-		var response = await tradeResultsService.GetStrategyResultAsync(userId, startDate, endTime, sortRequest, cancellationToken);
+		var response = await tradeResultsService.GetStrategyResultAsync(userId, startDate, endTime, sortRequest, ct);
 
 		return TypedResults.Ok(response);
 	}
@@ -46,11 +46,11 @@ public class ResultController(ITradeResultsService tradeResultsService, IJwtHelp
 		[FromRoute, Required] string tradeCode,
 		[FromQuery] DateTime? startDate,
 		[FromQuery] DateTime? endTime,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
-		var response = await tradeResultsService.GetStrategyResultByCodeAsync(userId, strategyName, tradeCode, startDate, endTime, cancellationToken);
+		var response = await tradeResultsService.GetStrategyResultByCodeAsync(userId, strategyName, tradeCode, startDate, endTime, ct);
 
 		return TypedResults.Ok(response);
 	}

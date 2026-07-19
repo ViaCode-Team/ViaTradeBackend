@@ -8,14 +8,14 @@ public interface ITradeResultsService
 {
 	Task<SignalStatisticReadModel> GetStrategyResultStatisticAsync(
 		int userId,
-		CancellationToken cancellationToken);
+		CancellationToken ct);
 
 	Task<StrategyResultResponse> GetStrategyResultAsync(
 		int userId,
 		DateTime? startDate,
 		DateTime? endDate,
 		SignalSortRequest? sortRequest,
-		CancellationToken cancellationToken);
+		CancellationToken ct);
 
 	Task<StrategyResultResponse> GetStrategyResultByCodeAsync(
 		int userId,
@@ -23,5 +23,5 @@ public interface ITradeResultsService
 		string tradeCode,
 		DateTime? startDate,
 		DateTime? endDate,
-		CancellationToken cancellationToken);
+		CancellationToken ct);
 }

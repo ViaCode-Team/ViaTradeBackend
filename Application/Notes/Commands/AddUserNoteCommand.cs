@@ -21,12 +21,12 @@ public class AddUserNoteValidator : AbstractValidator<AddUserNoteCommand>
 
 public class AddUserNoteCommandHandler(INoteRepository noteRepository) : IRequestHandler<AddUserNoteCommand>
 {
-	public async Task Handle(AddUserNoteCommand request, CancellationToken cancellationToken)
+	public async Task Handle(AddUserNoteCommand request, CancellationToken ct)
 	{
 		var existingNote = await noteRepository.FirstOrDefaultAsync(x =>
 				x.UserId == request.UserId &&
 				(request.NoteType == NoteType.TradeCodeNote ? x.TradeCodeId == request.RelatedId : x.TradeStrategyId == request.RelatedId),
-			cancellationToken);
+			ct);
 
 		if (existingNote != null)
 			throw new Exception("Note already exists. Use update.");
@@ -39,6 +39,6 @@ public class AddUserNoteCommandHandler(INoteRepository noteRepository) : IReques
 			TradeStrategyId = request.NoteType == NoteType.TradeStrategyNote ? request.RelatedId : null
 		};
 
-		await noteRepository.AddAsync(note, cancellationToken);
+		await noteRepository.AddAsync(note, ct);
 	}
 }

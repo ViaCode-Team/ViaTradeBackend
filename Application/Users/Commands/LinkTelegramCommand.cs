@@ -10,7 +10,7 @@ public class LinkTelegramCommandHandler(
 	IUserRepository userRepository, ITgTokenRepository tgTokenRepository)
 	: IRequestHandler<LinkTelegramCommand>
 {
-	public async Task Handle(LinkTelegramCommand request, CancellationToken cancellationToken)
+	public async Task Handle(LinkTelegramCommand request, CancellationToken ct)
 	{
 		var userIdNullable = await tgTokenRepository.GetUserIdAsync(request.TgToken);
 		if (userIdNullable == null)
@@ -19,7 +19,7 @@ public class LinkTelegramCommandHandler(
 		await tgTokenRepository.RemoveAsync(request.TgToken);
 		var userId = userIdNullable.Value;
 
-		var affectedRows = await userRepository.UpdateTgIdAsync(userId, request.TgId, cancellationToken);
+		var affectedRows = await userRepository.UpdateTgIdAsync(userId, request.TgId, ct);
 		if (affectedRows == 0)
 			throw new NullReferenceException(nameof(request.TgToken));
 	}

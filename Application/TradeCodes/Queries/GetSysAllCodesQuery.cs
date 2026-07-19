@@ -13,10 +13,10 @@ public class GetSysAllCodesQueryHandler(
 	IFileReader tradefileReader, ITradeCodeRepository tradeCodeRepository)
 	: IRequestHandler<GetSysAllCodesQuery, IEnumerable<TradeCodeFileDto>>
 {
-	public async Task<IEnumerable<TradeCodeFileDto>> Handle(GetSysAllCodesQuery request, CancellationToken cancellationToken)
+	public async Task<IEnumerable<TradeCodeFileDto>> Handle(GetSysAllCodesQuery request, CancellationToken ct)
 	{
 		var tradeFiles = tradefileReader.GetTradeCodes(request.DataType);
-		var tradeCodes = await tradeCodeRepository.GetAllAsync(cancellationToken);
+		var tradeCodes = await tradeCodeRepository.GetAllAsync(ct);
 
 		var dbCodeMap = tradeCodes.ToDictionary(
 			tradeCode => tradeCode.ExchangeId,

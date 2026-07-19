@@ -25,11 +25,11 @@ public class AuthController(ISender sender, IJwtHelper jwtHelper, IOptions<AuthC
 	[HttpPost("login")]
 	public async Task<NoContent> Login(
 		[FromBody, Required] LoginRequest request,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userAgent = Request.Headers.UserAgent.ToString();
 		var command = new LoginCommand(request.Login, request.Password, userAgent);
-		var result = await sender.Send(command, cancellationToken);
+		var result = await sender.Send(command, ct);
 
 		SetAuthCookies(result);
 		return TypedResults.NoContent();
@@ -38,24 +38,24 @@ public class AuthController(ISender sender, IJwtHelper jwtHelper, IOptions<AuthC
 	[HttpPost("register")]
 	public async Task<Created> Register(
 		[FromBody, Required] RegisterRequest request,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userAgent = Request.Headers.UserAgent.ToString();
 		var command = new RegisterCommand(request.Login, request.Password, userAgent);
-		var result = await sender.Send(command, cancellationToken);
+		var result = await sender.Send(command, ct);
 
 		SetAuthCookies(result);
 		return TypedResults.Created();
 	}
 
 	[HttpPost("refresh")]
-	public async Task<NoContent> RefreshToken(CancellationToken cancellationToken)
+	public async Task<NoContent> RefreshToken(CancellationToken ct)
 	{
 		if (!Request.Cookies.TryGetValue(_authCookiOptions.RefreshTokenCookie, out var refreshToken))
 			throw new UnauthorizedAccessException();
 
 		var command = new RefreshTokenCommand(refreshToken);
-		var result = await sender.Send(command, cancellationToken);
+		var result = await sender.Send(command, ct);
 
 		SetAuthCookies(result);
 		return TypedResults.NoContent();
@@ -93,11 +93,11 @@ public class AuthController(ISender sender, IJwtHelper jwtHelper, IOptions<AuthC
 
 	[HttpGet("sessions")]
 	[Authorize]
-	public async Task<Ok<PagedResult<UserSessionResponse>>> GetUserSessions([FromQuery] PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<Ok<PagedResult<UserSessionResponse>>> GetUserSessions([FromQuery] PaginationRequest paginationRequest, CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var query = new GetPagedUserSessionsQuery(userId, paginationRequest);
-		var pagedSessions = await sender.Send(query, cancellationToken);
+		var pagedSessions = await sender.Send(query, ct);
 
 		return TypedResults.Ok(pagedSessions.Map(s => s.Adapt<UserSessionResponse>()));
 	}

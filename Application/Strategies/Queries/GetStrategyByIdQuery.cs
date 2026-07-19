@@ -10,9 +10,9 @@ public record GetStrategyByIdQuery(int StrategyId) : IQuery<TradeStrategy>;
 public class GetStrategyByIdQueryHandler(ITradeStrategyRepository tradeStrategyRepository)
 	: IRequestHandler<GetStrategyByIdQuery, TradeStrategy>
 {
-	public async Task<TradeStrategy> Handle(GetStrategyByIdQuery request, CancellationToken cancellationToken)
+	public async Task<TradeStrategy> Handle(GetStrategyByIdQuery request, CancellationToken ct)
 	{
-		return await tradeStrategyRepository.GetByIdAsync(request.StrategyId, cancellationToken)
+		return await tradeStrategyRepository.GetByIdAsync(request.StrategyId, ct)
 			?? throw new KeyNotFoundException();
 	}
 }

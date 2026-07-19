@@ -2,7 +2,7 @@ using Application.Common.Models;
 
 namespace Application.Common.Interfaces.Repositories;
 
-public interface ICacheRepository<T> where T : RedisEntity
+public interface ICacheRepository<T> where T : CacheEntity
 {
 	Task<T?> GetAsync(string id);
 	Task SetAsync(T entity, TimeSpan? expiry = null);

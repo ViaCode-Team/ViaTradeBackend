@@ -14,7 +14,7 @@ public class RefreshTokenCommandHandler(
 {
 	private readonly TimeSpan _sessionTtl = TimeSpan.FromDays(7);
 
-	public async Task<AuthInternalResult> Handle(RefreshTokenCommand request, CancellationToken cancellationToken)
+	public async Task<AuthInternalResult> Handle(RefreshTokenCommand request, CancellationToken ct)
 	{
 		var sessionId = await refreshTokenRepository.GetSessionIdAsync(request.RefreshToken)
 			?? throw new UnauthorizedAccessException();
@@ -22,7 +22,7 @@ public class RefreshTokenCommandHandler(
 		var session = await sessionRepository.GetAsync(sessionId)
 			?? throw new UnauthorizedAccessException();
 
-		var user = await userRepository.GetByIdAsync(session.UserId, cancellationToken)
+		var user = await userRepository.GetByIdAsync(session.UserId, ct)
 			?? throw new UnauthorizedAccessException();
 
 		session.LastSeen = DateTime.UtcNow;

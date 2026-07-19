@@ -21,12 +21,12 @@ namespace ViaTradeBackend.Controllers;
 public class TradeController(ISender sender, IJwtHelper jwtHelper) : ControllerBase
 {
 	[HttpGet("statistics")]
-	public async Task<Ok<GlobalStatisticResponse>> GetTradeStatistics(CancellationToken cancellationToken)
+	public async Task<Ok<GlobalStatisticResponse>> GetTradeStatistics(CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var query = new GetGlobalStatisticQuery(userId);
-		var tradeStatistics = await sender.Send(query, cancellationToken);
+		var tradeStatistics = await sender.Send(query, ct);
 
 		return TypedResults.Ok(tradeStatistics.Adapt<GlobalStatisticResponse>());
 	}
@@ -35,12 +35,12 @@ public class TradeController(ISender sender, IJwtHelper jwtHelper) : ControllerB
 	public async Task<Ok<PagedResult<TradeResponse>>> GetUserTrades(
 		[FromQuery] TradeFilterRequest? filterRequest,
 		[FromQuery] PaginationRequest? paginationRequest,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var query = new GetTradesPagedQuery(userId, filterRequest, paginationRequest);
-		var userTrades = await sender.Send(query, cancellationToken);
+		var userTrades = await sender.Send(query, ct);
 
 		return TypedResults.Ok(userTrades.Map(t => t.Adapt<TradeResponse>()));
 	}
@@ -48,12 +48,12 @@ public class TradeController(ISender sender, IJwtHelper jwtHelper) : ControllerB
 	[HttpGet("{id}")]
 	public async Task<Ok<TradeResponse>> GetTradeById(
 		[Required] int id,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var query = new GetTradeByIdQuery(id, userId);
-		var trade = await sender.Send(query, cancellationToken);
+		var trade = await sender.Send(query, ct);
 
 		return TypedResults.Ok(trade.Adapt<TradeResponse>());
 	}
@@ -61,12 +61,12 @@ public class TradeController(ISender sender, IJwtHelper jwtHelper) : ControllerB
 	[HttpPost("byuser")]
 	public async Task<Created<TradeResponse>> CreateUserTrade(
 		[FromBody, Required] CreateTradeRequest request,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var command = new CreateTradeCommand(userId, request.Adapt<TradeCreateDto>());
-		var trade = await sender.Send(command, cancellationToken);
+		var trade = await sender.Send(command, ct);
 
 		return TypedResults.Created($"/api/Trade/{trade.Id}", trade.Adapt<TradeResponse>());
 	}
@@ -75,12 +75,12 @@ public class TradeController(ISender sender, IJwtHelper jwtHelper) : ControllerB
 	public async Task<NoContent> UpdateUserTrade(
 		[Required, FromRoute] int id,
 		[FromBody, Required] UpdateTradeRequest request,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var command = new UpdateTradeCommand(id, userId, request.Adapt<TradeCreateDto>());
-		await sender.Send(command, cancellationToken);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -88,12 +88,12 @@ public class TradeController(ISender sender, IJwtHelper jwtHelper) : ControllerB
 	[HttpDelete("byuser/{id}")]
 	public async Task<NoContent> DeleteUserTrade(
 		[Required, FromRoute] int id,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var command = new DeleteTradeCommand(id, userId);
-		await sender.Send(command, cancellationToken);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}

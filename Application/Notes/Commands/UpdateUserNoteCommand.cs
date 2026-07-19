@@ -20,7 +20,7 @@ public class UpdateUserNoteValidator : AbstractValidator<UpdateUserNoteCommand>
 
 public class UpdateUserNoteCommandHandler(INoteRepository noteRepository) : IRequestHandler<UpdateUserNoteCommand>
 {
-	public async Task Handle(UpdateUserNoteCommand request, CancellationToken cancellationToken)
+	public async Task Handle(UpdateUserNoteCommand request, CancellationToken ct)
 	{
 		try
 		{
@@ -29,7 +29,7 @@ public class UpdateUserNoteCommandHandler(INoteRepository noteRepository) : IReq
 				request.NoteType,
 				request.UserId,
 				request.NoteText,
-				cancellationToken);
+				ct);
 		}
 		catch (KeyNotFoundException)
 		{

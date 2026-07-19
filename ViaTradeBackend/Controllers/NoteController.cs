@@ -21,12 +21,12 @@ namespace ViaTradeBackend.Controllers;
 public class NoteController(ISender sender, IJwtHelper jwtHelper) : ControllerBase
 {
 	[HttpGet("statistics")]
-	public async Task<Ok<NoteStatisticResponse>> GetNoteStatistics(CancellationToken cancellationToken)
+	public async Task<Ok<NoteStatisticResponse>> GetNoteStatistics(CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var query = new GetNoteStatisticQuery(userId);
-		var statistics = await sender.Send(query, cancellationToken);
+		var statistics = await sender.Send(query, ct);
 
 		return TypedResults.Ok(statistics.Adapt<NoteStatisticResponse>());
 	}
@@ -35,12 +35,12 @@ public class NoteController(ISender sender, IJwtHelper jwtHelper) : ControllerBa
 	public async Task<Ok<PagedResult<NoteResponse>>> GetUserNotes(
 		[FromQuery] NoteFilterRequest filterRequest,
 		[FromQuery] PaginationRequest paginationRequest,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var query = new GetUserNotePagedQuery(userId, filterRequest, paginationRequest);
-		var notes = await sender.Send(query, cancellationToken);
+		var notes = await sender.Send(query, ct);
 
 		return TypedResults.Ok(notes.Map(n => n.Adapt<NoteResponse>()));
 	}
@@ -48,12 +48,12 @@ public class NoteController(ISender sender, IJwtHelper jwtHelper) : ControllerBa
 	[HttpGet("byuser/instrument/{idInstrument}")]
 	public async Task<Ok<NoteResponse>> GetUserInstrumentNote(
 		[FromRoute, Required] int idInstrument,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var query = new GetUserNoteByPropQuery(idInstrument, userId, NoteType.TradeCodeNote);
-		var note = await sender.Send(query, cancellationToken);
+		var note = await sender.Send(query, ct);
 
 		return TypedResults.Ok(note.Adapt<NoteResponse>());
 	}
@@ -61,12 +61,12 @@ public class NoteController(ISender sender, IJwtHelper jwtHelper) : ControllerBa
 	[HttpGet("byuser/strategy/{idStrategy}")]
 	public async Task<Ok<NoteResponse>> GetUserStrategyNote(
 		[FromRoute, Required] int idStrategy,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var query = new GetUserNoteByPropQuery(idStrategy, userId, NoteType.TradeStrategyNote);
-		var note = await sender.Send(query, cancellationToken);
+		var note = await sender.Send(query, ct);
 
 		return TypedResults.Ok(note.Adapt<NoteResponse>());
 	}
@@ -75,12 +75,12 @@ public class NoteController(ISender sender, IJwtHelper jwtHelper) : ControllerBa
 	public async Task<Created> AddUserInstrumentNote(
 		[FromRoute, Required] int idInstrument,
 		[FromBody, Required] CreateNoteRequest request,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var command = new AddUserNoteCommand(idInstrument, NoteType.TradeCodeNote, userId, request.NoteText);
-		await sender.Send(command, cancellationToken);
+		await sender.Send(command, ct);
 
 		return TypedResults.Created();
 	}
@@ -89,12 +89,12 @@ public class NoteController(ISender sender, IJwtHelper jwtHelper) : ControllerBa
 	public async Task<Created> AddUserStrategyNote(
 		[FromRoute, Required] int idStrategy,
 		[FromBody, Required] CreateNoteRequest request,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var command = new AddUserNoteCommand(idStrategy, NoteType.TradeStrategyNote, userId, request.NoteText);
-		await sender.Send(command, cancellationToken);
+		await sender.Send(command, ct);
 
 		return TypedResults.Created();
 	}
@@ -103,12 +103,12 @@ public class NoteController(ISender sender, IJwtHelper jwtHelper) : ControllerBa
 	public async Task<NoContent> UpdateUserInstrumentNote(
 		[FromRoute, Required] int idInstrument,
 		[FromBody, Required] UpdateNoteRequest request,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var command = new UpdateUserNoteCommand(idInstrument, NoteType.TradeCodeNote, userId, request.NoteText);
-		await sender.Send(command, cancellationToken);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -117,12 +117,12 @@ public class NoteController(ISender sender, IJwtHelper jwtHelper) : ControllerBa
 	public async Task<NoContent> UpdateUserStrategyNote(
 		[FromRoute, Required] int idStrategy,
 		[FromBody, Required] UpdateNoteRequest request,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var command = new UpdateUserNoteCommand(idStrategy, NoteType.TradeStrategyNote, userId, request.NoteText);
-		await sender.Send(command, cancellationToken);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -130,12 +130,12 @@ public class NoteController(ISender sender, IJwtHelper jwtHelper) : ControllerBa
 	[HttpDelete("byuser/instrument/{idInstrument}")]
 	public async Task<NoContent> DeleteUserInstrumentNote(
 		[FromRoute, Required] int idInstrument,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var command = new DeleteUserNoteCommand(idInstrument, userId, NoteType.TradeCodeNote);
-		await sender.Send(command, cancellationToken);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -143,12 +143,12 @@ public class NoteController(ISender sender, IJwtHelper jwtHelper) : ControllerBa
 	[HttpDelete("byuser/strategy/{idStrategy}")]
 	public async Task<NoContent> DeleteUserStrategyNote(
 		[FromRoute, Required] int idStrategy,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 
 		var command = new DeleteUserNoteCommand(idStrategy, userId, NoteType.TradeStrategyNote);
-		await sender.Send(command, cancellationToken);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}

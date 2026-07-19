@@ -13,13 +13,13 @@ public class UpdateTradeCommandHandler(
 	ITradeRepository tradeRepository, ITradeCodeRepository tradeCodeRepository, ITradeTypeRepository tradeTypeRepository)
 	: IRequestHandler<UpdateTradeCommand>
 {
-	public async Task Handle(UpdateTradeCommand request, CancellationToken cancellationToken)
+	public async Task Handle(UpdateTradeCommand request, CancellationToken ct)
 	{
-		bool isTradeCodeExist = await tradeCodeRepository.ExistsAsync(c => c.Id == request.Request.TradeCodeId, cancellationToken);
+		bool isTradeCodeExist = await tradeCodeRepository.ExistsAsync(c => c.Id == request.Request.TradeCodeId, ct);
 		if (!isTradeCodeExist)
 			throw new KeyNotFoundException();
 
-		bool isTradeTypeExist = await tradeTypeRepository.ExistsAsync(t => t.Id == request.Request.TradeTypeId, cancellationToken);
+		bool isTradeTypeExist = await tradeTypeRepository.ExistsAsync(t => t.Id == request.Request.TradeTypeId, ct);
 		if (!isTradeTypeExist)
 			throw new ArgumentException($"TradeType {request.Request.TradeTypeId} not found");
 
@@ -27,10 +27,10 @@ public class UpdateTradeCommandHandler(
 		var netIncome = TradeStatisticsCalcService.CalculateNetIncome(req.TradeOpen, req.TradeClose, req.TradeSignal);
 		var price = (decimal)req.TradeOpen * req.Count;
 
-		var affectedRows = await tradeRepository.UpdateAsync(request.Id, request.UserId, req, netIncome, price, cancellationToken);
+		var affectedRows = await tradeRepository.UpdateAsync(request.Id, request.UserId, req, netIncome, price, ct);
 		if (affectedRows == 0)
 		{
-			bool exists = await tradeRepository.ExistsAsync(t => t.Id == request.Id, cancellationToken);
+			bool exists = await tradeRepository.ExistsAsync(t => t.Id == request.Id, ct);
 			if (exists)
 				throw new UnauthorizedAccessException();
 

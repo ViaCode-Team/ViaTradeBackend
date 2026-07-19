@@ -10,12 +10,12 @@ public record GetUserNoteByPropQuery(int RelatedId, int UserId, NoteType NoteTyp
 
 public class GetUserNoteByPropQueryHandler(INoteRepository noteRepository) : IRequestHandler<GetUserNoteByPropQuery, Note>
 {
-	public async Task<Note> Handle(GetUserNoteByPropQuery request, CancellationToken cancellationToken)
+	public async Task<Note> Handle(GetUserNoteByPropQuery request, CancellationToken ct)
 	{
 		var existingNotes = await noteRepository.FindAsync(x =>
 				x.UserId == request.UserId &&
 				(request.NoteType == NoteType.TradeCodeNote ? x.TradeCodeId == request.RelatedId : x.TradeStrategyId == request.RelatedId),
-			cancellationToken);
+			ct);
 
 		var existingNote = existingNotes.FirstOrDefault();
 

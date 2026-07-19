@@ -13,9 +13,9 @@ public class RegisterCommandHandler(
 	IUserRepository userRepository, IPasswordHasher passwordHasher, ISender sender)
 	: IRequestHandler<RegisterCommand, AuthInternalResult>
 {
-	public async Task<AuthInternalResult> Handle(RegisterCommand request, CancellationToken cancellationToken)
+	public async Task<AuthInternalResult> Handle(RegisterCommand request, CancellationToken ct)
 	{
-		if (await userRepository.ExistsAsync(u => u.Login == request.Login, cancellationToken))
+		if (await userRepository.ExistsAsync(u => u.Login == request.Login, ct))
 			throw new InvalidOperationException("User already exists");
 
 		var user = new User
@@ -25,9 +25,9 @@ public class RegisterCommandHandler(
 			RegisterDate = DateTime.UtcNow
 		};
 
-		await userRepository.AddAsync(user, cancellationToken);
+		await userRepository.AddAsync(user, ct);
 
 		var loginCommand = new LoginCommand(request.Login, request.Password, request.UserAgent);
-		return await sender.Send(loginCommand, cancellationToken);
+		return await sender.Send(loginCommand, ct);
 	}
 }

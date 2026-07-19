@@ -10,8 +10,8 @@ public record GetUserByIdQuery(int UserId) : IQuery<User?>;
 public class GetUserByIdQueryHandler(IUserRepository userRepository)
 	: IRequestHandler<GetUserByIdQuery, User?>
 {
-	public async Task<User?> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
+	public async Task<User?> Handle(GetUserByIdQuery request, CancellationToken ct)
 	{
-		return await userRepository.GetByIdAsync(request.UserId, cancellationToken);
+		return await userRepository.GetByIdAsync(request.UserId, ct);
 	}
 }

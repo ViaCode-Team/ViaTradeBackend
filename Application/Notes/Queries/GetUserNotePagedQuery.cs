@@ -12,12 +12,12 @@ public record GetUserNotePagedQuery(int UserId, NoteFilterRequest? FilterRequest
 
 public class GetUserNotePagedQueryHandler(INoteRepository noteRepository) : IRequestHandler<GetUserNotePagedQuery, PagedResult<Note>>
 {
-	public async Task<PagedResult<Note>> Handle(GetUserNotePagedQuery request, CancellationToken cancellationToken)
+	public async Task<PagedResult<Note>> Handle(GetUserNotePagedQuery request, CancellationToken ct)
 	{
 		var spec = new NoteQuerySpecification(request.UserId, request.FilterRequest);
 
 		var pagination = request.PaginationRequest ?? new PaginationRequest();
 
-		return await noteRepository.GetPagedAsync(spec, pagination, cancellationToken);
+		return await noteRepository.GetPagedAsync(spec, pagination, ct);
 	}
 }

@@ -4,7 +4,7 @@ using Domain.Users.Entities;
 
 namespace Domain.Reminds.Entities;
 
-public sealed class TradeRemind : BaseEntity<int>
+public sealed class Reminder : BaseEntity<int>
 {
 	public string TextRemind { get; set; }
 	public DateTime DateTime { get; set; }
@@ -12,5 +12,4 @@ public sealed class TradeRemind : BaseEntity<int>
 	public int UserId { get; set; }
 	public TradeCode? TradeCode { get; set; }
 	public User? User { get; set; }
-
 }

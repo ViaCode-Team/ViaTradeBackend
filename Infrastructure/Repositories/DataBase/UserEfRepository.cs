@@ -6,27 +6,27 @@ namespace Infrastructure.Repositories.DataBase;
 
 public class UserEfRepository(AppDbContext context) : GenericEfRepository<User>(context), IUserRepository
 {
-	public async Task<User?> GetByLoginAsync(string login, CancellationToken cancellationToken = default)
+	public async Task<User?> GetByLoginAsync(string login, CancellationToken ct = default)
 	{
-		return await _dbSet.FirstOrDefaultAsync(u => u.Login == login, cancellationToken);
+		return await _dbSet.FirstOrDefaultAsync(u => u.Login == login, ct);
 	}
 
-	public async Task<IEnumerable<User>> GetAllWithTgLinkAsync(CancellationToken cancellationToken = default)
+	public async Task<IEnumerable<User>> GetAllWithTgLinkAsync(CancellationToken ct = default)
 	{
-		return await _dbSet.Where(u => u.TgId != null).ToListAsync(cancellationToken);
+		return await _dbSet.Where(u => u.TgId != null).ToListAsync(ct);
 	}
 
-	public async Task<int> UpdateTgIdAsync(int userId, string tgId, CancellationToken cancellationToken = default)
+	public async Task<int> UpdateTgIdAsync(int userId, string tgId, CancellationToken ct = default)
 	{
 		return await _dbSet
 			.Where(u => u.Id == userId)
-			.ExecuteUpdateAsync(s => s.SetProperty(u => u.TgId, tgId), cancellationToken);
+			.ExecuteUpdateAsync(s => s.SetProperty(u => u.TgId, tgId), ct);
 	}
 
-	public async Task<int> UpdateLastLoginDateAsync(int userId, DateTime lastLoginDate, CancellationToken cancellationToken = default)
+	public async Task<int> UpdateLastLoginDateAsync(int userId, DateTime lastLoginDate, CancellationToken ct = default)
 	{
 		return await _dbSet
 			.Where(u => u.Id == userId)
-			.ExecuteUpdateAsync(s => s.SetProperty(u => u.LastLoginDate, lastLoginDate), cancellationToken);
+			.ExecuteUpdateAsync(s => s.SetProperty(u => u.LastLoginDate, lastLoginDate), ct);
 	}
 }

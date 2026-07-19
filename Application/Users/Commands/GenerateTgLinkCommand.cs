@@ -10,7 +10,7 @@ public record GenerateTgLinkCommand(int UserId) : ICommand<string>;
 public class GenerateTgLinkCommandHandler(ITgTokenRepository tgTokenRepository)
 	: IRequestHandler<GenerateTgLinkCommand, string>
 {
-	public async Task<string> Handle(GenerateTgLinkCommand request, CancellationToken cancellationToken)
+	public async Task<string> Handle(GenerateTgLinkCommand request, CancellationToken ct)
 	{
 		var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(24))
 			.Replace("+", "-")

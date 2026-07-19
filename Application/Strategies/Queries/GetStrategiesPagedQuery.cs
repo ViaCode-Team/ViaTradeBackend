@@ -14,9 +14,9 @@ public record GetStrategiesPagedQuery(int UserId, StrategyFilterRequest? FilterR
 public class GetStrategiesPagedQueryHandler(ITradeStrategyRepository tradeStrategyRepository)
 	: IRequestHandler<GetStrategiesPagedQuery, PagedResult<TradeStrategy>>
 {
-	public async Task<PagedResult<TradeStrategy>> Handle(GetStrategiesPagedQuery request, CancellationToken cancellationToken)
+	public async Task<PagedResult<TradeStrategy>> Handle(GetStrategiesPagedQuery request, CancellationToken ct)
 	{
 		var spec = new StrategyQuerySpecification(request.UserId, request.FilterRequest, request.SortRequest);
-		return await tradeStrategyRepository.GetPagedFilteredAsync(request.UserId, spec, request.PaginationRequest, cancellationToken);
+		return await tradeStrategyRepository.GetPagedFilteredAsync(request.UserId, spec, request.PaginationRequest, ct);
 	}
 }

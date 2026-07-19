@@ -11,8 +11,8 @@ public class UserStrategyTradeCodeEfRepository(AppDbContext context) :
 	public async Task<PagedResult<UserStrategyTradeCode>> GetPagedAsync(
 		int userId,
 		PaginationRequest paginationRequest,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
-		return await FindPagedAsync(e => e.UserId == userId, paginationRequest, cancellationToken);
+		return await FindPagedAsync(e => e.UserId == userId, paginationRequest, ct);
 	}
 }

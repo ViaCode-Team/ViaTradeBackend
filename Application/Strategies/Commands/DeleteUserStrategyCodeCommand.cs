@@ -9,13 +9,13 @@ public record DeleteUserStrategyCodeCommand(int UserId, int StrategyId, int Trad
 public class DeleteUserStrategyCodeCommandHandler(IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository)
 	: IRequestHandler<DeleteUserStrategyCodeCommand>
 {
-	public async Task Handle(DeleteUserStrategyCodeCommand request, CancellationToken cancellationToken)
+	public async Task Handle(DeleteUserStrategyCodeCommand request, CancellationToken ct)
 	{
 		var affectedRows = await userStrategyTradeCodeRepository.ExecuteDeleteAsync(
 			e => e.UserId == request.UserId &&
 				 e.StrategyId == request.StrategyId &&
 				 e.TradeCodeId == request.TradeCodeId,
-			cancellationToken);
+			ct);
 
 		if (affectedRows == 0)
 			throw new KeyNotFoundException("User strategy code not found");

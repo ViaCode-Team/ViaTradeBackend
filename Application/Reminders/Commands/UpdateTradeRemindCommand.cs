@@ -20,14 +20,14 @@ public class UpdateTradeRemindValidator : AbstractValidator<UpdateTradeRemindCom
 
 public class UpdateTradeRemindCommandHandler(ITradeRemindRepository repository) : IRequestHandler<UpdateTradeRemindCommand>
 {
-	public async Task Handle(UpdateTradeRemindCommand request, CancellationToken cancellationToken)
+	public async Task Handle(UpdateTradeRemindCommand request, CancellationToken ct)
 	{
-		var rows = await repository.UpdateUserRemindAsync(
+		var rows = await repository.ExecuteUpdateUserRemindAsync(
 			request.RemindId,
 			request.UserId,
 			request.TextRemind,
 			request.DateTime,
-			cancellationToken);
+			ct);
 
 		if (rows == 0)
 			throw new Exception("Remind not found.");

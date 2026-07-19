@@ -9,8 +9,8 @@ public record UpdateLastLoginDateCommand(int UserId) : ICommand;
 public class UpdateLastLoginDateCommandHandler(IUserRepository userRepository)
 	: IRequestHandler<UpdateLastLoginDateCommand>
 {
-	public async Task Handle(UpdateLastLoginDateCommand request, CancellationToken cancellationToken)
+	public async Task Handle(UpdateLastLoginDateCommand request, CancellationToken ct)
 	{
-		await userRepository.UpdateLastLoginDateAsync(request.UserId, DateTime.UtcNow, cancellationToken);
+		await userRepository.UpdateLastLoginDateAsync(request.UserId, DateTime.UtcNow, ct);
 	}
 }

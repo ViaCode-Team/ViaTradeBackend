@@ -10,27 +10,27 @@ namespace Infrastructure.Repositories.DataBase;
 
 public class TradeCodeEfRepository(AppDbContext context) : GenericEfRepository<TradeCode>(context), ITradeCodeRepository
 {
-	public async Task<int> CountAsync(CancellationToken cancellationToken = default)
+	public async Task<int> CountAsync(CancellationToken ct = default)
 	{
-		return await _dbSet.CountAsync(cancellationToken);
+		return await _dbSet.CountAsync(ct);
 	}
 
-	public async Task<TradeCode?> GetByExchangeIdAsync(string code, CancellationToken cancellationToken = default)
+	public async Task<TradeCode?> GetByExchangeIdAsync(string code, CancellationToken ct = default)
 	{
 		return await _dbSet
 			.Where(e => e.ExchangeId == code)
-			.FirstOrDefaultAsync(cancellationToken);
+			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<int?> GetIdByExchangeIdAsync(string code, CancellationToken cancellationToken = default)
+	public async Task<int?> GetIdByExchangeIdAsync(string code, CancellationToken ct = default)
 	{
 		return await _dbSet
 			.Where(e => e.ExchangeId == code)
 			.Select(e => (int?)e.Id)
-			.FirstOrDefaultAsync(cancellationToken);
+			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<PagedResult<TradeCode>> GetCodesPagedAsync(PaginationRequest paginationRequest, StockSortRequest? sortRequest = null, CancellationToken cancellationToken = default)
+	public async Task<PagedResult<TradeCode>> GetCodesPagedAsync(PaginationRequest paginationRequest, StockSortRequest? sortRequest = null, CancellationToken ct = default)
 	{
 		var query = _dbSet.AsQueryable();
 
@@ -63,6 +63,6 @@ public class TradeCodeEfRepository(AppDbContext context) : GenericEfRepository<T
 			query = query.OrderBy(e => e.Id);
 		}
 
-		return await query.ToPagedAsync(paginationRequest, cancellationToken);
+		return await query.ToPagedAsync(paginationRequest, ct);
 	}
 }

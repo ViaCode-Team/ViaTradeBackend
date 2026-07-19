@@ -4,7 +4,7 @@ using Domain.Reminds.Enums;
 
 namespace Application.Common.Specifications;
 
-public class TradeRemindQuerySpecification : BaseQuerySpecification<TradeRemind>
+public class TradeRemindQuerySpecification : BaseQuerySpecification<Reminder>
 {
 	public TradeRemindQuerySpecification(int userId, int? tradeCodeId = null, RemindSortRequest? sort = null)
 	{

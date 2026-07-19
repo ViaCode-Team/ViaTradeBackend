@@ -10,14 +10,18 @@ namespace Application.Auth.Commands;
 public record LoginCommand(string Login, string Password, string UserAgent) : ICommand<AuthInternalResult>;
 
 public class LoginCommandHandler(
-	IUserRepository userRepository, IPasswordHasher passwordHasher, IJwtHelper jwtHelper, ISessionRepository sessionRepository, IRefreshTokenRepository refreshTokenRepository)
+	IUserRepository userRepository,
+	IPasswordHasher passwordHasher,
+	IJwtHelper jwtHelper,
+	ISessionRepository sessionRepository,
+	IRefreshTokenRepository refreshTokenRepository)
 	: IRequestHandler<LoginCommand, AuthInternalResult>
 {
 	private readonly TimeSpan _sessionTtl = TimeSpan.FromDays(7);
 
-	public async Task<AuthInternalResult> Handle(LoginCommand request, CancellationToken cancellationToken)
+	public async Task<AuthInternalResult> Handle(LoginCommand request, CancellationToken ct)
 	{
-		var user = await userRepository.GetByLoginAsync(request.Login, cancellationToken);
+		var user = await userRepository.GetByLoginAsync(request.Login, ct);
 
 		if (user == null || !passwordHasher.Verify(request.Password, user.HashPassword))
 			throw new UnauthorizedAccessException();

@@ -10,7 +10,7 @@ public class LogoutSessionCommandHandler(
 	ISessionRepository sessionRepository, IRefreshTokenRepository refreshTokenRepository)
 	: IRequestHandler<LogoutSessionCommand>
 {
-	public async Task Handle(LogoutSessionCommand request, CancellationToken cancellationToken)
+	public async Task Handle(LogoutSessionCommand request, CancellationToken ct)
 	{
 		var sessionId = await refreshTokenRepository.GetSessionIdAsync(request.RefreshToken);
 		if (sessionId == null)

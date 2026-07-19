@@ -2049,7 +2049,7 @@ paths:
     post:
       tags:
         - Remind
-      operationId: CreateUserReminder
+      operationId: CreateUserRemind
       parameters:
         - name: idInstrument
           in: path

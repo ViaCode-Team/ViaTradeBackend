@@ -10,19 +10,19 @@ namespace Infrastructure.Repositories.DataBase;
 public class TradeStrategyEfRepository(AppDbContext context) : GenericEfRepository<TradeStrategy>(context),
 	ITradeStrategyRepository
 {
-	public async Task<int> CountAsync(CancellationToken cancellationToken = default)
+	public async Task<int> CountAsync(CancellationToken ct = default)
 	{
-		return await _dbSet.CountAsync(cancellationToken);
+		return await _dbSet.CountAsync(ct);
 	}
 
-	public async Task<TradeStrategy?> GetByNameAsync(string name, CancellationToken cancellationToken = default)
+	public async Task<TradeStrategy?> GetByNameAsync(string name, CancellationToken ct = default)
 	{
 		return await _dbSet
 			.Where(tradeStrategy => tradeStrategy.Name == name)
-			.FirstOrDefaultAsync(cancellationToken);
+			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<PagedResult<TradeStrategy>> GetPagedFilteredAsync(int userId, IQuerySpecification<TradeStrategy> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken = default)
+	public async Task<PagedResult<TradeStrategy>> GetPagedFilteredAsync(int userId, IQuerySpecification<TradeStrategy> spec, PaginationRequest? paginationRequest, CancellationToken ct = default)
 	{
 		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
 
@@ -35,7 +35,7 @@ public class TradeStrategyEfRepository(AppDbContext context) : GenericEfReposito
 				Strategy = tradeStrategy,
 				IsActive = tradeStrategy.UserTradeStrategies!.Any(uts => uts.UserId == userId)
 			})
-			.ToPagedAsync(paginationRequest, cancellationToken);
+			.ToPagedAsync(paginationRequest, ct);
 
 		return pagedTuple.Map(t =>
 		{

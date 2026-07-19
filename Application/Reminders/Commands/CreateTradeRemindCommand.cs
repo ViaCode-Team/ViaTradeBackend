@@ -21,9 +21,9 @@ public class CreateTradeRemindValidator : AbstractValidator<CreateTradeRemindCom
 
 public class CreateTradeRemindCommandHandler(ITradeRemindRepository repository) : IRequestHandler<CreateTradeRemindCommand>
 {
-	public async Task Handle(CreateTradeRemindCommand request, CancellationToken cancellationToken)
+	public async Task Handle(CreateTradeRemindCommand request, CancellationToken ct)
 	{
-		var remind = new TradeRemind
+		var remind = new Reminder
 		{
 			TextRemind = request.TextRemind,
 			DateTime = request.DateTime,
@@ -31,6 +31,6 @@ public class CreateTradeRemindCommandHandler(ITradeRemindRepository repository) 
 			UserId = request.UserId
 		};
 
-		await repository.AddAsync(remind, cancellationToken);
+		await repository.AddAsync(remind, ct);
 	}
 }

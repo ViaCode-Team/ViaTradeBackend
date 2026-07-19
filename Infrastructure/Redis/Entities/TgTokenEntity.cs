@@ -2,7 +2,7 @@ using Application.Common.Models;
 
 namespace Infrastructure.Redis.Entities;
 
-public class TgTokenEntity : RedisEntity
+public class TgTokenEntity : CacheEntity
 {
 	public int UserId { get; set; }
 }

@@ -11,8 +11,8 @@ public record GetUserStrategyCodesPagedQuery(int UserId, PaginationRequest Pagin
 public class GetUserStrategyCodesPagedQueryHandler(IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository)
 	: IRequestHandler<GetUserStrategyCodesPagedQuery, PagedResult<UserStrategyTradeCode>>
 {
-	public async Task<PagedResult<UserStrategyTradeCode>> Handle(GetUserStrategyCodesPagedQuery request, CancellationToken cancellationToken)
+	public async Task<PagedResult<UserStrategyTradeCode>> Handle(GetUserStrategyCodesPagedQuery request, CancellationToken ct)
 	{
-		return await userStrategyTradeCodeRepository.GetPagedAsync(request.UserId, request.PaginationRequest, cancellationToken);
+		return await userStrategyTradeCodeRepository.GetPagedAsync(request.UserId, request.PaginationRequest, ct);
 	}
 }

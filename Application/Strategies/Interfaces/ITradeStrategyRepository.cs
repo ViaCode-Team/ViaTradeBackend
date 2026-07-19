@@ -7,7 +7,7 @@ namespace Application.Strategies.Interfaces;
 
 public interface ITradeStrategyRepository : IRepository<TradeStrategy>
 {
-	Task<int> CountAsync(CancellationToken cancellationToken = default);
-	Task<TradeStrategy?> GetByNameAsync(string name, CancellationToken cancellationToken = default);
-	Task<PagedResult<TradeStrategy>> GetPagedFilteredAsync(int userId, IQuerySpecification<TradeStrategy> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken = default);
+	Task<int> CountAsync(CancellationToken ct = default);
+	Task<TradeStrategy?> GetByNameAsync(string name, CancellationToken ct = default);
+	Task<PagedResult<TradeStrategy>> GetPagedFilteredAsync(int userId, IQuerySpecification<TradeStrategy> spec, PaginationRequest? paginationRequest, CancellationToken ct = default);
 }

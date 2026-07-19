@@ -10,8 +10,8 @@ public record GetUserByLoginQuery(string Login) : IQuery<User?>;
 public class GetUserByLoginQueryHandler(IUserRepository userRepository)
 	: IRequestHandler<GetUserByLoginQuery, User?>
 {
-	public async Task<User?> Handle(GetUserByLoginQuery request, CancellationToken cancellationToken)
+	public async Task<User?> Handle(GetUserByLoginQuery request, CancellationToken ct)
 	{
-		return await userRepository.GetByLoginAsync(request.Login, cancellationToken);
+		return await userRepository.GetByLoginAsync(request.Login, ct);
 	}
 }

@@ -10,13 +10,13 @@ public record CreateUserStrategyCodeCommand(int UserId, int StrategyId, int Trad
 public class CreateUserStrategyCodeCommandHandler(IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository)
 	: IRequestHandler<CreateUserStrategyCodeCommand>
 {
-	public async Task Handle(CreateUserStrategyCodeCommand request, CancellationToken cancellationToken)
+	public async Task Handle(CreateUserStrategyCodeCommand request, CancellationToken ct)
 	{
 		bool isUserStrategyCodeExist = await userStrategyTradeCodeRepository.ExistsAsync(
 			e => e.UserId == request.UserId &&
 			e.StrategyId == request.StrategyId &&
 			e.TradeCodeId == request.TradeCodeId,
-			cancellationToken);
+			ct);
 
 		if (isUserStrategyCodeExist)
 			throw new InvalidOperationException("User strategy code already exists");
@@ -28,6 +28,6 @@ public class CreateUserStrategyCodeCommandHandler(IUserStrategyTradeCodeReposito
 			StrategyId = request.StrategyId
 		};
 
-		await userStrategyTradeCodeRepository.AddAsync(newUserStrategyCode, cancellationToken);
+		await userStrategyTradeCodeRepository.AddAsync(newUserStrategyCode, ct);
 	}
 }

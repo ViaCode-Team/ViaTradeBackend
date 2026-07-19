@@ -10,8 +10,8 @@ public record GetAllUsersWithTgLinkQuery() : IQuery<IEnumerable<User>>;
 public class GetAllUsersWithTgLinkQueryHandler(IUserRepository userRepository)
 	: IRequestHandler<GetAllUsersWithTgLinkQuery, IEnumerable<User>>
 {
-	public async Task<IEnumerable<User>> Handle(GetAllUsersWithTgLinkQuery request, CancellationToken cancellationToken)
+	public async Task<IEnumerable<User>> Handle(GetAllUsersWithTgLinkQuery request, CancellationToken ct)
 	{
-		return await userRepository.GetAllWithTgLinkAsync(cancellationToken);
+		return await userRepository.GetAllWithTgLinkAsync(ct);
 	}
 }

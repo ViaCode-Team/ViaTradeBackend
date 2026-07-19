@@ -14,13 +14,13 @@ public class CreateTradeCommandHandler(
 	ITradeRepository tradeRepository, ITradeCodeRepository tradeCodeRepository, ITradeTypeRepository tradeTypeRepository)
 	: IRequestHandler<CreateTradeCommand, Trade>
 {
-	public async Task<Trade> Handle(CreateTradeCommand request, CancellationToken cancellationToken)
+	public async Task<Trade> Handle(CreateTradeCommand request, CancellationToken ct)
 	{
-		bool isTradeCodeExist = await tradeCodeRepository.ExistsAsync(c => c.Id == request.Request.TradeCodeId, cancellationToken);
+		bool isTradeCodeExist = await tradeCodeRepository.ExistsAsync(c => c.Id == request.Request.TradeCodeId, ct);
 		if (!isTradeCodeExist)
 			throw new KeyNotFoundException($"TradeCode {request.Request.TradeCodeId} not found");
 
-		bool isTradeTypeExist = await tradeTypeRepository.ExistsAsync(t => t.Id == request.Request.TradeTypeId, cancellationToken);
+		bool isTradeTypeExist = await tradeTypeRepository.ExistsAsync(t => t.Id == request.Request.TradeTypeId, ct);
 		if (!isTradeTypeExist)
 			throw new ArgumentException($"TradeType {request.Request.TradeTypeId} not found");
 
@@ -41,7 +41,7 @@ public class CreateTradeCommandHandler(
 			NetIncome = TradeStatisticsCalcService.CalculateNetIncome(req.TradeOpen, req.TradeClose, req.TradeSignal)
 		};
 
-		await tradeRepository.AddAsync(trade, cancellationToken);
+		await tradeRepository.AddAsync(trade, ct);
 
 		return trade;
 	}

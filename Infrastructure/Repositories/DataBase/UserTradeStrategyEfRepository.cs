@@ -9,15 +9,14 @@ namespace Infrastructure.Repositories.DataBase;
 public class UserTradeStrategyEfRepository(AppDbContext context) : GenericEfRepository<UserTradeStrategy>(context),
 	IUserTradeStrategyRepository
 {
-	public async Task<PagedResult<UserTradeStrategy>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<UserTradeStrategy>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken ct)
 	{
-		return await FindPagedAsync(e => e.UserId == userId, paginationRequest, cancellationToken);
+		return await FindPagedAsync(e => e.UserId == userId, paginationRequest, ct);
 	}
 
-	public async Task<int> CountByUserAsync(int userId, CancellationToken cancellationToken)
+	public async Task<int> CountByUserAsync(int userId, CancellationToken ct)
 	{
-		return await _context.UserTradeStrategies
-			.CountAsync(e => e.UserId == userId, cancellationToken);
+		return await _dbSet.CountAsync(e => e.UserId == userId, ct);
 	}
 
 	public async Task<Dictionary<string, List<string>>> GetUserPreferencesAsync(

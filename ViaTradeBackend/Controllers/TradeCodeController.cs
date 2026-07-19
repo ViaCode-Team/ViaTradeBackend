@@ -19,10 +19,10 @@ namespace ViaTradeBackend.Controllers;
 public class TradeCodeController(ISender sender) : ControllerBase
 {
 	[HttpGet("stocks/statistics")]
-	public async Task<Ok<StockStatisticResponse>> GetStockStatistics(CancellationToken cancellationToken)
+	public async Task<Ok<StockStatisticResponse>> GetStockStatistics(CancellationToken ct)
 	{
 		var query = new GetStockStatisticQuery();
-		var result = await sender.Send(query, cancellationToken);
+		var result = await sender.Send(query, ct);
 
 		return TypedResults.Ok(result.Adapt<StockStatisticResponse>());
 	}
@@ -31,19 +31,19 @@ public class TradeCodeController(ISender sender) : ControllerBase
 	public async Task<Ok<PagedResult<TradeCodeResponse>>> GetStockCodes(
 		[FromQuery] PaginationRequest paginationRequest,
 		[FromQuery] StockSortRequest? sortRequest,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var query = new GetCodesPagedQuery(paginationRequest, sortRequest);
-		var result = await sender.Send(query, cancellationToken);
+		var result = await sender.Send(query, ct);
 
 		return TypedResults.Ok(result.Map(c => c.Adapt<TradeCodeResponse>()));
 	}
 
 	[HttpGet("sys/stocks")]
-	public async Task<Ok<List<TradeCodeFileResponse>>> GetSysStockCodes(CancellationToken cancellationToken)
+	public async Task<Ok<List<TradeCodeFileResponse>>> GetSysStockCodes(CancellationToken ct)
 	{
 		var query = new GetSysAllCodesQuery(TradeDataType.Stocks);
-		var result = await sender.Send(query, cancellationToken);
+		var result = await sender.Send(query, ct);
 
 		return TypedResults.Ok(result.Adapt<List<TradeCodeFileResponse>>());
 	}
@@ -51,10 +51,10 @@ public class TradeCodeController(ISender sender) : ControllerBase
 	[HttpGet("sys/stocks/{tradeIdString}")]
 	public async Task<Ok<TradeCodeFileResponse>> GetSysStockCodeById(
 		[FromRoute, Required] string tradeIdString,
-		CancellationToken cancellationToken)
+		CancellationToken ct)
 	{
 		var query = new GetSysCodeByIdQuery(TradeDataType.Stocks, tradeIdString);
-		var result = await sender.Send(query, cancellationToken);
+		var result = await sender.Send(query, ct);
 
 		return TypedResults.Ok(result.Adapt<TradeCodeFileResponse>());
 	}

@@ -10,11 +10,11 @@ public record CreateUserStrategyCommand(int UserId, int StrategyId) : ITransacti
 public class CreateUserStrategyCommandHandler(IUserTradeStrategyRepository userTradeStrategyRepository)
 	: IRequestHandler<CreateUserStrategyCommand>
 {
-	public async Task Handle(CreateUserStrategyCommand request, CancellationToken cancellationToken)
+	public async Task Handle(CreateUserStrategyCommand request, CancellationToken ct)
 	{
 		var isUserExist = await userTradeStrategyRepository.ExistsAsync(
 			e => e.UserId == request.UserId && e.TradeStrategyId == request.StrategyId,
-			cancellationToken);
+			ct);
 
 		if (isUserExist)
 			throw new InvalidOperationException("User strategy already exists");
@@ -25,6 +25,6 @@ public class CreateUserStrategyCommandHandler(IUserTradeStrategyRepository userT
 			TradeStrategyId = request.StrategyId
 		};
 
-		await userTradeStrategyRepository.AddAsync(strategyLink, cancellationToken);
+		await userTradeStrategyRepository.AddAsync(strategyLink, ct);
 	}
 }

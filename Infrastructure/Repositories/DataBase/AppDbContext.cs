@@ -17,7 +17,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 	public DbSet<TradeStrategy> TradeStrategies { get; set; }
 	public DbSet<UserTradeStrategy> UserTradeStrategies { get; set; }
 	public DbSet<Note> Notes { get; set; }
-	public DbSet<TradeRemind> TradeReminds { get; set; }
+	public DbSet<Reminder> TradeReminds { get; set; }
 	public DbSet<UserStrategyTradeCode> UserStrategyTradeCodes { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -46,7 +46,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 			.HasIndex(x => new { x.UserId, x.TradeCodeId, x.StrategyId })
 			.IsUnique();
 
-		modelBuilder.Entity<TradeRemind>()
+		modelBuilder.Entity<Reminder>()
 			.HasIndex(x => x.UserId);
 
 		modelBuilder.Entity<Note>(entity =>

@@ -12,11 +12,11 @@ namespace Infrastructure.Repositories.DataBase;
 public class TradeEfRepository(AppDbContext context)
 	: GenericEfRepository<Trade>(context), ITradeRepository
 {
-	public async Task<GlobalStatisticReadModel> GetGlobalStatisticAsync(int userId, CancellationToken cancellationToken)
+	public async Task<GlobalStatisticReadModel> GetGlobalStatisticAsync(int userId, CancellationToken ct)
 	{
 		var baseQuery = _dbSet.Where(t => t.UserId == userId && t.NetIncome.HasValue);
 
-		var totalTrades = await baseQuery.CountAsync(cancellationToken);
+		var totalTrades = await baseQuery.CountAsync(ct);
 
 		if (totalTrades == 0)
 		{
@@ -28,12 +28,12 @@ public class TradeEfRepository(AppDbContext context)
 			};
 		}
 
-		var winTrades = await baseQuery.CountAsync(t => t.NetIncome > 0, cancellationToken);
-		var loseTrades = await baseQuery.CountAsync(t => t.NetIncome < 0, cancellationToken);
+		var winTrades = await baseQuery.CountAsync(t => t.NetIncome > 0, ct);
+		var loseTrades = await baseQuery.CountAsync(t => t.NetIncome < 0, ct);
 
-		var totalAbsoluteIncome = await baseQuery.SumAsync(TradeStatisticsCalcService.AbsoluteIncomeExpression, cancellationToken);
-		var totalProfit = await baseQuery.Where(t => t.NetIncome > 0).SumAsync(TradeStatisticsCalcService.AbsoluteIncomeAbsExpression, cancellationToken);
-		var totalLoss = await baseQuery.Where(t => t.NetIncome < 0).SumAsync(TradeStatisticsCalcService.AbsoluteIncomeAbsExpression, cancellationToken);
+		var totalAbsoluteIncome = await baseQuery.SumAsync(TradeStatisticsCalcService.AbsoluteIncomeExpression, ct);
+		var totalProfit = await baseQuery.Where(t => t.NetIncome > 0).SumAsync(TradeStatisticsCalcService.AbsoluteIncomeAbsExpression, ct);
+		var totalLoss = await baseQuery.Where(t => t.NetIncome < 0).SumAsync(TradeStatisticsCalcService.AbsoluteIncomeAbsExpression, ct);
 
 		var resultTrade = new TradeStatisticReadModel
 		{
@@ -62,22 +62,22 @@ public class TradeEfRepository(AppDbContext context)
 		};
 	}
 
-	public async Task<PagedResult<Trade>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<Trade>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken ct)
 	{
-		return await FindPagedAsync(t => t.UserId == userId, paginationRequest, cancellationToken);
+		return await FindPagedAsync(t => t.UserId == userId, paginationRequest, ct);
 	}
 
-	public async Task<PagedResult<Trade>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<Trade>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken ct)
 	{
-		return await FindPagedAsync(t => t.UserId == userId && t.TradeCodeId == tradeCodeId, paginationRequest, cancellationToken);
+		return await FindPagedAsync(t => t.UserId == userId && t.TradeCodeId == tradeCodeId, paginationRequest, ct);
 	}
 
-	public async Task<PagedResult<Trade>> GetPagedFilteredAsync(IQuerySpecification<Trade> spec, PaginationRequest? paginationRequest, CancellationToken cancellationToken)
+	public async Task<PagedResult<Trade>> GetPagedFilteredAsync(IQuerySpecification<Trade> spec, PaginationRequest? paginationRequest, CancellationToken ct)
 	{
-		return await GetPagedAsync(spec, paginationRequest, cancellationToken);
+		return await GetPagedAsync(spec, paginationRequest, ct);
 	}
 
-	public async Task<int> UpdateAsync(int id, int userId, TradeCreateDto request, double? netIncome, decimal price, CancellationToken cancellationToken = default)
+	public async Task<int> UpdateAsync(int id, int userId, TradeCreateDto request, double? netIncome, decimal price, CancellationToken ct = default)
 	{
 		return await _dbSet
 			.Where(t => t.Id == id && t.UserId == userId)
@@ -92,6 +92,6 @@ public class TradeEfRepository(AppDbContext context)
 				.SetProperty(t => t.Price, price)
 				.SetProperty(t => t.TradeTypeId, request.TradeTypeId)
 				.SetProperty(t => t.TradeCodeId, request.TradeCodeId),
-				cancellationToken);
+				ct);
 	}
 }

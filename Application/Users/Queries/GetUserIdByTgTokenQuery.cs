@@ -9,7 +9,7 @@ public record GetUserIdByTgTokenQuery(string TgToken) : IQuery<int?>;
 public class GetUserIdByTgTokenQueryHandler(ITgTokenRepository tgTokenRepository)
 	: IRequestHandler<GetUserIdByTgTokenQuery, int?>
 {
-	public async Task<int?> Handle(GetUserIdByTgTokenQuery request, CancellationToken cancellationToken)
+	public async Task<int?> Handle(GetUserIdByTgTokenQuery request, CancellationToken ct)
 	{
 		var userId = await tgTokenRepository.GetUserIdAsync(request.TgToken);
 

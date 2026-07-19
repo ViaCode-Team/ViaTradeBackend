@@ -10,9 +10,9 @@ public record GetRemindStatisticQuery(int UserId) : IQuery<TradeRemindStatisticR
 
 public class GetRemindStatisticQueryHandler(ITradeRemindRepository tradeRemindRepository) : IRequestHandler<GetRemindStatisticQuery, TradeRemindStatisticReadModel>
 {
-	public async Task<TradeRemindStatisticReadModel> Handle(GetRemindStatisticQuery request, CancellationToken cancellationToken)
+	public async Task<TradeRemindStatisticReadModel> Handle(GetRemindStatisticQuery request, CancellationToken ct)
 	{
-		var total = await tradeRemindRepository.CountAsync(x => x.UserId == request.UserId, cancellationToken);
+		var total = await tradeRemindRepository.CountAsync(x => x.UserId == request.UserId, ct);
 		return new TradeRemindStatisticReadModel(total);
 	}
 }

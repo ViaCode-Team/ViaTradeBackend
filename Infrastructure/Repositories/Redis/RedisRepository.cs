@@ -5,7 +5,7 @@ using System.Text.Json;
 
 namespace Infrastructure.Repositories.Redis;
 
-public class RedisRepository<T>(IConnectionMultiplexer redis, string prefix) : ICacheRepository<T> where T : RedisEntity
+public class RedisRepository<T>(IConnectionMultiplexer redis, string prefix) : ICacheRepository<T> where T : CacheEntity
 {
 	protected readonly IDatabase _db = redis.GetDatabase();
 	protected readonly string _prefix = prefix;

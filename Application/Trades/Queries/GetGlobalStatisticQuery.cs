@@ -10,8 +10,8 @@ public record GetGlobalStatisticQuery(int UserId) : IQuery<GlobalStatisticReadMo
 public class GetGlobalStatisticQueryHandler(ITradeRepository tradeRepository)
 	: IRequestHandler<GetGlobalStatisticQuery, GlobalStatisticReadModel>
 {
-	public async Task<GlobalStatisticReadModel> Handle(GetGlobalStatisticQuery request, CancellationToken cancellationToken)
+	public async Task<GlobalStatisticReadModel> Handle(GetGlobalStatisticQuery request, CancellationToken ct)
 	{
-		return await tradeRepository.GetGlobalStatisticAsync(request.UserId, cancellationToken);
+		return await tradeRepository.GetGlobalStatisticAsync(request.UserId, ct);
 	}
 }

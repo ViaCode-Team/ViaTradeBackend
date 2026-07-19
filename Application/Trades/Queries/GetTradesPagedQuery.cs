@@ -13,9 +13,9 @@ public record GetTradesPagedQuery(int UserId, TradeFilterRequest? FilterRequest,
 public class GetTradesPagedQueryHandler(ITradeRepository tradeRepository)
 	: IRequestHandler<GetTradesPagedQuery, PagedResult<Trade>>
 {
-	public async Task<PagedResult<Trade>> Handle(GetTradesPagedQuery request, CancellationToken cancellationToken)
+	public async Task<PagedResult<Trade>> Handle(GetTradesPagedQuery request, CancellationToken ct)
 	{
 		var spec = new TradeQuerySpecification(request.UserId, request.FilterRequest);
-		return await tradeRepository.GetPagedFilteredAsync(spec, request.PaginationRequest, cancellationToken);
+		return await tradeRepository.GetPagedFilteredAsync(spec, request.PaginationRequest, ct);
 	}
 }
