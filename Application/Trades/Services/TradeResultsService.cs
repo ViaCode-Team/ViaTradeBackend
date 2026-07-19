@@ -1,10 +1,10 @@
-using Application.Auth.Interfaces;
-using Application.Common.Models.Sort;
 using Application.Interfaces;
 using Application.Statistics.Models;
 using Application.Strategies.Interfaces;
+using Application.Trades.Interfaces;
+using Application.Trades.Models;
+using Application.Trades.Queries;
 using Domain.Trades.Entities;
-using Domain.Trades.Enums;
 
 namespace Application.Trades.Services;
 
@@ -15,7 +15,7 @@ public class TradeResultsService(
 {
 	public async Task<SignalStatisticReadModel> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		var signals = await GetAsync(userId, DateTime.Now, null, new SignalSortRequest(), ct);
+		var signals = await GetAsync(userId, DateTime.Now, null, new SignalSort(), ct);
 
 		var allResults = signals.Strategies
 			.SelectMany(s => s.Tickers)
@@ -29,11 +29,11 @@ public class TradeResultsService(
 		};
 	}
 
-	public async Task<StrategyResultResponse> GetAsync(
+	public async Task<StrategyResults> GetAsync(
 		int userId,
 		DateTime? startDate,
 		DateTime? endDate,
-		SignalSortRequest sortRequest,
+		SignalSort sort,
 		CancellationToken ct)
 	{
 		if (startDate != null)
@@ -41,12 +41,12 @@ public class TradeResultsService(
 			startDate = startDate.Value.Date;
 		}
 
-		var strategys = await tradeStrategyRepository.GetAllAsync(ct);
-		var strategyAccuracyDict = strategys.ToDictionary(s => s.Name, s => s.Accuracy);
+		var availableStrategies = await tradeStrategyRepository.GetAllAsync(ct);
+		var strategyAccuracyDict = availableStrategies.ToDictionary(s => s.Name, s => s.Accuracy);
 
 		var userPreferences = await userTradeStrategyRepository.GetUserPreferencesAsync(userId, ct);
 		if (userPreferences.Count == 0)
-			return new StrategyResultResponse { Strategies = [] };
+			return new StrategyResults { Strategies = [] };
 
 		List<(string StrategyName, int? Accuracy, string TradeCode, StrategyResult Item)> allResults = [];
 
@@ -76,7 +76,7 @@ public class TradeResultsService(
 			}
 		}
 
-		var sortFields = sortRequest.GetEffectiveSortBy();
+		var sortFields = sort.GetEffectiveSortBy();
 
 		var strategies = allResults
 			.GroupBy(x => x.StrategyName)
@@ -99,10 +99,10 @@ public class TradeResultsService(
 			})
 			.ToList();
 
-		return new StrategyResultResponse { Strategies = strategies };
+		return new StrategyResults { Strategies = strategies };
 	}
 
-	public async Task<StrategyResultResponse> GetAsync(
+	public async Task<StrategyResults> GetAsync(
 		int userId,
 		string strategyName,
 		string tradeCode,
@@ -130,7 +130,7 @@ public class TradeResultsService(
 			.Select(r => r.Item)
 			.ToList();
 
-		return new StrategyResultResponse
+		return new StrategyResults
 		{
 			Strategies =
 			[

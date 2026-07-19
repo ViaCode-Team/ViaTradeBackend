@@ -1,3 +1,4 @@
+
 using Domain.Trades.Enums;
 
 namespace ViaTradeBackend.Contracts.Trades;

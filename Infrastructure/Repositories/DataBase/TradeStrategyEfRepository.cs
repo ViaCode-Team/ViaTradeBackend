@@ -1,5 +1,5 @@
 using Application.Common.Interfaces;
-using Application.Common.Models.Pagination;
+using Application.Common.Queries;
 using Application.Strategies.Interfaces;
 using Domain.Strategies.Entities;
 using Infrastructure.Extensions;
@@ -7,8 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase;
 
-public class TradeStrategyEfRepository(AppDbContext context) : GenericEfRepository<TradeStrategy>(context),
-	ITradeStrategyRepository
+public class TradeStrategyEfRepository(AppDbContext context)
+	: GenericEfRepository<TradeStrategy>(context), ITradeStrategyRepository
 {
 	public async Task<int> CountAsync(CancellationToken ct = default)
 	{
@@ -22,7 +22,11 @@ public class TradeStrategyEfRepository(AppDbContext context) : GenericEfReposito
 			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<PagedResult<TradeStrategy>> GetPagedFilteredAsync(int userId, IQuerySpecification<TradeStrategy> spec, PaginationRequest paginationRequest, CancellationToken ct = default)
+	public async Task<PageResult<TradeStrategy>> GetPagedFilteredAsync(
+		int userId,
+		IQuerySpecification<TradeStrategy> spec,
+		PageOptions page,
+		CancellationToken ct = default)
 	{
 		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
 
@@ -35,7 +39,7 @@ public class TradeStrategyEfRepository(AppDbContext context) : GenericEfReposito
 				Strategy = tradeStrategy,
 				IsActive = tradeStrategy.UserTradeStrategies!.Any(uts => uts.UserId == userId)
 			})
-			.ToPagedAsync(paginationRequest, ct);
+			.ToPagedAsync(page, ct);
 
 		return pagedTuple.Map(t =>
 		{

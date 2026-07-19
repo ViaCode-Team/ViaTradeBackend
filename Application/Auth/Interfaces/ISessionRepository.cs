@@ -1,4 +1,4 @@
-using Application.Common.Models.Pagination;
+using Application.Common.Queries;
 using Application.Users.Models;
 
 namespace Application.Auth.Interfaces;
@@ -9,7 +9,7 @@ public interface ISessionRepository
 	Task<UserSessionDto?> GetAsync(string sessionId);
 	Task RemoveAsync(string sessionId);
 	Task<IEnumerable<UserSessionDto>> GetUserSessionsAsync(int userId);
-	Task<PagedResult<UserSessionDto>> GetPagedUserSessionsAsync(int userId, PaginationRequest paginationRequest);
+	Task<PageResult<UserSessionDto>> GetPagedUserSessionsAsync(int userId, PageOptions page);
 	IEnumerable<int> GetAllUserIdsWithSessions();
 	Task<int> CleanupExpiredSessionsAsync(DateTime threshold);
 }

@@ -1,12 +1,12 @@
-using Application.Common.Models;
+using Application.Auth.Models;
 
 namespace Application.Auth.Interfaces;
 
 public interface IAuthCommandService
 {
-	Task<AuthInternalResult> LoginAsync(string login, string password, string userAgent, CancellationToken ct);
+	Task<AuthTokens> LoginAsync(string login, string password, string userAgent, CancellationToken ct);
 	Task LogoutAllAsync(int userId, CancellationToken ct);
 	Task LogoutSessionAsync(string refreshToken, CancellationToken ct);
-	Task<AuthInternalResult> RefreshTokenAsync(string refreshToken, CancellationToken ct);
-	Task<AuthInternalResult> RegisterAsync(string login, string password, string userAgent, CancellationToken ct);
+	Task<AuthTokens> RefreshTokenAsync(string refreshToken, CancellationToken ct);
+	Task<AuthTokens> RegisterAsync(string login, string password, string userAgent, CancellationToken ct);
 }

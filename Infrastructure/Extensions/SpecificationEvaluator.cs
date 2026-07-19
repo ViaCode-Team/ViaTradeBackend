@@ -47,13 +47,13 @@ public static class SpecificationEvaluator
 		if (specification.SortExpressions.Count == 0)
 			return query;
 
-		var firstSort = specification.SortExpressions[0];
 		IOrderedQueryable<TEntity> orderedQuery;
 
-		if (firstSort.IsDescending)
-			orderedQuery = query.OrderByDescending(firstSort.KeySelector);
+		var (FirstKeySelector, FirstIsDescending) = specification.SortExpressions[0];
+		if (FirstIsDescending)
+			orderedQuery = query.OrderByDescending(FirstKeySelector);
 		else
-			orderedQuery = query.OrderBy(firstSort.KeySelector);
+			orderedQuery = query.OrderBy(FirstKeySelector);
 
 		return specification.SortExpressions
 			.Skip(1)

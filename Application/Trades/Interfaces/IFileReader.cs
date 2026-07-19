@@ -1,6 +1,6 @@
 using Domain.Trades.Entities;
 
-namespace Application.Auth.Interfaces;
+namespace Application.Trades.Interfaces;
 
 public interface IFileReader
 {

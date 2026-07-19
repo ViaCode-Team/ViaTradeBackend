@@ -1,4 +1,4 @@
-using Application.Common.Models.Pagination;
+using Application.Common.Queries;
 using Application.Strategies.Interfaces;
 using Domain.Strategies.Entities;
 using Infrastructure.Utils;
@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase;
 
-public class UserTradeStrategyEfRepository(AppDbContext context) : GenericEfRepository<UserTradeStrategy>(context),
-	IUserTradeStrategyRepository
+public class UserTradeStrategyEfRepository(AppDbContext context)
+	: GenericEfRepository<UserTradeStrategy>(context), IUserTradeStrategyRepository
 {
-	public async Task<PagedResult<UserTradeStrategy>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken ct)
+	public async Task<PageResult<UserTradeStrategy>> GetByUserPagedAsync(int userId, PageOptions page, CancellationToken ct)
 	{
-		return await FindPagedAsync(e => e.UserId == userId, paginationRequest, ct);
+		return await FindPagedAsync(e => e.UserId == userId, page, ct);
 	}
 
 	public async Task<int> CountByUserAsync(int userId, CancellationToken ct)

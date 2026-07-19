@@ -15,5 +15,5 @@ public class UserInternalDto
 	public required DateTime RegisterDate { get; set; }
 
 	[MaxLength(512)]
-	public string? TgId { get; set; }
+	public string? TelegramId { get; set; }
 }

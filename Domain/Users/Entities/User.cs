@@ -1,6 +1,7 @@
 using Domain.Common;
 using Domain.Strategies.Entities;
 using Domain.Trades.Entities;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Users.Entities;
 
@@ -14,7 +15,8 @@ public sealed class User : BaseEntity<int>
 
 	public DateTime RegisterDate { get; set; }
 
-	public string? TgId { get; set; }
+	[Column("TgId")]
+	public string? TelegramId { get; set; }
 
 	public ICollection<Trade> Trades { get; set; } = [];
 

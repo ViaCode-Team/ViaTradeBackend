@@ -1,26 +1,24 @@
-using Application.Common.Models.Pagination;
+using Application.Common.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Extensions;
 
 public static class QueryableExtensions
 {
-	public static async Task<PagedResult<T>> ToPagedAsync<T>(
+	public static async Task<PageResult<T>> ToPagedAsync<T>(
 		this IQueryable<T> source,
-		PaginationRequest paginationRequest,
+		PageOptions page,
 		CancellationToken ct = default)
 	{
-		paginationRequest ??= new PaginationRequest();
-
 		var totalCount = await source.CountAsync(ct);
 		if (totalCount == 0)
-			return new PagedResult<T>([], 0, paginationRequest.Page, paginationRequest.PageSize);
+			return new PageResult<T>([], 0, page.Page, page.PageSize);
 
 		var items = await source
-			.Skip((paginationRequest.Page - 1) * paginationRequest.PageSize)
-			.Take(paginationRequest.PageSize)
+			.Skip((page.Page - 1) * page.PageSize)
+			.Take(page.PageSize)
 			.ToListAsync(ct);
 
-		return new PagedResult<T>(items, totalCount, paginationRequest.Page, paginationRequest.PageSize);
+		return new PageResult<T>(items, totalCount, page.Page, page.PageSize);
 	}
 }

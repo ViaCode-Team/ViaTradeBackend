@@ -1,6 +1,6 @@
 using Application.Auth.Interfaces;
-using Application.Common.Models;
-using Application.Common.Models.Pagination;
+using Application.Auth.Models;
+using Application.Common.Queries;
 using Infrastructure.Configuration;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
@@ -89,17 +89,17 @@ public class AuthController(
 
 	[HttpGet("sessions")]
 	[Authorize]
-	public async Task<Ok<PagedResult<UserSessionResponse>>> GetUserSessions(
-		[FromQuery] PaginationRequest paginationRequest,
+	public async Task<Ok<PageResult<UserSessionResponse>>> GetUserSessions(
+		[FromQuery] PageOptions page,
 		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userSessions = await authQueryService.GetSessionsPagedAsync(userId, paginationRequest, ct);
+		var userSessions = await authQueryService.GetSessionsPagedAsync(userId, page, ct);
 
 		return TypedResults.Ok(userSessions.Map(s => s.Adapt<UserSessionResponse>()));
 	}
 
-	private void SetAuthCookies(AuthInternalResult result)
+	private void SetAuthCookies(AuthTokens result)
 	{
 		Response.Cookies.Append(
 			_authCookiOptions.AccessTokenCookie,

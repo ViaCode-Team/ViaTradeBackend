@@ -1,8 +1,8 @@
 using Application.Auth.Interfaces;
-using Application.Common.Models.Filters;
-using Application.Common.Models.Pagination;
+using Application.Common.Queries;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
+using Application.Trades.Queries;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -31,13 +31,13 @@ public class TradesController(
 	}
 
 	[HttpGet("byuser")]
-	public async Task<Ok<PagedResult<TradeResponse>>> GetUserTrades(
-		[FromQuery] TradeFilterRequest filterRequest,
-		[FromQuery] PaginationRequest paginationRequest,
+	public async Task<Ok<PageResult<TradeResponse>>> GetUserTrades(
+		[FromQuery] TradeFilter filter,
+		[FromQuery] PageOptions page,
 		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userTrades = await tradeQueryService.GetAsync(userId, filterRequest, paginationRequest, ct);
+		var userTrades = await tradeQueryService.GetAsync(userId, filter, page, ct);
 
 		return TypedResults.Ok(userTrades.Map(t => t.Adapt<TradeResponse>()));
 	}
@@ -59,7 +59,7 @@ public class TradesController(
 		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var trade = await tradeCommandService.CreateAsync(userId, request.Adapt<TradeCreateDto>(), ct);
+		var trade = await tradeCommandService.CreateAsync(userId, request.Adapt<TradeInput>(), ct);
 
 		return TypedResults.Created($"/api/Trades/{trade.Id}", trade.Adapt<TradeResponse>());
 	}
@@ -71,7 +71,7 @@ public class TradesController(
 		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await tradeCommandService.UpdateAsync(id, userId, request.Adapt<TradeCreateDto>(), ct);
+		await tradeCommandService.UpdateAsync(id, userId, request.Adapt<TradeInput>(), ct);
 
 		return TypedResults.NoContent();
 	}

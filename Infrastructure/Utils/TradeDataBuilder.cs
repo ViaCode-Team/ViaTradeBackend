@@ -1,4 +1,4 @@
-using Application.Auth.Interfaces;
+using Application.Trades.Interfaces;
 using Domain.Trades.Entities;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -15,7 +15,7 @@ public class TradeDataBuilder : ITradeDataBuilder
 		RegexOptions.Compiled | RegexOptions.IgnoreCase
 	);
 
-	public IEnumerable<TradeCodeFile> BuildFileTradeResonse(IEnumerable<string>? fileNames)
+	public IEnumerable<TradeCodeFile> BuildTradeCodeFiles(IEnumerable<string>? fileNames)
 	{
 		if (fileNames == null)
 		{

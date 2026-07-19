@@ -1,14 +1,14 @@
 using Application.Auth.Interfaces;
-using Application.Common.Models.Pagination;
+using Application.Common.Queries;
 using Application.Users.Models;
 
 namespace Application.Auth;
 
 public class AuthQueryService(ISessionRepository sessionRepository) : IAuthQueryService
 {
-	public async Task<PagedResult<UserSessionDto>> GetSessionsPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken ct)
+	public async Task<PageResult<UserSessionDto>> GetSessionsPagedAsync(int userId, PageOptions page, CancellationToken ct)
 	{
-		return await sessionRepository.GetPagedUserSessionsAsync(userId, paginationRequest);
+		return await sessionRepository.GetPagedUserSessionsAsync(userId, page);
 	}
 
 	public async Task<IEnumerable<UserSessionDto>> GetSessionsAsync(int userId, CancellationToken ct)

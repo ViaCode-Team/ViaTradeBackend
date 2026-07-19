@@ -1,6 +1,6 @@
-using Application.Common.Models.Pagination;
-using Application.Common.Models.Sort;
+using Application.Common.Queries;
 using Application.TradeCodes.Interfaces;
+using Application.TradeCodes.Queries;
 using Domain.Trades.Entities;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
@@ -26,12 +26,12 @@ public class TradeCodesController(ITradeCodeQueryService tradeCodeQueryService) 
 	}
 
 	[HttpGet("stocks")]
-	public async Task<Ok<PagedResult<TradeCodeResponse>>> GetStockCodes(
-		[FromQuery] PaginationRequest paginationRequest,
-		[FromQuery] StockSortRequest sortRequest,
+	public async Task<Ok<PageResult<TradeCodeResponse>>> GetStockCodes(
+		[FromQuery] PageOptions page,
+		[FromQuery] TradeCodeSort sort,
 		CancellationToken ct)
 	{
-		var pagedCodes = await tradeCodeQueryService.GetAsync(paginationRequest, sortRequest, ct);
+		var pagedCodes = await tradeCodeQueryService.GetAsync(page, sort, ct);
 
 		return TypedResults.Ok(pagedCodes.Map(c => c.Adapt<TradeCodeResponse>()));
 	}
@@ -39,7 +39,7 @@ public class TradeCodesController(ITradeCodeQueryService tradeCodeQueryService) 
 	[HttpGet("sys/stocks")]
 	public async Task<Ok<List<TradeCodeFileResponse>>> GetSysStockCodes(CancellationToken ct)
 	{
-		var sysCodes = await tradeCodeQueryService.GetSystemAsync(TradeDataType.Stocks, ct);
+		var sysCodes = await tradeCodeQueryService.GetFileMetadataAsync(TradeDataType.Stocks, ct);
 
 		return TypedResults.Ok(sysCodes.Adapt<List<TradeCodeFileResponse>>());
 	}
@@ -49,7 +49,7 @@ public class TradeCodesController(ITradeCodeQueryService tradeCodeQueryService) 
 		[FromRoute, Required] string id,
 		CancellationToken ct)
 	{
-		var sysCode = await tradeCodeQueryService.GetSystemAsync(TradeDataType.Stocks, id, ct);
+		var sysCode = await tradeCodeQueryService.GetFileMetadataAsync(TradeDataType.Stocks, id, ct);
 
 		return TypedResults.Ok(sysCode.Adapt<TradeCodeFileResponse>());
 	}

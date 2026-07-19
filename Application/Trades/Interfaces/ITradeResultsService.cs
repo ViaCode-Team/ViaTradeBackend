@@ -1,6 +1,7 @@
-using Application.Common.Models.Sort;
 using Application.Statistics.Models;
-using Domain.Trades.Entities;
+using Application.Trades.Models;
+
+using Application.Trades.Queries;
 
 namespace Application.Interfaces;
 
@@ -10,14 +11,14 @@ public interface ITradeResultsService
 		int userId,
 		CancellationToken ct);
 
-	Task<StrategyResultResponse> GetAsync(
+	Task<StrategyResults> GetAsync(
 		int userId,
 		DateTime? startDate,
 		DateTime? endDate,
-		SignalSortRequest sortRequest,
+		SignalSort sort,
 		CancellationToken ct);
 
-	Task<StrategyResultResponse> GetAsync(
+	Task<StrategyResults> GetAsync(
 		int userId,
 		string strategyName,
 		string tradeCode,

@@ -1,5 +1,5 @@
 using Application.Auth.Interfaces;
-using Application.Common.Models.Pagination;
+using Application.Common.Queries;
 using Application.Users.Models;
 using StackExchange.Redis;
 using System.Text.Json;
@@ -77,12 +77,12 @@ public class SessionRedisRepository(IConnectionMultiplexer redis) : ISessionRepo
 		return result;
 	}
 
-	public async Task<PagedResult<UserSessionDto>> GetPagedUserSessionsAsync(int userId, PaginationRequest paginationRequest)
+	public async Task<PageResult<UserSessionDto>> GetPagedUserSessionsAsync(int userId, PageOptions page)
 	{
 		var totalCount = await _db.SortedSetLengthAsync(UserSessionsKey(userId));
 
-		int start = (paginationRequest.Page - 1) * paginationRequest.PageSize;
-		int stop = start + paginationRequest.PageSize - 1;
+		int start = (page.Page - 1) * page.PageSize;
+		int stop = start + page.PageSize - 1;
 
 		var sessionIds = await _db.SortedSetRangeByRankAsync(UserSessionsKey(userId), start, stop, Order.Descending);
 		List<UserSessionDto> result = [];
@@ -107,7 +107,7 @@ public class SessionRedisRepository(IConnectionMultiplexer redis) : ISessionRepo
 			}
 		}
 
-		return new PagedResult<UserSessionDto>(result, (int)totalCount, paginationRequest.Page, paginationRequest.PageSize);
+		return new PageResult<UserSessionDto>(result, (int)totalCount, page.Page, page.PageSize);
 	}
 
 	// Cleaning old records from User`s Session SET <user:sessions:{userId}>

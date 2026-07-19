@@ -1,8 +1,8 @@
-using Application.Auth.Interfaces;
-using Application.Common.Models.Pagination;
-using Application.Common.Models.Sort;
+using Application.Common.Queries;
 using Application.Statistics.Models;
 using Application.TradeCodes.Interfaces;
+using Application.TradeCodes.Queries;
+using Application.Trades.Interfaces;
 using Application.Trades.Models;
 using Domain.TradeCodes.Entities;
 using Domain.Trades.Entities;
@@ -13,9 +13,9 @@ public class TradeCodeQueryService(
 	IFileReader tradefileReader,
 	ITradeCodeRepository tradeCodeRepository) : ITradeCodeQueryService
 {
-	public async Task<PagedResult<TradeCode>> GetAsync(PaginationRequest paginationRequest, StockSortRequest sortRequest, CancellationToken ct)
+	public async Task<PageResult<TradeCode>> GetAsync(PageOptions page, TradeCodeSort sort, CancellationToken ct)
 	{
-		return await tradeCodeRepository.GetCodesPagedAsync(paginationRequest, sortRequest, ct);
+		return await tradeCodeRepository.GetCodesPagedAsync(page, sort, ct);
 	}
 
 	public async Task<StockStatisticReadModel> GetStatisticsAsync(CancellationToken ct)
@@ -26,7 +26,7 @@ public class TradeCodeQueryService(
 		};
 	}
 
-	public async Task<IEnumerable<TradeCodeFileDto>> GetSystemAsync(TradeDataType dataType, CancellationToken ct)
+	public async Task<IEnumerable<TradeCodeFileDto>> GetFileMetadataAsync(TradeDataType dataType, CancellationToken ct)
 	{
 		var tradeFiles = tradefileReader.GetTradeCodes(dataType);
 		var tradeCodes = await tradeCodeRepository.GetAllAsync(ct);
@@ -48,7 +48,7 @@ public class TradeCodeQueryService(
 			});
 	}
 
-	public async Task<TradeCodeFileDto> GetSystemAsync(TradeDataType dataType, string tradeIdString, CancellationToken ct)
+	public async Task<TradeCodeFileDto> GetFileMetadataAsync(TradeDataType dataType, string tradeIdString, CancellationToken ct)
 	{
 		string exchangeId;
 		int? dbId = null;

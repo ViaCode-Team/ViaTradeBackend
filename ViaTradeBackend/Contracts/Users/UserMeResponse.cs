@@ -5,6 +5,6 @@ public record UserMeResponse(
 	string Login,
 	DateTime LastLoginDate,
 	DateTime RegisterDate,
-	string? TgId
+	string? TelegramId
 );
 

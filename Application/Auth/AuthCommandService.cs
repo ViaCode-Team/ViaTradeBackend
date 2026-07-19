@@ -1,6 +1,6 @@
 using Application.Auth.Interfaces;
+using Application.Auth.Models;
 using Application.Common.Interfaces;
-using Application.Common.Models;
 using Application.Users.Interfaces;
 using Application.Users.Models;
 using Domain.Users.Entities;
@@ -17,7 +17,7 @@ public class AuthCommandService(
 {
 	private readonly TimeSpan _sessionTtl = TimeSpan.FromDays(7);
 
-	public async Task<AuthInternalResult> LoginAsync(string login, string password, string userAgent, CancellationToken ct)
+	public async Task<AuthTokens> LoginAsync(string login, string password, string userAgent, CancellationToken ct)
 	{
 		var user = await userRepository.GetByLoginAsync(login, ct);
 
@@ -42,7 +42,7 @@ public class AuthCommandService(
 
 		await refreshTokenRepository.StoreAsync(sessionId, refreshToken, _sessionTtl);
 
-		return new AuthInternalResult
+		return new AuthTokens
 		{
 			AccessToken = accessToken,
 			RefreshToken = refreshToken
@@ -70,7 +70,7 @@ public class AuthCommandService(
 		await sessionRepository.RemoveAsync(sessionId);
 	}
 
-	public async Task<AuthInternalResult> RefreshTokenAsync(string refreshToken, CancellationToken ct)
+	public async Task<AuthTokens> RefreshTokenAsync(string refreshToken, CancellationToken ct)
 	{
 		var sessionId = await refreshTokenRepository.GetSessionIdAsync(refreshToken)
 			?? throw new UnauthorizedAccessException();
@@ -89,14 +89,14 @@ public class AuthCommandService(
 
 		await refreshTokenRepository.RotateAsync(sessionId, newRefreshToken, _sessionTtl);
 
-		return new AuthInternalResult
+		return new AuthTokens
 		{
 			AccessToken = newAccessToken,
 			RefreshToken = newRefreshToken
 		};
 	}
 
-	public async Task<AuthInternalResult> RegisterAsync(string login, string password, string userAgent, CancellationToken ct)
+	public async Task<AuthTokens> RegisterAsync(string login, string password, string userAgent, CancellationToken ct)
 	{
 		if (await userRepository.ExistsAsync(u => u.Login == login, ct))
 			throw new InvalidOperationException("User already exists");

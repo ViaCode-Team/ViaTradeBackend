@@ -1,7 +1,7 @@
-using Application.Common.Models.Filters;
-using Application.Common.Models.Pagination;
+using Application.Common.Queries;
 using Application.Common.Specifications;
 using Application.Notes.Interfaces;
+using Application.Notes.Queries;
 using Application.Statistics.Models;
 using Domain.Notes.Entities;
 using Domain.Notes.Enums;
@@ -32,9 +32,9 @@ public class NoteQueryService(INoteRepository noteRepository) : INoteQueryServic
 		return existingNote;
 	}
 
-	public async Task<PagedResult<Note>> GetAsync(int userId, NoteFilterRequest filterRequest, PaginationRequest paginationRequest, CancellationToken ct)
+	public async Task<PageResult<Note>> GetAsync(int userId, NoteFilter filter, PageOptions page, CancellationToken ct)
 	{
-		var spec = new NoteQuerySpecification(userId, filterRequest);
-		return await noteRepository.GetPagedAsync(spec, paginationRequest, ct);
+		var spec = new NoteQuerySpecification(userId, filter);
+		return await noteRepository.GetPagedAsync(spec, page, ct);
 	}
 }

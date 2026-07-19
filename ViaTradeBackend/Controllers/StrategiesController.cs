@@ -1,8 +1,7 @@
 using Application.Auth.Interfaces;
-using Application.Common.Models.Filters;
-using Application.Common.Models.Pagination;
-using Application.Common.Models.Sort;
+using Application.Common.Queries;
 using Application.Strategies.Interfaces;
+using Application.Strategies.Queries;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -31,14 +30,14 @@ public class StrategiesController(
 	}
 
 	[HttpGet]
-	public async Task<Ok<PagedResult<TradeStrategyResponse>>> GetStrategies(
-		[FromQuery] StrategyFilterRequest filterRequest,
-		[FromQuery] StrategySortRequest sortRequest,
-		[FromQuery] PaginationRequest paginationRequest,
+	public async Task<Ok<PageResult<TradeStrategyResponse>>> GetStrategies(
+		[FromQuery] StrategyFilter filter,
+		[FromQuery] StrategySort sort,
+		[FromQuery] PageOptions page,
 		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var pagedStrategies = await strategyQueryService.GetAsync(userId, filterRequest, sortRequest, paginationRequest, ct);
+		var pagedStrategies = await strategyQueryService.GetAsync(userId, filter, sort, page, ct);
 
 		return TypedResults.Ok(pagedStrategies.Map(s => s.Adapt<TradeStrategyResponse>()));
 	}
@@ -51,23 +50,23 @@ public class StrategiesController(
 	}
 
 	[HttpGet("byuser")]
-	public async Task<Ok<PagedResult<UserTradeStrategyResponse>>> GetUserStrategies(
-		[FromQuery] PaginationRequest paginationRequest,
+	public async Task<Ok<PageResult<UserTradeStrategyResponse>>> GetUserStrategies(
+		[FromQuery] PageOptions page,
 		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userStrategies = await strategyQueryService.GetUserLinkedAsync(userId, paginationRequest, ct);
+		var userStrategies = await strategyQueryService.GetUserLinkedAsync(userId, page, ct);
 
 		return TypedResults.Ok(userStrategies.Map(s => s.Adapt<UserTradeStrategyResponse>()));
 	}
 
 	[HttpGet("codes/byuser")]
-	public async Task<Ok<PagedResult<UserStrategyTradeCodeResponse>>> GetUserStrategyCodes(
-		[FromQuery] PaginationRequest paginationRequest,
+	public async Task<Ok<PageResult<UserStrategyTradeCodeResponse>>> GetUserStrategyCodes(
+		[FromQuery] PageOptions page,
 		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userStrategyCodes = await strategyQueryService.GetUserLinkedCodesAsync(userId, paginationRequest, ct);
+		var userStrategyCodes = await strategyQueryService.GetUserLinkedCodesAsync(userId, page, ct);
 
 		return TypedResults.Ok(userStrategyCodes.Map(s => s.Adapt<UserStrategyTradeCodeResponse>()));
 	}

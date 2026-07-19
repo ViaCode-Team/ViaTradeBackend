@@ -1,8 +1,8 @@
-using Application.Common.Models.Filters;
-using Application.Common.Models.Pagination;
+using Application.Common.Queries;
 using Application.Common.Specifications;
 using Application.Statistics.Models;
 using Application.Trades.Interfaces;
+using Application.Trades.Queries;
 using Domain.Trades.Entities;
 
 namespace Application.Trades;
@@ -23,9 +23,9 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 		return trade;
 	}
 
-	public async Task<PagedResult<Trade>> GetAsync(int userId, TradeFilterRequest filterRequest, PaginationRequest paginationRequest, CancellationToken ct)
+	public async Task<PageResult<Trade>> GetAsync(int userId, TradeFilter filter, PageOptions page, CancellationToken ct)
 	{
-		var spec = new TradeQuerySpecification(userId, filterRequest);
-		return await tradeRepository.GetPagedFilteredAsync(spec, paginationRequest, ct);
+		var spec = new TradeQuerySpecification(userId, filter);
+		return await tradeRepository.GetPagedFilteredAsync(spec, page, ct);
 	}
 }

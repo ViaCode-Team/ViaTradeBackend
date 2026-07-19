@@ -1,4 +1,4 @@
-using Application.Auth.Interfaces;
+using Application.Trades.Interfaces;
 using Domain.Trades.Entities;
 using Infrastructure.Configuration;
 using Microsoft.Extensions.Options;
@@ -63,7 +63,7 @@ public class TradeFileReader : IFileReader
 			.Cast<string>();
 
 		// Use builder to parse file names into response objects
-		foreach (var response in _tradeDataBuilder.BuildFileTradeResonse(matchingFiles))
+		foreach (var response in _tradeDataBuilder.BuildTradeCodeFiles(matchingFiles))
 		{
 			yield return response;
 		}

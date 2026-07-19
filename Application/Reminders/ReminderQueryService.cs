@@ -1,53 +1,53 @@
-using Application.Common.Models.Pagination;
-using Application.Common.Models.Sort;
+using Application.Common.Queries;
 using Application.Common.Specifications;
 using Application.Reminders.Interfaces;
 using Application.Reminders.Models;
-using Domain.Reminds.Entities;
+using Application.Reminders.Queries;
+using Domain.Reminders.Entities;
 
 namespace Application.Reminders;
 
-public class ReminderQueryService(IReminderRepository remindRepository) : IReminderQueryService
+public class ReminderQueryService(IReminderRepository reminderRepository) : IReminderQueryService
 {
-	public async Task<RemindStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
+	public async Task<ReminderStatistics> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		int total = await remindRepository.CountAsync(
+		int total = await reminderRepository.CountAsync(
 			x => x.UserId == userId, ct);
 
-		return new RemindStatisticDto(total);
+		return new ReminderStatistics(total);
 	}
 
 	public async Task<IEnumerable<Reminder>> GetAsync(CancellationToken ct)
 	{
-		return await remindRepository.FindAsync(
+		return await reminderRepository.FindAsync(
 			x => x.DateTime <= DateTime.UtcNow, ct);
 	}
 
-	public async Task<Reminder> GetAsync(int remindId, int userId, CancellationToken ct)
+	public async Task<Reminder> GetAsync(int reminderId, int userId, CancellationToken ct)
 	{
-		return await remindRepository.FirstOrDefaultAsync(
-			x => x.Id == remindId && x.UserId == userId, ct)
-			?? throw new Exception("Remind not found.");
+		return await reminderRepository.FirstOrDefaultAsync(
+			x => x.Id == reminderId && x.UserId == userId, ct)
+			?? throw new KeyNotFoundException("Reminder not found.");
 	}
 
-	public async Task<PagedResult<Reminder>> GetAsync(
+	public async Task<PageResult<Reminder>> GetAsync(
 		int userId,
 		int tradeCodeId,
-		PaginationRequest paginationRequest,
-		ReminderSortRequest sortRequest,
+		PageOptions page,
+		ReminderSort sort,
 		CancellationToken ct)
 	{
-		var spec = new TradeRemindQuerySpecification(userId, tradeCodeId, sortRequest);
-		return await remindRepository.GetPagedAsync(spec, paginationRequest, ct);
+		var spec = new ReminderQuerySpecification(userId, tradeCodeId, sort);
+		return await reminderRepository.GetPagedAsync(spec, page, ct);
 	}
 
-	public async Task<PagedResult<Reminder>> GetAsync(
+	public async Task<PageResult<Reminder>> GetAsync(
 		int userId,
-		PaginationRequest paginationRequest,
-		ReminderSortRequest sortRequest,
+		PageOptions page,
+		ReminderSort sort,
 		CancellationToken ct)
 	{
-		var spec = new TradeRemindQuerySpecification(userId, null, sortRequest);
-		return await remindRepository.GetPagedAsync(spec, paginationRequest, ct);
+		var spec = new ReminderQuerySpecification(userId, null, sort);
+		return await reminderRepository.GetPagedAsync(spec, page, ct);
 	}
 }

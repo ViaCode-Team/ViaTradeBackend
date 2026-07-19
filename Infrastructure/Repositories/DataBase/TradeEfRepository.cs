@@ -1,5 +1,5 @@
 using Application.Common.Interfaces;
-using Application.Common.Models.Pagination;
+using Application.Common.Queries;
 using Application.Statistics.Models;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
@@ -62,22 +62,22 @@ public class TradeEfRepository(AppDbContext context)
 		};
 	}
 
-	public async Task<PagedResult<Trade>> GetByUserPagedAsync(int userId, PaginationRequest paginationRequest, CancellationToken ct)
+	public async Task<PageResult<Trade>> GetByUserPagedAsync(int userId, PageOptions page, CancellationToken ct)
 	{
-		return await FindPagedAsync(t => t.UserId == userId, paginationRequest, ct);
+		return await FindPagedAsync(t => t.UserId == userId, page, ct);
 	}
 
-	public async Task<PagedResult<Trade>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PaginationRequest paginationRequest, CancellationToken ct)
+	public async Task<PageResult<Trade>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PageOptions page, CancellationToken ct)
 	{
-		return await FindPagedAsync(t => t.UserId == userId && t.TradeCodeId == tradeCodeId, paginationRequest, ct);
+		return await FindPagedAsync(t => t.UserId == userId && t.TradeCodeId == tradeCodeId, page, ct);
 	}
 
-	public async Task<PagedResult<Trade>> GetPagedFilteredAsync(IQuerySpecification<Trade> spec, PaginationRequest paginationRequest, CancellationToken ct)
+	public async Task<PageResult<Trade>> GetPagedFilteredAsync(IQuerySpecification<Trade> spec, PageOptions page, CancellationToken ct)
 	{
-		return await GetPagedAsync(spec, paginationRequest, ct);
+		return await GetPagedAsync(spec, page, ct);
 	}
 
-	public async Task<int> UpdateAsync(int id, int userId, TradeCreateDto request, double? netIncome, decimal price, CancellationToken ct = default)
+	public async Task<int> UpdateAsync(int id, int userId, TradeInput request, double? netIncome, decimal price, CancellationToken ct)
 	{
 		return await _dbSet
 			.Where(t => t.Id == id && t.UserId == userId)

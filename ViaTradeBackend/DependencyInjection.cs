@@ -141,7 +141,7 @@ public static class DependencyInjection
 	{
 		services.AddScoped<UserRedisRepository>();
 
-		services.AddScoped<ITgTokenRepository, TgTokenRedisRepository>();
+		services.AddScoped<ITelegramTokenRepository, TelegramTokenRedisRepository>();
 		services.AddScoped<ISessionRepository, SessionRedisRepository>();
 		services.AddScoped<IRefreshTokenRepository, RefreshTokenRedisRepository>();
 

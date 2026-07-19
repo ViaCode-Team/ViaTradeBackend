@@ -1,4 +1,4 @@
-using Application.Common.Models.Filters;
+using Application.Notes.Queries;
 using Domain.Notes.Entities;
 using Domain.Notes.Enums;
 
@@ -6,7 +6,7 @@ namespace Application.Common.Specifications;
 
 public class NoteQuerySpecification : BaseQuerySpecification<Note>
 {
-	public NoteQuerySpecification(int userId, NoteFilterRequest request)
+	public NoteQuerySpecification(int userId, NoteFilter request)
 	{
 		AddCriteria(x => x.UserId == userId);
 

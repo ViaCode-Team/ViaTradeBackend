@@ -1,7 +1,7 @@
 using Application.Auth.Interfaces;
-using Application.Common.Models.Sort;
 using Application.Interfaces;
-using Domain.Trades.Entities;
+using Application.Trades.Models;
+using Application.Trades.Queries;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -26,20 +26,20 @@ public class ResultsController(ITradeResultsService tradeResultsService, IJwtHel
 	}
 
 	[HttpGet("strategy")]
-	public async Task<Ok<StrategyResultResponse>> GetStrategyResults(
+	public async Task<Ok<StrategyResults>> GetStrategyResults(
 		[FromQuery] DateTime? startDate,
 		[FromQuery] DateTime? endTime,
-		[FromQuery] SignalSortRequest sortRequest,
+		[FromQuery] SignalSort sort,
 		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var response = await tradeResultsService.GetAsync(userId, startDate, endTime, sortRequest, ct);
+		var response = await tradeResultsService.GetAsync(userId, startDate, endTime, sort, ct);
 
 		return TypedResults.Ok(response);
 	}
 
 	[HttpGet("strategy/{strategyName}/{tradeCode}")]
-	public async Task<Ok<StrategyResultResponse>> GetStrategyResultsByCode(
+	public async Task<Ok<StrategyResults>> GetStrategyResultsByCode(
 		[FromRoute, Required] string strategyName,
 		[FromRoute, Required] string tradeCode,
 		[FromQuery] DateTime? startDate,

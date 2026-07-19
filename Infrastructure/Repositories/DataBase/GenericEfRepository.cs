@@ -1,6 +1,6 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Models.Pagination;
+using Application.Common.Queries;
 using Domain.Common;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -30,18 +30,18 @@ public class GenericEfRepository<TEntity> : IRepository<TEntity>
 		return await _dbSet.ToListAsync(ct);
 	}
 
-	public async Task<PagedResult<TEntity>> GetPagedAsync(PaginationRequest paginationRequest, CancellationToken ct = default)
+	public async Task<PageResult<TEntity>> GetPagedAsync(PageOptions page, CancellationToken ct = default)
 	{
-		return await _dbSet.OrderBy(e => e.Id).ToPagedAsync(paginationRequest, ct);
+		return await _dbSet.OrderBy(e => e.Id).ToPagedAsync(page, ct);
 	}
 
-	public async Task<PagedResult<TEntity>> GetPagedAsync(IQuerySpecification<TEntity> spec, PaginationRequest paginationRequest, CancellationToken ct = default)
+	public async Task<PageResult<TEntity>> GetPagedAsync(IQuerySpecification<TEntity> spec, PageOptions page, CancellationToken ct = default)
 	{
 		var query = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
 		if (spec.SortExpressions.Count == 0)
 			query = query.OrderBy(e => e.Id);
 
-		return await query.ToPagedAsync(paginationRequest, ct);
+		return await query.ToPagedAsync(page, ct);
 	}
 
 	public async Task<IEnumerable<TEntity>> FindAsync(
@@ -58,12 +58,12 @@ public class GenericEfRepository<TEntity> : IRepository<TEntity>
 		return await _dbSet.FirstOrDefaultAsync(predicate, ct);
 	}
 
-	public async Task<PagedResult<TEntity>> FindPagedAsync(
+	public async Task<PageResult<TEntity>> FindPagedAsync(
 		Expression<Func<TEntity, bool>> predicate,
-		PaginationRequest paginationRequest,
+		PageOptions page,
 		CancellationToken ct = default)
 	{
-		return await _dbSet.Where(predicate).OrderBy(e => e.Id).ToPagedAsync(paginationRequest, ct);
+		return await _dbSet.Where(predicate).OrderBy(e => e.Id).ToPagedAsync(page, ct);
 	}
 
 	public async Task<bool> ExistsAsync(

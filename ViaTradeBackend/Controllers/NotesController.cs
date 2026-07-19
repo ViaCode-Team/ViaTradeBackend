@@ -1,7 +1,7 @@
 using Application.Auth.Interfaces;
-using Application.Common.Models.Filters;
-using Application.Common.Models.Pagination;
+using Application.Common.Queries;
 using Application.Notes.Interfaces;
+using Application.Notes.Queries;
 using Domain.Notes.Enums;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
@@ -31,13 +31,13 @@ public class NotesController(
 	}
 
 	[HttpGet("byuser")]
-	public async Task<Ok<PagedResult<NoteResponse>>> GetUserNotes(
-		[FromQuery] NoteFilterRequest filterRequest,
-		[FromQuery] PaginationRequest paginationRequest,
+	public async Task<Ok<PageResult<NoteResponse>>> GetUserNotes(
+		[FromQuery] NoteFilter filter,
+		[FromQuery] PageOptions page,
 		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userNotes = await noteQueryService.GetAsync(userId, filterRequest, paginationRequest, ct);
+		var userNotes = await noteQueryService.GetAsync(userId, filter, page, ct);
 
 		return TypedResults.Ok(userNotes.Map(n => n.Adapt<NoteResponse>()));
 	}

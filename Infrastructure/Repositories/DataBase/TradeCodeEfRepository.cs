@@ -1,28 +1,28 @@
-using Application.Common.Models.Pagination;
-using Application.Common.Models.Sort;
+using Application.Common.Queries;
 using Application.TradeCodes.Interfaces;
+using Application.TradeCodes.Queries;
 using Domain.TradeCodes.Entities;
-using Domain.Trades.Enums;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase;
 
-public class TradeCodeEfRepository(AppDbContext context) : GenericEfRepository<TradeCode>(context), ITradeCodeRepository
+public class TradeCodeEfRepository(AppDbContext context)
+	: GenericEfRepository<TradeCode>(context), ITradeCodeRepository
 {
-	public async Task<int> CountAsync(CancellationToken ct = default)
+	public async Task<int> CountAsync(CancellationToken ct)
 	{
 		return await _dbSet.CountAsync(ct);
 	}
 
-	public async Task<TradeCode?> GetByExchangeIdAsync(string code, CancellationToken ct = default)
+	public async Task<TradeCode?> GetByExchangeIdAsync(string code, CancellationToken ct)
 	{
 		return await _dbSet
 			.Where(e => e.ExchangeId == code)
 			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<int?> GetIdByExchangeIdAsync(string code, CancellationToken ct = default)
+	public async Task<int?> GetIdByExchangeIdAsync(string code, CancellationToken ct)
 	{
 		return await _dbSet
 			.Where(e => e.ExchangeId == code)
@@ -30,20 +30,22 @@ public class TradeCodeEfRepository(AppDbContext context) : GenericEfRepository<T
 			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<PagedResult<TradeCode>> GetCodesPagedAsync(PaginationRequest paginationRequest, StockSortRequest sortRequest, CancellationToken ct = default)
+	public async Task<PageResult<TradeCode>> GetCodesPagedAsync(PageOptions page, TradeCodeSort sort, CancellationToken ct)
 	{
 		var query = _dbSet.AsQueryable();
 
-		if (sortRequest.SortBy.Count > 0)
+		var sortFields = sort.GetEffectiveSortBy();
+
+		if (sortFields.Count > 0)
 		{
 			IOrderedQueryable<TradeCode>? orderedQuery = null;
-			foreach (var field in sortRequest.SortBy)
+			foreach (var field in sortFields)
 			{
 				if (orderedQuery == null)
 				{
 					orderedQuery = field switch
 					{
-						StockSortField.NameDesc => query.OrderByDescending(e => e.ExchangeId),
+						TradeCodeSortField.NameDesc => query.OrderByDescending(e => e.ExchangeId),
 						_ => query.OrderBy(e => e.ExchangeId)
 					};
 				}
@@ -51,7 +53,7 @@ public class TradeCodeEfRepository(AppDbContext context) : GenericEfRepository<T
 				{
 					orderedQuery = field switch
 					{
-						StockSortField.NameDesc => orderedQuery.ThenByDescending(e => e.ExchangeId),
+						TradeCodeSortField.NameDesc => orderedQuery.ThenByDescending(e => e.ExchangeId),
 						_ => orderedQuery.ThenBy(e => e.ExchangeId)
 					};
 				}
@@ -63,6 +65,6 @@ public class TradeCodeEfRepository(AppDbContext context) : GenericEfRepository<T
 			query = query.OrderBy(e => e.Id);
 		}
 
-		return await query.ToPagedAsync(paginationRequest, ct);
+		return await query.ToPagedAsync(page, ct);
 	}
 }

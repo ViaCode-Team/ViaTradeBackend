@@ -34,27 +34,27 @@ public class UsersController(
 	}
 
 	[Authorize]
-	[HttpGet("tgToken")]
-	public async Task<Ok<TgTokenResponse>> GenerateTgToken(CancellationToken ct)
+	[HttpGet("telegramToken")]
+	public async Task<Ok<TelegramTokenResponse>> GenerateTelegramToken(CancellationToken ct)
 	{
 		logger.LogInformation("Generating Telegram token for user");
 
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var token = await userCommandService.GenerateTgLinkAsync(userId, ct);
-		var response = new TgTokenResponse(token);
+		var response = new TelegramTokenResponse(token);
 
 		return TypedResults.Ok(response);
 	}
 
 	[ServicePassword]
-	[HttpPost("tgToken")]
-	public async Task<Accepted> LinkTgToken(
+	[HttpPost("telegramToken")]
+	public async Task<Accepted> LinkTelegramToken(
 		[FromBody, Required] LinkTelegramRequest request,
 		CancellationToken ct)
 	{
 		logger.LogInformation("Processing Telegram token for user");
 
-		await userCommandService.LinkTelegramAsync(request.TgToken, request.TgId, ct);
+		await userCommandService.LinkTelegramAsync(request.TelegramToken, request.TelegramId, ct);
 
 		logger.LogInformation("Telegram token processed successfully");
 		return TypedResults.Accepted(string.Empty);
@@ -62,12 +62,12 @@ public class UsersController(
 
 	[ServicePassword]
 	[HttpGet("user")]
-	public async Task<Ok<List<UserTgResponse>>> GetUsersWithTgLink(CancellationToken ct)
+	public async Task<Ok<List<UserTelegramResponse>>> GetUsersWithTgLink(CancellationToken ct)
 	{
 		logger.LogInformation("Getting all users with Telegram links");
 
 		var users = await userQueryService.GetWithTgLinkAsync(ct);
 
-		return TypedResults.Ok(users.Adapt<List<UserTgResponse>>());
+		return TypedResults.Ok(users.Adapt<List<UserTelegramResponse>>());
 	}
 }

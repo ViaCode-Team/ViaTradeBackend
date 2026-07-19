@@ -1,5 +1,5 @@
 using Domain.Notes.Entities;
-using Domain.Reminds.Entities;
+using Domain.Reminders.Entities;
 using Domain.Strategies.Entities;
 using Domain.TradeCodes.Entities;
 using Domain.Trades.Entities;
@@ -17,7 +17,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 	public DbSet<TradeStrategy> TradeStrategies { get; set; }
 	public DbSet<UserTradeStrategy> UserTradeStrategies { get; set; }
 	public DbSet<Note> Notes { get; set; }
-	public DbSet<Reminder> TradeReminds { get; set; }
+	public DbSet<Reminder> Reminders { get; set; }
 	public DbSet<UserStrategyTradeCode> UserStrategyTradeCodes { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -48,6 +48,9 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
 		modelBuilder.Entity<Reminder>()
 			.HasIndex(x => x.UserId);
+
+		modelBuilder.Entity<Reminder>()
+			.ToTable("TradeReminds");
 
 		modelBuilder.Entity<Note>(entity =>
 		{

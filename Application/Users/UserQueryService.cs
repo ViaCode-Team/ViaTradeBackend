@@ -5,7 +5,7 @@ namespace Application.Users;
 
 public class UserQueryService(
 	IUserRepository userRepository,
-	ITgTokenRepository tgTokenRepository) : IUserQueryService
+	ITelegramTokenRepository telegramTokenRepository) : IUserQueryService
 {
 	public async Task<IEnumerable<User>> GetWithTgLinkAsync(CancellationToken ct)
 	{
@@ -22,14 +22,14 @@ public class UserQueryService(
 		return await userRepository.GetByLoginAsync(login, ct);
 	}
 
-	public async Task<int?> GetIdAsync(string tgToken, CancellationToken ct)
+	public async Task<int?> GetIdAsync(string telegramToken, CancellationToken ct)
 	{
-		var userId = await tgTokenRepository.GetUserIdAsync(tgToken);
+		var userId = await telegramTokenRepository.GetUserIdAsync(telegramToken);
 
 		if (userId == null)
 			return null;
 
-		await tgTokenRepository.RemoveAsync(tgToken);
+		await telegramTokenRepository.RemoveAsync(telegramToken);
 
 		return userId;
 	}

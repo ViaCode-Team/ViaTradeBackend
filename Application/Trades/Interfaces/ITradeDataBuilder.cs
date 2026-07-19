@@ -1,8 +1,8 @@
 using Domain.Trades.Entities;
 
-namespace Application.Auth.Interfaces;
+namespace Application.Trades.Interfaces;
 
 public interface ITradeDataBuilder
 {
-	IEnumerable<TradeCodeFile> BuildFileTradeResonse(IEnumerable<string>? fileNames);
+	IEnumerable<TradeCodeFile> BuildTradeCodeFiles(IEnumerable<string>? fileNames);
 }

@@ -13,7 +13,7 @@ public class TradeCommandService(
 	ITradeTypeRepository tradeTypeRepository,
 	IUnitOfWork uow) : ITradeCommandService
 {
-	public async Task<Trade> CreateAsync(int userId, TradeCreateDto request, CancellationToken ct)
+	public async Task<Trade> CreateAsync(int userId, TradeInput request, CancellationToken ct)
 	{
 		bool isTradeCodeExist = await tradeCodeRepository.ExistsAsync(c => c.Id == request.TradeCodeId, ct);
 		if (!isTradeCodeExist)
@@ -57,7 +57,7 @@ public class TradeCommandService(
 		}
 	}
 
-	public async Task UpdateAsync(int id, int userId, TradeCreateDto request, CancellationToken ct)
+	public async Task UpdateAsync(int id, int userId, TradeInput request, CancellationToken ct)
 	{
 		bool isTradeCodeExist = await tradeCodeRepository.ExistsAsync(c => c.Id == request.TradeCodeId, ct);
 		if (!isTradeCodeExist)

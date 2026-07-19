@@ -1,4 +1,4 @@
-using Application.Common.Models.Filters;
+using Application.Trades.Queries;
 using Domain.Trades.Entities;
 using Domain.Trades.Enums;
 
@@ -6,7 +6,7 @@ namespace Application.Common.Specifications;
 
 public class TradeQuerySpecification : BaseQuerySpecification<Trade>
 {
-	public TradeQuerySpecification(int userId, TradeFilterRequest request)
+	public TradeQuerySpecification(int userId, TradeFilter request)
 	{
 		AddCriteria(x => x.UserId == userId);
 		AddInclude(x => x.TradeType!);

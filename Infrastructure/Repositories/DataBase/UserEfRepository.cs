@@ -4,26 +4,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase;
 
-public class UserEfRepository(AppDbContext context) : GenericEfRepository<User>(context), IUserRepository
+public class UserEfRepository(AppDbContext context)
+	: GenericEfRepository<User>(context), IUserRepository
 {
-	public async Task<User?> GetByLoginAsync(string login, CancellationToken ct = default)
+	public async Task<User?> GetByLoginAsync(string login, CancellationToken ct)
 	{
 		return await _dbSet.FirstOrDefaultAsync(u => u.Login == login, ct);
 	}
 
-	public async Task<IEnumerable<User>> GetAllWithTgLinkAsync(CancellationToken ct = default)
+	public async Task<IEnumerable<User>> GetAllWithTgLinkAsync(CancellationToken ct)
 	{
-		return await _dbSet.Where(u => u.TgId != null).ToListAsync(ct);
+		return await _dbSet.Where(u => u.TelegramId != null).ToListAsync(ct);
 	}
 
-	public async Task<int> UpdateTgIdAsync(int userId, string tgId, CancellationToken ct = default)
+	public async Task<int> UpdateTelegramIdAsync(int userId, string telegramId, CancellationToken ct)
 	{
 		return await _dbSet
 			.Where(u => u.Id == userId)
-			.ExecuteUpdateAsync(s => s.SetProperty(u => u.TgId, tgId), ct);
+			.ExecuteUpdateAsync(s => s.SetProperty(u => u.TelegramId, telegramId), ct);
 	}
 
-	public async Task<int> UpdateLastLoginDateAsync(int userId, DateTime lastLoginDate, CancellationToken ct = default)
+	public async Task<int> UpdateLastLoginDateAsync(int userId, DateTime lastLoginDate, CancellationToken ct)
 	{
 		return await _dbSet
 			.Where(u => u.Id == userId)

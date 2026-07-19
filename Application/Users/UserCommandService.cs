@@ -5,7 +5,7 @@ namespace Application.Users;
 
 public class UserCommandService(
 	IUserRepository userRepository,
-	ITgTokenRepository tgTokenRepository) : IUserCommandService
+	ITelegramTokenRepository telegramTokenRepository) : IUserCommandService
 {
 	public async Task<string> GenerateTgLinkAsync(int userId, CancellationToken ct)
 	{
@@ -14,23 +14,23 @@ public class UserCommandService(
 			.Replace("/", "_")
 			.TrimEnd('=');
 
-		await tgTokenRepository.SetAsync(token, userId, TimeSpan.FromMinutes(5));
+		await telegramTokenRepository.SetAsync(token, userId, TimeSpan.FromMinutes(5));
 
 		return $"https://t.me/ViaTradeBot?start={token}";
 	}
 
-	public async Task LinkTelegramAsync(string tgToken, string tgId, CancellationToken ct)
+	public async Task LinkTelegramAsync(string telegramToken, string telegramId, CancellationToken ct)
 	{
-		var userIdNullable = await tgTokenRepository.GetUserIdAsync(tgToken);
+		var userIdNullable = await telegramTokenRepository.GetUserIdAsync(telegramToken);
 		if (userIdNullable == null)
-			throw new NullReferenceException(nameof(tgToken));
+			throw new NullReferenceException(nameof(telegramToken));
 
-		await tgTokenRepository.RemoveAsync(tgToken);
+		await telegramTokenRepository.RemoveAsync(telegramToken);
 		var userId = userIdNullable.Value;
 
-		var affectedRows = await userRepository.UpdateTgIdAsync(userId, tgId, ct);
+		var affectedRows = await userRepository.UpdateTelegramIdAsync(userId, telegramId, ct);
 		if (affectedRows == 0)
-			throw new NullReferenceException(nameof(tgToken));
+			throw new NullReferenceException(nameof(telegramToken));
 	}
 
 	public async Task UpdateLastLoginDateAsync(int userId, CancellationToken ct)

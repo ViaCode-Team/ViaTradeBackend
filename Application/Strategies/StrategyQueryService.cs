@@ -1,9 +1,8 @@
-using Application.Common.Models.Filters;
-using Application.Common.Models.Pagination;
-using Application.Common.Models.Sort;
+using Application.Common.Queries;
 using Application.Common.Specifications;
 using Application.Statistics.Models;
 using Application.Strategies.Interfaces;
+using Application.Strategies.Queries;
 using Domain.Strategies.Entities;
 
 namespace Application.Strategies;
@@ -31,10 +30,10 @@ public class StrategyQueryService(
 		};
 	}
 
-	public async Task<PagedResult<TradeStrategy>> GetAsync(int userId, StrategyFilterRequest filterRequest, StrategySortRequest sortRequest, PaginationRequest paginationRequest, CancellationToken ct)
+	public async Task<PageResult<TradeStrategy>> GetAsync(int userId, StrategyFilter filter, StrategySort sort, PageOptions page, CancellationToken ct)
 	{
-		var spec = new StrategyQuerySpecification(userId, filterRequest, sortRequest);
-		return await tradeStrategyRepository.GetPagedFilteredAsync(userId, spec, paginationRequest, ct);
+		var spec = new StrategyQuerySpecification(userId, filter, sort);
+		return await tradeStrategyRepository.GetPagedFilteredAsync(userId, spec, page, ct);
 	}
 
 	public async Task<TradeStrategy> GetAsync(int strategyId, CancellationToken ct)
@@ -43,13 +42,13 @@ public class StrategyQueryService(
 			?? throw new KeyNotFoundException();
 	}
 
-	public async Task<PagedResult<UserTradeStrategy>> GetUserLinkedAsync(int userId, PaginationRequest paginationRequest, CancellationToken ct)
+	public async Task<PageResult<UserTradeStrategy>> GetUserLinkedAsync(int userId, PageOptions page, CancellationToken ct)
 	{
-		return await userTradeStrategyRepository.GetByUserPagedAsync(userId, paginationRequest, ct);
+		return await userTradeStrategyRepository.GetByUserPagedAsync(userId, page, ct);
 	}
 
-	public async Task<PagedResult<UserStrategyTradeCode>> GetUserLinkedCodesAsync(int userId, PaginationRequest paginationRequest, CancellationToken ct)
+	public async Task<PageResult<UserStrategyTradeCode>> GetUserLinkedCodesAsync(int userId, PageOptions page, CancellationToken ct)
 	{
-		return await userStrategyTradeCodeRepository.GetPagedAsync(userId, paginationRequest, ct);
+		return await userStrategyTradeCodeRepository.GetPagedAsync(userId, page, ct);
 	}
 }

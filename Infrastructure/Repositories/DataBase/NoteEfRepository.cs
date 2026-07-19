@@ -6,7 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase;
 
-public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(context), INoteRepository
+public class NoteEfRepository(AppDbContext context)
+	: GenericEfRepository<Note>(context), INoteRepository
 {
 	public async Task<NoteStatisticReadModel> GetNoteStatisticAsync(int userId, CancellationToken ct = default)
 	{
@@ -27,14 +28,14 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 		};
 	}
 
-	public async Task<Note?> FindUserNoteByEntityAsync(int userId, int relatedId, NoteType noteType, CancellationToken ct) => noteType switch
+	public async Task<Note?> FindByTargetAsync(int userId, int relatedId, NoteType noteType, CancellationToken ct) => noteType switch
 	{
 		NoteType.TradeCodeNote => await _dbSet.FirstOrDefaultAsync(n => n.TradeCodeId == relatedId && n.UserId == userId, ct),
 		NoteType.TradeStrategyNote => await _dbSet.FirstOrDefaultAsync(n => n.TradeStrategyId == relatedId && n.UserId == userId, ct),
 		_ => null
 	};
 
-	public async Task<Note> GetUserNoteByProp(int id, int userId, NoteType noteType, CancellationToken ct)
+	public async Task<Note> GetByTargetAsync(int id, int userId, NoteType noteType, CancellationToken ct)
 	{
 		Note? found = noteType switch
 		{

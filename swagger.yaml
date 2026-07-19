@@ -481,7 +481,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserSessionResponsePagedResult'
+                $ref: '#/components/schemas/UserSessionResponsePageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -680,7 +680,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NoteResponsePagedResult'
+                $ref: '#/components/schemas/NoteResponsePageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -1548,14 +1548,14 @@ paths:
     get:
       tags:
         - Reminders
-      operationId: GetRemindStatistics
+      operationId: GetReminderStatistics
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TradeRemindStatisticResponse'
+                $ref: '#/components/schemas/ReminderStatisticsResponse'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -1637,7 +1637,7 @@ paths:
     get:
       tags:
         - Reminders
-      operationId: GetActualReminders
+      operationId: GetDueReminders
       responses:
         '200':
           description: OK
@@ -1646,7 +1646,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/TradeRemindResponse'
+                  $ref: '#/components/schemas/ReminderResponse'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -1728,7 +1728,7 @@ paths:
     delete:
       tags:
         - Reminders
-      operationId: DeleteActualReminder
+      operationId: DeleteDueReminder
       parameters:
         - name: id
           in: path
@@ -1843,14 +1843,14 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/RemindSortField'
+              $ref: '#/components/schemas/ReminderSortField'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TradeRemindResponsePagedResult'
+                $ref: '#/components/schemas/ReminderResponsePageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -1955,7 +1955,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/RemindSortField'
+              $ref: '#/components/schemas/ReminderSortField'
         - name: tradeCodeId
           in: path
           required: true
@@ -1968,7 +1968,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TradeRemindResponsePagedResult'
+                $ref: '#/components/schemas/ReminderResponsePageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -2061,13 +2061,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateTradeRemindRequest'
+              $ref: '#/components/schemas/CreateReminderRequest'
           text/json:
             schema:
-              $ref: '#/components/schemas/CreateTradeRemindRequest'
+              $ref: '#/components/schemas/CreateReminderRequest'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/CreateTradeRemindRequest'
+              $ref: '#/components/schemas/CreateReminderRequest'
         required: true
       responses:
         '201':
@@ -2167,7 +2167,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TradeRemindResponse'
+                $ref: '#/components/schemas/ReminderResponse'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -2260,13 +2260,13 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateTradeRemindRequest'
+              $ref: '#/components/schemas/UpdateReminderRequest'
           text/json:
             schema:
-              $ref: '#/components/schemas/UpdateTradeRemindRequest'
+              $ref: '#/components/schemas/UpdateReminderRequest'
           application/*+json:
             schema:
-              $ref: '#/components/schemas/UpdateTradeRemindRequest'
+              $ref: '#/components/schemas/UpdateReminderRequest'
         required: true
       responses:
         '204':
@@ -2556,7 +2556,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StrategyResultResponse'
+                $ref: '#/components/schemas/StrategyResults'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -2666,7 +2666,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StrategyResultResponse'
+                $ref: '#/components/schemas/StrategyResults'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -2871,7 +2871,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TradeStrategyResponsePagedResult'
+                $ref: '#/components/schemas/TradeStrategyResponsePageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3073,7 +3073,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserTradeStrategyResponsePagedResult'
+                $ref: '#/components/schemas/UserTradeStrategyResponsePageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3366,7 +3366,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserStrategyTradeCodeResponsePagedResult'
+                $ref: '#/components/schemas/UserStrategyTradeCodeResponsePageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3753,14 +3753,14 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/components/schemas/StockSortField'
+              $ref: '#/components/schemas/TradeCodeSortField'
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TradeCodeResponsePagedResult'
+                $ref: '#/components/schemas/TradeCodeResponsePageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4163,7 +4163,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TradeResponsePagedResult'
+                $ref: '#/components/schemas/TradeResponsePageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4712,18 +4712,18 @@ paths:
                 title: Internal Server Error
                 status: 500
                 detail: Specific error details here
-  /api/Users/tgToken:
+  /api/Users/telegramToken:
     get:
       tags:
         - Users
-      operationId: GenerateTgToken
+      operationId: GenerateTelegramToken
       responses:
         '200':
           description: OK
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TgTokenResponse'
+                $ref: '#/components/schemas/TelegramTokenResponse'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4804,7 +4804,7 @@ paths:
     post:
       tags:
         - Users
-      operationId: LinkTgToken
+      operationId: LinkTelegramToken
       requestBody:
         content:
           application/json:
@@ -4910,7 +4910,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/UserTgResponse'
+                  $ref: '#/components/schemas/UserTelegramResponse'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4998,13 +4998,13 @@ components:
         noteText:
           type: string
       additionalProperties: false
-    CreateTradeRemindRequest:
+    CreateReminderRequest:
       required:
         - dateTime
-        - textRemind
+        - text
       type: object
       properties:
-        textRemind:
+        text:
           type: string
         dateTime:
           type: string
@@ -5095,13 +5095,13 @@ components:
       additionalProperties: false
     LinkTelegramRequest:
       required:
-        - tgId
-        - tgToken
+        - telegramId
+        - telegramToken
       type: object
       properties:
-        tgToken:
+        telegramToken:
           type: string
-        tgId:
+        telegramId:
           type: string
       additionalProperties: false
     LoginRequest:
@@ -5137,7 +5137,7 @@ components:
           type: integer
           format: int32
       additionalProperties: false
-    NoteResponsePagedResult:
+    NoteResponsePageResult:
       required:
         - items
         - totalCount
@@ -5212,11 +5212,63 @@ components:
         password:
           type: string
       additionalProperties: false
-    RemindSortField:
+    ReminderResponse:
+      required:
+        - dateTime
+        - id
+        - text
+        - tradeCodeId
+        - userId
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        text:
+          type: string
+        dateTime:
+          type: string
+          format: date-time
+        tradeCodeId:
+          type: integer
+          format: int32
+        userId:
+          type: integer
+          format: int32
+      additionalProperties: false
+    ReminderResponsePageResult:
+      required:
+        - items
+        - totalCount
+        - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReminderResponse'
+        totalCount:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+          readOnly: true
+      additionalProperties: false
+    ReminderSortField:
       enum:
         - dateTimeAsc
         - dateTimeDesc
       type: string
+    ReminderStatisticsResponse:
+      required:
+        - totalReminders
+      type: object
+      properties:
+        totalReminders:
+          type: integer
+          format: int32
+      additionalProperties: false
     SignalSortField:
       enum:
         - dateTimeAsc
@@ -5243,11 +5295,6 @@ components:
           type: integer
           format: int32
       additionalProperties: false
-    StockSortField:
-      enum:
-        - nameAsc
-        - nameDesc
-      type: string
     StockStatisticResponse:
       required:
         - totalStocks
@@ -5286,7 +5333,7 @@ components:
         signal:
           type: string
       additionalProperties: false
-    StrategyResultResponse:
+    StrategyResults:
       required:
         - strategies
       type: object
@@ -5320,12 +5367,12 @@ components:
           type: integer
           format: int32
       additionalProperties: false
-    TgTokenResponse:
+    TelegramTokenResponse:
       required:
-        - tgToken
+        - telegramToken
       type: object
       properties:
-        tgToken:
+        telegramToken:
           type: string
       additionalProperties: false
     TickerResults:
@@ -5381,7 +5428,7 @@ components:
         description:
           type: string
       additionalProperties: false
-    TradeCodeResponsePagedResult:
+    TradeCodeResponsePageResult:
       required:
         - items
         - totalCount
@@ -5400,58 +5447,11 @@ components:
           format: int32
           readOnly: true
       additionalProperties: false
-    TradeRemindResponse:
-      required:
-        - dateTime
-        - id
-        - textRemind
-        - tradeCodeId
-        - userId
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        textRemind:
-          type: string
-        dateTime:
-          type: string
-          format: date-time
-        tradeCodeId:
-          type: integer
-          format: int32
-        userId:
-          type: integer
-          format: int32
-      additionalProperties: false
-    TradeRemindResponsePagedResult:
-      required:
-        - items
-        - totalCount
-        - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/TradeRemindResponse'
-        totalCount:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-          readOnly: true
-      additionalProperties: false
-    TradeRemindStatisticResponse:
-      required:
-        - totalReminds
-      type: object
-      properties:
-        totalReminds:
-          type: integer
-          format: int32
-      additionalProperties: false
+    TradeCodeSortField:
+      enum:
+        - nameAsc
+        - nameDesc
+      type: string
     TradeResponse:
       required:
         - count
@@ -5501,7 +5501,7 @@ components:
           type: integer
           format: int32
       additionalProperties: false
-    TradeResponsePagedResult:
+    TradeResponsePageResult:
       required:
         - items
         - totalCount
@@ -5578,7 +5578,7 @@ components:
         isActive:
           type: boolean
       additionalProperties: false
-    TradeStrategyResponsePagedResult:
+    TradeStrategyResponsePageResult:
       required:
         - items
         - totalCount
@@ -5605,13 +5605,13 @@ components:
         noteText:
           type: string
       additionalProperties: false
-    UpdateTradeRemindRequest:
+    UpdateReminderRequest:
       required:
         - dateTime
-        - textRemind
+        - text
       type: object
       properties:
-        textRemind:
+        text:
           type: string
         dateTime:
           type: string
@@ -5670,7 +5670,7 @@ components:
         registerDate:
           type: string
           format: date-time
-        tgId:
+        telegramId:
           type: string
       additionalProperties: false
     UserSessionResponse:
@@ -5696,7 +5696,7 @@ components:
           type: string
           format: date-time
       additionalProperties: false
-    UserSessionResponsePagedResult:
+    UserSessionResponsePageResult:
       required:
         - items
         - totalCount
@@ -5732,7 +5732,7 @@ components:
           type: integer
           format: int32
       additionalProperties: false
-    UserStrategyTradeCodeResponsePagedResult:
+    UserStrategyTradeCodeResponsePageResult:
       required:
         - items
         - totalCount
@@ -5751,16 +5751,16 @@ components:
           format: int32
           readOnly: true
       additionalProperties: false
-    UserTgResponse:
+    UserTelegramResponse:
       required:
         - id
-        - tgId
+        - telegramId
       type: object
       properties:
         id:
           type: integer
           format: int32
-        tgId:
+        telegramId:
           type: string
       additionalProperties: false
     UserTradeStrategyResponse:
@@ -5780,7 +5780,7 @@ components:
           type: integer
           format: int32
       additionalProperties: false
-    UserTradeStrategyResponsePagedResult:
+    UserTradeStrategyResponsePageResult:
       required:
         - items
         - totalCount

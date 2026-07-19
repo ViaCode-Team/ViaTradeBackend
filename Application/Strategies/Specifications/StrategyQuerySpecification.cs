@@ -1,13 +1,11 @@
-using Application.Common.Models.Filters;
-using Application.Common.Models.Sort;
+using Application.Strategies.Queries;
 using Domain.Strategies.Entities;
-using Domain.Strategies.Enums;
 
 namespace Application.Common.Specifications;
 
 public class StrategyQuerySpecification : BaseQuerySpecification<TradeStrategy>
 {
-	public StrategyQuerySpecification(int userId, StrategyFilterRequest filter, StrategySortRequest sort)
+	public StrategyQuerySpecification(int userId, StrategyFilter filter, StrategySort sort)
 	{
 		if (filter.IsActive is bool isActive)
 		{

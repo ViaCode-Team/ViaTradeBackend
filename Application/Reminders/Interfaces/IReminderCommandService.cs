@@ -5,23 +5,23 @@ public interface IReminderCommandService
 	Task CreateAsync(
 		int userId,
 		int tradeCodeId,
-		string textRemind,
+		string text,
 		DateTime dateTime,
 		CancellationToken ct);
 
 	Task UpdateAsync(
-		int remindId,
+		int reminderId,
 		int userId,
-		string textRemind,
+		string text,
 		DateTime dateTime,
 		CancellationToken ct);
 
 	Task DeleteAsync(
-		int remindId,
+		int reminderId,
 		int userId,
 		CancellationToken ct);
 
 	Task DeleteAsync(
-		int remindId,
+		int reminderId,
 		CancellationToken ct);
 }

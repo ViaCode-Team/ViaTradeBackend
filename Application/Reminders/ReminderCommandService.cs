@@ -1,68 +1,68 @@
 using Application.Common.Interfaces;
 using Application.Reminders.Interfaces;
-using Domain.Reminds.Entities;
+using Domain.Reminders.Entities;
 
 namespace Application.Reminders;
 
 public class ReminderCommandService(
-	IReminderRepository remindRepository,
+	IReminderRepository reminderRepository,
 	IUnitOfWork UoW) : IReminderCommandService
 {
 	public async Task CreateAsync(
 		int userId,
 		int tradeCodeId,
-		string textRemind,
+		string text,
 		DateTime dateTime,
 		CancellationToken ct)
 	{
-		var remind = new Reminder
+		var reminder = new Reminder
 		{
-			TextRemind = textRemind,
+			Text = text,
 			DateTime = dateTime,
 			TradeCodeId = tradeCodeId,
 			UserId = userId
 		};
 
-		await remindRepository.AddAsync(remind, ct);
+		await reminderRepository.AddAsync(reminder, ct);
 
 		await UoW.SaveChangesAsync(ct);
 	}
 
 	public async Task UpdateAsync(
-		int remindId,
+		int reminderId,
 		int userId,
-		string textRemind,
+		string text,
 		DateTime dateTime,
 		CancellationToken ct)
 	{
-		int rows = await remindRepository.ExecuteUpdateUserRemindAsync(
-			remindId,
+		int rows = await reminderRepository.UpdateForUserAsync(
+			reminderId,
 			userId,
-			textRemind,
+			text,
 			dateTime,
 			ct);
 
 		if (rows == 0)
-			throw new Exception("Remind not found.");
+			throw new KeyNotFoundException("Reminder not found.");
 	}
 
-	public async Task DeleteAsync(int remindId, int userId, CancellationToken ct)
+	public async Task DeleteAsync(int reminderId, int userId, CancellationToken ct)
 	{
-		int rows = await remindRepository.ExecuteDeleteAsync(
-			x => x.Id == remindId && x.UserId == userId,
+		int rows = await reminderRepository.ExecuteDeleteAsync(
+			x => x.Id == reminderId && x.UserId == userId,
 			ct);
 
 		if (rows == 0)
-			throw new Exception("Remind not found.");
+			throw new KeyNotFoundException("Reminder not found.");
 	}
 
-	public async Task DeleteAsync(int remindId, CancellationToken ct)
+	public async Task DeleteAsync(int reminderId, CancellationToken ct)
 	{
-		int rows = await remindRepository.ExecuteDeleteAsync(
-			x => x.Id == remindId,
+		int rows = await reminderRepository.ExecuteDeleteAsync(
+			x => x.Id == reminderId,
 			ct);
 
 		if (rows == 0)
-			throw new Exception("Remind not found.");
+			throw new KeyNotFoundException("Reminder not found.");
 	}
 }
