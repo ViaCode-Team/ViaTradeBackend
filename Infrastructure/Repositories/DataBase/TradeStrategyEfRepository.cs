@@ -8,7 +8,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Infrastructure.Repositories.DataBase;
 
 public class TradeStrategyEfRepository(AppDbContext context)
-	: GenericEfRepository<TradeStrategy>(context), ITradeStrategyRepository
+	: GenericEfRepository<TradeStrategy>(context),
+		ITradeStrategyRepository
 {
 	public async Task<int> CountAsync(CancellationToken ct = default)
 	{
@@ -17,16 +18,15 @@ public class TradeStrategyEfRepository(AppDbContext context)
 
 	public async Task<TradeStrategy?> GetByNameAsync(string name, CancellationToken ct = default)
 	{
-		return await _dbSet
-			.Where(tradeStrategy => tradeStrategy.Name == name)
-			.FirstOrDefaultAsync(ct);
+		return await _dbSet.Where(tradeStrategy => tradeStrategy.Name == name).FirstOrDefaultAsync(ct);
 	}
 
 	public async Task<PageResult<TradeStrategy>> GetPagedFilteredAsync(
 		int userId,
 		IQuerySpecification<TradeStrategy> spec,
 		PageOptions page,
-		CancellationToken ct = default)
+		CancellationToken ct = default
+	)
 	{
 		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
 
@@ -37,7 +37,7 @@ public class TradeStrategyEfRepository(AppDbContext context)
 			.Select(tradeStrategy => new
 			{
 				Strategy = tradeStrategy,
-				IsActive = tradeStrategy.UserTradeStrategies!.Any(uts => uts.UserId == userId)
+				IsActive = tradeStrategy.UserTradeStrategies!.Any(uts => uts.UserId == userId),
 			})
 			.ToPagedAsync(page, ct);
 

@@ -1,6 +1,6 @@
+using System.Linq.Expressions;
 using Domain.Trades.Entities;
 using Domain.Trades.Enums;
-using System.Linq.Expressions;
 
 namespace Domain.Statistics.Services;
 

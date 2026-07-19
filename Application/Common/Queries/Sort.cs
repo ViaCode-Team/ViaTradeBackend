@@ -2,7 +2,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Application.Common.Queries;
 
-public abstract record Sort<TField> : IValidatableObject where TField : struct, Enum
+public abstract record Sort<TField> : IValidatableObject
+	where TField : struct, Enum
 {
 	public List<TField> SortBy { get; init; } = [];
 
@@ -16,12 +17,7 @@ public abstract record Sort<TField> : IValidatableObject where TField : struct, 
 		if (effectiveSort.Count <= 1)
 			yield break;
 
-		var baseFields = effectiveSort
-			.Select(x => x
-				.ToString()
-				.Replace("Asc", "")
-				.Replace("Desc", ""))
-			.ToList();
+		var baseFields = effectiveSort.Select(x => x.ToString().Replace("Asc", "").Replace("Desc", "")).ToList();
 
 		if (baseFields.Distinct().Count() != baseFields.Count)
 		{

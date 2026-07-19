@@ -7,5 +7,5 @@ public enum SignalSortField
 	AssetAsc,
 	AssetDesc,
 	AccuracyAsc,
-	AccuracyDesc
+	AccuracyDesc,
 }

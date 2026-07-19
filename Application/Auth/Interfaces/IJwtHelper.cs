@@ -1,5 +1,5 @@
-using Domain.Users.Entities;
 using System.Security.Claims;
+using Domain.Users.Entities;
 
 namespace Application.Auth.Interfaces;
 

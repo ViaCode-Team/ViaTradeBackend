@@ -9,4 +9,3 @@ public record NoteResponse(
 	int? TradeCodeId,
 	int? TradeStrategyId
 );
-

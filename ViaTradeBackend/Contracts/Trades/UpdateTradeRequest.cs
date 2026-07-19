@@ -1,5 +1,5 @@
-using Domain.Trades.Enums;
 using System.ComponentModel.DataAnnotations;
+using Domain.Trades.Enums;
 
 namespace ViaTradeBackend.Contracts.Trades;
 
@@ -13,4 +13,3 @@ public record UpdateTradeRequest(
 	int TradeTypeId,
 	int TradeCodeId
 );
-

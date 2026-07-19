@@ -7,8 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase;
 
-public class TradeCodeEfRepository(AppDbContext context)
-	: GenericEfRepository<TradeCode>(context), ITradeCodeRepository
+public class TradeCodeEfRepository(AppDbContext context) : GenericEfRepository<TradeCode>(context), ITradeCodeRepository
 {
 	public async Task<int> CountAsync(CancellationToken ct)
 	{
@@ -17,20 +16,19 @@ public class TradeCodeEfRepository(AppDbContext context)
 
 	public async Task<TradeCode?> GetByExchangeIdAsync(string code, CancellationToken ct)
 	{
-		return await _dbSet
-			.Where(e => e.ExchangeId == code)
-			.FirstOrDefaultAsync(ct);
+		return await _dbSet.Where(e => e.ExchangeId == code).FirstOrDefaultAsync(ct);
 	}
 
 	public async Task<int?> GetIdByExchangeIdAsync(string code, CancellationToken ct)
 	{
-		return await _dbSet
-			.Where(e => e.ExchangeId == code)
-			.Select(e => (int?)e.Id)
-			.FirstOrDefaultAsync(ct);
+		return await _dbSet.Where(e => e.ExchangeId == code).Select(e => (int?)e.Id).FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<PageResult<TradeCode>> GetCodesPagedAsync(PageOptions page, TradeCodeSort sort, CancellationToken ct)
+	public async Task<PageResult<TradeCode>> GetCodesPagedAsync(
+		PageOptions page,
+		TradeCodeSort sort,
+		CancellationToken ct
+	)
 	{
 		var query = _dbSet.AsQueryable();
 
@@ -46,7 +44,7 @@ public class TradeCodeEfRepository(AppDbContext context)
 					orderedQuery = field switch
 					{
 						TradeCodeSortField.NameDesc => query.OrderByDescending(e => e.ExchangeId),
-						_ => query.OrderBy(e => e.ExchangeId)
+						_ => query.OrderBy(e => e.ExchangeId),
 					};
 				}
 				else
@@ -54,7 +52,7 @@ public class TradeCodeEfRepository(AppDbContext context)
 					orderedQuery = field switch
 					{
 						TradeCodeSortField.NameDesc => orderedQuery.ThenByDescending(e => e.ExchangeId),
-						_ => orderedQuery.ThenBy(e => e.ExchangeId)
+						_ => orderedQuery.ThenBy(e => e.ExchangeId),
 					};
 				}
 			}

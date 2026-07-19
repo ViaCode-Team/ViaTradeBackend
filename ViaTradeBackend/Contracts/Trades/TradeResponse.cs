@@ -1,4 +1,3 @@
-
 using Domain.Trades.Enums;
 
 namespace ViaTradeBackend.Contracts.Trades;
@@ -17,4 +16,3 @@ public record TradeResponse(
 	int TradeCodeId,
 	int UserId
 );
-

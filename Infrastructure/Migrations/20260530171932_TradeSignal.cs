@@ -15,14 +15,13 @@ public partial class TradeSignal : Migration
 			table: "Trades",
 			type: "int",
 			nullable: false,
-			defaultValue: 0);
+			defaultValue: 0
+		);
 	}
 
 	/// <inheritdoc />
 	protected override void Down(MigrationBuilder migrationBuilder)
 	{
-		migrationBuilder.DropColumn(
-			name: "TradeSignal",
-			table: "Trades");
+		migrationBuilder.DropColumn(name: "TradeSignal", table: "Trades");
 	}
 }

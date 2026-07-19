@@ -9,14 +9,15 @@ public class ServicePasswordAttribute() : ActionFilterAttribute
 {
 	public override void OnActionExecuting(ActionExecutingContext context)
 	{
-		var options = context.HttpContext.RequestServices
-			.GetRequiredService<IOptions<ServiceSecurity>>();
+		var options = context.HttpContext.RequestServices.GetRequiredService<IOptions<ServiceSecurity>>();
 
 		var expectedPassword = options.Value.Password;
 		var providedPassword = context.HttpContext.Request.Headers["TgBot-Service-Password"];
 
-		if (string.IsNullOrWhiteSpace(providedPassword) ||
-			!string.Equals(providedPassword, expectedPassword, StringComparison.Ordinal))
+		if (
+			string.IsNullOrWhiteSpace(providedPassword)
+			|| !string.Equals(providedPassword, expectedPassword, StringComparison.Ordinal)
+		)
 		{
 			context.Result = new ForbidResult();
 		}

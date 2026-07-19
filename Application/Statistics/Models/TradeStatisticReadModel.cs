@@ -8,4 +8,3 @@ public class TradeStatisticReadModel
 
 	public int LoseTrades { get; set; }
 }
-

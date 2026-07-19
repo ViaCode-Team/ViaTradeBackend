@@ -13,7 +13,8 @@ public class AuthCommandService(
 	IJwtHelper jwtHelper,
 	ISessionRepository sessionRepository,
 	IRefreshTokenRepository refreshTokenRepository,
-	IUnitOfWork uow) : IAuthCommandService
+	IUnitOfWork uow
+) : IAuthCommandService
 {
 	private readonly TimeSpan _sessionTtl = TimeSpan.FromDays(7);
 
@@ -32,7 +33,7 @@ public class AuthCommandService(
 			UserId = user.Id,
 			UserAgent = userAgent,
 			CreatedAt = DateTime.UtcNow,
-			LastSeen = DateTime.UtcNow
+			LastSeen = DateTime.UtcNow,
 		};
 
 		await sessionRepository.CreateAsync(session, _sessionTtl);
@@ -42,11 +43,7 @@ public class AuthCommandService(
 
 		await refreshTokenRepository.StoreAsync(sessionId, refreshToken, _sessionTtl);
 
-		return new AuthTokens
-		{
-			AccessToken = accessToken,
-			RefreshToken = refreshToken
-		};
+		return new AuthTokens { AccessToken = accessToken, RefreshToken = refreshToken };
 	}
 
 	public async Task LogoutAllAsync(int userId, CancellationToken ct)
@@ -72,14 +69,12 @@ public class AuthCommandService(
 
 	public async Task<AuthTokens> RefreshTokenAsync(string refreshToken, CancellationToken ct)
 	{
-		var sessionId = await refreshTokenRepository.GetSessionIdAsync(refreshToken)
-			?? throw new UnauthorizedAccessException();
+		var sessionId =
+			await refreshTokenRepository.GetSessionIdAsync(refreshToken) ?? throw new UnauthorizedAccessException();
 
-		var session = await sessionRepository.GetAsync(sessionId)
-			?? throw new UnauthorizedAccessException();
+		var session = await sessionRepository.GetAsync(sessionId) ?? throw new UnauthorizedAccessException();
 
-		var user = await userRepository.GetByIdAsync(session.UserId, ct)
-			?? throw new UnauthorizedAccessException();
+		var user = await userRepository.GetByIdAsync(session.UserId, ct) ?? throw new UnauthorizedAccessException();
 
 		session.LastSeen = DateTime.UtcNow;
 		await sessionRepository.CreateAsync(session, _sessionTtl);
@@ -89,11 +84,7 @@ public class AuthCommandService(
 
 		await refreshTokenRepository.RotateAsync(sessionId, newRefreshToken, _sessionTtl);
 
-		return new AuthTokens
-		{
-			AccessToken = newAccessToken,
-			RefreshToken = newRefreshToken
-		};
+		return new AuthTokens { AccessToken = newAccessToken, RefreshToken = newRefreshToken };
 	}
 
 	public async Task<AuthTokens> RegisterAsync(string login, string password, string userAgent, CancellationToken ct)
@@ -105,7 +96,7 @@ public class AuthCommandService(
 		{
 			Login = login,
 			HashPassword = passwordHasher.Hash(password),
-			RegisterDate = DateTime.UtcNow
+			RegisterDate = DateTime.UtcNow,
 		};
 
 		await userRepository.AddAsync(user, ct);

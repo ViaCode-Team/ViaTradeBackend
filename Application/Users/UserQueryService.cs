@@ -3,9 +3,8 @@ using Domain.Users.Entities;
 
 namespace Application.Users;
 
-public class UserQueryService(
-	IUserRepository userRepository,
-	ITelegramTokenRepository telegramTokenRepository) : IUserQueryService
+public class UserQueryService(IUserRepository userRepository, ITelegramTokenRepository telegramTokenRepository)
+	: IUserQueryService
 {
 	public async Task<IEnumerable<User>> GetWithTgLinkAsync(CancellationToken ct)
 	{

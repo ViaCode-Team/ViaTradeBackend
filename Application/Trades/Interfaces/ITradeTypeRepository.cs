@@ -3,6 +3,4 @@ using Domain.Trades.Entities;
 
 namespace Application.Trades.Interfaces;
 
-public interface ITradeTypeRepository : IRepository<TradeType>
-{
-}
+public interface ITradeTypeRepository : IRepository<TradeType> { }

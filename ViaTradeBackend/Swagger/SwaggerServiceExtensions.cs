@@ -1,6 +1,6 @@
+using System.Reflection;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Reflection;
 using ViaTradeBackend.Swagger.Filters;
 
 namespace ViaTradeBackend.Swagger;
@@ -13,12 +13,15 @@ public static class SwaggerServiceExtensions
 
 		services.AddSwaggerGen(options =>
 		{
-			options.SwaggerDoc("v1", new OpenApiInfo
-			{
-				Title = "ViaTrade API",
-				Version = "v1",
-				Description = "API для платформы инвестиционного анализа ViaTrade"
-			});
+			options.SwaggerDoc(
+				"v1",
+				new OpenApiInfo
+				{
+					Title = "ViaTrade API",
+					Version = "v1",
+					Description = "API для платформы инвестиционного анализа ViaTrade",
+				}
+			);
 
 			options.SupportNonNullableReferenceTypes();
 			options.NonNullableReferenceTypesAsRequired();

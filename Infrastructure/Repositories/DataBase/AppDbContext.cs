@@ -22,35 +22,29 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{
-		modelBuilder.Entity<TradeCode>()
-			.HasIndex(x => x.ExchangeId)
+		modelBuilder.Entity<TradeCode>().HasIndex(x => x.ExchangeId).IsUnique();
+
+		modelBuilder.Entity<TradeStrategy>().HasIndex(x => x.Name).IsUnique();
+
+		modelBuilder.Entity<TradeType>().HasIndex(x => x.Name).IsUnique();
+
+		modelBuilder.Entity<UserTradeCode>().HasIndex(x => new { x.UserId, x.TradeCodeId }).IsUnique();
+
+		modelBuilder.Entity<UserTradeStrategy>().HasIndex(x => new { x.UserId, x.TradeStrategyId }).IsUnique();
+
+		modelBuilder
+			.Entity<UserStrategyTradeCode>()
+			.HasIndex(x => new
+			{
+				x.UserId,
+				x.TradeCodeId,
+				x.StrategyId,
+			})
 			.IsUnique();
 
-		modelBuilder.Entity<TradeStrategy>()
-			.HasIndex(x => x.Name)
-			.IsUnique();
+		modelBuilder.Entity<Reminder>().HasIndex(x => x.UserId);
 
-		modelBuilder.Entity<TradeType>()
-			.HasIndex(x => x.Name)
-			.IsUnique();
-
-		modelBuilder.Entity<UserTradeCode>()
-			.HasIndex(x => new { x.UserId, x.TradeCodeId })
-			.IsUnique();
-
-		modelBuilder.Entity<UserTradeStrategy>()
-			.HasIndex(x => new { x.UserId, x.TradeStrategyId })
-			.IsUnique();
-
-		modelBuilder.Entity<UserStrategyTradeCode>()
-			.HasIndex(x => new { x.UserId, x.TradeCodeId, x.StrategyId })
-			.IsUnique();
-
-		modelBuilder.Entity<Reminder>()
-			.HasIndex(x => x.UserId);
-
-		modelBuilder.Entity<Reminder>()
-			.ToTable("TradeReminds");
+		modelBuilder.Entity<Reminder>().ToTable("TradeReminds");
 
 		modelBuilder.Entity<Note>(entity =>
 		{
@@ -58,8 +52,12 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 			entity.HasOne(n => n.TradeCode).WithMany().HasForeignKey(n => n.TradeCodeId).IsRequired(false);
 			entity.HasOne(n => n.TradeStrategy).WithMany().HasForeignKey(n => n.TradeStrategyId).IsRequired(false);
 
-			entity.ToTable(t => t.HasCheckConstraint("CK_Note_ExclusiveTarget",
-			  "(`TradeCodeId` IS NOT NULL AND `TradeStrategyId` IS NULL) OR (`TradeCodeId` IS NULL AND `TradeStrategyId` IS NOT NULL)"));
+			entity.ToTable(t =>
+				t.HasCheckConstraint(
+					"CK_Note_ExclusiveTarget",
+					"(`TradeCodeId` IS NOT NULL AND `TradeStrategyId` IS NULL) OR (`TradeCodeId` IS NULL AND `TradeStrategyId` IS NOT NULL)"
+				)
+			);
 
 			entity.HasIndex(x => x.UserId);
 		});
@@ -71,45 +69,73 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 			entity.Ignore(t => t.NetIncome);
 		});
 
-		modelBuilder.Entity<TradeStrategy>().HasData(
-			new
-			{
-				Id = 1,
-				Name = "TrendFollowingStrategy",
-				Description = "Basic trend-following strategy for an asset. Minimal risk, rare signals.",
-				Accuracy = 81,
-				SignalFrequency = "1-2 times a month",
-				InvestmentHorizon = "1-3 weeks",
-				LogicDesc = "Analysis of a long-term chart to confirm movement",
-				UseDesc = "Follow the main trend, during low or medium volatility",
-				LimitDesc = "Strategy exclusively for following the trend",
-				CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-				IsActive = true
-			},
-			new
-			{
-				Id = 2,
-				Name = "Test",
-				Description = "Test strategy. 100000% profit per nanosecond",
-				Accuracy = 99,
-				SignalFrequency = "3 times a month",
-				InvestmentHorizon = "up to 1 week",
-				LogicDesc = "Very clear",
-				UseDesc = "Use it however you like",
-				LimitDesc = "SuperStart",
-				CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
-				IsActive = true
-			}
-		);
+		modelBuilder
+			.Entity<TradeStrategy>()
+			.HasData(
+				new
+				{
+					Id = 1,
+					Name = "TrendFollowingStrategy",
+					Description = "Basic trend-following strategy for an asset. Minimal risk, rare signals.",
+					Accuracy = 81,
+					SignalFrequency = "1-2 times a month",
+					InvestmentHorizon = "1-3 weeks",
+					LogicDesc = "Analysis of a long-term chart to confirm movement",
+					UseDesc = "Follow the main trend, during low or medium volatility",
+					LimitDesc = "Strategy exclusively for following the trend",
+					CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+					IsActive = true,
+				},
+				new
+				{
+					Id = 2,
+					Name = "Test",
+					Description = "Test strategy. 100000% profit per nanosecond",
+					Accuracy = 99,
+					SignalFrequency = "3 times a month",
+					InvestmentHorizon = "up to 1 week",
+					LogicDesc = "Very clear",
+					UseDesc = "Use it however you like",
+					LimitDesc = "SuperStart",
+					CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+					IsActive = true,
+				}
+			);
 
-		modelBuilder.Entity<TradeCode>().HasData(
-			new { Id = 1, ExchangeId = "GAZP", Description = "Gazprom", CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-			new { Id = 2, ExchangeId = "GMKN", Description = "Nornickel", CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
-		);
+		modelBuilder
+			.Entity<TradeCode>()
+			.HasData(
+				new
+				{
+					Id = 1,
+					ExchangeId = "GAZP",
+					Description = "Gazprom",
+					CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+				},
+				new
+				{
+					Id = 2,
+					ExchangeId = "GMKN",
+					Description = "Nornickel",
+					CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+				}
+			);
 
-		modelBuilder.Entity<TradeType>().HasData(
-			new { Id = 1, Name = "Stock", CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) },
-			new { Id = 2, Name = "Futures", CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc) }
-		);
+		modelBuilder
+			.Entity<TradeType>()
+			.HasData(
+				new
+				{
+					Id = 1,
+					Name = "Stock",
+					CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+				},
+				new
+				{
+					Id = 2,
+					Name = "Futures",
+					CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
+				}
+			);
 	}
 }

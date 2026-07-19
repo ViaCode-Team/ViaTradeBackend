@@ -7,15 +7,15 @@ namespace Application.Strategies;
 public class StrategyCommandService(
 	IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository,
 	IUserTradeStrategyRepository userTradeStrategyRepository,
-	IUnitOfWork uow) : IStrategyCommandService
+	IUnitOfWork uow
+) : IStrategyCommandService
 {
 	public async Task CreateCodeAsync(int userId, int strategyId, int tradeCodeId, CancellationToken ct)
 	{
 		bool isUserStrategyCodeExist = await userStrategyTradeCodeRepository.ExistsAsync(
-			e => e.UserId == userId &&
-			e.StrategyId == strategyId &&
-			e.TradeCodeId == tradeCodeId,
-			ct);
+			e => e.UserId == userId && e.StrategyId == strategyId && e.TradeCodeId == tradeCodeId,
+			ct
+		);
 
 		if (isUserStrategyCodeExist)
 			throw new InvalidOperationException("User strategy code already exists");
@@ -24,7 +24,7 @@ public class StrategyCommandService(
 		{
 			UserId = userId,
 			TradeCodeId = tradeCodeId,
-			StrategyId = strategyId
+			StrategyId = strategyId,
 		};
 
 		await userStrategyTradeCodeRepository.AddAsync(newUserStrategyCode, ct);
@@ -35,16 +35,13 @@ public class StrategyCommandService(
 	{
 		var isUserExist = await userTradeStrategyRepository.ExistsAsync(
 			e => e.UserId == userId && e.TradeStrategyId == strategyId,
-			ct);
+			ct
+		);
 
 		if (isUserExist)
 			throw new InvalidOperationException("User strategy already exists");
 
-		var strategyLink = new UserTradeStrategy
-		{
-			UserId = userId,
-			TradeStrategyId = strategyId
-		};
+		var strategyLink = new UserTradeStrategy { UserId = userId, TradeStrategyId = strategyId };
 
 		await userTradeStrategyRepository.AddAsync(strategyLink, ct);
 		await uow.SaveChangesAsync(ct);
@@ -53,10 +50,9 @@ public class StrategyCommandService(
 	public async Task DeleteCodeAsync(int userId, int strategyId, int tradeCodeId, CancellationToken ct)
 	{
 		var affectedRows = await userStrategyTradeCodeRepository.ExecuteDeleteAsync(
-			e => e.UserId == userId &&
-				 e.StrategyId == strategyId &&
-				 e.TradeCodeId == tradeCodeId,
-			ct);
+			e => e.UserId == userId && e.StrategyId == strategyId && e.TradeCodeId == tradeCodeId,
+			ct
+		);
 
 		if (affectedRows == 0)
 			throw new KeyNotFoundException("User strategy code not found");
@@ -66,7 +62,8 @@ public class StrategyCommandService(
 	{
 		var affectedRows = await userTradeStrategyRepository.ExecuteDeleteAsync(
 			e => e.UserId == userId && e.TradeStrategyId == strategyId,
-			ct);
+			ct
+		);
 
 		if (affectedRows == 0)
 			throw new KeyNotFoundException("User strategy not found");

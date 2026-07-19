@@ -1,6 +1,3 @@
 namespace ViaTradeBackend.Contracts.Statistics;
 
-public record StockStatisticResponse(
-	int TotalStocks
-);
-
+public record StockStatisticResponse(int TotalStocks);

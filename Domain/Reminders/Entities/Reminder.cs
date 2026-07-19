@@ -1,7 +1,7 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Common;
 using Domain.TradeCodes.Entities;
 using Domain.Users.Entities;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Reminders.Entities;
 

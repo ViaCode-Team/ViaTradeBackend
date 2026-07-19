@@ -1,7 +1,7 @@
-using Application.Trades.Interfaces;
-using Domain.Trades.Entities;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Application.Trades.Interfaces;
+using Domain.Trades.Entities;
 
 namespace Infrastructure.Utils;
 
@@ -44,18 +44,22 @@ public class TradeDataBuilder : ITradeDataBuilder
 			return false;
 
 		// Try to parse dates with invariant culture to avoid locale issues
-		if (!DateTime.TryParseExact(
+		if (
+			!DateTime.TryParseExact(
 				match.Groups["Start"].Value,
 				"yyyy-MM-dd",
 				CultureInfo.InvariantCulture,
 				DateTimeStyles.None,
-				out var startDate) ||
-			!DateTime.TryParseExact(
+				out var startDate
+			)
+			|| !DateTime.TryParseExact(
 				match.Groups["End"].Value,
 				"yyyy-MM-dd",
 				CultureInfo.InvariantCulture,
 				DateTimeStyles.None,
-				out var endDate))
+				out var endDate
+			)
+		)
 			return false;
 
 		result = new TradeCodeFile

@@ -11,7 +11,8 @@ public class TradeCommandService(
 	ITradeRepository tradeRepository,
 	ITradeCodeRepository tradeCodeRepository,
 	ITradeTypeRepository tradeTypeRepository,
-	IUnitOfWork uow) : ITradeCommandService
+	IUnitOfWork uow
+) : ITradeCommandService
 {
 	public async Task<Trade> CreateAsync(int userId, TradeInput request, CancellationToken ct)
 	{
@@ -35,7 +36,11 @@ public class TradeCommandService(
 			UserId = userId,
 			TradeSignal = request.TradeSignal,
 			Price = (decimal)request.TradeOpen * request.Count,
-			NetIncome = TradeStatisticsCalcService.CalculateNetIncome(request.TradeOpen, request.TradeClose, request.TradeSignal)
+			NetIncome = TradeStatisticsCalcService.CalculateNetIncome(
+				request.TradeOpen,
+				request.TradeClose,
+				request.TradeSignal
+			),
 		};
 
 		await tradeRepository.AddAsync(trade, ct);
@@ -67,7 +72,11 @@ public class TradeCommandService(
 		if (!isTradeTypeExist)
 			throw new ArgumentException($"TradeType {request.TradeTypeId} not found");
 
-		var netIncome = TradeStatisticsCalcService.CalculateNetIncome(request.TradeOpen, request.TradeClose, request.TradeSignal);
+		var netIncome = TradeStatisticsCalcService.CalculateNetIncome(
+			request.TradeOpen,
+			request.TradeClose,
+			request.TradeSignal
+		);
 		var price = (decimal)request.TradeOpen * request.Count;
 
 		var affectedRows = await tradeRepository.UpdateAsync(id, userId, request, netIncome, price, ct);

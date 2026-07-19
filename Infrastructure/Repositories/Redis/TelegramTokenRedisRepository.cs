@@ -4,7 +4,9 @@ using StackExchange.Redis;
 
 namespace Infrastructure.Repositories.Redis;
 
-public class TelegramTokenRedisRepository(IConnectionMultiplexer redis) : RedisRepository<TelegramTokenEntity>(redis, "TgToken:"), ITelegramTokenRepository
+public class TelegramTokenRedisRepository(IConnectionMultiplexer redis)
+	: RedisRepository<TelegramTokenEntity>(redis, "TgToken:"),
+		ITelegramTokenRepository
 {
 	public async Task SetAsync(string token, int userId, TimeSpan expiry)
 	{

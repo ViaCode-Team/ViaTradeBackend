@@ -1,5 +1,5 @@
-using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Exceptions;
 
 namespace ViaTradeBackend.Middleware;
@@ -66,7 +66,7 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
 			),
 
 #if !DEBUG
-            _ => HandleAll(),
+			_ => HandleAll(),
 #else
 			_ => throw exception // In DEBUG mode, propagate exception for debugging
 #endif
@@ -82,9 +82,7 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
 			exception.GetType().Name
 		);
 
-		await context.Response.WriteAsync(
-			JsonSerializer.Serialize(problem)
-		);
+		await context.Response.WriteAsync(JsonSerializer.Serialize(problem));
 	}
 
 	private static ProblemDetails HandleAll()
@@ -97,19 +95,14 @@ public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<Exception
 		);
 	}
 
-	private static ProblemDetails CreateProblem(
-		int status,
-		string title,
-		string type,
-		string detail
-	)
+	private static ProblemDetails CreateProblem(int status, string title, string type, string detail)
 	{
 		return new ProblemDetails
 		{
 			Status = status,
 			Title = title,
 			Type = type,
-			Detail = detail
+			Detail = detail,
 		};
 	}
 }

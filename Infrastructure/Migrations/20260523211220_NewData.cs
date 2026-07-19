@@ -18,21 +18,16 @@ public partial class NewData : Migration
 			values: new object[,]
 			{
 				{ 1, "Акция" },
-				{ 2, "Фьючерс" }
-			});
+				{ 2, "Фьючерс" },
+			}
+		);
 	}
 
 	/// <inheritdoc />
 	protected override void Down(MigrationBuilder migrationBuilder)
 	{
-		migrationBuilder.DeleteData(
-			table: "TradeTypes",
-			keyColumn: "Id",
-			keyValue: 1);
+		migrationBuilder.DeleteData(table: "TradeTypes", keyColumn: "Id", keyValue: 1);
 
-		migrationBuilder.DeleteData(
-			table: "TradeTypes",
-			keyColumn: "Id",
-			keyValue: 2);
+		migrationBuilder.DeleteData(table: "TradeTypes", keyColumn: "Id", keyValue: 2);
 	}
 }

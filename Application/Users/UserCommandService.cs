@@ -1,15 +1,15 @@
-using Application.Users.Interfaces;
 using System.Security.Cryptography;
+using Application.Users.Interfaces;
 
 namespace Application.Users;
 
-public class UserCommandService(
-	IUserRepository userRepository,
-	ITelegramTokenRepository telegramTokenRepository) : IUserCommandService
+public class UserCommandService(IUserRepository userRepository, ITelegramTokenRepository telegramTokenRepository)
+	: IUserCommandService
 {
 	public async Task<string> GenerateTgLinkAsync(int userId, CancellationToken ct)
 	{
-		var token = Convert.ToBase64String(RandomNumberGenerator.GetBytes(24))
+		var token = Convert
+			.ToBase64String(RandomNumberGenerator.GetBytes(24))
 			.Replace("+", "-")
 			.Replace("/", "_")
 			.TrimEnd('=');

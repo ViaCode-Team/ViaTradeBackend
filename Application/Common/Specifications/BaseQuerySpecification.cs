@@ -1,5 +1,5 @@
-using Application.Common.Interfaces;
 using System.Linq.Expressions;
+using Application.Common.Interfaces;
 
 namespace Application.Common.Specifications;
 
@@ -15,9 +15,7 @@ public abstract class BaseQuerySpecification<T> : IQuerySpecification<T>
 		Criteria.Add(criteria);
 	}
 
-	protected BaseQuerySpecification()
-	{
-	}
+	protected BaseQuerySpecification() { }
 
 	protected void AddCriteria(Expression<Func<T, bool>> criteria)
 	{

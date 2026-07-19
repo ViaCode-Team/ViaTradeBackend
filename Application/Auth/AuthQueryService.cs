@@ -6,7 +6,11 @@ namespace Application.Auth;
 
 public class AuthQueryService(ISessionRepository sessionRepository) : IAuthQueryService
 {
-	public async Task<PageResult<UserSessionDto>> GetSessionsPagedAsync(int userId, PageOptions page, CancellationToken ct)
+	public async Task<PageResult<UserSessionDto>> GetSessionsPagedAsync(
+		int userId,
+		PageOptions page,
+		CancellationToken ct
+	)
 	{
 		return await sessionRepository.GetPagedUserSessionsAsync(userId, page);
 	}

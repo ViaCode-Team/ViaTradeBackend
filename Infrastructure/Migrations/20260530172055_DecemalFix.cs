@@ -16,7 +16,8 @@ public partial class DecemalFix : Migration
 			type: "decimal(18,2)",
 			nullable: false,
 			oldClrType: typeof(decimal),
-			oldType: "decimal(65,30)");
+			oldType: "decimal(65,30)"
+		);
 	}
 
 	/// <inheritdoc />
@@ -28,6 +29,7 @@ public partial class DecemalFix : Migration
 			type: "decimal(65,30)",
 			nullable: false,
 			oldClrType: typeof(decimal),
-			oldType: "decimal(18,2)");
+			oldType: "decimal(18,2)"
+		);
 	}
 }

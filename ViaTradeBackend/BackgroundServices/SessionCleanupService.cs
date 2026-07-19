@@ -7,7 +7,8 @@ namespace ViaTradeBackend.BackgroundServices;
 public class SessionCleanupService(
 	IServiceProvider services,
 	ILogger<SessionCleanupService> logger,
-	IOptions<AuthCookieOptions> options) : BackgroundService
+	IOptions<AuthCookieOptions> options
+) : BackgroundService
 {
 	private readonly TimeSpan _cleanupInterval = TimeSpan.FromHours(24);
 	private readonly int _sessionLifetimeDays = options.Value.RefreshTokenExpiryDays;

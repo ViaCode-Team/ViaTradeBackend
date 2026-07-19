@@ -5,4 +5,3 @@ public record GlobalStatisticResponse(
 	IncomeTradeStatisticResponse IncomeStatistic,
 	WinrateTradeStatisticResponse WinrateStatistic
 );
-

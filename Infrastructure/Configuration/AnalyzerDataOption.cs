@@ -11,5 +11,4 @@ public class AnalyzerDataOption
 	public required string StrategyResultDirectoryName { get; set; }
 
 	public required string ScrennerResultDirectoryName { get; set; }
-
 }

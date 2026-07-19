@@ -5,5 +5,5 @@ public enum TradeDataType
 	Futures,
 	Stocks,
 	Strategy,
-	Screener
+	Screener,
 }

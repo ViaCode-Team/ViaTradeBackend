@@ -1,5 +1,6 @@
 using Domain.Common;
 using Domain.Users.Entities;
+
 namespace Domain.TradeCodes.Entities;
 
 public sealed class UserTradeCode : BaseEntity<int>

@@ -1,5 +1,3 @@
 namespace Application.Strategies.Queries;
 
-public record StrategyFilter(
-	bool? IsActive
-);
+public record StrategyFilter(bool? IsActive);

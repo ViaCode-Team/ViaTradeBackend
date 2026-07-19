@@ -11,21 +11,20 @@ namespace Application.Trades.Services;
 public class TradeResultsService(
 	IFileReader tradefileReader,
 	ITradeStrategyRepository tradeStrategyRepository,
-	IUserTradeStrategyRepository userTradeStrategyRepository) : ITradeResultsService
+	IUserTradeStrategyRepository userTradeStrategyRepository
+) : ITradeResultsService
 {
 	public async Task<SignalStatisticReadModel> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
 		var signals = await GetAsync(userId, DateTime.Now, null, new SignalSort(), ct);
 
-		var allResults = signals.Strategies
-			.SelectMany(s => s.Tickers)
-			.SelectMany(t => t.Results);
+		var allResults = signals.Strategies.SelectMany(s => s.Tickers).SelectMany(t => t.Results);
 
 		return new SignalStatisticReadModel
 		{
 			TotalSignals = allResults.Count(),
 			BuySignals = allResults.Count(r => r.Signal == "BUY"),
-			SellSignals = allResults.Count(r => r.Signal == "SELL")
+			SellSignals = allResults.Count(r => r.Signal == "SELL"),
 		};
 	}
 
@@ -34,7 +33,8 @@ public class TradeResultsService(
 		DateTime? startDate,
 		DateTime? endDate,
 		SignalSort sort,
-		CancellationToken ct)
+		CancellationToken ct
+	)
 	{
 		if (startDate != null)
 		{
@@ -61,7 +61,8 @@ public class TradeResultsService(
 				TradeDataType.Strategy,
 				tradeCodes,
 				startDate,
-				endDate);
+				endDate
+			);
 
 			foreach (var result in results)
 			{
@@ -82,20 +83,15 @@ public class TradeResultsService(
 			.GroupBy(x => x.StrategyName)
 			.Select(g =>
 			{
-				var tickers = g
-					.GroupBy(x => x.TradeCode)
+				var tickers = g.GroupBy(x => x.TradeCode)
 					.Select(t => new TickerResults
 					{
 						TradeCode = t.Key,
 						Results = ApplyResultSorting(t.Select(x => x.Item), sortFields).ToList(),
-						Accuracy = t.Select(x => x.Accuracy).FirstOrDefault()
+						Accuracy = t.Select(x => x.Accuracy).FirstOrDefault(),
 					});
 
-				return new StrategyData
-				{
-					Name = g.Key,
-					Tickers = ApplyTickerSorting(tickers, sortFields).ToList()
-				};
+				return new StrategyData { Name = g.Key, Tickers = ApplyTickerSorting(tickers, sortFields).ToList() };
 			})
 			.ToList();
 
@@ -108,7 +104,8 @@ public class TradeResultsService(
 		string tradeCode,
 		DateTime? startDate,
 		DateTime? endDate,
-		CancellationToken ct)
+		CancellationToken ct
+	)
 	{
 		var userPreferences = await userTradeStrategyRepository.GetUserPreferencesAsync(userId, ct);
 		var preference = userPreferences.FirstOrDefault(x => x.Key == strategyName);
@@ -123,7 +120,8 @@ public class TradeResultsService(
 			TradeDataType.Strategy,
 			[tradeCode],
 			startDate,
-			endDate);
+			endDate
+		);
 
 		var filteredResults = results
 			.Where(r => r.TradeCode == tradeCode && r.StrategyName == strategyName)
@@ -143,15 +141,18 @@ public class TradeResultsService(
 						{
 							TradeCode = tradeCode,
 							Results = filteredResults,
-							Accuracy = accuracy
-						}
-					]
-				}
-			]
+							Accuracy = accuracy,
+						},
+					],
+				},
+			],
 		};
 	}
 
-	private static IEnumerable<StrategyResult> ApplyResultSorting(IEnumerable<StrategyResult> results, List<SignalSortField> sortFields)
+	private static IEnumerable<StrategyResult> ApplyResultSorting(
+		IEnumerable<StrategyResult> results,
+		List<SignalSortField> sortFields
+	)
 	{
 		if (sortFields.Count == 0)
 			return results.OrderByDescending(r => r.Date);
@@ -164,14 +165,17 @@ public class TradeResultsService(
 				(null, SignalSortField.DateTimeAsc) => results.OrderBy(r => r.Date),
 				(null, _) => results.OrderByDescending(r => r.Date),
 				(_, SignalSortField.DateTimeAsc) => orderedResults.ThenBy(r => r.Date),
-				(_, _) => orderedResults.ThenByDescending(r => r.Date)
+				(_, _) => orderedResults.ThenByDescending(r => r.Date),
 			};
 		}
 
 		return orderedResults ?? results.OrderByDescending(r => r.Date);
 	}
 
-	private static IEnumerable<TickerResults> ApplyTickerSorting(IEnumerable<TickerResults> tickers, List<SignalSortField> sortFields)
+	private static IEnumerable<TickerResults> ApplyTickerSorting(
+		IEnumerable<TickerResults> tickers,
+		List<SignalSortField> sortFields
+	)
 	{
 		if (sortFields.Count == 0)
 			return tickers;
@@ -190,7 +194,7 @@ public class TradeResultsService(
 				(_, SignalSortField.AssetDesc) => orderedTickers.ThenByDescending(t => t.TradeCode),
 				(_, SignalSortField.AccuracyDesc) => orderedTickers.ThenByDescending(t => t.Accuracy ?? 0),
 				(_, SignalSortField.AccuracyAsc) => orderedTickers.ThenBy(t => t.Accuracy ?? 0),
-				(_, _) => orderedTickers.ThenBy(t => 0)
+				(_, _) => orderedTickers.ThenBy(t => 0),
 			};
 		}
 

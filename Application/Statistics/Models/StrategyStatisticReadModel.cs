@@ -8,4 +8,3 @@ public class StrategyStatisticReadModel
 
 	public int DisabledStrategies { get; set; }
 }
-

@@ -20,5 +20,4 @@ public sealed class Note : BaseEntity<int>
 	public TradeCode? TradeCode { get; set; }
 
 	public TradeStrategy? TradeStrategy { get; set; }
-
 }

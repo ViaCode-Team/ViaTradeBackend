@@ -1,7 +1,3 @@
 namespace ViaTradeBackend.Contracts.Users;
 
-public record UserTelegramResponse(
-	int Id,
-	string TelegramId
-);
-
+public record UserTelegramResponse(int Id, string TelegramId);

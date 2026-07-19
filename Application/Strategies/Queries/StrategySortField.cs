@@ -5,5 +5,5 @@ public enum StrategySortField
 	NameAsc,
 	NameDesc,
 	AccuracyAsc,
-	AccuracyDesc
+	AccuracyDesc,
 }

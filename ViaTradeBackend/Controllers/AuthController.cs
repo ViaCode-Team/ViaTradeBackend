@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
 using Application.Auth.Models;
 using Application.Common.Queries;
@@ -7,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using System.ComponentModel.DataAnnotations;
 using ViaTradeBackend.Contracts.Auth;
 using ViaTradeBackend.Contracts.Users;
 
@@ -19,14 +19,13 @@ public class AuthController(
 	IAuthCommandService authCommandService,
 	IAuthQueryService authQueryService,
 	IJwtHelper jwtHelper,
-	IOptions<AuthCookieOptions> authOptions) : ControllerBase
+	IOptions<AuthCookieOptions> authOptions
+) : ControllerBase
 {
 	private readonly AuthCookieOptions _authCookiOptions = authOptions.Value;
 
 	[HttpPost("login")]
-	public async Task<NoContent> Login(
-		[FromBody, Required] LoginRequest request,
-		CancellationToken ct)
+	public async Task<NoContent> Login([FromBody, Required] LoginRequest request, CancellationToken ct)
 	{
 		var userAgent = Request.Headers.UserAgent.ToString();
 		var result = await authCommandService.LoginAsync(request.Login, request.Password, userAgent, ct);
@@ -36,9 +35,7 @@ public class AuthController(
 	}
 
 	[HttpPost("register")]
-	public async Task<Created> Register(
-		[FromBody, Required] RegisterRequest request,
-		CancellationToken ct)
+	public async Task<Created> Register([FromBody, Required] RegisterRequest request, CancellationToken ct)
 	{
 		var userAgent = Request.Headers.UserAgent.ToString();
 		var result = await authCommandService.RegisterAsync(request.Login, request.Password, userAgent, ct);
@@ -91,7 +88,8 @@ public class AuthController(
 	[Authorize]
 	public async Task<Ok<PageResult<UserSessionResponse>>> GetUserSessions(
 		[FromQuery] PageOptions page,
-		CancellationToken ct)
+		CancellationToken ct
+	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var userSessions = await authQueryService.GetSessionsPagedAsync(userId, page, ct);
@@ -110,8 +108,9 @@ public class AuthController(
 				Secure = true,
 				SameSite = SameSiteMode.Strict,
 				Expires = DateTimeOffset.UtcNow.AddHours(1),
-				Path = "/"
-			});
+				Path = "/",
+			}
+		);
 
 		Response.Cookies.Append(
 			_authCookiOptions.RefreshTokenCookie,
@@ -122,7 +121,8 @@ public class AuthController(
 				Secure = true,
 				SameSite = SameSiteMode.Strict,
 				Expires = DateTimeOffset.UtcNow.AddDays(7),
-				Path = "/"
-			});
+				Path = "/",
+			}
+		);
 	}
 }

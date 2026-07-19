@@ -15,10 +15,7 @@ public interface IReminderQueryService
 		int tradeCodeId,
 		PageOptions page,
 		ReminderSort sort,
-		CancellationToken ct);
-	Task<PageResult<Reminder>> GetAsync(
-		int userId,
-		PageOptions page,
-		ReminderSort sort,
-		CancellationToken ct);
+		CancellationToken ct
+	);
+	Task<PageResult<Reminder>> GetAsync(int userId, PageOptions page, ReminderSort sort, CancellationToken ct);
 }

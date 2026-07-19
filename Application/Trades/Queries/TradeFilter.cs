@@ -1,4 +1,3 @@
-
 using Domain.Trades.Enums;
 
 namespace Application.Trades.Queries;

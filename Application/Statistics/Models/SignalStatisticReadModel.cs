@@ -8,4 +8,3 @@ public class SignalStatisticReadModel
 
 	public required int SellSignals { get; set; }
 }
-

@@ -1,7 +1,7 @@
+using System.Text.Json.Nodes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Text.Json.Nodes;
 
 namespace ViaTradeBackend.Swagger.Filters;
 

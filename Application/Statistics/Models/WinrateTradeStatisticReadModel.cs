@@ -6,4 +6,3 @@ public class WinrateTradeStatisticReadModel
 
 	public float ProfitFactor { get; set; }
 }
-

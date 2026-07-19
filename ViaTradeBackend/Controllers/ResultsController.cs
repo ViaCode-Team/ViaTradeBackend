@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
 using Application.Interfaces;
 using Application.Trades.Models;
@@ -6,7 +7,6 @@ using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 using ViaTradeBackend.Contracts.Statistics;
 
 namespace ViaTradeBackend.Controllers;
@@ -30,7 +30,8 @@ public class ResultsController(ITradeResultsService tradeResultsService, IJwtHel
 		[FromQuery] DateTime? startDate,
 		[FromQuery] DateTime? endTime,
 		[FromQuery] SignalSort sort,
-		CancellationToken ct)
+		CancellationToken ct
+	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var response = await tradeResultsService.GetAsync(userId, startDate, endTime, sort, ct);
@@ -44,7 +45,8 @@ public class ResultsController(ITradeResultsService tradeResultsService, IJwtHel
 		[FromRoute, Required] string tradeCode,
 		[FromQuery] DateTime? startDate,
 		[FromQuery] DateTime? endTime,
-		CancellationToken ct)
+		CancellationToken ct
+	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var response = await tradeResultsService.GetAsync(userId, strategyName, tradeCode, startDate, endTime, ct);
@@ -52,4 +54,3 @@ public class ResultsController(ITradeResultsService tradeResultsService, IJwtHel
 		return TypedResults.Ok(response);
 	}
 }
-

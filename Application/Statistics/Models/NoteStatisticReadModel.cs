@@ -8,4 +8,3 @@ public class NoteStatisticReadModel
 
 	public required int StrategyNotes { get; set; }
 }
-

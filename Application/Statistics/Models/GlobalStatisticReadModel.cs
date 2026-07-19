@@ -8,4 +8,3 @@ public class GlobalStatisticReadModel
 
 	public required WinrateTradeStatisticReadModel WinrateStatistic { get; set; }
 }
-

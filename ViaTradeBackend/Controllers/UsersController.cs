@@ -1,10 +1,10 @@
+using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
 using Application.Users.Interfaces;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 using ViaTradeBackend.Attribute;
 using ViaTradeBackend.Contracts.Users;
 
@@ -16,7 +16,8 @@ public class UsersController(
 	IUserCommandService userCommandService,
 	IUserQueryService userQueryService,
 	IJwtHelper jwtHelper,
-	ILogger<UsersController> logger) : ControllerBase
+	ILogger<UsersController> logger
+) : ControllerBase
 {
 	[Authorize]
 	[HttpGet("me")]
@@ -50,7 +51,8 @@ public class UsersController(
 	[HttpPost("telegramToken")]
 	public async Task<Accepted> LinkTelegramToken(
 		[FromBody, Required] LinkTelegramRequest request,
-		CancellationToken ct)
+		CancellationToken ct
+	)
 	{
 		logger.LogInformation("Processing Telegram token for user");
 

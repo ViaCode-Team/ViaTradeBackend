@@ -26,5 +26,4 @@ public sealed class Trade : BaseEntity<int>
 	public TradeCode? TradeCode { get; set; }
 
 	public User? User { get; set; }
-
 }

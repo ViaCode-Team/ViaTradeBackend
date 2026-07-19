@@ -1,22 +1,20 @@
 using Application.Statistics.Models;
 using Application.Trades.Models;
-
 using Application.Trades.Queries;
 
 namespace Application.Interfaces;
 
 public interface ITradeResultsService
 {
-	Task<SignalStatisticReadModel> GetStatisticsAsync(
-		int userId,
-		CancellationToken ct);
+	Task<SignalStatisticReadModel> GetStatisticsAsync(int userId, CancellationToken ct);
 
 	Task<StrategyResults> GetAsync(
 		int userId,
 		DateTime? startDate,
 		DateTime? endDate,
 		SignalSort sort,
-		CancellationToken ct);
+		CancellationToken ct
+	);
 
 	Task<StrategyResults> GetAsync(
 		int userId,
@@ -24,5 +22,6 @@ public interface ITradeResultsService
 		string tradeCode,
 		DateTime? startDate,
 		DateTime? endDate,
-		CancellationToken ct);
+		CancellationToken ct
+	);
 }

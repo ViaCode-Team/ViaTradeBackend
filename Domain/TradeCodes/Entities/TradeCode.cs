@@ -12,5 +12,4 @@ public sealed class TradeCode : BaseEntity<int>
 	public ICollection<Trade> Trades { get; set; } = [];
 
 	public ICollection<UserTradeCode> UserTradeCodes { get; set; } = [];
-
 }

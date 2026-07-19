@@ -1,6 +1,6 @@
-using Infrastructure.Configuration;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Infrastructure.Configuration;
 using ViaTradeBackend;
 using ViaTradeBackend.Middleware;
 using ViaTradeBackend.Swagger;
@@ -15,20 +15,17 @@ builder.Services.AddAuthLayer(builder.Configuration);
 
 builder.Services.Configure<AnalyzerDataOption>(builder.Configuration.GetSection("AnalyzerData"));
 
-builder.Services
-	.AddControllers()
+builder
+	.Services.AddControllers()
 	.AddJsonOptions(options =>
 	{
-		options.JsonSerializerOptions.DefaultIgnoreCondition =
-			JsonIgnoreCondition.WhenWritingNull;
+		options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 
-		options.JsonSerializerOptions.Converters.Add(
-			new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
+		options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
 	});
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddViaTradeSwagger();
-
 
 var app = builder.Build();
 

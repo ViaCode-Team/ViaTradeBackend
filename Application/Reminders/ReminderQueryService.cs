@@ -11,22 +11,19 @@ public class ReminderQueryService(IReminderRepository reminderRepository) : IRem
 {
 	public async Task<ReminderStatistics> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		int total = await reminderRepository.CountAsync(
-			x => x.UserId == userId, ct);
+		int total = await reminderRepository.CountAsync(x => x.UserId == userId, ct);
 
 		return new ReminderStatistics(total);
 	}
 
 	public async Task<IEnumerable<Reminder>> GetAsync(CancellationToken ct)
 	{
-		return await reminderRepository.FindAsync(
-			x => x.DateTime <= DateTime.UtcNow, ct);
+		return await reminderRepository.FindAsync(x => x.DateTime <= DateTime.UtcNow, ct);
 	}
 
 	public async Task<Reminder> GetAsync(int reminderId, int userId, CancellationToken ct)
 	{
-		return await reminderRepository.FirstOrDefaultAsync(
-			x => x.Id == reminderId && x.UserId == userId, ct)
+		return await reminderRepository.FirstOrDefaultAsync(x => x.Id == reminderId && x.UserId == userId, ct)
 			?? throw new KeyNotFoundException("Reminder not found.");
 	}
 
@@ -35,7 +32,8 @@ public class ReminderQueryService(IReminderRepository reminderRepository) : IRem
 		int tradeCodeId,
 		PageOptions page,
 		ReminderSort sort,
-		CancellationToken ct)
+		CancellationToken ct
+	)
 	{
 		var spec = new ReminderQuerySpecification(userId, tradeCodeId, sort);
 		return await reminderRepository.GetPagedAsync(spec, page, ct);
@@ -45,7 +43,8 @@ public class ReminderQueryService(IReminderRepository reminderRepository) : IRem
 		int userId,
 		PageOptions page,
 		ReminderSort sort,
-		CancellationToken ct)
+		CancellationToken ct
+	)
 	{
 		var spec = new ReminderQuerySpecification(userId, null, sort);
 		return await reminderRepository.GetPagedAsync(spec, page, ct);

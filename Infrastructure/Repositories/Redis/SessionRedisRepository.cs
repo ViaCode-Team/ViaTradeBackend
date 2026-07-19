@@ -1,8 +1,8 @@
+using System.Text.Json;
 using Application.Auth.Interfaces;
 using Application.Common.Queries;
 using Application.Users.Models;
 using StackExchange.Redis;
-using System.Text.Json;
 
 namespace Infrastructure.Repositories.Redis;
 
@@ -39,7 +39,8 @@ public class SessionRedisRepository(IConnectionMultiplexer redis) : ISessionRepo
 	public async Task RemoveAsync(string sessionId)
 	{
 		var session = await GetAsync(sessionId);
-		if (session == null) return;
+		if (session == null)
+			return;
 
 		var tran = _db.CreateTransaction();
 		var delSession = tran.KeyDeleteAsync(SessionKey(sessionId));
@@ -54,7 +55,8 @@ public class SessionRedisRepository(IConnectionMultiplexer redis) : ISessionRepo
 	{
 		var sessionIds = await _db.SortedSetRangeByRankAsync(UserSessionsKey(userId), 0, -1);
 		List<UserSessionDto> result = [];
-		if (sessionIds.Length == 0) return result;
+		if (sessionIds.Length == 0)
+			return result;
 
 		var keys = sessionIds
 			.Where(id => !id.IsNullOrEmpty)
@@ -125,13 +127,16 @@ public class SessionRedisRepository(IConnectionMultiplexer redis) : ISessionRepo
 			var expiredSessionIds = await _db.SortedSetRangeByScoreAsync(
 				userKey,
 				double.NegativeInfinity,
-				thresholdTicks);
+				thresholdTicks
+			);
 
-			if (expiredSessionIds.Length == 0) continue;
+			if (expiredSessionIds.Length == 0)
+				continue;
 
 			foreach (var sessionId in expiredSessionIds)
 			{
-				if (string.IsNullOrEmpty(sessionId)) continue;
+				if (string.IsNullOrEmpty(sessionId))
+					continue;
 
 				try
 				{

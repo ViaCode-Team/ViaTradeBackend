@@ -17,10 +17,12 @@ public class NoteQueryService(INoteRepository noteRepository) : INoteQueryServic
 
 	public async Task<Note> GetAsync(int relatedId, int userId, NoteType noteType, CancellationToken ct)
 	{
-		var existingNotes = await noteRepository.FindAsync(x =>
-				x.UserId == userId &&
-				(noteType == NoteType.TradeCodeNote ? x.TradeCodeId == relatedId : x.TradeStrategyId == relatedId),
-			ct);
+		var existingNotes = await noteRepository.FindAsync(
+			x =>
+				x.UserId == userId
+				&& (noteType == NoteType.TradeCodeNote ? x.TradeCodeId == relatedId : x.TradeStrategyId == relatedId),
+			ct
+		);
 
 		var existingNote = existingNotes.FirstOrDefault();
 

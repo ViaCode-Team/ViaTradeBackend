@@ -6,4 +6,3 @@ public class IncomeTradeStatisticReadModel
 
 	public required decimal AverageIncome { get; set; }
 }
-

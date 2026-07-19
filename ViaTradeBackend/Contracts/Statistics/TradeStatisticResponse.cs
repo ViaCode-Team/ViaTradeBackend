@@ -1,8 +1,3 @@
 namespace ViaTradeBackend.Contracts.Statistics;
 
-public record TradeStatisticResponse(
-	int TotalTrades,
-	int WinTrades,
-	int LoseTrades
-);
-
+public record TradeStatisticResponse(int TotalTrades, int WinTrades, int LoseTrades);

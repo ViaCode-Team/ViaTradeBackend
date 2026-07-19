@@ -1,6 +1,6 @@
+using System.IdentityModel.Tokens.Jwt;
 using Application.Auth.Interfaces;
 using Microsoft.AspNetCore.Authorization;
-using System.IdentityModel.Tokens.Jwt;
 
 namespace ViaTradeBackend.Handler;
 
@@ -10,7 +10,8 @@ public class ActiveSessionHandler(ISessionRepository sessionRepository) : Author
 {
 	protected override async Task HandleRequirementAsync(
 		AuthorizationHandlerContext context,
-		ActiveSessionRequirement requirement)
+		ActiveSessionRequirement requirement
+	)
 	{
 		var sessionId = context.User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value;
 

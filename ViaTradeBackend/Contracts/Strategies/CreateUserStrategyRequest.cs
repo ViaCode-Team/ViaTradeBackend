@@ -1,6 +1,3 @@
 namespace ViaTradeBackend.Contracts.Strategies;
 
-public record CreateUserStrategyRequest(
-	int StrategyId
-);
-
+public record CreateUserStrategyRequest(int StrategyId);

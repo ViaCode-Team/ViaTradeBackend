@@ -65,7 +65,8 @@ public static class DependencyInjection
 
 	public static IServiceCollection AddInfrastructureLayer(
 		this IServiceCollection services,
-		IConfiguration configuration)
+		IConfiguration configuration
+	)
 	{
 		services.AddDatabase(configuration);
 		services.AddRedis(configuration);
@@ -80,9 +81,7 @@ public static class DependencyInjection
 		return services;
 	}
 
-	public static IServiceCollection AddAuthLayer(
-		this IServiceCollection services,
-		IConfiguration configuration)
+	public static IServiceCollection AddAuthLayer(this IServiceCollection services, IConfiguration configuration)
 	{
 		services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
 		services.Configure<ServiceSecurity>(configuration.GetSection("ServiceSecurity"));
@@ -94,14 +93,11 @@ public static class DependencyInjection
 		return services;
 	}
 
-	private static IServiceCollection AddDatabase(
-		this IServiceCollection services,
-		IConfiguration configuration)
+	private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
 	{
 		var connectionString =
 			configuration.GetConnectionString("MySql")
-			?? throw new InvalidOperationException(
-				"Connection string 'MySql' is not configured.");
+			?? throw new InvalidOperationException("Connection string 'MySql' is not configured.");
 
 		services.AddDbContext<AppDbContext>(options =>
 		{
@@ -109,23 +105,19 @@ public static class DependencyInjection
 				.UseMySql(
 					connectionString,
 					ServerVersion.AutoDetect(connectionString),
-					mySqlOptions =>
-						mySqlOptions.EnableStringComparisonTranslations())
-				.UseQueryTrackingBehavior(
-					QueryTrackingBehavior.NoTracking);
+					mySqlOptions => mySqlOptions.EnableStringComparisonTranslations()
+				)
+				.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 		});
 
 		return services;
 	}
 
-	private static IServiceCollection AddRedis(
-		this IServiceCollection services,
-		IConfiguration configuration)
+	private static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration configuration)
 	{
 		var connectionString =
 			configuration.GetConnectionString("Redis")
-			?? throw new InvalidOperationException(
-				"Connection string 'Redis' is not configured.");
+			?? throw new InvalidOperationException("Connection string 'Redis' is not configured.");
 
 		services.AddSingleton<IConnectionMultiplexer>(_ =>
 		{
@@ -163,13 +155,9 @@ public static class DependencyInjection
 
 	private static IServiceCollection AddJwtAuthentication(this IServiceCollection services)
 	{
-		services.AddSingleton<
-			IConfigureOptions<JwtBearerOptions>,
-			JwtBearerOptionsSetup>();
+		services.AddSingleton<IConfigureOptions<JwtBearerOptions>, JwtBearerOptionsSetup>();
 
-		services
-			.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-			.AddJwtBearer();
+		services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer();
 
 		return services;
 	}
@@ -182,7 +170,8 @@ public static class DependencyInjection
 				new AuthorizationPolicyBuilder()
 					.RequireAuthenticatedUser()
 					.AddRequirements(new ActiveSessionRequirement())
-					.Build());
+					.Build()
+			);
 
 		services.AddScoped<IAuthorizationHandler, ActiveSessionHandler>();
 

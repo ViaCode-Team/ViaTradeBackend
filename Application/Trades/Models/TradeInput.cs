@@ -1,5 +1,5 @@
-using Domain.Trades.Enums;
 using System.ComponentModel.DataAnnotations;
+using Domain.Trades.Enums;
 
 namespace Application.Trades.Models;
 

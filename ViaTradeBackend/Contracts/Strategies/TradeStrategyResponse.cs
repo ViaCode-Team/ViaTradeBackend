@@ -12,4 +12,3 @@ public record TradeStrategyResponse(
 	string? LimitDesc,
 	bool IsActive
 );
-

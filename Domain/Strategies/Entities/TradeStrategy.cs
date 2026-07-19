@@ -23,5 +23,4 @@ public sealed class TradeStrategy : BaseEntity<int>
 	public string? LimitDesc { get; set; }
 
 	public ICollection<UserTradeStrategy> UserTradeStrategies { get; set; } = [];
-
 }

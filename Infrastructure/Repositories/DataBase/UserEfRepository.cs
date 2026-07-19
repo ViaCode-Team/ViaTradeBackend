@@ -4,8 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Repositories.DataBase;
 
-public class UserEfRepository(AppDbContext context)
-	: GenericEfRepository<User>(context), IUserRepository
+public class UserEfRepository(AppDbContext context) : GenericEfRepository<User>(context), IUserRepository
 {
 	public async Task<User?> GetByLoginAsync(string login, CancellationToken ct)
 	{

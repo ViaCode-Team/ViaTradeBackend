@@ -11,7 +11,23 @@ public interface ITradeRepository : IRepository<Trade>
 {
 	Task<GlobalStatisticReadModel> GetGlobalStatisticAsync(int userId, CancellationToken ct = default);
 	Task<PageResult<Trade>> GetByUserPagedAsync(int userId, PageOptions page, CancellationToken ct = default);
-	Task<PageResult<Trade>> GetByUserAndTradeCodePagedAsync(int userId, int tradeCodeId, PageOptions page, CancellationToken ct = default);
-	Task<PageResult<Trade>> GetPagedFilteredAsync(IQuerySpecification<Trade> spec, PageOptions page, CancellationToken ct = default);
-	Task<int> UpdateAsync(int id, int userId, TradeInput request, double? netIncome, decimal price, CancellationToken ct = default);
+	Task<PageResult<Trade>> GetByUserAndTradeCodePagedAsync(
+		int userId,
+		int tradeCodeId,
+		PageOptions page,
+		CancellationToken ct = default
+	);
+	Task<PageResult<Trade>> GetPagedFilteredAsync(
+		IQuerySpecification<Trade> spec,
+		PageOptions page,
+		CancellationToken ct = default
+	);
+	Task<int> UpdateAsync(
+		int id,
+		int userId,
+		TradeInput request,
+		double? netIncome,
+		decimal price,
+		CancellationToken ct = default
+	);
 }

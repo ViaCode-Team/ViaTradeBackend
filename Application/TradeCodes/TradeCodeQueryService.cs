@@ -9,9 +9,8 @@ using Domain.Trades.Entities;
 
 namespace Application.TradeCodes;
 
-public class TradeCodeQueryService(
-	IFileReader tradefileReader,
-	ITradeCodeRepository tradeCodeRepository) : ITradeCodeQueryService
+public class TradeCodeQueryService(IFileReader tradefileReader, ITradeCodeRepository tradeCodeRepository)
+	: ITradeCodeQueryService
 {
 	public async Task<PageResult<TradeCode>> GetAsync(PageOptions page, TradeCodeSort sort, CancellationToken ct)
 	{
@@ -20,10 +19,7 @@ public class TradeCodeQueryService(
 
 	public async Task<StockStatisticReadModel> GetStatisticsAsync(CancellationToken ct)
 	{
-		return new StockStatisticReadModel
-		{
-			TotalStocks = await tradeCodeRepository.CountAsync(ct)
-		};
+		return new StockStatisticReadModel { TotalStocks = await tradeCodeRepository.CountAsync(ct) };
 	}
 
 	public async Task<IEnumerable<TradeCodeFileDto>> GetFileMetadataAsync(TradeDataType dataType, CancellationToken ct)
@@ -34,7 +30,8 @@ public class TradeCodeQueryService(
 		var dbCodeMap = tradeCodes.ToDictionary(
 			tradeCode => tradeCode.ExchangeId,
 			tradeCode => tradeCode.Id,
-			StringComparer.OrdinalIgnoreCase);
+			StringComparer.OrdinalIgnoreCase
+		);
 
 		return tradeFiles
 			.Where(fileCode => dbCodeMap.ContainsKey(fileCode.TradeCode))
@@ -44,18 +41,23 @@ public class TradeCodeQueryService(
 				ExchangeId = fileCode.TradeCode,
 				TimeFrame = fileCode.TimeFrame,
 				StartDate = fileCode.StartDate,
-				EndDate = fileCode.EndDate
+				EndDate = fileCode.EndDate,
 			});
 	}
 
-	public async Task<TradeCodeFileDto> GetFileMetadataAsync(TradeDataType dataType, string tradeIdString, CancellationToken ct)
+	public async Task<TradeCodeFileDto> GetFileMetadataAsync(
+		TradeDataType dataType,
+		string tradeIdString,
+		CancellationToken ct
+	)
 	{
 		string exchangeId;
 		int? dbId = null;
 
 		if (int.TryParse(tradeIdString, out var tradeCodeId))
 		{
-			var dbEntity = await tradeCodeRepository.GetByIdAsync(tradeCodeId, ct)
+			var dbEntity =
+				await tradeCodeRepository.GetByIdAsync(tradeCodeId, ct)
 				?? throw new KeyNotFoundException($"TradeCode with Id {tradeCodeId} not found in database");
 
 			exchangeId = dbEntity.ExchangeId;
@@ -68,7 +70,8 @@ public class TradeCodeQueryService(
 		}
 
 		var fileCodes = tradefileReader.GetTradeCodes(dataType, [exchangeId]);
-		var fileCode = fileCodes.FirstOrDefault()
+		var fileCode =
+			fileCodes.FirstOrDefault()
 			?? throw new KeyNotFoundException($"No file data found for trade code '{exchangeId}'");
 
 		dbId ??= await tradeCodeRepository.GetIdByExchangeIdAsync(fileCode.TradeCode, ct);
@@ -82,7 +85,7 @@ public class TradeCodeQueryService(
 			ExchangeId = fileCode.TradeCode,
 			TimeFrame = fileCode.TimeFrame,
 			StartDate = fileCode.StartDate,
-			EndDate = fileCode.EndDate
+			EndDate = fileCode.EndDate,
 		};
 	}
 }

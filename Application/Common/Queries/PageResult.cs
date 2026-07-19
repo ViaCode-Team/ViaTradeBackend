@@ -1,10 +1,6 @@
 namespace Application.Common.Queries;
 
-public sealed class PageResult<T>(
-	IReadOnlyList<T> items,
-	int totalCount,
-	int pageNumber,
-	int pageSize)
+public sealed class PageResult<T>(IReadOnlyList<T> items, int totalCount, int pageNumber, int pageSize)
 {
 	public IReadOnlyList<T> Items { get; } = items;
 
@@ -32,10 +28,6 @@ public sealed class PageResult<T>(
 		if (mapFunc == null)
 			throw new KeyNotFoundException(nameof(mapFunc));
 
-		return new PageResult<TResult>(
-			Items.Select(mapFunc).ToList(),
-			TotalCount,
-			pageNumber,
-			pageSize);
+		return new PageResult<TResult>(Items.Select(mapFunc).ToList(), TotalCount, pageNumber, pageSize);
 	}
 }

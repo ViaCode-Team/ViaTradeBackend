@@ -5,16 +5,16 @@ using Domain.Notes.Enums;
 
 namespace Application.Notes;
 
-public class NoteCommandService(
-	INoteRepository noteRepository,
-	IUnitOfWork uow) : INoteCommandService
+public class NoteCommandService(INoteRepository noteRepository, IUnitOfWork uow) : INoteCommandService
 {
 	public async Task AddAsync(int relatedId, NoteType noteType, int userId, string noteText, CancellationToken ct)
 	{
-		var existingNote = await noteRepository.FirstOrDefaultAsync(x =>
-				x.UserId == userId &&
-				(noteType == NoteType.TradeCodeNote ? x.TradeCodeId == relatedId : x.TradeStrategyId == relatedId),
-			ct);
+		var existingNote = await noteRepository.FirstOrDefaultAsync(
+			x =>
+				x.UserId == userId
+				&& (noteType == NoteType.TradeCodeNote ? x.TradeCodeId == relatedId : x.TradeStrategyId == relatedId),
+			ct
+		);
 
 		if (existingNote != null)
 			throw new Exception("Note already exists. Use update.");
@@ -24,7 +24,7 @@ public class NoteCommandService(
 			UserId = userId,
 			NoteText = noteText,
 			TradeCodeId = noteType == NoteType.TradeCodeNote ? relatedId : null,
-			TradeStrategyId = noteType == NoteType.TradeStrategyNote ? relatedId : null
+			TradeStrategyId = noteType == NoteType.TradeStrategyNote ? relatedId : null,
 		};
 
 		await noteRepository.AddAsync(note, ct);
@@ -34,9 +34,11 @@ public class NoteCommandService(
 	public async Task DeleteAsync(int relatedId, int userId, NoteType noteType, CancellationToken ct)
 	{
 		var rows = await noteRepository.ExecuteDeleteAsync(
-			x => x.UserId == userId &&
-				 (noteType == NoteType.TradeCodeNote ? x.TradeCodeId == relatedId : x.TradeStrategyId == relatedId),
-			ct);
+			x =>
+				x.UserId == userId
+				&& (noteType == NoteType.TradeCodeNote ? x.TradeCodeId == relatedId : x.TradeStrategyId == relatedId),
+			ct
+		);
 
 		if (rows == 0)
 			throw new Exception("Note not found.");
@@ -46,12 +48,7 @@ public class NoteCommandService(
 	{
 		try
 		{
-			await noteRepository.ExecuteUpdateUserNoteAsync(
-				relatedId,
-				noteType,
-				userId,
-				noteText,
-				ct);
+			await noteRepository.ExecuteUpdateUserNoteAsync(relatedId, noteType, userId, noteText, ct);
 		}
 		catch (KeyNotFoundException)
 		{

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Application.Common.Queries;
 using Application.TradeCodes.Interfaces;
 using Application.TradeCodes.Queries;
@@ -6,7 +7,6 @@ using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using System.ComponentModel.DataAnnotations;
 using ViaTradeBackend.Contracts.Statistics;
 using ViaTradeBackend.Contracts.Trades;
 
@@ -29,7 +29,8 @@ public class TradeCodesController(ITradeCodeQueryService tradeCodeQueryService) 
 	public async Task<Ok<PageResult<TradeCodeResponse>>> GetStockCodes(
 		[FromQuery] PageOptions page,
 		[FromQuery] TradeCodeSort sort,
-		CancellationToken ct)
+		CancellationToken ct
+	)
 	{
 		var pagedCodes = await tradeCodeQueryService.GetAsync(page, sort, ct);
 
@@ -47,7 +48,8 @@ public class TradeCodesController(ITradeCodeQueryService tradeCodeQueryService) 
 	[HttpGet("sys/stocks/{id}")]
 	public async Task<Ok<TradeCodeFileResponse>> GetSysStockCodeById(
 		[FromRoute, Required] string id,
-		CancellationToken ct)
+		CancellationToken ct
+	)
 	{
 		var sysCode = await tradeCodeQueryService.GetFileMetadataAsync(TradeDataType.Stocks, id, ct);
 

@@ -1,7 +1,7 @@
+using System.ComponentModel.DataAnnotations.Schema;
 using Domain.Common;
 using Domain.Strategies.Entities;
 using Domain.Trades.Entities;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Domain.Users.Entities;
 
@@ -21,5 +21,4 @@ public sealed class User : BaseEntity<int>
 	public ICollection<Trade> Trades { get; set; } = [];
 
 	public ICollection<UserTradeStrategy> UserTradeStrategies { get; set; } = [];
-
 }
