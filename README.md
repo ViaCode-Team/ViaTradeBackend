@@ -30,7 +30,7 @@
 
 ### Основной Backend
 
-Основное приложение реализовано на ASP.NET Core 9 и отвечает за:
+Основное приложение реализовано на ASP.NET Core 10 и отвечает за:
 
 * авторизацию пользователей;
 * управление сессиями;
@@ -75,11 +75,11 @@ src
 
 ### Backend
 
-* ASP.NET Core 9
+* ASP.NET Core 10
 * C#
 * Entity Framework Core
-* PostgreSQL
-* AutoMapper
+* Mysql
+* Mapster
 
 ### Аналитика
 
@@ -96,7 +96,7 @@ src
 
 ### Требования
 
-* .NET 9 SDK
+* .NET 10 SDK
 * MySQLServer
 * Python 3.11+
 * Git

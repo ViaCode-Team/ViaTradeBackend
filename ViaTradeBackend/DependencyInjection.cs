@@ -63,7 +63,10 @@ public static class DependencyInjection
 		return services;
 	}
 
-	public static IServiceCollection AddInfrastructureLayer(this IServiceCollection services, IConfiguration configuration)
+	public static IServiceCollection AddInfrastructureLayer(
+		this IServiceCollection services,
+		IConfiguration configuration
+	)
 	{
 		services.AddDatabase(configuration);
 		services.AddRedis(configuration);
