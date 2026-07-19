@@ -9,5 +9,5 @@ public interface ITradeQueryService
 {
 	Task<GlobalStatisticReadModel> GetStatisticsAsync(int userId, CancellationToken ct);
 	Task<Trade> GetAsync(int id, int userId, CancellationToken ct);
-	Task<PagedResult<Trade>> GetAsync(int userId, TradeFilterRequest? filterRequest, PaginationRequest? paginationRequest, CancellationToken ct);
+	Task<PagedResult<Trade>> GetAsync(int userId, TradeFilterRequest? filterRequest, PaginationRequest paginationRequest, CancellationToken ct);
 }

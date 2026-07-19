@@ -17,7 +17,7 @@ namespace ViaTradeBackend.Controllers;
 [ApiController]
 public class RemindersController(
 	IReminderCommandService remindCommandService,
-	IRemindQueryService remindQueryService,
+	IReminderQueryService remindQueryService,
 	IJwtHelper jwtHelper) : ControllerBase
 {
 	[Authorize]
@@ -51,7 +51,7 @@ public class RemindersController(
 	[HttpGet("byuser")]
 	public async Task<Ok<PagedResult<TradeRemindResponse>>> GetUserReminders(
 		[FromQuery] PaginationRequest paginationRequest,
-		[FromQuery] RemindSortRequest? sortRequest,
+		[FromQuery] ReminderSortRequest? sortRequest,
 		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
@@ -65,7 +65,7 @@ public class RemindersController(
 	[HttpGet("byuser/instrument/{tradeCodeId}")]
 	public async Task<Ok<PagedResult<TradeRemindResponse>>> GetUserRemindersByInstrument(
 		[FromQuery] PaginationRequest paginationRequest,
-		[FromQuery] RemindSortRequest? sortRequest,
+		[FromQuery] ReminderSortRequest? sortRequest,
 		[Required, FromRoute] int tradeCodeId,
 		CancellationToken ct)
 	{

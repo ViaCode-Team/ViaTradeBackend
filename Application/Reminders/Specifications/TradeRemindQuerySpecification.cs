@@ -6,7 +6,7 @@ namespace Application.Common.Specifications;
 
 public class TradeRemindQuerySpecification : BaseQuerySpecification<Reminder>
 {
-	public TradeRemindQuerySpecification(int userId, int? tradeCodeId = null, RemindSortRequest? sort = null)
+	public TradeRemindQuerySpecification(int userId, int? tradeCodeId = null, ReminderSortRequest? sort = null)
 	{
 		AddCriteria(r => r.UserId == userId);
 

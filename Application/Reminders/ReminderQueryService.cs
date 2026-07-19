@@ -7,7 +7,7 @@ using Domain.Reminds.Entities;
 
 namespace Application.Reminders;
 
-public class ReminderQueryService(IReminderRepository remindRepository) : IRemindQueryService
+public class ReminderQueryService(IReminderRepository remindRepository) : IReminderQueryService
 {
 	public async Task<RemindStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
@@ -34,7 +34,7 @@ public class ReminderQueryService(IReminderRepository remindRepository) : IRemin
 		int userId,
 		int tradeCodeId,
 		PaginationRequest paginationRequest,
-		RemindSortRequest? sortRequest,
+		ReminderSortRequest? sortRequest,
 		CancellationToken ct)
 	{
 		var spec = new TradeRemindQuerySpecification(userId, tradeCodeId, sortRequest);
@@ -44,7 +44,7 @@ public class ReminderQueryService(IReminderRepository remindRepository) : IRemin
 	public async Task<PagedResult<Reminder>> GetAsync(
 		int userId,
 		PaginationRequest paginationRequest,
-		RemindSortRequest? sortRequest,
+		ReminderSortRequest? sortRequest,
 		CancellationToken ct)
 	{
 		var spec = new TradeRemindQuerySpecification(userId, null, sortRequest);

@@ -33,7 +33,7 @@ public class TradesController(
 	[HttpGet("byuser")]
 	public async Task<Ok<PagedResult<TradeResponse>>> GetUserTrades(
 		[FromQuery] TradeFilterRequest? filterRequest,
-		[FromQuery] PaginationRequest? paginationRequest,
+		[FromQuery] PaginationRequest paginationRequest,
 		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
@@ -66,7 +66,7 @@ public class TradesController(
 
 	[HttpPut("byuser/{id}")]
 	public async Task<NoContent> UpdateUserTrade(
-		[Required, FromRoute] int id,
+		[FromRoute, Required] int id,
 		[FromBody, Required] UpdateTradeRequest request,
 		CancellationToken ct)
 	{
@@ -78,7 +78,7 @@ public class TradesController(
 
 	[HttpDelete("byuser/{id}")]
 	public async Task<NoContent> DeleteUserTrade(
-		[Required, FromRoute] int id,
+		[FromRoute, Required] int id,
 		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);

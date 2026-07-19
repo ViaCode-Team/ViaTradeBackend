@@ -22,7 +22,7 @@ public class TradeStrategyEfRepository(AppDbContext context) : GenericEfReposito
 			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<PagedResult<TradeStrategy>> GetPagedFilteredAsync(int userId, IQuerySpecification<TradeStrategy> spec, PaginationRequest? paginationRequest, CancellationToken ct = default)
+	public async Task<PagedResult<TradeStrategy>> GetPagedFilteredAsync(int userId, IQuerySpecification<TradeStrategy> spec, PaginationRequest paginationRequest, CancellationToken ct = default)
 	{
 		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
 

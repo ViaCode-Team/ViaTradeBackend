@@ -5,7 +5,7 @@ using Domain.Reminds.Entities;
 
 namespace Application.Reminders.Interfaces;
 
-public interface IRemindQueryService
+public interface IReminderQueryService
 {
 	Task<RemindStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct);
 	Task<IEnumerable<Reminder>> GetAsync(CancellationToken ct);
@@ -14,11 +14,11 @@ public interface IRemindQueryService
 		int userId,
 		int tradeCodeId,
 		PaginationRequest paginationRequest,
-		RemindSortRequest? sortRequest,
+		ReminderSortRequest? sortRequest,
 		CancellationToken ct);
 	Task<PagedResult<Reminder>> GetAsync(
 		int userId,
 		PaginationRequest paginationRequest,
-		RemindSortRequest? sortRequest,
+		ReminderSortRequest? sortRequest,
 		CancellationToken ct);
 }

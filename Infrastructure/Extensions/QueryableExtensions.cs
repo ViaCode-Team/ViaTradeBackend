@@ -7,7 +7,7 @@ public static class QueryableExtensions
 {
 	public static async Task<PagedResult<T>> ToPagedAsync<T>(
 		this IQueryable<T> source,
-		PaginationRequest? paginationRequest,
+		PaginationRequest paginationRequest,
 		CancellationToken ct = default)
 	{
 		paginationRequest ??= new PaginationRequest();

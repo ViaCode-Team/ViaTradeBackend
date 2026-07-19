@@ -89,7 +89,9 @@ public class AuthController(
 
 	[HttpGet("sessions")]
 	[Authorize]
-	public async Task<Ok<PagedResult<UserSessionResponse>>> GetUserSessions([FromQuery] PaginationRequest paginationRequest, CancellationToken ct)
+	public async Task<Ok<PagedResult<UserSessionResponse>>> GetUserSessions(
+		[FromQuery] PaginationRequest paginationRequest, 
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var userSessions = await authQueryService.GetSessionsPagedAsync(userId, paginationRequest, ct);

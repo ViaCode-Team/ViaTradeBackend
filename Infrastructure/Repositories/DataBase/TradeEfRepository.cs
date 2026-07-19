@@ -72,7 +72,7 @@ public class TradeEfRepository(AppDbContext context)
 		return await FindPagedAsync(t => t.UserId == userId && t.TradeCodeId == tradeCodeId, paginationRequest, ct);
 	}
 
-	public async Task<PagedResult<Trade>> GetPagedFilteredAsync(IQuerySpecification<Trade> spec, PaginationRequest? paginationRequest, CancellationToken ct)
+	public async Task<PagedResult<Trade>> GetPagedFilteredAsync(IQuerySpecification<Trade> spec, PaginationRequest paginationRequest, CancellationToken ct)
 	{
 		return await GetPagedAsync(spec, paginationRequest, ct);
 	}

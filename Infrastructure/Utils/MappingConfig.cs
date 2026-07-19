@@ -3,7 +3,7 @@ using MapsterMapper;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 
-namespace Application.Mappings;
+namespace Infrastructure.Utils;
 
 public static class MappingConfig
 {

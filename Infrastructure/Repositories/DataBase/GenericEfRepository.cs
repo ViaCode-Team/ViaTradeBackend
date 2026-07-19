@@ -31,12 +31,12 @@ public class GenericEfRepository<TEntity> : IRepository<TEntity>
 		return await _dbSet.ToListAsync(ct);
 	}
 
-	public async Task<PagedResult<TEntity>> GetPagedAsync(PaginationRequest? paginationRequest, CancellationToken ct = default)
+	public async Task<PagedResult<TEntity>> GetPagedAsync(PaginationRequest paginationRequest, CancellationToken ct = default)
 	{
 		return await _dbSet.OrderBy(e => e.Id).ToPagedAsync(paginationRequest, ct);
 	}
 
-	public async Task<PagedResult<TEntity>> GetPagedAsync(IQuerySpecification<TEntity> spec, PaginationRequest? paginationRequest, CancellationToken ct = default)
+	public async Task<PagedResult<TEntity>> GetPagedAsync(IQuerySpecification<TEntity> spec, PaginationRequest paginationRequest, CancellationToken ct = default)
 	{
 		var query = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
 		if (spec.SortExpressions.Count == 0)
@@ -61,7 +61,7 @@ public class GenericEfRepository<TEntity> : IRepository<TEntity>
 
 	public async Task<PagedResult<TEntity>> FindPagedAsync(
 		Expression<Func<TEntity, bool>> predicate,
-		PaginationRequest? paginationRequest,
+		PaginationRequest paginationRequest,
 		CancellationToken ct = default)
 	{
 		return await _dbSet.Where(predicate).OrderBy(e => e.Id).ToPagedAsync(paginationRequest, ct);
@@ -95,13 +95,5 @@ public class GenericEfRepository<TEntity> : IRepository<TEntity>
 		CancellationToken ct = default)
 	{
 		return await _dbSet.Where(predicate).ExecuteDeleteAsync(ct);
-	}
-
-	public async Task<int> ExecuteUpdateAsync(
-		Expression<Func<TEntity, bool>> predicate,
-		Expression<Func<SetPropertyCalls<TEntity>, SetPropertyCalls<TEntity>>> updateExpression,
-		CancellationToken ct = default)
-	{
-		return await _dbSet.Where(predicate).ExecuteUpdateAsync(updateExpression, ct);
 	}
 }

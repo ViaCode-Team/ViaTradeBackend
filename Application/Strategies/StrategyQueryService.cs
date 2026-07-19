@@ -31,7 +31,7 @@ public class StrategyQueryService(
 		};
 	}
 
-	public async Task<PagedResult<TradeStrategy>> GetAsync(int userId, StrategyFilterRequest? filterRequest, StrategySortRequest? sortRequest, PaginationRequest? paginationRequest, CancellationToken ct)
+	public async Task<PagedResult<TradeStrategy>> GetAsync(int userId, StrategyFilterRequest? filterRequest, StrategySortRequest? sortRequest, PaginationRequest paginationRequest, CancellationToken ct)
 	{
 		var spec = new StrategyQuerySpecification(userId, filterRequest, sortRequest);
 		return await tradeStrategyRepository.GetPagedFilteredAsync(userId, spec, paginationRequest, ct);

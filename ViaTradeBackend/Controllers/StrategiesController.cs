@@ -34,7 +34,7 @@ public class StrategiesController(
 	public async Task<Ok<PagedResult<TradeStrategyResponse>>> GetStrategies(
 		[FromQuery] StrategyFilterRequest? filterRequest,
 		[FromQuery] StrategySortRequest? sortRequest,
-		[FromQuery] PaginationRequest? paginationRequest,
+		[FromQuery] PaginationRequest paginationRequest,
 		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
@@ -73,7 +73,9 @@ public class StrategiesController(
 	}
 
 	[HttpPost("codes/byuser")]
-	public async Task<Created> CreateUserStrategyCode([FromBody, Required] CreateUserStrategyTradeCodeRequest userStrategyCodeRequest, CancellationToken ct)
+	public async Task<Created> CreateUserStrategyCode(
+		[FromBody, Required] CreateUserStrategyTradeCodeRequest userStrategyCodeRequest,
+		CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		await strategyCommandService.CreateCodeAsync(userId, userStrategyCodeRequest.StrategyId, userStrategyCodeRequest.TradeCodeId, ct);
