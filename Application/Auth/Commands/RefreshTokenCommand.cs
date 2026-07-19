@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Application.Auth.Commands;
 
-public record RefreshTokenCommand(string RefreshToken) : ICommandWithoutUoW<AuthInternalResult>;
+public record RefreshTokenCommand(string RefreshToken) : ICommand<AuthInternalResult>;
 
 public class RefreshTokenCommandHandler(
 	IUserRepository userRepository,

@@ -26,9 +26,9 @@ public sealed class User : AggregateRoot<int>
 
 	public User(string login, string hashPassword, DateTime registerDate)
 	{
-		if (string.IsNullOrWhiteSpace(login)) 
+		if (string.IsNullOrWhiteSpace(login))
 			throw new ArgumentException("Login cannot be empty.", nameof(login));
-		if (string.IsNullOrWhiteSpace(hashPassword)) 
+		if (string.IsNullOrWhiteSpace(hashPassword))
 			throw new ArgumentException("Password hash cannot be empty.", nameof(hashPassword));
 
 		Login = login;

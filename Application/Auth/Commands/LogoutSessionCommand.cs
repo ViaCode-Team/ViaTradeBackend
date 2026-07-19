@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Auth.Commands;
 
-public record LogoutSessionCommand(string RefreshToken) : ICommandWithoutUoW;
+public record LogoutSessionCommand(string RefreshToken) : ICommand;
 
 public class LogoutSessionCommandHandler(
 	ISessionRepository sessionRepository,

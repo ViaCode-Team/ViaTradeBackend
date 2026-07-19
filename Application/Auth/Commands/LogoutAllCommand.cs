@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Auth.Commands;
 
-public record LogoutAllCommand(int UserId) : ICommandWithoutUoW;
+public record LogoutAllCommand(int UserId) : ICommand;
 
 public class LogoutAllCommandHandler(
 	ISessionRepository sessionRepository,

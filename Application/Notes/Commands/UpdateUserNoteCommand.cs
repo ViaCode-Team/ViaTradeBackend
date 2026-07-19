@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Application.Notes.Commands;
 
-public record UpdateUserNoteCommand(int RelatedId, NoteType NoteType, int UserId, string NoteText) : ICommandWithoutUoW;
+public record UpdateUserNoteCommand(int RelatedId, NoteType NoteType, int UserId, string NoteText) : ICommand;
 
 public class UpdateUserNoteValidator : AbstractValidator<UpdateUserNoteCommand>
 {

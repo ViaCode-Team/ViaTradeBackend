@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Strategies.Commands;
 
-public record DeleteUserStrategyCodeCommand(int UserId, int StrategyId, int TradeCodeId) : ICommandWithoutUoW;
+public record DeleteUserStrategyCodeCommand(int UserId, int StrategyId, int TradeCodeId) : ICommand;
 
 public class DeleteUserStrategyCodeCommandHandler(IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository)
 	: IRequestHandler<DeleteUserStrategyCodeCommand>

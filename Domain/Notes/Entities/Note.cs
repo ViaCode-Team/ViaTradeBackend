@@ -28,14 +28,20 @@ public sealed class Note : AggregateRoot<int>
 		if (!tradeCodeId.HasValue && !tradeStrategyId.HasValue)
 			throw new ArgumentException("Note must belong to either TradeCode or TradeStrategy");
 
+		if (string.IsNullOrEmpty(noteText))
+			throw new ArgumentNullException(nameof(noteText));
+
 		UserId = userId;
-		NoteText = noteText ?? throw new ArgumentNullException(nameof(noteText));
+		NoteText = noteText;
 		TradeCodeId = tradeCodeId;
 		TradeStrategyId = tradeStrategyId;
 	}
 
 	public void UpdateText(string newText)
 	{
-		NoteText = newText ?? throw new ArgumentNullException(nameof(newText));
+		if (string.IsNullOrEmpty(newText))
+			throw new ArgumentNullException(nameof(newText));
+
+		NoteText = newText;
 	}
 }

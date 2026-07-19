@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Application.Auth.Commands;
 
-public record RegisterCommand(string Login, string Password, string UserAgent) : ICommand<AuthInternalResult>;
+public record RegisterCommand(string Login, string Password, string UserAgent) : ITransactionalCommand<AuthInternalResult>;
 
 public class RegisterCommandHandler(
 	IUserRepository userRepository,

@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Application.Strategies.Commands;
 
-public record CreateUserStrategyCodeCommand(int UserId, int StrategyId, int TradeCodeId) : ICommand;
+public record CreateUserStrategyCodeCommand(int UserId, int StrategyId, int TradeCodeId) : ITransactionalCommand;
 
 public class CreateUserStrategyCodeCommandHandler(IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository)
 	: IRequestHandler<CreateUserStrategyCodeCommand>

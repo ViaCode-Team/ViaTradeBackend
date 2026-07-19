@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Application.Auth.Commands;
 
-public record LoginCommand(string Login, string Password, string UserAgent) : ICommandWithoutUoW<AuthInternalResult>;
+public record LoginCommand(string Login, string Password, string UserAgent) : ICommand<AuthInternalResult>;
 
 public class LoginCommandHandler(
 	IUserRepository userRepository,

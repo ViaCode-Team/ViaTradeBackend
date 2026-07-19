@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Users.Commands;
 
-public record UpdateLastLoginDateCommand(int UserId) : ICommandWithoutUoW;
+public record UpdateLastLoginDateCommand(int UserId) : ICommand;
 
 public class UpdateLastLoginDateCommandHandler(IUserRepository userRepository)
 	: IRequestHandler<UpdateLastLoginDateCommand>

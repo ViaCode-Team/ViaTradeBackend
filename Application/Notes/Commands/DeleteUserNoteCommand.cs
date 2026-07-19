@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Application.Notes.Commands;
 
-public record DeleteUserNoteCommand(int RelatedId, int UserId, NoteType NoteType) : ICommandWithoutUoW;
+public record DeleteUserNoteCommand(int RelatedId, int UserId, NoteType NoteType) : ICommand;
 
 public class DeleteUserNoteCommandHandler(INoteRepository noteRepository) : IRequestHandler<DeleteUserNoteCommand>
 {

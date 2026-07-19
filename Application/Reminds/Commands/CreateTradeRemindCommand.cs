@@ -6,7 +6,7 @@ using MediatR;
 
 namespace Application.Reminds.Commands;
 
-public record CreateTradeRemindCommand(int UserId, int TradeCodeId, string TextRemind, DateTime DateTime) : ICommand;
+public record CreateTradeRemindCommand(int UserId, int TradeCodeId, string TextRemind, DateTime DateTime) : ITransactionalCommand;
 
 public class CreateTradeRemindValidator : AbstractValidator<CreateTradeRemindCommand>
 {

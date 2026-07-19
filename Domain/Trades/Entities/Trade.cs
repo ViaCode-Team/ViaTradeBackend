@@ -29,26 +29,24 @@ public sealed class Trade : AggregateRoot<int>
 
 	private Trade() { }
 
-	public Trade(DateTime dateOpen, double tradeOpen, int count, decimal price, int tradeTypeId, int tradeCodeId, int userId, TradeSignal tradeSignal)
+	public Trade(
+		DateTime dateOpen,
+		DateTime? dateClose,
+		double tradeOpen,
+		double? tradeClose,
+		int count,
+		int tradeTypeId,
+		int tradeCodeId,
+		int userId,
+		TradeSignal tradeSignal)
 	{
-		if (count <= 0)
-			throw new ArgumentException("Count must be greater than zero.", nameof(count));
-		if (price < 0) 
-			throw new ArgumentException("Price cannot be negative.", nameof(price));
-
-		DateOpen = dateOpen;
-		TradeOpen = tradeOpen;
-		Count = count;
-		Price = price;
-		TradeTypeId = tradeTypeId;
-		TradeCodeId = tradeCodeId;
 		UserId = userId;
-		TradeSignal = tradeSignal;
+		Update(dateOpen, dateClose, tradeOpen, tradeClose, count, tradeTypeId, tradeCodeId, tradeSignal);
 	}
 
 	public void Update(DateTime dateOpen, DateTime? dateClose, double tradeOpen, double? tradeClose, int count, int tradeTypeId, int tradeCodeId, TradeSignal tradeSignal)
 	{
-		if (count <= 0) 
+		if (count <= 0)
 			throw new ArgumentException("Count must be greater than zero.", nameof(count));
 
 		DateOpen = dateOpen;

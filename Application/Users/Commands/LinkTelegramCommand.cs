@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Users.Commands;
 
-public record LinkTelegramCommand(string TgToken, string TgId) : ICommandWithoutUoW;
+public record LinkTelegramCommand(string TgToken, string TgId) : ICommand;
 
 public class LinkTelegramCommandHandler(
 	IUserRepository userRepository,

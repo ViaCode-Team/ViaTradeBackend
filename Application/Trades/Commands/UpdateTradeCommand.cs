@@ -7,19 +7,19 @@ using MediatR;
 
 namespace Application.Trades.Commands;
 
-public record UpdateTradeCommand(int Id, int UserId, TradeCreateDto Request) : ICommand<Trade>;
+public record UpdateTradeCommand(int Id, int UserId, TradeCreateDto Request) : ICommand;
 
 public class UpdateTradeCommandHandler(
 	ITradeRepository tradeRepository,
 	ITradeCodeRepository tradeCodeRepository,
 	ITradeTypeRepository tradeTypeRepository)
-	: IRequestHandler<UpdateTradeCommand, Trade>
+	: IRequestHandler<UpdateTradeCommand>
 {
 	private readonly ITradeRepository _tradeRepository = tradeRepository;
 	private readonly ITradeCodeRepository _tradeCodeRepository = tradeCodeRepository;
 	private readonly ITradeTypeRepository _tradeTypeRepository = tradeTypeRepository;
 
-	public async Task<Trade> Handle(UpdateTradeCommand request, CancellationToken cancellationToken)
+	public async Task Handle(UpdateTradeCommand request, CancellationToken cancellationToken)
 	{
 		bool isTradeCodeExist = await _tradeCodeRepository.ExistsAsync(c => c.Id == request.Request.TradeCodeId, cancellationToken);
 		if (!isTradeCodeExist)
@@ -29,25 +29,18 @@ public class UpdateTradeCommandHandler(
 		if (!isTradeTypeExist)
 			throw new ArgumentException($"TradeType {request.Request.TradeTypeId} not found");
 
-		var trade = await _tradeRepository.GetByIdAsync(request.Id, cancellationToken);
-		if (trade == null || trade.UserId != request.UserId)
-			throw new KeyNotFoundException();
-
 		var req = request.Request;
+		var netIncome = Trade.CalculateNetIncome(req.TradeOpen, req.TradeClose, req.TradeSignal);
+		var price = (decimal)req.TradeOpen * req.Count;
 
-		trade.Update(
-			req.DateOpen,
-			req.DateClose,
-			req.TradeOpen,
-			req.TradeClose,
-			req.Count,
-			req.TradeTypeId,
-			req.TradeCodeId,
-			req.TradeSignal
-		);
+		var affectedRows = await _tradeRepository.UpdateAsync(request.Id, request.UserId, req, netIncome, price, cancellationToken);
+		if (affectedRows == 0)
+		{
+			bool exists = await _tradeRepository.ExistsAsync(t => t.Id == request.Id, cancellationToken);
+			if (exists)
+				throw new UnauthorizedAccessException();
 
-		_tradeRepository.Update(trade);
-
-		return trade;
+			throw new KeyNotFoundException();
+		}
 	}
 }

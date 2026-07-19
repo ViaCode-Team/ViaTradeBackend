@@ -5,7 +5,7 @@ using MediatR;
 
 namespace Application.Reminds.Commands;
 
-public record UpdateTradeRemindCommand(int RemindId, int UserId, string TextRemind, DateTime DateTime) : ICommandWithoutUoW;
+public record UpdateTradeRemindCommand(int RemindId, int UserId, string TextRemind, DateTime DateTime) : ICommand;
 
 public class UpdateTradeRemindValidator : AbstractValidator<UpdateTradeRemindCommand>
 {

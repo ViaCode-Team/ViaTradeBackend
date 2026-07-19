@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Application.Notes.Commands;
 
-public record AddUserNoteCommand(int RelatedId, NoteType NoteType, int UserId, string NoteText) : ICommand;
+public record AddUserNoteCommand(int RelatedId, NoteType NoteType, int UserId, string NoteText) : ITransactionalCommand;
 
 public class AddUserNoteValidator : AbstractValidator<AddUserNoteCommand>
 {

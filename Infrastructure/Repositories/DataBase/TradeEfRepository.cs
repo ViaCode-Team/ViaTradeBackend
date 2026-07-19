@@ -77,7 +77,7 @@ public class TradeEfRepository(AppDbContext context)
 		return await GetPagedAsync(spec, paginationRequest, cancellationToken);
 	}
 
-	public async Task<int> UpdateUserTradeAsync(int id, int userId, TradeCreateDto request, double? netIncome, decimal price, CancellationToken cancellationToken = default)
+	public async Task<int> UpdateAsync(int id, int userId, TradeCreateDto request, double? netIncome, decimal price, CancellationToken cancellationToken = default)
 	{
 		return await _dbSet
 			.Where(t => t.Id == id && t.UserId == userId)

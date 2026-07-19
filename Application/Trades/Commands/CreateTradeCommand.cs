@@ -7,7 +7,7 @@ using MediatR;
 
 namespace Application.Trades.Commands;
 
-public record CreateTradeCommand(int UserId, TradeCreateDto Request) : ICommand<Trade>;
+public record CreateTradeCommand(int UserId, TradeCreateDto Request) : ITransactionalCommand<Trade>;
 
 public class CreateTradeCommandHandler(
 	ITradeRepository tradeRepository,
@@ -33,22 +33,13 @@ public class CreateTradeCommandHandler(
 
 		var trade = new Trade(
 			req.DateOpen,
-			req.TradeOpen,
-			req.Count,
-			(decimal)req.TradeOpen * req.Count,
-			req.TradeTypeId,
-			req.TradeCodeId,
-			request.UserId,
-			req.TradeSignal
-		);
-		trade.Update(
-			req.DateOpen,
 			req.DateClose,
 			req.TradeOpen,
 			req.TradeClose,
 			req.Count,
 			req.TradeTypeId,
 			req.TradeCodeId,
+			request.UserId,
 			req.TradeSignal
 		);
 

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Application.Reminds.Commands;
 
-public record DeleteActualRemindCommand(int RemindId) : ICommandWithoutUoW;
+public record DeleteActualRemindCommand(int RemindId) : ICommand;
 
 public class DeleteActualRemindCommandHandler(ITradeRemindRepository repository) : IRequestHandler<DeleteActualRemindCommand>
 {
