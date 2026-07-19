@@ -1,4 +1,5 @@
-using Infrastructure.Redis.Entities;
+using Application.Common.Interfaces.Repositories;
+using Application.Common.Models;
 using StackExchange.Redis;
 using System.Text.Json;
 

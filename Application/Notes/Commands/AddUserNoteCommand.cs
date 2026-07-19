@@ -23,12 +23,11 @@ public class AddUserNoteCommandHandler(INoteRepository noteRepository) : IReques
 {
 	public async Task Handle(AddUserNoteCommand request, CancellationToken cancellationToken)
 	{
-		var existingNotes = await noteRepository.FindAsync(x =>
+		var existingNote = await noteRepository.FirstOrDefaultAsync(x =>
 				x.UserId == request.UserId &&
 				(request.NoteType == NoteType.TradeCodeNote ? x.TradeCodeId == request.RelatedId : x.TradeStrategyId == request.RelatedId),
 			cancellationToken);
 
-		var existingNote = existingNotes.FirstOrDefault();
 		if (existingNote != null)
 			throw new Exception("Note already exists. Use update.");
 

@@ -1,4 +1,4 @@
-namespace Infrastructure.Redis.Entities;
+namespace Application.Common.Models;
 
 public abstract class RedisEntity
 {

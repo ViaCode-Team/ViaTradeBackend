@@ -1,3 +1,5 @@
+using Application.Common.Models;
+
 namespace Infrastructure.Redis.Entities;
 
 public class UserRedisEntity : RedisEntity

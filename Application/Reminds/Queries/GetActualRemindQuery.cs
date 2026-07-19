@@ -7,11 +7,11 @@ namespace Application.Reminds.Queries;
 
 public record GetActualRemindQuery() : IQuery<List<TradeRemind>>;
 
-public class GetActualRemindQueryHandler(ITradeRemindRepository repository) : IRequestHandler<GetActualRemindQuery, List<TradeRemind>>
+public class GetActualRemindQueryHandler(ITradeRemindRepository tradeRemindRepository) : IRequestHandler<GetActualRemindQuery, List<TradeRemind>>
 {
 	public async Task<List<TradeRemind>> Handle(GetActualRemindQuery request, CancellationToken cancellationToken)
 	{
-		var reminds = await repository.FindAsync(x => x.DateTime <= DateTime.UtcNow, cancellationToken);
+		var reminds = await tradeRemindRepository.FindAsync(x => x.DateTime <= DateTime.UtcNow, cancellationToken);
 		return reminds.ToList();
 	}
 }

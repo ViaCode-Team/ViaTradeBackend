@@ -18,4 +18,5 @@ public interface IRepository<TEntity> where TEntity : BaseEntity<int>
 	void Remove(TEntity entity);
 	Task<int> ExecuteDeleteAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
 	Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
+	Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
 }

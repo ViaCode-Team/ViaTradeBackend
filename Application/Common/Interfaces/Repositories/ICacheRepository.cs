@@ -1,5 +1,6 @@
-using Infrastructure.Redis.Entities;
-namespace Infrastructure.Repositories.Redis;
+using Application.Common.Models;
+
+namespace Application.Common.Interfaces.Repositories;
 
 public interface ICacheRepository<T> where T : RedisEntity
 {

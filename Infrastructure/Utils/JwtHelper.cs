@@ -54,10 +54,10 @@ public class JwtHelper(IOptions<JwtOptions> options) : IJwtHelper
 
 	public int GetUserIdFromClaims(ClaimsPrincipal user)
 	{
-		var subClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier); // Fuck this auto-mapper from ASP
+		var subClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 		if (subClaim == null)
 			throw new InvalidOperationException("User claims do not contain 'sub'.");
 
-		return int.Parse(subClaim.Value);
+		return int.Parse(subClaim);
 	}
 }

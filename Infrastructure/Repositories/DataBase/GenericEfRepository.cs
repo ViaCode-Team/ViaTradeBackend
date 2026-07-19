@@ -74,6 +74,13 @@ public class GenericEfRepository<TEntity> : IRepository<TEntity>
 		return await _dbSet.AnyAsync(predicate, ct);
 	}
 
+	public async Task<int> CountAsync(
+		Expression<Func<TEntity, bool>> predicate,
+		CancellationToken ct = default)
+	{
+		return await _dbSet.CountAsync(predicate, ct);
+	}
+
 	public async Task AddAsync(TEntity entity, CancellationToken ct = default)
 	{
 		await _dbSet.AddAsync(entity, ct);

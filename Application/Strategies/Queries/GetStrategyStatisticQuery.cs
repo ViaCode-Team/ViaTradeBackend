@@ -18,8 +18,8 @@ public class GetStrategyStatisticQueryHandler(
 
 		await Task.WhenAll(totalStrategiesTask, activeStrategiesTask);
 
-		var totalStrategies = totalStrategiesTask.Result;
-		var activeStrategies = activeStrategiesTask.Result;
+		var totalStrategies = await totalStrategiesTask;
+		var activeStrategies = await activeStrategiesTask;
 
 		return new StrategyStatisticReadModel
 		{

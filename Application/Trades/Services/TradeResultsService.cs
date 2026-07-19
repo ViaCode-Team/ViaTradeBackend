@@ -42,6 +42,8 @@ public class TradeResultsService(
 		}
 
 		var strategys = await tradeStrategyRepository.GetAllAsync(cancellationToken);
+		var strategyAccuracyDict = strategys.ToDictionary(s => s.Name, s => s.Accuracy);
+
 		var userPreferences = await userTradeStrategyRepository.GetUserPreferencesAsync(userId, cancellationToken);
 		if (userPreferences.Count == 0)
 			return new StrategyResultResponse { Strategies = [] };
@@ -53,7 +55,7 @@ public class TradeResultsService(
 			var strategyName = kvp.Key;
 			var tradeCodes = kvp.Value;
 
-			var accuracy = strategys.FirstOrDefault(s => s.Name == strategyName)?.Accuracy;
+			strategyAccuracyDict.TryGetValue(strategyName, out var accuracy);
 
 			var results = tradefileReader.ReadDataByCodesWithStrategy<StrategyResult>(
 				TradeDataType.Strategy,
