@@ -22,6 +22,3 @@ csharp_using_directive_placement = outside_namespace:warning
 csharp_using_directive_placement = outside_namespace:none
 dotnet_sort_system_directives_first = true
 dotnet_separate_import_directive_groups = false
-
-[Domain/**/Entities/*.cs]
-dotnet_diagnostic.CS8618.severity = none

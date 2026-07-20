@@ -1,6 +1,6 @@
 using System.Linq.Expressions;
 using Application.Common.Queries;
-using Domain.Common;
+using Domain.Entities;
 
 namespace Application.Common.Interfaces.Repositories;
 

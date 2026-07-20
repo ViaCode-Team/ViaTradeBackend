@@ -1,5 +1,5 @@
 using Application.Common.Interfaces;
-using Domain.Common;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Extensions;
