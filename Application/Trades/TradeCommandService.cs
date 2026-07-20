@@ -1,3 +1,4 @@
+using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.TradeCodes.Interfaces;
 using Application.Trades.Interfaces;
@@ -16,13 +17,13 @@ public class TradeCommandService(
 {
 	public async Task<Trade> CreateAsync(int userId, TradeInput request, CancellationToken ct)
 	{
-		bool isTradeCodeExist = await tradeCodeRepository.ExistsAsync(c => c.Id == request.TradeCodeId, ct);
-		if (!isTradeCodeExist)
-			throw new KeyNotFoundException($"TradeCode {request.TradeCodeId} not found");
+		bool tradeCodeExists = await tradeCodeRepository.ExistsAsync(c => c.Id == request.TradeCodeId, ct);
+		if (!tradeCodeExists)
+			throw new NotFoundException($"Trade code {request.TradeCodeId} not found.", "trade_code_not_found");
 
-		bool isTradeTypeExist = await tradeTypeRepository.ExistsAsync(t => t.Id == request.TradeTypeId, ct);
-		if (!isTradeTypeExist)
-			throw new ArgumentException($"TradeType {request.TradeTypeId} not found");
+		bool tradeTypeExists = await tradeTypeRepository.ExistsAsync(t => t.Id == request.TradeTypeId, ct);
+		if (!tradeTypeExists)
+			throw new NotFoundException($"Trade type {request.TradeTypeId} not found.", "trade_type_not_found");
 
 		var trade = new Trade
 		{
@@ -53,24 +54,18 @@ public class TradeCommandService(
 	{
 		var affectedRows = await tradeRepository.ExecuteDeleteAsync(t => t.Id == id && t.UserId == userId, ct);
 		if (affectedRows == 0)
-		{
-			bool exists = await tradeRepository.ExistsAsync(t => t.Id == id, ct);
-			if (exists)
-				throw new UnauthorizedAccessException();
-
-			throw new KeyNotFoundException();
-		}
+			throw new NotFoundException("Trade not found.", "trade_not_found");
 	}
 
 	public async Task UpdateAsync(int id, int userId, TradeInput request, CancellationToken ct)
 	{
-		bool isTradeCodeExist = await tradeCodeRepository.ExistsAsync(c => c.Id == request.TradeCodeId, ct);
-		if (!isTradeCodeExist)
-			throw new KeyNotFoundException();
+		bool tradeCodeExists = await tradeCodeRepository.ExistsAsync(c => c.Id == request.TradeCodeId, ct);
+		if (!tradeCodeExists)
+			throw new NotFoundException($"Trade code {request.TradeCodeId} not found.", "trade_code_not_found");
 
-		bool isTradeTypeExist = await tradeTypeRepository.ExistsAsync(t => t.Id == request.TradeTypeId, ct);
-		if (!isTradeTypeExist)
-			throw new ArgumentException($"TradeType {request.TradeTypeId} not found");
+		bool tradeTypeExists = await tradeTypeRepository.ExistsAsync(t => t.Id == request.TradeTypeId, ct);
+		if (!tradeTypeExists)
+			throw new NotFoundException($"Trade type {request.TradeTypeId} not found.", "trade_type_not_found");
 
 		var netIncome = TradeStatisticsCalcService.CalculateNetIncome(
 			request.TradeOpen,
@@ -81,12 +76,6 @@ public class TradeCommandService(
 
 		var affectedRows = await tradeRepository.UpdateAsync(id, userId, request, netIncome, price, ct);
 		if (affectedRows == 0)
-		{
-			bool exists = await tradeRepository.ExistsAsync(t => t.Id == id, ct);
-			if (exists)
-				throw new UnauthorizedAccessException();
-
-			throw new KeyNotFoundException();
-		}
+			throw new NotFoundException("Trade not found.", "trade_not_found");
 	}
 }

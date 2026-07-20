@@ -1,5 +1,4 @@
 using System.Text.Json.Nodes;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -9,20 +8,16 @@ public class ProblemDetailsOperationFilter : IOperationFilter
 {
 	public void Apply(OpenApiOperation operation, OperationFilterContext context)
 	{
-		var problemDetailsSchema = context.SchemaGenerator.GenerateSchema(
-			typeof(ProblemDetails),
-			context.SchemaRepository
-		);
-
 		var errorResponses = new Dictionary<int, string>
 		{
-			{ 400, "Bad Request - Invalid input data" },
-			{ 401, "Unauthorized - Invalid credentials" },
-			{ 403, "Forbidden - Access denied" },
-			{ 404, "Not Found - Resource does not exist" },
-			{ 408, "Timeout - Server timeout" },
-			{ 409, "Conflict - Conflict operation" },
-			{ 500, "Internal Server Error - Unexpected error" },
+			[400] = "Bad Request - Invalid input data",
+			[401] = "Unauthorized - Authentication is required",
+			[403] = "Forbidden - Access denied",
+			[404] = "Not Found - Resource does not exist",
+			[408] = "Request Timeout - Operation timed out",
+			[409] = "Conflict - Resource state conflict",
+			[422] = "Unprocessable Content - Business rule violation",
+			[500] = "Internal Server Error - Unexpected error",
 		};
 
 		foreach (var (statusCode, description) in errorResponses)
@@ -36,18 +31,27 @@ public class ProblemDetailsOperationFilter : IOperationFilter
 					{
 						["application/problem+json"] = new OpenApiMediaType
 						{
-							Schema = problemDetailsSchema,
-							Example = new JsonObject
-							{
-								["type"] = $"https://httpstatuses.com/{statusCode}",
-								["title"] = description.Split(" - ")[0],
-								["status"] = statusCode,
-								["detail"] = "Specific error details here",
-							},
+							Schema = new OpenApiSchemaReference("ProblemDetails", context.Document),
+							Example = CreateExample(statusCode, description),
 						},
 					},
 				}
 			);
 		}
+	}
+
+	private static JsonObject CreateExample(int statusCode, string description)
+	{
+		string title = description.Split(" - ")[0];
+		return new JsonObject
+		{
+			["type"] = $"https://httpstatuses.io/{statusCode}",
+			["title"] = title,
+			["status"] = statusCode,
+			["detail"] = "Safe error description.",
+			["instance"] = "/api/resource",
+			["code"] = "error_code",
+			["traceId"] = "0HNABC123:00000001",
+		};
 	}
 }

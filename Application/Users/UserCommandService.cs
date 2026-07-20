@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using Application.Common.Exceptions;
 using Application.Users.Interfaces;
 
 namespace Application.Users;
@@ -23,14 +24,14 @@ public class UserCommandService(IUserRepository userRepository, ITelegramTokenRe
 	{
 		var userIdNullable = await telegramTokenRepository.GetUserIdAsync(telegramToken);
 		if (userIdNullable == null)
-			throw new NullReferenceException(nameof(telegramToken));
+			throw new InvalidTokenException("The Telegram link token is invalid or expired.");
 
 		await telegramTokenRepository.RemoveAsync(telegramToken);
 		var userId = userIdNullable.Value;
 
 		var affectedRows = await userRepository.UpdateTelegramIdAsync(userId, telegramId, ct);
 		if (affectedRows == 0)
-			throw new NullReferenceException(nameof(telegramToken));
+			throw new NotFoundException("User not found.", "user_not_found");
 	}
 
 	public async Task UpdateLastLoginDateAsync(int userId, CancellationToken ct)

@@ -1,3 +1,4 @@
+using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Notes.Interfaces;
 using Domain.Notes.Entities;
@@ -17,7 +18,7 @@ public class NoteCommandService(INoteRepository noteRepository, IUnitOfWork uow)
 		);
 
 		if (existingNote != null)
-			throw new Exception("Note already exists. Use update.");
+			throw new ConflictException("Note already exists. Use update.", "note_already_exists");
 
 		var note = new Note
 		{
@@ -41,7 +42,7 @@ public class NoteCommandService(INoteRepository noteRepository, IUnitOfWork uow)
 		);
 
 		if (rows == 0)
-			throw new Exception("Note not found.");
+			throw new NotFoundException("Note not found.", "note_not_found");
 	}
 
 	public async Task UpdateAsync(int relatedId, NoteType noteType, int userId, string noteText, CancellationToken ct)
@@ -50,9 +51,9 @@ public class NoteCommandService(INoteRepository noteRepository, IUnitOfWork uow)
 		{
 			await noteRepository.ExecuteUpdateUserNoteAsync(relatedId, noteType, userId, noteText, ct);
 		}
-		catch (KeyNotFoundException)
+		catch (KeyNotFoundException exception)
 		{
-			throw new Exception("Note not found.");
+			throw new NotFoundException("Note not found.", "note_not_found", exception);
 		}
 	}
 }

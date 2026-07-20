@@ -1,3 +1,4 @@
+using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Strategies.Interfaces;
 using Domain.Strategies.Entities;
@@ -12,34 +13,34 @@ public class StrategyCommandService(
 {
 	public async Task CreateCodeAsync(int userId, int strategyId, int tradeCodeId, CancellationToken ct)
 	{
-		bool isUserStrategyCodeExist = await userStrategyTradeCodeRepository.ExistsAsync(
+		bool exists = await userStrategyTradeCodeRepository.ExistsAsync(
 			e => e.UserId == userId && e.StrategyId == strategyId && e.TradeCodeId == tradeCodeId,
 			ct
 		);
 
-		if (isUserStrategyCodeExist)
-			throw new InvalidOperationException("User strategy code already exists");
+		if (exists)
+			throw new ConflictException("User strategy code already exists.", "strategy_code_already_exists");
 
-		var newUserStrategyCode = new UserStrategyTradeCode
+		var strategyCode = new UserStrategyTradeCode
 		{
 			UserId = userId,
 			TradeCodeId = tradeCodeId,
 			StrategyId = strategyId,
 		};
 
-		await userStrategyTradeCodeRepository.AddAsync(newUserStrategyCode, ct);
+		await userStrategyTradeCodeRepository.AddAsync(strategyCode, ct);
 		await uow.SaveChangesAsync(ct);
 	}
 
 	public async Task CreateAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		var isUserExist = await userTradeStrategyRepository.ExistsAsync(
+		bool exists = await userTradeStrategyRepository.ExistsAsync(
 			e => e.UserId == userId && e.TradeStrategyId == strategyId,
 			ct
 		);
 
-		if (isUserExist)
-			throw new InvalidOperationException("User strategy already exists");
+		if (exists)
+			throw new ConflictException("User strategy already exists.", "user_strategy_already_exists");
 
 		var strategyLink = new UserTradeStrategy { UserId = userId, TradeStrategyId = strategyId };
 
@@ -55,7 +56,7 @@ public class StrategyCommandService(
 		);
 
 		if (affectedRows == 0)
-			throw new KeyNotFoundException("User strategy code not found");
+			throw new NotFoundException("User strategy code not found.", "strategy_code_not_found");
 	}
 
 	public async Task DeleteAsync(int userId, int strategyId, CancellationToken ct)
@@ -66,6 +67,6 @@ public class StrategyCommandService(
 		);
 
 		if (affectedRows == 0)
-			throw new KeyNotFoundException("User strategy not found");
+			throw new NotFoundException("User strategy not found.", "user_strategy_not_found");
 	}
 }

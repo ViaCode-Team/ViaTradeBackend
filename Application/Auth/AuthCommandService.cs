@@ -1,5 +1,6 @@
 using Application.Auth.Interfaces;
 using Application.Auth.Models;
+using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Users.Interfaces;
 using Application.Users.Models;
@@ -23,10 +24,9 @@ public class AuthCommandService(
 		var user = await userRepository.GetByLoginAsync(login, ct);
 
 		if (user == null || !passwordHasher.Verify(password, user.HashPassword))
-			throw new UnauthorizedAccessException();
+			throw new InvalidCredentialsException();
 
 		var sessionId = Guid.NewGuid().ToString();
-
 		var session = new UserSessionDto
 		{
 			Id = sessionId,
@@ -70,11 +70,10 @@ public class AuthCommandService(
 	public async Task<AuthTokens> RefreshTokenAsync(string refreshToken, CancellationToken ct)
 	{
 		var sessionId =
-			await refreshTokenRepository.GetSessionIdAsync(refreshToken) ?? throw new UnauthorizedAccessException();
+			await refreshTokenRepository.GetSessionIdAsync(refreshToken) ?? throw new InvalidTokenException();
 
-		var session = await sessionRepository.GetAsync(sessionId) ?? throw new UnauthorizedAccessException();
-
-		var user = await userRepository.GetByIdAsync(session.UserId, ct) ?? throw new UnauthorizedAccessException();
+		var session = await sessionRepository.GetAsync(sessionId) ?? throw new InvalidTokenException();
+		var user = await userRepository.GetByIdAsync(session.UserId, ct) ?? throw new InvalidTokenException();
 
 		session.LastSeen = DateTime.UtcNow;
 		await sessionRepository.CreateAsync(session, _sessionTtl);
@@ -90,7 +89,7 @@ public class AuthCommandService(
 	public async Task<AuthTokens> RegisterAsync(string login, string password, string userAgent, CancellationToken ct)
 	{
 		if (await userRepository.ExistsAsync(u => u.Login == login, ct))
-			throw new InvalidOperationException("User already exists");
+			throw new ConflictException("User already exists.", "user_already_exists");
 
 		var user = new User
 		{

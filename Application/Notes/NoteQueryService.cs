@@ -1,3 +1,4 @@
+using Application.Common.Exceptions;
 using Application.Common.Queries;
 using Application.Common.Specifications;
 using Application.Notes.Interfaces;
@@ -27,9 +28,7 @@ public class NoteQueryService(INoteRepository noteRepository) : INoteQueryServic
 		var existingNote = existingNotes.FirstOrDefault();
 
 		if (existingNote == null)
-		{
-			throw new Exception("Note not found.");
-		}
+			throw new NotFoundException("Note not found.", "note_not_found");
 
 		return existingNote;
 	}

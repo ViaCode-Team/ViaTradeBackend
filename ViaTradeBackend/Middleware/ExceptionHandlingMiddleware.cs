@@ -1,108 +1,93 @@
-using System.Text.Json;
+using Application.Common.Exceptions;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using ViaTradeBackend.Exceptions;
 
 namespace ViaTradeBackend.Middleware;
 
-public class ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
+public class ExceptionHandlingMiddleware(
+	IProblemDetailsService problemDetailsService,
+	ILogger<ExceptionHandlingMiddleware> logger
+) : IExceptionHandler
 {
-	public async Task Invoke(HttpContext context)
+	public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken ct)
 	{
-		try
+		if (context.RequestAborted.IsCancellationRequested)
 		{
-			await next(context);
+			logger.LogDebug("Request was aborted by the client: Path={Path}", context.Request.Path);
+			return true;
 		}
-		catch (Exception ex)
+
+		var descriptor = MapException(exception);
+		LogException(context, exception, descriptor.Status);
+
+		if (context.Response.HasStarted)
+			return false;
+
+		context.Response.StatusCode = descriptor.Status;
+
+		var problem = new ProblemDetails
 		{
-			await HandleException(context, ex);
-		}
-	}
-
-	private async Task HandleException(HttpContext context, Exception exception)
-	{
-		var problem = exception switch
-		{
-			UnauthorizedAccessException => CreateProblem(
-				StatusCodes.Status401Unauthorized,
-				"Unauthorized",
-				"https://httpstatuses.com/401  ",
-				"Invalid login or password"
-			),
-
-			ForbiddenException => CreateProblem(
-				StatusCodes.Status403Forbidden,
-				"Forbidden",
-				"https://httpstatuses.com/403  ",
-				"Access denied to the requested resource"
-			),
-
-			KeyNotFoundException => CreateProblem(
-				StatusCodes.Status404NotFound,
-				"Not Found",
-				"https://httpstatuses.com/404  ",
-				"The requested resource does not exist"
-			),
-
-			ArgumentException => CreateProblem(
-				StatusCodes.Status400BadRequest,
-				"Bad Request",
-				"https://httpstatuses.com/400  ",
-				exception.Message
-			),
-
-			//InvalidOperationException => CreateProblem(
-			//    StatusCodes.Status409Conflict,
-			//    "Invalid/Conflict Operation",
-			//    "https://httpstatuses.com/409",
-			//    "Operation is not valid due to the current state of the object"
-			//),
-
-			// 408 Canceled or server timeout
-			OperationCanceledException or TaskCanceledException => CreateProblem(
-				StatusCodes.Status408RequestTimeout,
-				"Request Cancelled",
-				"https://httpstatuses.com/408  ",
-				"Client closed the request or the server timeout has expired"
-			),
-
-#if !DEBUG
-			_ => HandleAll(),
-#else
-			_ => throw exception // In DEBUG mode, propagate exception for debugging
-#endif
+			Status = descriptor.Status,
+			Title = descriptor.Title,
+			Type = $"https://httpstatuses.io/{descriptor.Status}",
+			Detail = descriptor.Detail,
+			Instance = context.Request.Path,
 		};
 
-		context.Response.StatusCode = problem.Status!.Value;
-		context.Response.ContentType = "application/problem+json";
+		problem.Extensions["code"] = descriptor.Code;
+		problem.Extensions["traceId"] = context.TraceIdentifier;
+
+		if (exception is ValidationException validationException)
+			problem.Extensions["errors"] = validationException.Errors;
+
+		return await problemDetailsService.TryWriteAsync(
+			new ProblemDetailsContext { HttpContext = context, ProblemDetails = problem }
+		);
+	}
+
+	private static ErrorDescriptor MapException(Exception exception)
+	{
+		return exception switch
+		{
+			ValidationException ex => new(400, "Validation Failed", ex.Code, ex.Message),
+			BadRequestException ex => new(400, "Bad Request", ex.Code, ex.Message),
+			InvalidCredentialsException ex => new(401, "Unauthorized", ex.Code, ex.Message),
+			InvalidTokenException ex => new(401, "Unauthorized", ex.Code, ex.Message),
+			AuthenticationException ex => new(401, "Unauthorized", ex.Code, ex.Message),
+			ForbiddenException ex => new(403, "Forbidden", ex.Code, ex.Message),
+			NotFoundException ex => new(404, "Not Found", ex.Code, ex.Message),
+			ConflictException ex => new(409, "Conflict", ex.Code, ex.Message),
+			BusinessRuleException ex => new(422, "Business Rule Violation", ex.Code, ex.Message),
+			ArgumentException ex => new(400, "Bad Request", "invalid_argument", ex.Message),
+			KeyNotFoundException => new(404, "Not Found", "not_found", "The requested resource was not found."),
+			UnauthorizedAccessException => new(401, "Unauthorized", "unauthorized", "Authentication is required."),
+			OperationCanceledException => new(408, "Request Timeout", "request_timeout", "The operation timed out."),
+			_ => new(500, "Internal Server Error", "internal_error", "An unexpected server error occurred."),
+		};
+	}
+
+	private void LogException(HttpContext context, Exception exception, int status)
+	{
+		if (status >= 500)
+		{
+			logger.LogError(
+				exception,
+				"Unhandled exception: Status={Status}, Path={Path}, TraceId={TraceId}",
+				status,
+				context.Request.Path,
+				context.TraceIdentifier
+			);
+			return;
+		}
 
 		logger.LogInformation(
-			"Exception handled: Status={Status}, Path={Path}, Type={ExceptionType}",
-			problem.Status,
+			"Expected exception handled: Status={Status}, Path={Path}, Type={ExceptionType}, TraceId={TraceId}",
+			status,
 			context.Request.Path,
-			exception.GetType().Name
-		);
-
-		await context.Response.WriteAsync(JsonSerializer.Serialize(problem));
-	}
-
-	private static ProblemDetails HandleAll()
-	{
-		return CreateProblem(
-			StatusCodes.Status500InternalServerError,
-			"Internal Server Error",
-			"https://httpstatuses.com/500",
-			"Unexpected server error"
+			exception.GetType().Name,
+			context.TraceIdentifier
 		);
 	}
 
-	private static ProblemDetails CreateProblem(int status, string title, string type, string detail)
-	{
-		return new ProblemDetails
-		{
-			Status = status,
-			Title = title,
-			Type = type,
-			Detail = detail,
-		};
-	}
+	private sealed record ErrorDescriptor(int Status, string Title, string Code, string Detail);
 }
