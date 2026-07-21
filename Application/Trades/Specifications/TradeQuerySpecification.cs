@@ -9,9 +9,6 @@ public class TradeQuerySpecification : BaseQuerySpecification<Trade>
 	public TradeQuerySpecification(int userId, TradeFilter request)
 	{
 		AddCriteria(x => x.UserId == userId);
-		AddInclude(x => x.TradeType!);
-		AddInclude(x => x.TradeCode!);
-
 		if (request.Signal.HasValue)
 			AddCriteria(x => x.TradeSignal == request.Signal.Value);
 

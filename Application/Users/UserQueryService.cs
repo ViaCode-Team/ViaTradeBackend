@@ -1,24 +1,19 @@
 using Application.Users.Interfaces;
-using Domain.Users.Entities;
+using Application.Users.Models;
 
 namespace Application.Users;
 
 public class UserQueryService(IUserRepository userRepository, ITelegramTokenRepository telegramTokenRepository)
 	: IUserQueryService
 {
-	public async Task<IEnumerable<User>> GetWithTgLinkAsync(CancellationToken ct)
+	public async Task<IReadOnlyList<UserTelegramDto>> GetTelegramRecipientsAsync(CancellationToken ct)
 	{
-		return await userRepository.GetAllWithTgLinkAsync(ct);
+		return await userRepository.GetTelegramRecipientsAsync(ct);
 	}
 
-	public async Task<User?> GetAsync(int id, CancellationToken ct)
+	public async Task<UserMeDto?> GetMeAsync(int userId, CancellationToken ct)
 	{
-		return await userRepository.GetByIdAsync(id, ct);
-	}
-
-	public async Task<User?> GetAsync(string login, CancellationToken ct)
-	{
-		return await userRepository.GetByLoginAsync(login, ct);
+		return await userRepository.GetMeAsync(userId, ct);
 	}
 
 	public async Task<int?> GetIdAsync(string telegramToken, CancellationToken ct)

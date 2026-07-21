@@ -7,7 +7,6 @@ using Domain.Notes.Entities;
 using Domain.Reminders.Entities;
 using Domain.Strategies.Entities;
 using Domain.TradeCodes.Entities;
-using Domain.Users.Entities;
 using Riok.Mapperly.Abstractions;
 using ViaTradeBackend.Contracts.Notes;
 using ViaTradeBackend.Contracts.Reminders;
@@ -21,15 +20,16 @@ namespace ViaTradeBackend.Mappings;
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public static partial class ApiMapper
 {
-	public static partial UserMeResponse ToUserMeResponse(User source);
+	public static partial UserMeResponse ToResponse(UserMeDto source);
 
-	public static partial UserTelegramResponse ToUserTelegramResponse(User source);
+	public static partial UserTelegramResponse ToResponse(UserTelegramDto source);
 
 	public static partial UserSessionResponse ToResponse(UserSessionDto source);
 
 	public static partial NoteResponse ToResponse(Note source);
 
-	public static partial ReminderResponse ToResponse(Reminder source);
+	public static ReminderResponse ToResponse(Reminder source) =>
+		new(source.Id, source.TextRemind, source.DateTime, source.TradeCodeId, source.UserId);
 
 	public static partial TradeStrategyResponse ToResponse(TradeStrategy source);
 

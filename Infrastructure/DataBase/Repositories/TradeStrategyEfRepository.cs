@@ -25,35 +25,46 @@ public class TradeStrategyEfRepository(AppDbContext context)
 			?? throw new KeyNotFoundException($"User with ID {userId} was not found.");
 	}
 
-	public async Task<TradeStrategy?> GetByNameAsync(string name, CancellationToken ct = default)
+	public async Task<Dictionary<string, int?>> GetAccuracyMapAsync(CancellationToken ct)
 	{
-		return await _dbSet.Where(tradeStrategy => tradeStrategy.Name == name).FirstOrDefaultAsync(ct);
+		var strategies = await _dbSet
+			.Select(tradeStrategy => new { tradeStrategy.Name, tradeStrategy.Accuracy })
+			.ToListAsync(ct);
+
+		return strategies.ToDictionary(tradeStrategy => tradeStrategy.Name, tradeStrategy => tradeStrategy.Accuracy);
+	}
+
+	public async Task<int?> GetAccuracyByNameAsync(string name, CancellationToken ct)
+	{
+		return await _dbSet
+			.Where(tradeStrategy => tradeStrategy.Name == name)
+			.Select(tradeStrategy => tradeStrategy.Accuracy)
+			.FirstOrDefaultAsync(ct);
 	}
 
 	public async Task<PageResult<TradeStrategy>> GetPagedFilteredAsync(
 		int userId,
 		IQuerySpecification<TradeStrategy> spec,
 		PageOptions page,
-		CancellationToken ct = default
+		CancellationToken ct
 	)
 	{
-		var queryable = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
-
+		var query = SpecificationEvaluator.GetQuery(_dbSet, spec);
 		if (spec.SortExpressions.Count == 0)
-			queryable = queryable.OrderBy(e => e.Id);
+			query = query.OrderBy(strategy => strategy.Id);
 
-		var pagedTuple = await queryable
-			.Select(tradeStrategy => new
+		var pagedStrategies = await query
+			.Select(strategy => new
 			{
-				Strategy = tradeStrategy,
-				IsActive = tradeStrategy.UserTradeStrategies!.Any(uts => uts.UserId == userId),
+				Strategy = strategy,
+				IsActive = strategy.UserTradeStrategies.Any(link => link.UserId == userId),
 			})
 			.ToPagedAsync(page, ct);
 
-		return pagedTuple.Map(t =>
+		return pagedStrategies.Map(strategy =>
 		{
-			t.Strategy.IsActive = t.IsActive;
-			return t.Strategy;
+			strategy.Strategy.IsActive = strategy.IsActive;
+			return strategy.Strategy;
 		});
 	}
 }

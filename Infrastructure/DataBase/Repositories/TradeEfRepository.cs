@@ -40,21 +40,6 @@ public class TradeEfRepository(AppDbContext context) : GenericEfRepository<Trade
 		return result ?? TradeStatisticAggregateDto.Empty;
 	}
 
-	public async Task<PageResult<Trade>> GetByUserPagedAsync(int userId, PageOptions page, CancellationToken ct)
-	{
-		return await FindPagedAsync(t => t.UserId == userId, page, ct);
-	}
-
-	public async Task<PageResult<Trade>> GetByUserAndTradeCodePagedAsync(
-		int userId,
-		int tradeCodeId,
-		PageOptions page,
-		CancellationToken ct
-	)
-	{
-		return await FindPagedAsync(t => t.UserId == userId && t.TradeCodeId == tradeCodeId, page, ct);
-	}
-
 	public async Task<int> ExecuteUpdateAsync(
 		int id,
 		int userId,
@@ -81,4 +66,5 @@ public class TradeEfRepository(AppDbContext context) : GenericEfRepository<Trade
 				)
 		);
 	}
+
 }

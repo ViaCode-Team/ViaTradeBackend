@@ -19,13 +19,31 @@ public class TradeCodeEfRepository(AppDbContext context) : GenericEfRepository<T
 		return await _dbSet.Where(e => e.ExchangeId == code).Select(e => (int?)e.Id).FirstOrDefaultAsync(ct);
 	}
 
+	public async Task<string?> GetExchangeIdByIdAsync(int id, CancellationToken ct)
+	{
+		return await _dbSet.Where(e => e.Id == id).Select(e => e.ExchangeId).FirstOrDefaultAsync(ct);
+	}
+
+	public async Task<Dictionary<string, int>> GetExchangeIdMapAsync(CancellationToken ct)
+	{
+		return await _dbSet
+			.Select(tradeCode => new TradeCodeReferenceDto(tradeCode.Id, tradeCode.ExchangeId))
+			.ToDictionaryAsync(tradeCode => tradeCode.ExchangeId, tradeCode => tradeCode.Id, StringComparer.OrdinalIgnoreCase, ct);
+	}
+
 	public async Task<PageResult<TradeCode>> GetCodesPagedAsync(
 		PageOptions page,
 		TradeCodeSort sort,
 		CancellationToken ct
 	)
 	{
-		var query = _dbSet.AsQueryable();
+		var query = ApplySort(_dbSet, sort);
+
+		return await query.ToPagedAsync(page, ct);
+	}
+
+	private static IQueryable<TradeCode> ApplySort(IQueryable<TradeCode> query, TradeCodeSort sort)
+	{
 
 		var sortFields = sort.GetEffectiveSortBy();
 
@@ -58,6 +76,6 @@ public class TradeCodeEfRepository(AppDbContext context) : GenericEfRepository<T
 			query = query.OrderBy(e => e.Id);
 		}
 
-		return await query.ToPagedAsync(page, ct);
+		return query;
 	}
 }

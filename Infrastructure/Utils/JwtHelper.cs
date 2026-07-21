@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Application.Auth.Interfaces;
-using Domain.Users.Entities;
+using Application.Users.Models;
 using Infrastructure.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -14,7 +14,7 @@ public class JwtHelper(IOptions<JwtOptions> options) : IJwtHelper
 {
 	private readonly JwtOptions _options = options.Value;
 
-	public string GenerateAccessToken(User user, string sessionId)
+	public string GenerateAccessToken(UserTokenDto user, string sessionId)
 	{
 		var claims = new[]
 		{

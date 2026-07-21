@@ -21,7 +21,7 @@ public class AuthCommandService(
 
 	public async Task<AuthTokens> LoginAsync(string login, string password, string userAgent, CancellationToken ct)
 	{
-		var user = await userRepository.GetByLoginAsync(login, ct);
+		var user = await userRepository.GetLoginUserAsync(login, ct);
 
 		if (user == null || !passwordHasher.Verify(password, user.HashPassword))
 			throw new InvalidCredentialsException();
@@ -38,7 +38,7 @@ public class AuthCommandService(
 
 		await sessionRepository.CreateAsync(session, _sessionTtl);
 
-		var accessToken = jwtHelper.GenerateAccessToken(user, sessionId);
+		var accessToken = jwtHelper.GenerateAccessToken(new UserTokenDto(user.Id, user.Login), sessionId);
 		var refreshToken = jwtHelper.GenerateRefreshToken();
 
 		await refreshTokenRepository.StoreAsync(sessionId, refreshToken, _sessionTtl);
@@ -77,7 +77,7 @@ public class AuthCommandService(
 		if (session == null)
 			throw new InvalidTokenException();
 
-		var user = await userRepository.GetByIdAsync(session.UserId, ct);
+		var user = await userRepository.GetTokenUserAsync(session.UserId, ct);
 		if (user == null)
 			throw new InvalidTokenException();
 

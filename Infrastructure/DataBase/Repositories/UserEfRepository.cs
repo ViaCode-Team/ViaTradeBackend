@@ -1,4 +1,5 @@
 using Application.Users.Interfaces;
+using Application.Users.Models;
 using Domain.Users.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,14 +7,43 @@ namespace Infrastructure.DataBase.Repositories;
 
 public class UserEfRepository(AppDbContext context) : GenericEfRepository<User>(context), IUserRepository
 {
-	public async Task<User?> GetByLoginAsync(string login, CancellationToken ct)
+	public async Task<UserLoginDto?> GetLoginUserAsync(string login, CancellationToken ct)
 	{
-		return await _dbSet.FirstOrDefaultAsync(u => u.Login == login, ct);
+		return await _dbSet
+			.Where(user => user.Login == login)
+			.Select(user => new UserLoginDto(user.Id, user.Login, user.HashPassword))
+			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<IEnumerable<User>> GetAllWithTgLinkAsync(CancellationToken ct)
+	public async Task<UserMeDto?> GetMeAsync(int userId, CancellationToken ct)
 	{
-		return await _dbSet.Where(u => u.TelegramId != null).ToListAsync(ct);
+		return await _dbSet
+			.Where(user => user.Id == userId)
+			.Select(user => new UserMeDto
+			{
+				Id = user.Id,
+				Login = user.Login,
+				LastLoginDate = user.LastLoginDate,
+				RegisterDate = user.RegisterDate,
+				TelegramId = user.TelegramId,
+			})
+			.FirstOrDefaultAsync(ct);
+	}
+
+	public async Task<UserTokenDto?> GetTokenUserAsync(int userId, CancellationToken ct)
+	{
+		return await _dbSet
+			.Where(user => user.Id == userId)
+			.Select(user => new UserTokenDto(user.Id, user.Login))
+			.FirstOrDefaultAsync(ct);
+	}
+
+	public async Task<IReadOnlyList<UserTelegramDto>> GetTelegramRecipientsAsync(CancellationToken ct)
+	{
+		return await _dbSet
+			.Where(user => user.TelegramId != null)
+			.Select(user => new UserTelegramDto { Id = user.Id, TelegramId = user.TelegramId! })
+			.ToListAsync(ct);
 	}
 
 	public async Task<int> UpdateTelegramIdAsync(int userId, string telegramId, CancellationToken ct)

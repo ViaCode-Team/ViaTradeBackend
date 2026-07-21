@@ -26,13 +26,7 @@ public class TradeCodeQueryService(IFileReader tradefileReader, ITradeCodeReposi
 	public async Task<IEnumerable<TradeCodeFileDto>> GetFileMetadataAsync(TradeDataType dataType, CancellationToken ct)
 	{
 		var tradeFiles = tradefileReader.GetTradeCodes(dataType);
-		var tradeCodes = await tradeCodeRepository.GetAllAsync(ct);
-
-		var dbCodeMap = tradeCodes.ToDictionary(
-			tradeCode => tradeCode.ExchangeId,
-			tradeCode => tradeCode.Id,
-			StringComparer.OrdinalIgnoreCase
-		);
+		var dbCodeMap = await tradeCodeRepository.GetExchangeIdMapAsync(ct);
 
 		return tradeFiles
 			.Where(fileCode => dbCodeMap.ContainsKey(fileCode.TradeCode))
@@ -57,12 +51,11 @@ public class TradeCodeQueryService(IFileReader tradefileReader, ITradeCodeReposi
 
 		if (int.TryParse(tradeIdString, out var tradeCodeId))
 		{
-			var dbEntity =
-				await tradeCodeRepository.GetByIdAsync(tradeCodeId, ct)
+			exchangeId =
+				await tradeCodeRepository.GetExchangeIdByIdAsync(tradeCodeId, ct)
 				?? throw new KeyNotFoundException($"TradeCode with Id {tradeCodeId} not found in database");
 
-			exchangeId = dbEntity.ExchangeId;
-			dbId = dbEntity.Id;
+			dbId = tradeCodeId;
 		}
 		else
 		{

@@ -16,7 +16,7 @@ public class ReminderCommandService(
 	{
 		var reminder = new Reminder
 		{
-			Text = text,
+			TextRemind = text,
 			DateTime = dateTime,
 			TradeCodeId = tradeCodeId,
 			UserId = userId,

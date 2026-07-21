@@ -14,6 +14,6 @@ public class UserStrategyTradeCodeEfRepository(AppDbContext context)
 		CancellationToken ct
 	)
 	{
-		return await FindPagedAsync(e => e.UserId == userId, page, ct);
+		return await FindPagedAsync(strategyCode => strategyCode.UserId == userId, page, ct);
 	}
 }

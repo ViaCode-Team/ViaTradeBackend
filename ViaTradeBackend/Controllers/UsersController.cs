@@ -26,12 +26,12 @@ public class UsersController(
 		logger.LogInformation("Getting current user information");
 
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var user = await userQueryService.GetAsync(userId, ct);
+		var user = await userQueryService.GetMeAsync(userId, ct);
 
 		if (user == null)
 			return TypedResults.NotFound();
 
-		return TypedResults.Ok(ApiMapper.ToUserMeResponse(user));
+		return TypedResults.Ok(ApiMapper.ToResponse(user));
 	}
 
 	[Authorize]
@@ -68,8 +68,8 @@ public class UsersController(
 	{
 		logger.LogInformation("Getting all users with Telegram links");
 
-		var users = await userQueryService.GetWithTgLinkAsync(ct);
+		var users = await userQueryService.GetTelegramRecipientsAsync(ct);
 
-		return TypedResults.Ok(users.Select(ApiMapper.ToUserTelegramResponse).ToList());
+		return TypedResults.Ok(users.Select(ApiMapper.ToResponse).ToList());
 	}
 }

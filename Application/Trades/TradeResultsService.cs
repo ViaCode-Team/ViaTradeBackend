@@ -39,8 +39,7 @@ public class TradeResultsService(
 			startDate = startDate.Value.Date;
 		}
 
-		var availableStrategies = await tradeStrategyRepository.GetAllAsync(ct);
-		var strategyAccuracyDict = availableStrategies.ToDictionary(s => s.Name, s => s.Accuracy);
+		var strategyAccuracyDict = await tradeStrategyRepository.GetAccuracyMapAsync(ct);
 
 		var userPreferences = await userTradeStrategyRepository.GetUserPreferencesAsync(userId, ct);
 		if (userPreferences.Count == 0)
@@ -111,8 +110,7 @@ public class TradeResultsService(
 		if (preference.Key == null || !preference.Value.Contains(tradeCode))
 			throw new KeyNotFoundException();
 
-		var strategy = await tradeStrategyRepository.GetByNameAsync(strategyName, ct);
-		var accuracy = strategy?.Accuracy;
+		var accuracy = await tradeStrategyRepository.GetAccuracyByNameAsync(strategyName, ct);
 
 		var results = tradefileReader.ReadDataByCodesWithStrategy<StrategyResult>(
 			TradeDataType.Strategy,

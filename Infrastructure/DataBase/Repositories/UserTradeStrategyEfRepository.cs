@@ -21,7 +21,7 @@ public class UserTradeStrategyEfRepository(AppDbContext context)
 		CancellationToken ct
 	)
 	{
-		return await FindPagedAsync(e => e.UserId == userId, page, ct);
+		return await FindPagedAsync(strategy => strategy.UserId == userId, page, ct);
 	}
 
 	public async Task<Dictionary<string, List<string>>> GetUserPreferencesAsync(int userId, CancellationToken ct)

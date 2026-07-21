@@ -26,33 +26,15 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 		noteType switch
 		{
 			NoteType.TradeCodeNote => await _dbSet.FirstOrDefaultAsync(
-				n => n.TradeCodeId == relatedId && n.UserId == userId,
+				note => note.TradeCodeId == relatedId && note.UserId == userId,
 				ct
 			),
 			NoteType.TradeStrategyNote => await _dbSet.FirstOrDefaultAsync(
-				n => n.TradeStrategyId == relatedId && n.UserId == userId,
+				note => note.TradeStrategyId == relatedId && note.UserId == userId,
 				ct
 			),
 			_ => null,
 		};
-
-	public async Task<Note> GetByTargetAsync(int id, int userId, NoteType noteType, CancellationToken ct)
-	{
-		Note? found = noteType switch
-		{
-			NoteType.TradeCodeNote => await _dbSet.FirstOrDefaultAsync(
-				n => n.TradeCodeId == id && n.UserId == userId,
-				ct
-			),
-			NoteType.TradeStrategyNote => await _dbSet.FirstOrDefaultAsync(
-				n => n.TradeStrategyId == id && n.UserId == userId,
-				ct
-			),
-			_ => throw new KeyNotFoundException(),
-		};
-
-		return found ?? throw new KeyNotFoundException();
-	}
 
 	public async Task AddUserNoteAsync(
 		int relatedId,
@@ -109,4 +91,5 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 			_ => throw new ArgumentOutOfRangeException(nameof(noteType), noteType, "Unsupported note type."),
 		};
 	}
+
 }

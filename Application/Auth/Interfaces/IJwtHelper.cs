@@ -1,11 +1,11 @@
 using System.Security.Claims;
-using Domain.Users.Entities;
+using Application.Users.Models;
 
 namespace Application.Auth.Interfaces;
 
 public interface IJwtHelper
 {
-	string GenerateAccessToken(User user, string sessionId);
+	string GenerateAccessToken(UserTokenDto user, string sessionId);
 	string GenerateRefreshToken();
 	string GetSessionId(ClaimsPrincipal user);
 	int GetUserIdFromClaims(ClaimsPrincipal user);
