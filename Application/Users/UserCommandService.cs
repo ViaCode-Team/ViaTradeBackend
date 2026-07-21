@@ -22,7 +22,7 @@ public class UserCommandService(IUserRepository userRepository, ITelegramTokenRe
 
 	public async Task LinkTelegramAsync(string telegramToken, string telegramId, CancellationToken ct)
 	{
-		var userIdNullable = await telegramTokenRepository.GetUserIdAsync(telegramToken);
+		var userIdNullable = await telegramTokenRepository.FindUserIdAsync(telegramToken);
 		if (userIdNullable == null)
 			throw new InvalidTokenException("The Telegram link token is invalid or expired.");
 

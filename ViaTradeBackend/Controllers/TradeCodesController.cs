@@ -32,7 +32,7 @@ public class TradeCodesController(ITradeCodeQueryService tradeCodeQueryService) 
 		CancellationToken ct
 	)
 	{
-		var pagedCodes = await tradeCodeQueryService.GetAsync(page, sort, ct);
+		var pagedCodes = await tradeCodeQueryService.GetPageAsync(page, sort, ct);
 
 		return TypedResults.Ok(pagedCodes.Map(ApiMapper.ToResponse));
 	}
@@ -40,7 +40,7 @@ public class TradeCodesController(ITradeCodeQueryService tradeCodeQueryService) 
 	[HttpGet("sys/stocks")]
 	public async Task<Ok<List<TradeCodeFileResponse>>> GetSysStockCodes(CancellationToken ct)
 	{
-		var sysCodes = await tradeCodeQueryService.GetFileMetadataAsync(TradeDataType.Stocks, ct);
+		var sysCodes = await tradeCodeQueryService.ListFileMetadataAsync(TradeDataType.Stocks, ct);
 
 		return TypedResults.Ok(sysCodes.Select(ApiMapper.ToResponse).ToList());
 	}

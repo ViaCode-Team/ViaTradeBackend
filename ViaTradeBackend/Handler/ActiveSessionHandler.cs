@@ -21,7 +21,7 @@ public class ActiveSessionHandler(ISessionRepository sessionRepository) : Author
 			return;
 		}
 
-		var session = await sessionRepository.GetAsync(sessionId);
+		var session = await sessionRepository.FindByIdAsync(sessionId);
 		if (session == null)
 		{
 			context.Fail();

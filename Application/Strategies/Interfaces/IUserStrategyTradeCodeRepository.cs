@@ -6,5 +6,9 @@ namespace Application.Strategies.Interfaces;
 
 public interface IUserStrategyTradeCodeRepository : IRepository<UserStrategyTradeCode>
 {
-	Task<PageResult<UserStrategyTradeCode>> GetPagedAsync(int userId, PageOptions page, CancellationToken ct = default);
+	Task<PageResult<UserStrategyTradeCode>> GetPageByUserAsync(
+		int userId,
+		PageOptions page,
+		CancellationToken ct = default
+	);
 }

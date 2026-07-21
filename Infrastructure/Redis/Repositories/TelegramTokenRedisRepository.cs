@@ -14,9 +14,9 @@ public class TelegramTokenRedisRepository(IConnectionMultiplexer redis)
 		await SetAsync(entity, expiry);
 	}
 
-	public async Task<int?> GetUserIdAsync(string token)
+	public async Task<int?> FindUserIdAsync(string token)
 	{
-		var entity = await GetAsync(token);
+		var entity = await FindByIdAsync(token);
 		return entity?.UserId;
 	}
 }

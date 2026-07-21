@@ -15,13 +15,13 @@ public class UserTradeStrategyEfRepository(AppDbContext context)
 		return await _dbSet.CountAsync(e => e.UserId == userId, ct);
 	}
 
-	public async Task<PageResult<UserTradeStrategy>> GetByUserPagedAsync(
+	public async Task<PageResult<UserTradeStrategy>> GetPageByUserAsync(
 		int userId,
 		PageOptions page,
 		CancellationToken ct
 	)
 	{
-		return await FindPagedAsync(strategy => strategy.UserId == userId, page, ct);
+		return await GetPageByAsync(strategy => strategy.UserId == userId, page, ct);
 	}
 
 	public async Task<Dictionary<string, List<string>>> GetUserPreferencesAsync(int userId, CancellationToken ct)

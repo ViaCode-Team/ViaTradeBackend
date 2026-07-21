@@ -35,7 +35,7 @@ public class RemindersController(
 	[HttpGet("byuser/actual")]
 	public async Task<Ok<IEnumerable<ReminderResponse>>> GetDueReminders(CancellationToken ct)
 	{
-		var reminders = await reminderQueryService.GetAsync(ct);
+		var reminders = await reminderQueryService.ListDueAsync(ct);
 
 		return TypedResults.Ok(reminders.Select(ApiMapper.ToResponse));
 	}
@@ -44,7 +44,7 @@ public class RemindersController(
 	[HttpDelete("byuser/actual/{id}")]
 	public async Task<NoContent> DeleteDueReminder([FromRoute, Required] int id, CancellationToken ct)
 	{
-		await reminderCommandService.DeleteAsync(id, ct);
+		await reminderCommandService.DeleteDueAsync(id, ct);
 		return TypedResults.NoContent();
 	}
 
@@ -57,7 +57,7 @@ public class RemindersController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userReminders = await reminderQueryService.GetAsync(userId, page, sort, ct);
+		var userReminders = await reminderQueryService.GetPageAsync(userId, page, sort, ct);
 
 		return TypedResults.Ok(userReminders.Map(ApiMapper.ToResponse));
 	}
@@ -72,7 +72,7 @@ public class RemindersController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var reminders = await reminderQueryService.GetAsync(userId, tradeCodeId, page, sort, ct);
+		var reminders = await reminderQueryService.GetPageAsync(userId, tradeCodeId, page, sort, ct);
 
 		return TypedResults.Ok(reminders.Map(ApiMapper.ToResponse));
 	}
@@ -82,7 +82,7 @@ public class RemindersController(
 	public async Task<Ok<ReminderResponse>> GetUserReminderById([Required] int id, CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var reminder = await reminderQueryService.GetAsync(id, userId, ct);
+		var reminder = await reminderQueryService.GetAsync(userId, id, ct);
 
 		return TypedResults.Ok(ApiMapper.ToResponse(reminder));
 	}
@@ -111,7 +111,7 @@ public class RemindersController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await reminderCommandService.UpdateAsync(id, userId, request.Text, request.DateTime, ct);
+		await reminderCommandService.UpdateAsync(userId, id, request.Text, request.DateTime, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -121,7 +121,7 @@ public class RemindersController(
 	public async Task<NoContent> DeleteUserReminder([Required, FromRoute] int id, CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await reminderCommandService.DeleteAsync(id, userId, ct);
+		await reminderCommandService.DeleteAsync(userId, id, ct);
 
 		return TypedResults.NoContent();
 	}

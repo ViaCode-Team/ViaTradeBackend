@@ -8,7 +8,7 @@ namespace Application.Notes;
 
 public class NoteCommandService(INoteRepository noteRepository, IUnitOfWork uow) : INoteCommandService
 {
-	public async Task AddAsync(int relatedId, NoteType noteType, int userId, string noteText, CancellationToken ct)
+	public async Task AddAsync(int userId, int relatedId, NoteType noteType, string noteText, CancellationToken ct)
 	{
 		var note = noteType switch
 		{
@@ -33,7 +33,7 @@ public class NoteCommandService(INoteRepository noteRepository, IUnitOfWork uow)
 		await uow.SaveChangesAsync(ct);
 	}
 
-	public async Task DeleteAsync(int relatedId, int userId, NoteType noteType, CancellationToken ct)
+	public async Task DeleteAsync(int userId, int relatedId, NoteType noteType, CancellationToken ct)
 	{
 		var affectedRows = await noteRepository.ExecuteDeleteAsync(
 			x =>
@@ -43,8 +43,8 @@ public class NoteCommandService(INoteRepository noteRepository, IUnitOfWork uow)
 		);
 	}
 
-	public async Task UpdateAsync(int relatedId, NoteType noteType, int userId, string noteText, CancellationToken ct)
+	public async Task UpdateAsync(int userId, int relatedId, NoteType noteType, string noteText, CancellationToken ct)
 	{
-		await noteRepository.ExecuteUpdateUserNoteAsync(relatedId, noteType, userId, noteText, ct);
+		await noteRepository.ExecuteUpdateUserNoteAsync(userId, relatedId, noteType, noteText, ct);
 	}
 }

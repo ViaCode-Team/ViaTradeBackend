@@ -33,7 +33,7 @@ public class ResultsController(ITradeResultsService tradeResultsService, IJwtHel
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var response = await tradeResultsService.GetAsync(userId, startDate, endTime, sort, ct);
+		var response = await tradeResultsService.GetStrategyResultsAsync(userId, startDate, endTime, sort, ct);
 
 		return TypedResults.Ok(response);
 	}
@@ -48,7 +48,14 @@ public class ResultsController(ITradeResultsService tradeResultsService, IJwtHel
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var response = await tradeResultsService.GetAsync(userId, strategyName, tradeCode, startDate, endTime, ct);
+		var response = await tradeResultsService.GetStrategyTradeCodeResultsAsync(
+			userId,
+			strategyName,
+			tradeCode,
+			startDate,
+			endTime,
+			ct
+		);
 
 		return TypedResults.Ok(response);
 	}

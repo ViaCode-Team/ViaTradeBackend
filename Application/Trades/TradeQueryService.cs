@@ -10,7 +10,7 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 {
 	public async Task<GlobalTradeStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		var result = await tradeRepository.GetGlobalStatisticAsync(userId, ct);
+		var result = await tradeRepository.GetGlobalStatisticsAsync(userId, ct);
 
 		var tradeStatistic = new TradeStatisticDto(result.TotalTrades, result.WinTrades, result.LoseTrades);
 
@@ -27,9 +27,9 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 		return new GlobalTradeStatisticDto(tradeStatistic, incomeStatistic, winrateStatistic);
 	}
 
-	public async Task<TradeDto> GetAsync(int id, int userId, CancellationToken ct)
+	public async Task<TradeDto> GetAsync(int userId, int id, CancellationToken ct)
 	{
-		var trade = await tradeRepository.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId, ct);
+		var trade = await tradeRepository.FindOneAsync(x => x.Id == id && x.UserId == userId, ct);
 		if (trade == null)
 			throw new KeyNotFoundException();
 
@@ -49,7 +49,7 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 		);
 	}
 
-	public async Task<PageResult<TradeDto>> GetAsync(
+	public async Task<PageResult<TradeDto>> GetPageAsync(
 		int userId,
 		TradeFilter filter,
 		PageOptions page,
@@ -57,23 +57,21 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 	)
 	{
 		var spec = new TradeQuerySpecification(userId, filter);
-		var trades = await tradeRepository.GetPagedAsync(spec, page, ct);
+		var trades = await tradeRepository.GetPageAsync(spec, page, ct);
 
-		return trades.Map(trade =>
-			new TradeDto(
-				trade.Id,
-				trade.DateOpen,
-				trade.DateClose,
-				trade.TradeOpen,
-				trade.TradeClose,
-				TradeStatisticsCalcService.CalculateNetIncome(trade.TradeOpen, trade.TradeClose, trade.TradeSignal),
-				trade.Count,
-				trade.Price,
-				trade.TradeSignal,
-				trade.TradeTypeId,
-				trade.TradeCodeId,
-				trade.UserId
-			)
-		);
+		return trades.Map(trade => new TradeDto(
+			trade.Id,
+			trade.DateOpen,
+			trade.DateClose,
+			trade.TradeOpen,
+			trade.TradeClose,
+			TradeStatisticsCalcService.CalculateNetIncome(trade.TradeOpen, trade.TradeClose, trade.TradeSignal),
+			trade.Count,
+			trade.Price,
+			trade.TradeSignal,
+			trade.TradeTypeId,
+			trade.TradeCodeId,
+			trade.UserId
+		));
 	}
 }

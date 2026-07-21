@@ -9,7 +9,7 @@ namespace Infrastructure.DataBase.Repositories;
 
 public class TradeEfRepository(AppDbContext context) : GenericEfRepository<Trade>(context), ITradeRepository
 {
-	public async Task<TradeStatisticAggregateDto> GetGlobalStatisticAsync(int userId, CancellationToken ct)
+	public async Task<TradeStatisticAggregateDto> GetGlobalStatisticsAsync(int userId, CancellationToken ct)
 	{
 		var result = await _context
 			.Trades.Where(trade =>
@@ -20,11 +20,10 @@ public class TradeEfRepository(AppDbContext context) : GenericEfRepository<Trade
 			)
 			.Select(trade => new
 			{
-				Income =
-					Math.Round(
-						(trade.TradeClose!.Value - trade.TradeOpen) / trade.TradeOpen * 100 * (int)trade.TradeSignal,
-						2
-					),
+				Income = Math.Round(
+					(trade.TradeClose!.Value - trade.TradeOpen) / trade.TradeOpen * 100 * (int)trade.TradeSignal,
+					2
+				),
 			})
 			.GroupBy(_ => 1)
 			.Select(group => new TradeStatisticAggregateDto(
@@ -41,8 +40,8 @@ public class TradeEfRepository(AppDbContext context) : GenericEfRepository<Trade
 	}
 
 	public async Task<int> ExecuteUpdateAsync(
-		int id,
 		int userId,
+		int id,
 		TradeInputDto request,
 		decimal price,
 		CancellationToken ct
@@ -66,5 +65,4 @@ public class TradeEfRepository(AppDbContext context) : GenericEfRepository<Trade
 				)
 		);
 	}
-
 }

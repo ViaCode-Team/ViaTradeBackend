@@ -8,7 +8,7 @@ namespace Application.Strategies.Interfaces;
 public interface IStrategyQueryService
 {
 	Task<StrategyStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct);
-	Task<PageResult<TradeStrategy>> GetAsync(
+	Task<PageResult<TradeStrategy>> GetPageAsync(
 		int userId,
 		StrategyFilter filter,
 		StrategySort sort,
@@ -16,6 +16,10 @@ public interface IStrategyQueryService
 		CancellationToken ct
 	);
 	Task<TradeStrategy> GetAsync(int strategyId, CancellationToken ct);
-	Task<PageResult<UserTradeStrategy>> GetUserLinkedAsync(int userId, PageOptions page, CancellationToken ct);
-	Task<PageResult<UserStrategyTradeCode>> GetUserLinkedCodesAsync(int userId, PageOptions page, CancellationToken ct);
+	Task<PageResult<UserTradeStrategy>> GetUserStrategiesPageAsync(int userId, PageOptions page, CancellationToken ct);
+	Task<PageResult<UserStrategyTradeCode>> GetUserStrategyTradeCodesPageAsync(
+		int userId,
+		PageOptions page,
+		CancellationToken ct
+	);
 }

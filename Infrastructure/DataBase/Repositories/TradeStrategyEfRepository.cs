@@ -12,7 +12,7 @@ public class TradeStrategyEfRepository(AppDbContext context)
 	: GenericEfRepository<TradeStrategy>(context),
 		ITradeStrategyRepository
 {
-	public async Task<StrategyCountsDto> GetStatisticAsync(int userId, CancellationToken ct)
+	public async Task<StrategyCountsDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
 		var query = _context
 			.Users.Where(user => user.Id == userId)
@@ -34,7 +34,7 @@ public class TradeStrategyEfRepository(AppDbContext context)
 		return strategies.ToDictionary(tradeStrategy => tradeStrategy.Name, tradeStrategy => tradeStrategy.Accuracy);
 	}
 
-	public async Task<int?> GetAccuracyByNameAsync(string name, CancellationToken ct)
+	public async Task<int?> FindAccuracyByNameAsync(string name, CancellationToken ct)
 	{
 		return await _dbSet
 			.Where(tradeStrategy => tradeStrategy.Name == name)
@@ -42,7 +42,7 @@ public class TradeStrategyEfRepository(AppDbContext context)
 			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<PageResult<TradeStrategy>> GetPagedFilteredAsync(
+	public async Task<PageResult<TradeStrategy>> GetPageAsync(
 		int userId,
 		IQuerySpecification<TradeStrategy> spec,
 		PageOptions page,

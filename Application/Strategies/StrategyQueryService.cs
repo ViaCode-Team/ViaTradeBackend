@@ -16,7 +16,7 @@ public class StrategyQueryService(
 {
 	public async Task<StrategyStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		var counts = await tradeStrategyRepository.GetStatisticAsync(userId, ct);
+		var counts = await tradeStrategyRepository.GetStatisticsAsync(userId, ct);
 		if (counts == null)
 			throw new KeyNotFoundException($"User with ID {userId} was not found for get stratagy statiscs.");
 
@@ -38,7 +38,7 @@ public class StrategyQueryService(
 		);
 	}
 
-	public async Task<PageResult<TradeStrategy>> GetAsync(
+	public async Task<PageResult<TradeStrategy>> GetPageAsync(
 		int userId,
 		StrategyFilter filter,
 		StrategySort sort,
@@ -47,29 +47,33 @@ public class StrategyQueryService(
 	)
 	{
 		var spec = new StrategyQuerySpecification(userId, filter, sort);
-		return await tradeStrategyRepository.GetPagedFilteredAsync(userId, spec, page, ct);
+		return await tradeStrategyRepository.GetPageAsync(userId, spec, page, ct);
 	}
 
 	public async Task<TradeStrategy> GetAsync(int strategyId, CancellationToken ct)
 	{
-		return await tradeStrategyRepository.GetByIdAsync(strategyId, ct) ?? throw new KeyNotFoundException();
+		var tradeStrategy = await tradeStrategyRepository.FindByIdAsync(strategyId, ct);
+		if (tradeStrategy == null)
+			throw new KeyNotFoundException();
+
+		return tradeStrategy;
 	}
 
-	public async Task<PageResult<UserTradeStrategy>> GetUserLinkedAsync(
+	public async Task<PageResult<UserTradeStrategy>> GetUserStrategiesPageAsync(
 		int userId,
 		PageOptions page,
 		CancellationToken ct
 	)
 	{
-		return await userTradeStrategyRepository.GetByUserPagedAsync(userId, page, ct);
+		return await userTradeStrategyRepository.GetPageByUserAsync(userId, page, ct);
 	}
 
-	public async Task<PageResult<UserStrategyTradeCode>> GetUserLinkedCodesAsync(
+	public async Task<PageResult<UserStrategyTradeCode>> GetUserStrategyTradeCodesPageAsync(
 		int userId,
 		PageOptions page,
 		CancellationToken ct
 	)
 	{
-		return await userStrategyTradeCodeRepository.GetPagedAsync(userId, page, ct);
+		return await userStrategyTradeCodeRepository.GetPageByUserAsync(userId, page, ct);
 	}
 }

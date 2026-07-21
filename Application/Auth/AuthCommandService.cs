@@ -21,7 +21,7 @@ public class AuthCommandService(
 
 	public async Task<AuthTokens> LoginAsync(string login, string password, string userAgent, CancellationToken ct)
 	{
-		var user = await userRepository.GetLoginUserAsync(login, ct);
+		var user = await userRepository.FindLoginUserAsync(login, ct);
 
 		if (user == null || !passwordHasher.Verify(password, user.HashPassword))
 			throw new InvalidCredentialsException();
@@ -48,7 +48,7 @@ public class AuthCommandService(
 
 	public async Task LogoutAllAsync(int userId, CancellationToken ct)
 	{
-		var sessions = await sessionRepository.GetUserSessionsAsync(userId);
+		var sessions = await sessionRepository.ListByUserAsync(userId);
 
 		foreach (var session in sessions)
 		{
@@ -59,7 +59,7 @@ public class AuthCommandService(
 
 	public async Task LogoutSessionAsync(string refreshToken, CancellationToken ct)
 	{
-		var sessionId = await refreshTokenRepository.GetSessionIdAsync(refreshToken);
+		var sessionId = await refreshTokenRepository.FindSessionIdAsync(refreshToken);
 		if (sessionId == null)
 			return;
 
@@ -69,15 +69,15 @@ public class AuthCommandService(
 
 	public async Task<AuthTokens> RefreshTokenAsync(string refreshToken, CancellationToken ct)
 	{
-		var sessionId = await refreshTokenRepository.GetSessionIdAsync(refreshToken);
+		var sessionId = await refreshTokenRepository.FindSessionIdAsync(refreshToken);
 		if (sessionId == null)
 			throw new InvalidTokenException();
 
-		var session = await sessionRepository.GetAsync(sessionId);
+		var session = await sessionRepository.FindByIdAsync(sessionId);
 		if (session == null)
 			throw new InvalidTokenException();
 
-		var user = await userRepository.GetTokenUserAsync(session.UserId, ct);
+		var user = await userRepository.FindTokenUserAsync(session.UserId, ct);
 		if (user == null)
 			throw new InvalidTokenException();
 

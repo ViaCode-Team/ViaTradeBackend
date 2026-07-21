@@ -4,7 +4,7 @@ namespace Application.Users.Interfaces;
 
 public interface IUserQueryService
 {
-	Task<UserMeDto?> GetMeAsync(int userId, CancellationToken ct);
-	Task<IReadOnlyList<UserTelegramDto>> GetTelegramRecipientsAsync(CancellationToken ct);
-	Task<int?> GetIdAsync(string token, CancellationToken ct);
+	Task<UserMeDto> GetCurrentUserAsync(int userId, CancellationToken ct);
+	Task<IReadOnlyList<UserTelegramDto>> ListTelegramRecipientsAsync(CancellationToken ct);
+	Task<int?> FindUserIdByTelegramTokenAsync(string token, CancellationToken ct);
 }

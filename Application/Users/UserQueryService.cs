@@ -6,20 +6,23 @@ namespace Application.Users;
 public class UserQueryService(IUserRepository userRepository, ITelegramTokenRepository telegramTokenRepository)
 	: IUserQueryService
 {
-	public async Task<IReadOnlyList<UserTelegramDto>> GetTelegramRecipientsAsync(CancellationToken ct)
+	public async Task<IReadOnlyList<UserTelegramDto>> ListTelegramRecipientsAsync(CancellationToken ct)
 	{
-		return await userRepository.GetTelegramRecipientsAsync(ct);
+		return await userRepository.ListTelegramRecipientsAsync(ct);
 	}
 
-	public async Task<UserMeDto?> GetMeAsync(int userId, CancellationToken ct)
+	public async Task<UserMeDto> GetCurrentUserAsync(int userId, CancellationToken ct)
 	{
-		return await userRepository.GetMeAsync(userId, ct);
+		var user = await userRepository.FindMeAsync(userId, ct);
+		if (user == null)
+			throw new KeyNotFoundException("User not found.");
+
+		return user;
 	}
 
-	public async Task<int?> GetIdAsync(string telegramToken, CancellationToken ct)
+	public async Task<int?> FindUserIdByTelegramTokenAsync(string telegramToken, CancellationToken ct)
 	{
-		var userId = await telegramTokenRepository.GetUserIdAsync(telegramToken);
-
+		var userId = await telegramTokenRepository.FindUserIdAsync(telegramToken);
 		if (userId == null)
 			return null;
 

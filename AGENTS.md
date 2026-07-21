@@ -32,3 +32,14 @@
 3. **Syntax Constraints**: Use modern syntax (switch expressions). NO ternary operators (`? :`); use `if/else` or `switch`. NO spread collections `[..]` for fluent methods (prefer `.ToList()`). Regular collections `[]` allowed.
 4. **Clean Code**: Avoid unnecessary braces for single-line statements. Comments must be minimal, in English, and only for highly complex code.
 5. **Entity Framework**: The DbContext is globally configured with `QueryTrackingBehavior.NoTracking`. All read operations are untracked by default. DO NOT add `.AsNoTracking()` explicitly. When updating entities using `SaveChangesAsync()`, you MUST explicitly call `_dbSet.Update(entity)` beforehand. Prefer `ExecuteUpdateAsync/ExecuteDeleteAsync` where possible.
+
+## Method Naming
+
+- `Find...Async`: nullable result when absence is expected.
+- `Get...Async`: required result; services throw `NotFoundException` only when required by business rules.
+- `List...Async`: unpaged collection.
+- `Get...PageAsync`: paged result.
+- Overload only identical operations with the same result; extra parameters may only refine the query. Different operations require distinct names.
+- Repositories access/persist data; services apply business rules.
+- Prefix direct bulk operations with `Execute`: `ExecuteUpdate...Async`, `ExecuteDelete...Async`.
+- Parameter order: `userId`, primary ID, related IDs, required parameters, optional parameters, filters, paging, sorting, `CancellationToken`.

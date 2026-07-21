@@ -6,7 +6,7 @@ public interface ITradeResultsService
 {
 	Task<SignalStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct);
 
-	Task<StrategyResults> GetAsync(
+	Task<StrategyResults> GetStrategyResultsAsync(
 		int userId,
 		DateTime? startDate,
 		DateTime? endDate,
@@ -14,7 +14,7 @@ public interface ITradeResultsService
 		CancellationToken ct
 	);
 
-	Task<StrategyResults> GetAsync(
+	Task<StrategyResults> GetStrategyTradeCodeResultsAsync(
 		int userId,
 		string strategyName,
 		string tradeCode,

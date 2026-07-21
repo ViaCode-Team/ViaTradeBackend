@@ -7,18 +7,18 @@ namespace Application.Common.Interfaces.Repositories;
 public interface IRepository<TEntity>
 	where TEntity : BaseEntity<int>
 {
-	Task<TEntity?> GetByIdAsync(int id, CancellationToken ct = default);
-	Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken ct = default);
-	Task<PageResult<TEntity>> GetPagedAsync(PageOptions page, CancellationToken ct = default);
-	Task<PageResult<TEntity>> GetPagedAsync(
+	Task<TEntity?> FindByIdAsync(int id, CancellationToken ct = default);
+	Task<IReadOnlyList<TEntity>> ListAsync(CancellationToken ct = default);
+	Task<PageResult<TEntity>> GetPageAsync(PageOptions page, CancellationToken ct = default);
+	Task<PageResult<TEntity>> GetPageAsync(
 		IQuerySpecification<TEntity> spec,
 		PageOptions page,
 		CancellationToken ct = default
 	);
-	Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
-	Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
-	Task<TEntity?> FirstOrDefaultAsync(CancellationToken ct = default);
-	Task<PageResult<TEntity>> FindPagedAsync(
+	Task<IReadOnlyList<TEntity>> ListByAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
+	Task<TEntity?> FindOneAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
+	Task<TEntity?> FindOneAsync(CancellationToken ct = default);
+	Task<PageResult<TEntity>> GetPageByAsync(
 		Expression<Func<TEntity, bool>> predicate,
 		PageOptions page,
 		CancellationToken ct = default

@@ -39,7 +39,7 @@ public class StrategiesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var pagedStrategies = await strategyQueryService.GetAsync(userId, filter, sort, page, ct);
+		var pagedStrategies = await strategyQueryService.GetPageAsync(userId, filter, sort, page, ct);
 
 		return TypedResults.Ok(pagedStrategies.Map(ApiMapper.ToResponse));
 	}
@@ -58,7 +58,7 @@ public class StrategiesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userStrategies = await strategyQueryService.GetUserLinkedAsync(userId, page, ct);
+		var userStrategies = await strategyQueryService.GetUserStrategiesPageAsync(userId, page, ct);
 
 		return TypedResults.Ok(userStrategies.Map(ApiMapper.ToResponse));
 	}
@@ -70,7 +70,7 @@ public class StrategiesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userStrategyCodes = await strategyQueryService.GetUserLinkedCodesAsync(userId, page, ct);
+		var userStrategyCodes = await strategyQueryService.GetUserStrategyTradeCodesPageAsync(userId, page, ct);
 
 		return TypedResults.Ok(userStrategyCodes.Map(ApiMapper.ToResponse));
 	}

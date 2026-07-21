@@ -8,7 +8,7 @@ namespace Infrastructure.DataBase.Repositories;
 
 public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(context), INoteRepository
 {
-	public async Task<NoteStatisticDto> GetNoteStatisticAsync(int userId, CancellationToken ct = default)
+	public async Task<NoteStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct = default)
 	{
 		var baseQuery = _dbSet.Where(n => n.UserId == userId);
 
@@ -59,9 +59,9 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 	}
 
 	public async Task<int> ExecuteUpdateUserNoteAsync(
+		int userId,
 		int id,
 		NoteType noteType,
-		int userId,
 		string noteText,
 		CancellationToken ct
 	)
@@ -73,7 +73,7 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 		);
 	}
 
-	public async Task<int> DeleteUserNoteAsync(int id, int userId, NoteType noteType, CancellationToken ct)
+	public async Task<int> ExecuteDeleteUserNoteAsync(int userId, int id, NoteType noteType, CancellationToken ct)
 	{
 		var query = GetTargetQuery(id, userId, noteType);
 
@@ -91,5 +91,4 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 			_ => throw new ArgumentOutOfRangeException(nameof(noteType), noteType, "Unsupported note type."),
 		};
 	}
-
 }

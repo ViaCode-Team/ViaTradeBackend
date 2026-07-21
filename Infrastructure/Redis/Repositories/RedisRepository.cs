@@ -13,7 +13,7 @@ public class RedisRepository<T>(IConnectionMultiplexer redis, string prefix) : I
 
 	protected string GetKey(string id) => $"{_prefix}{id}";
 
-	public async Task<T?> GetAsync(string id)
+	public async Task<T?> FindByIdAsync(string id)
 	{
 		var value = await _db.StringGetAsync(GetKey(id));
 		if (value.IsNullOrEmpty)
@@ -39,7 +39,7 @@ public class RedisRepository<T>(IConnectionMultiplexer redis, string prefix) : I
 		await _db.KeyDeleteAsync(GetKey(id));
 	}
 
-	public async Task<IEnumerable<T>> GetAllAsync()
+	public async Task<IReadOnlyList<T>> ListAsync()
 	{
 		var server = _db.Multiplexer.GetServer(_db.Multiplexer.GetEndPoints()[0]);
 		var keys = server.Keys(pattern: $"{_prefix}*");

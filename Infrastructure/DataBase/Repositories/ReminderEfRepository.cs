@@ -9,7 +9,7 @@ namespace Infrastructure.DataBase.Repositories;
 
 public class ReminderEfRepository(AppDbContext context) : GenericEfRepository<Reminder>(context), IReminderRepository
 {
-	public async Task<IEnumerable<Reminder>> GetDueRemindersAsync(CancellationToken ct)
+	public async Task<IReadOnlyList<Reminder>> ListDueAsync(CancellationToken ct)
 	{
 		return await _dbSet.Where(reminder => reminder.DateTime <= DateTime.UtcNow).ToListAsync(ct);
 	}
@@ -19,9 +19,9 @@ public class ReminderEfRepository(AppDbContext context) : GenericEfRepository<Re
 		return await _dbSet.CountAsync(r => r.UserId == userId, ct);
 	}
 
-	public async Task<int> UpdateForUserAsync(
-		int reminderId,
+	public async Task<int> ExecuteUpdateForUserAsync(
 		int userId,
+		int reminderId,
 		string text,
 		DateTime dateTime,
 		CancellationToken ct
@@ -30,10 +30,12 @@ public class ReminderEfRepository(AppDbContext context) : GenericEfRepository<Re
 		var affectedRows = await EfDatabaseOperation.ExecuteAsync(() =>
 			_dbSet
 				.Where(r => r.Id == reminderId && r.UserId == userId)
-				.ExecuteUpdateAsync(s => s.SetProperty(r => r.TextRemind, text).SetProperty(r => r.DateTime, dateTime), ct)
+				.ExecuteUpdateAsync(
+					s => s.SetProperty(r => r.TextRemind, text).SetProperty(r => r.DateTime, dateTime),
+					ct
+				)
 		);
 
 		return affectedRows;
 	}
-
 }

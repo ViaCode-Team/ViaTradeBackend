@@ -18,12 +18,15 @@ public class TradeCodeQueryService(IFileReader tradefileReader, ITradeCodeReposi
 		return new StockStatisticDto(totalStocksCount);
 	}
 
-	public async Task<PageResult<TradeCode>> GetAsync(PageOptions page, TradeCodeSort sort, CancellationToken ct)
+	public async Task<PageResult<TradeCode>> GetPageAsync(PageOptions page, TradeCodeSort sort, CancellationToken ct)
 	{
-		return await tradeCodeRepository.GetCodesPagedAsync(page, sort, ct);
+		return await tradeCodeRepository.GetPageAsync(page, sort, ct);
 	}
 
-	public async Task<IEnumerable<TradeCodeFileDto>> GetFileMetadataAsync(TradeDataType dataType, CancellationToken ct)
+	public async Task<IReadOnlyList<TradeCodeFileDto>> ListFileMetadataAsync(
+		TradeDataType dataType,
+		CancellationToken ct
+	)
 	{
 		var tradeFiles = tradefileReader.GetTradeCodes(dataType);
 		var dbCodeMap = await tradeCodeRepository.GetExchangeIdMapAsync(ct);
@@ -37,7 +40,8 @@ public class TradeCodeQueryService(IFileReader tradefileReader, ITradeCodeReposi
 				TimeFrame = fileCode.TimeFrame,
 				StartDate = fileCode.StartDate,
 				EndDate = fileCode.EndDate,
-			});
+			})
+			.ToList();
 	}
 
 	public async Task<TradeCodeFileDto> GetFileMetadataAsync(
@@ -47,12 +51,12 @@ public class TradeCodeQueryService(IFileReader tradefileReader, ITradeCodeReposi
 	)
 	{
 		string exchangeId;
-		int? dbId = null;
+		int? dbId;
 
 		if (int.TryParse(tradeIdString, out var tradeCodeId))
 		{
 			exchangeId =
-				await tradeCodeRepository.GetExchangeIdByIdAsync(tradeCodeId, ct)
+				await tradeCodeRepository.FindExchangeIdByIdAsync(tradeCodeId, ct)
 				?? throw new KeyNotFoundException($"TradeCode with Id {tradeCodeId} not found in database");
 
 			dbId = tradeCodeId;
@@ -60,16 +64,15 @@ public class TradeCodeQueryService(IFileReader tradefileReader, ITradeCodeReposi
 		else
 		{
 			exchangeId = tradeIdString;
-			dbId = await tradeCodeRepository.GetIdByExchangeIdAsync(exchangeId, ct);
+			dbId = await tradeCodeRepository.FindIdByExchangeIdAsync(exchangeId, ct);
 		}
 
 		var fileCodes = tradefileReader.GetTradeCodes(dataType, [exchangeId]);
-		var fileCode =
-			fileCodes.FirstOrDefault()
-			?? throw new KeyNotFoundException($"No file data found for trade code '{exchangeId}'");
+		var fileCode = fileCodes.FirstOrDefault();
+		if (fileCode == null)
+			throw new KeyNotFoundException($"No file data found for trade code '{exchangeId}'");
 
-		dbId ??= await tradeCodeRepository.GetIdByExchangeIdAsync(fileCode.TradeCode, ct);
-
+		dbId ??= await tradeCodeRepository.FindIdByExchangeIdAsync(fileCode.TradeCode, ct);
 		if (dbId == null)
 			throw new KeyNotFoundException($"TradeCode '{exchangeId}' is not registered in database");
 

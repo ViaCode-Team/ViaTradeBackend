@@ -3,6 +3,7 @@ using Application.Common.Specifications;
 using Application.Reminders.Interfaces;
 using Application.Reminders.Models;
 using Domain.Reminders.Entities;
+using Domain.Strategies.Entities;
 
 namespace Application.Reminders;
 
@@ -15,18 +16,21 @@ public class ReminderQueryService(IReminderRepository reminderRepository) : IRem
 		return new ReminderStatisticsDto(total);
 	}
 
-	public async Task<IEnumerable<Reminder>> GetAsync(CancellationToken ct)
+	public async Task<IReadOnlyList<Reminder>> ListDueAsync(CancellationToken ct)
 	{
-		return await reminderRepository.GetDueRemindersAsync(ct);
+		return await reminderRepository.ListDueAsync(ct);
 	}
 
-	public async Task<Reminder> GetAsync(int reminderId, int userId, CancellationToken ct)
+	public async Task<Reminder> GetAsync(int userId, int reminderId, CancellationToken ct)
 	{
-		return await reminderRepository.FirstOrDefaultAsync(x => x.Id == reminderId && x.UserId == userId, ct)
-			?? throw new KeyNotFoundException("Reminder not found.");
+		var reminder = await reminderRepository.FindOneAsync(x => x.Id == reminderId && x.UserId == userId, ct);
+		if (reminder == null)
+			throw new KeyNotFoundException("Reminder not found.");
+
+		return reminder;
 	}
 
-	public async Task<PageResult<Reminder>> GetAsync(
+	public async Task<PageResult<Reminder>> GetPageAsync(
 		int userId,
 		int tradeCodeId,
 		PageOptions page,
@@ -35,10 +39,10 @@ public class ReminderQueryService(IReminderRepository reminderRepository) : IRem
 	)
 	{
 		var spec = new ReminderQuerySpecification(userId, tradeCodeId, sort);
-		return await reminderRepository.GetPagedAsync(spec, page, ct);
+		return await reminderRepository.GetPageAsync(spec, page, ct);
 	}
 
-	public async Task<PageResult<Reminder>> GetAsync(
+	public async Task<PageResult<Reminder>> GetPageAsync(
 		int userId,
 		PageOptions page,
 		ReminderSort sort,
@@ -46,6 +50,6 @@ public class ReminderQueryService(IReminderRepository reminderRepository) : IRem
 	)
 	{
 		var spec = new ReminderQuerySpecification(userId, null, sort);
-		return await reminderRepository.GetPagedAsync(spec, page, ct);
+		return await reminderRepository.GetPageAsync(spec, page, ct);
 	}
 }

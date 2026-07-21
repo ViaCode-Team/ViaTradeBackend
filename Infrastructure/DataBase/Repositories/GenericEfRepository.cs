@@ -20,22 +20,22 @@ public class GenericEfRepository<TEntity> : IRepository<TEntity>
 		_dbSet = _context.Set<TEntity>();
 	}
 
-	public async Task<TEntity?> GetByIdAsync(int id, CancellationToken ct)
+	public async Task<TEntity?> FindByIdAsync(int id, CancellationToken ct)
 	{
 		return await _dbSet.FindAsync([id], ct);
 	}
 
-	public async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken ct)
+	public async Task<IReadOnlyList<TEntity>> ListAsync(CancellationToken ct)
 	{
 		return await _dbSet.ToListAsync(ct);
 	}
 
-	public async Task<PageResult<TEntity>> GetPagedAsync(PageOptions page, CancellationToken ct)
+	public async Task<PageResult<TEntity>> GetPageAsync(PageOptions page, CancellationToken ct)
 	{
 		return await _dbSet.OrderBy(e => e.Id).ToPagedAsync(page, ct);
 	}
 
-	public async Task<PageResult<TEntity>> GetPagedAsync(
+	public async Task<PageResult<TEntity>> GetPageAsync(
 		IQuerySpecification<TEntity> spec,
 		PageOptions page,
 		CancellationToken ct
@@ -48,7 +48,7 @@ public class GenericEfRepository<TEntity> : IRepository<TEntity>
 		return await query.ToPagedAsync(page, ct);
 	}
 
-	public async Task<IEnumerable<TEntity>> FindAsync(
+	public async Task<IReadOnlyList<TEntity>> ListByAsync(
 		Expression<Func<TEntity, bool>> predicate,
 		CancellationToken ct = default
 	)
@@ -56,17 +56,17 @@ public class GenericEfRepository<TEntity> : IRepository<TEntity>
 		return await _dbSet.Where(predicate).ToListAsync(ct);
 	}
 
-	public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct)
+	public async Task<TEntity?> FindOneAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct)
 	{
 		return await _dbSet.FirstOrDefaultAsync(predicate, ct);
 	}
 
-	public async Task<TEntity?> FirstOrDefaultAsync(CancellationToken ct)
+	public async Task<TEntity?> FindOneAsync(CancellationToken ct)
 	{
 		return await _dbSet.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<PageResult<TEntity>> FindPagedAsync(
+	public async Task<PageResult<TEntity>> GetPageByAsync(
 		Expression<Func<TEntity, bool>> predicate,
 		PageOptions page,
 		CancellationToken ct

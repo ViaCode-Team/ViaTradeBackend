@@ -38,7 +38,7 @@ public class TradesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userTrades = await tradeQueryService.GetAsync(userId, filter, page, ct);
+		var userTrades = await tradeQueryService.GetPageAsync(userId, filter, page, ct);
 
 		return TypedResults.Ok(userTrades.Map(ApiMapper.ToResponse));
 	}
@@ -47,7 +47,7 @@ public class TradesController(
 	public async Task<Ok<TradeResponse>> GetTradeById([Required] int id, CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var trade = await tradeQueryService.GetAsync(id, userId, ct);
+		var trade = await tradeQueryService.GetAsync(userId, id, ct);
 
 		return TypedResults.Ok(ApiMapper.ToResponse(trade));
 	}
@@ -72,7 +72,7 @@ public class TradesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await tradeCommandService.UpdateAsync(id, userId, ApiMapper.ToInput(request), ct);
+		await tradeCommandService.UpdateAsync(userId, id, ApiMapper.ToInput(request), ct);
 
 		return TypedResults.NoContent();
 	}
@@ -81,7 +81,7 @@ public class TradesController(
 	public async Task<NoContent> DeleteUserTrade([FromRoute, Required] int id, CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await tradeCommandService.DeleteAsync(id, userId, ct);
+		await tradeCommandService.DeleteAsync(userId, id, ct);
 
 		return TypedResults.NoContent();
 	}

@@ -6,10 +6,10 @@ namespace Application.Auth.Interfaces;
 public interface ISessionRepository
 {
 	Task CreateAsync(UserSessionDto session, TimeSpan ttl);
-	Task<UserSessionDto?> GetAsync(string sessionId);
+	Task<UserSessionDto?> FindByIdAsync(string sessionId);
 	Task RemoveAsync(string sessionId);
-	Task<IEnumerable<UserSessionDto>> GetUserSessionsAsync(int userId);
-	Task<PageResult<UserSessionDto>> GetPagedUserSessionsAsync(int userId, PageOptions page);
-	IEnumerable<int> GetAllUserIdsWithSessions();
+	Task<IReadOnlyList<UserSessionDto>> ListByUserAsync(int userId);
+	Task<PageResult<UserSessionDto>> GetPageByUserAsync(int userId, PageOptions page);
+	IReadOnlyList<int> ListUserIds();
 	Task<int> CleanupExpiredSessionsAsync(DateTime threshold);
 }

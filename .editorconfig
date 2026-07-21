@@ -25,3 +25,6 @@ dotnet_separate_import_directive_groups = false
 
 dotnet_diagnostic.RMG012.severity = error
 dotnet_diagnostic.RMG020.severity = error
+
+dotnet_diagnostic.IDE0046.severity = none
+dotnet_diagnostic.IDE0270.severity = none

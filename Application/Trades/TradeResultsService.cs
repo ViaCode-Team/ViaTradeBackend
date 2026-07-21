@@ -15,7 +15,7 @@ public class TradeResultsService(
 {
 	public async Task<SignalStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		var signals = await GetAsync(userId, DateTime.UtcNow, null, new SignalSort(), ct);
+		var signals = await GetStrategyResultsAsync(userId, DateTime.UtcNow, null, new SignalSort(), ct);
 
 		var allResults = signals.Strategies.SelectMany(s => s.Tickers).SelectMany(t => t.Results);
 
@@ -26,7 +26,7 @@ public class TradeResultsService(
 		);
 	}
 
-	public async Task<StrategyResults> GetAsync(
+	public async Task<StrategyResults> GetStrategyResultsAsync(
 		int userId,
 		DateTime? startDate,
 		DateTime? endDate,
@@ -95,7 +95,7 @@ public class TradeResultsService(
 		return new StrategyResults { Strategies = strategies };
 	}
 
-	public async Task<StrategyResults> GetAsync(
+	public async Task<StrategyResults> GetStrategyTradeCodeResultsAsync(
 		int userId,
 		string strategyName,
 		string tradeCode,
@@ -110,7 +110,7 @@ public class TradeResultsService(
 		if (preference.Key == null || !preference.Value.Contains(tradeCode))
 			throw new KeyNotFoundException();
 
-		var accuracy = await tradeStrategyRepository.GetAccuracyByNameAsync(strategyName, ct);
+		var accuracy = await tradeStrategyRepository.FindAccuracyByNameAsync(strategyName, ct);
 
 		var results = tradefileReader.ReadDataByCodesWithStrategy<StrategyResult>(
 			TradeDataType.Strategy,

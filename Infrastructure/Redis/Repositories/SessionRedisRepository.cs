@@ -27,7 +27,7 @@ public class SessionRedisRepository(IConnectionMultiplexer redis) : ISessionRepo
 			throw new Exception("Failed to create session in Redis.");
 	}
 
-	public async Task<UserSessionDto?> GetAsync(string sessionId)
+	public async Task<UserSessionDto?> FindByIdAsync(string sessionId)
 	{
 		var value = await _db.StringGetAsync(SessionKey(sessionId));
 		if (value.IsNullOrEmpty)
@@ -38,7 +38,7 @@ public class SessionRedisRepository(IConnectionMultiplexer redis) : ISessionRepo
 
 	public async Task RemoveAsync(string sessionId)
 	{
-		var session = await GetAsync(sessionId);
+		var session = await FindByIdAsync(sessionId);
 		if (session == null)
 			return;
 
@@ -51,7 +51,7 @@ public class SessionRedisRepository(IConnectionMultiplexer redis) : ISessionRepo
 			throw new Exception("Failed to remove session in Redis.");
 	}
 
-	public async Task<IEnumerable<UserSessionDto>> GetUserSessionsAsync(int userId)
+	public async Task<IReadOnlyList<UserSessionDto>> ListByUserAsync(int userId)
 	{
 		var sessionIds = await _db.SortedSetRangeByRankAsync(UserSessionsKey(userId), 0, -1);
 		List<UserSessionDto> result = [];
@@ -79,7 +79,7 @@ public class SessionRedisRepository(IConnectionMultiplexer redis) : ISessionRepo
 		return result;
 	}
 
-	public async Task<PageResult<UserSessionDto>> GetPagedUserSessionsAsync(int userId, PageOptions page)
+	public async Task<PageResult<UserSessionDto>> GetPageByUserAsync(int userId, PageOptions page)
 	{
 		var totalCount = await _db.SortedSetLengthAsync(UserSessionsKey(userId));
 
@@ -162,7 +162,7 @@ public class SessionRedisRepository(IConnectionMultiplexer redis) : ISessionRepo
 		return totalDeleted;
 	}
 
-	public IEnumerable<int> GetAllUserIdsWithSessions()
+	public IReadOnlyList<int> ListUserIds()
 	{
 		var server = _db.Multiplexer.GetServer(_db.Multiplexer.GetEndPoints()[0]);
 		var keys = server.Keys(pattern: "user:sessions:*", pageSize: 10000);

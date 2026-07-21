@@ -12,10 +12,10 @@ public class NoteQueryService(INoteRepository noteRepository) : INoteQueryServic
 {
 	public async Task<NoteStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		return await noteRepository.GetNoteStatisticAsync(userId, ct);
+		return await noteRepository.GetStatisticsAsync(userId, ct);
 	}
 
-	public async Task<Note> GetAsync(int relatedId, int userId, NoteType noteType, CancellationToken ct)
+	public async Task<Note> GetAsync(int userId, int relatedId, NoteType noteType, CancellationToken ct)
 	{
 		var existingNote = await noteRepository.FindByTargetAsync(userId, relatedId, noteType, ct);
 		if (existingNote == null)
@@ -24,9 +24,14 @@ public class NoteQueryService(INoteRepository noteRepository) : INoteQueryServic
 		return existingNote;
 	}
 
-	public async Task<PageResult<Note>> GetAsync(int userId, NoteFilter filter, PageOptions page, CancellationToken ct)
+	public async Task<PageResult<Note>> GetPageAsync(
+		int userId,
+		NoteFilter filter,
+		PageOptions page,
+		CancellationToken ct
+	)
 	{
 		var spec = new NoteQuerySpecification(userId, filter);
-		return await noteRepository.GetPagedAsync(spec, page, ct);
+		return await noteRepository.GetPageAsync(spec, page, ct);
 	}
 }

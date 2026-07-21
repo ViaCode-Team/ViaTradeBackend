@@ -23,7 +23,7 @@ public class RefreshTokenRedisRepository(IConnectionMultiplexer redis) : IRefres
 			throw new Exception("Failed to store refresh token in Redis.");
 	}
 
-	public async Task<string?> GetSessionIdAsync(string refreshToken)
+	public async Task<string?> FindSessionIdAsync(string refreshToken)
 	{
 		return await _db.StringGetAsync(IndexKey(refreshToken));
 	}

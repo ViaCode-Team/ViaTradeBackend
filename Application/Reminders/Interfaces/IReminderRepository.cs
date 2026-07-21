@@ -7,11 +7,11 @@ namespace Application.Reminders.Interfaces;
 
 public interface IReminderRepository : IRepository<Reminder>
 {
-	Task<IEnumerable<Reminder>> GetDueRemindersAsync(CancellationToken ct = default);
+	Task<IReadOnlyList<Reminder>> ListDueAsync(CancellationToken ct = default);
 	Task<int> CountByUserAsync(int userId, CancellationToken ct = default);
-	Task<int> UpdateForUserAsync(
-		int reminderId,
+	Task<int> ExecuteUpdateForUserAsync(
 		int userId,
+		int reminderId,
 		string text,
 		DateTime dateTime,
 		CancellationToken ct = default

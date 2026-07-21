@@ -6,17 +6,12 @@ namespace Application.Auth;
 
 public class AuthQueryService(ISessionRepository sessionRepository) : IAuthQueryService
 {
-	public async Task<PageResult<UserSessionDto>> GetSessionsPagedAsync(
+	public async Task<PageResult<UserSessionDto>> GetSessionsPageAsync(
 		int userId,
 		PageOptions page,
 		CancellationToken ct
 	)
 	{
-		return await sessionRepository.GetPagedUserSessionsAsync(userId, page);
-	}
-
-	public async Task<IEnumerable<UserSessionDto>> GetSessionsAsync(int userId, CancellationToken ct)
-	{
-		return await sessionRepository.GetUserSessionsAsync(userId);
+		return await sessionRepository.GetPageByUserAsync(userId, page);
 	}
 }

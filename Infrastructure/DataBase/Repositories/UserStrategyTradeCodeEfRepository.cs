@@ -8,12 +8,12 @@ public class UserStrategyTradeCodeEfRepository(AppDbContext context)
 	: GenericEfRepository<UserStrategyTradeCode>(context),
 		IUserStrategyTradeCodeRepository
 {
-	public async Task<PageResult<UserStrategyTradeCode>> GetPagedAsync(
+	public async Task<PageResult<UserStrategyTradeCode>> GetPageByUserAsync(
 		int userId,
 		PageOptions page,
 		CancellationToken ct
 	)
 	{
-		return await FindPagedAsync(strategyCode => strategyCode.UserId == userId, page, ct);
+		return await GetPageByAsync(strategyCode => strategyCode.UserId == userId, page, ct);
 	}
 }

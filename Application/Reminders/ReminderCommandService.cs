@@ -6,11 +6,7 @@ using Domain.Reminders.Entities;
 
 namespace Application.Reminders;
 
-public class ReminderCommandService(
-	IReminderRepository reminderRepository,
-	ITradeCodeRepository tradeCodeRepository,
-	IUnitOfWork uow
-) : IReminderCommandService
+public class ReminderCommandService(IReminderRepository reminderRepository, IUnitOfWork uow) : IReminderCommandService
 {
 	public async Task CreateAsync(int userId, int tradeCodeId, string text, DateTime dateTime, CancellationToken ct)
 	{
@@ -26,15 +22,15 @@ public class ReminderCommandService(
 		await uow.SaveChangesAsync(ct);
 	}
 
-	public async Task UpdateAsync(int reminderId, int userId, string text, DateTime dateTime, CancellationToken ct)
+	public async Task UpdateAsync(int userId, int reminderId, string text, DateTime dateTime, CancellationToken ct)
 	{
-		int rows = await reminderRepository.UpdateForUserAsync(reminderId, userId, text, dateTime, ct);
+		int rows = await reminderRepository.ExecuteUpdateForUserAsync(userId, reminderId, text, dateTime, ct);
 
 		if (rows == 0)
 			throw new NotFoundException("Reminder not found.", "reminder_not_found");
 	}
 
-	public async Task DeleteAsync(int reminderId, int userId, CancellationToken ct)
+	public async Task DeleteAsync(int userId, int reminderId, CancellationToken ct)
 	{
 		int rows = await reminderRepository.ExecuteDeleteAsync(x => x.Id == reminderId && x.UserId == userId, ct);
 
@@ -42,9 +38,12 @@ public class ReminderCommandService(
 			throw new NotFoundException("Reminder not found.", "reminder_not_found");
 	}
 
-	public async Task DeleteAsync(int reminderId, CancellationToken ct)
+	public async Task DeleteDueAsync(int reminderId, CancellationToken ct)
 	{
-		int rows = await reminderRepository.ExecuteDeleteAsync(x => x.Id == reminderId, ct);
+		int rows = await reminderRepository.ExecuteDeleteAsync(
+			x => x.Id == reminderId && x.DateTime <= DateTime.UtcNow,
+			ct
+		);
 
 		if (rows == 0)
 			throw new NotFoundException("Reminder not found.", "reminder_not_found");

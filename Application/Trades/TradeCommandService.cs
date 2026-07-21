@@ -8,12 +8,7 @@ using Domain.Statistics.Services;
 
 namespace Application.Trades;
 
-public class TradeCommandService(
-	ITradeRepository tradeRepository,
-	ITradeCodeRepository tradeCodeRepository,
-	ITradeTypeRepository tradeTypeRepository,
-	IUnitOfWork uow
-) : ITradeCommandService
+public class TradeCommandService(ITradeRepository tradeRepository, IUnitOfWork uow) : ITradeCommandService
 {
 	public async Task<TradeDto> CreateAsync(int userId, TradeInputDto request, CancellationToken ct)
 	{
@@ -50,7 +45,7 @@ public class TradeCommandService(
 		);
 	}
 
-	public async Task DeleteAsync(int id, int userId, CancellationToken ct)
+	public async Task DeleteAsync(int userId, int id, CancellationToken ct)
 	{
 		var affectedRows = await tradeRepository.ExecuteDeleteAsync(t => t.Id == id && t.UserId == userId, ct);
 
@@ -58,11 +53,11 @@ public class TradeCommandService(
 			throw new NotFoundException("Trade not found.", "trade_not_found");
 	}
 
-	public async Task UpdateAsync(int id, int userId, TradeInputDto request, CancellationToken ct)
+	public async Task UpdateAsync(int userId, int id, TradeInputDto request, CancellationToken ct)
 	{
 		var price = (decimal)request.TradeOpen * request.Count;
 
-		var affectedRows = await tradeRepository.ExecuteUpdateAsync(id, userId, request, price, ct);
+		var affectedRows = await tradeRepository.ExecuteUpdateAsync(userId, id, request, price, ct);
 		if (affectedRows != 0)
 			return;
 

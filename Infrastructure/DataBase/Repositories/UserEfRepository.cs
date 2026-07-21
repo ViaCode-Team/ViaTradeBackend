@@ -7,7 +7,7 @@ namespace Infrastructure.DataBase.Repositories;
 
 public class UserEfRepository(AppDbContext context) : GenericEfRepository<User>(context), IUserRepository
 {
-	public async Task<UserLoginDto?> GetLoginUserAsync(string login, CancellationToken ct)
+	public async Task<UserLoginDto?> FindLoginUserAsync(string login, CancellationToken ct)
 	{
 		return await _dbSet
 			.Where(user => user.Login == login)
@@ -15,7 +15,7 @@ public class UserEfRepository(AppDbContext context) : GenericEfRepository<User>(
 			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<UserMeDto?> GetMeAsync(int userId, CancellationToken ct)
+	public async Task<UserMeDto?> FindMeAsync(int userId, CancellationToken ct)
 	{
 		return await _dbSet
 			.Where(user => user.Id == userId)
@@ -30,7 +30,7 @@ public class UserEfRepository(AppDbContext context) : GenericEfRepository<User>(
 			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<UserTokenDto?> GetTokenUserAsync(int userId, CancellationToken ct)
+	public async Task<UserTokenDto?> FindTokenUserAsync(int userId, CancellationToken ct)
 	{
 		return await _dbSet
 			.Where(user => user.Id == userId)
@@ -38,7 +38,7 @@ public class UserEfRepository(AppDbContext context) : GenericEfRepository<User>(
 			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<IReadOnlyList<UserTelegramDto>> GetTelegramRecipientsAsync(CancellationToken ct)
+	public async Task<IReadOnlyList<UserTelegramDto>> ListTelegramRecipientsAsync(CancellationToken ct)
 	{
 		return await _dbSet
 			.Where(user => user.TelegramId != null)

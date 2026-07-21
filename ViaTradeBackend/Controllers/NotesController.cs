@@ -39,7 +39,7 @@ public class NotesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userNotes = await noteQueryService.GetAsync(userId, filter, page, ct);
+		var userNotes = await noteQueryService.GetPageAsync(userId, filter, page, ct);
 
 		return TypedResults.Ok(userNotes.Map(ApiMapper.ToResponse));
 	}
@@ -51,7 +51,7 @@ public class NotesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var note = await noteQueryService.GetAsync(tradeCodeId, userId, NoteType.TradeCodeNote, ct);
+		var note = await noteQueryService.GetAsync(userId, tradeCodeId, NoteType.TradeCodeNote, ct);
 
 		return TypedResults.Ok(ApiMapper.ToResponse(note));
 	}
@@ -60,7 +60,7 @@ public class NotesController(
 	public async Task<Ok<NoteResponse>> GetUserStrategyNote([FromRoute, Required] int strategyId, CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var note = await noteQueryService.GetAsync(strategyId, userId, NoteType.TradeStrategyNote, ct);
+		var note = await noteQueryService.GetAsync(userId, strategyId, NoteType.TradeStrategyNote, ct);
 
 		return TypedResults.Ok(ApiMapper.ToResponse(note));
 	}
@@ -73,7 +73,7 @@ public class NotesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await noteCommandService.AddAsync(tradeCodeId, NoteType.TradeCodeNote, userId, request.NoteText, ct);
+		await noteCommandService.AddAsync(userId, tradeCodeId, NoteType.TradeCodeNote, request.NoteText, ct);
 
 		return TypedResults.Created();
 	}
@@ -86,7 +86,7 @@ public class NotesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await noteCommandService.AddAsync(strategyId, NoteType.TradeStrategyNote, userId, request.NoteText, ct);
+		await noteCommandService.AddAsync(userId, strategyId, NoteType.TradeStrategyNote, request.NoteText, ct);
 
 		return TypedResults.Created();
 	}
@@ -99,7 +99,7 @@ public class NotesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await noteCommandService.UpdateAsync(tradeCodeId, NoteType.TradeCodeNote, userId, request.NoteText, ct);
+		await noteCommandService.UpdateAsync(userId, tradeCodeId, NoteType.TradeCodeNote, request.NoteText, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -112,7 +112,7 @@ public class NotesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await noteCommandService.UpdateAsync(strategyId, NoteType.TradeStrategyNote, userId, request.NoteText, ct);
+		await noteCommandService.UpdateAsync(userId, strategyId, NoteType.TradeStrategyNote, request.NoteText, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -121,7 +121,7 @@ public class NotesController(
 	public async Task<NoContent> DeleteUserInstrumentNote([FromRoute, Required] int tradeCodeId, CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await noteCommandService.DeleteAsync(tradeCodeId, userId, NoteType.TradeCodeNote, ct);
+		await noteCommandService.DeleteAsync(userId, tradeCodeId, NoteType.TradeCodeNote, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -130,7 +130,7 @@ public class NotesController(
 	public async Task<NoContent> DeleteUserStrategyNote([FromRoute, Required] int strategyId, CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await noteCommandService.DeleteAsync(strategyId, userId, NoteType.TradeStrategyNote, ct);
+		await noteCommandService.DeleteAsync(userId, strategyId, NoteType.TradeStrategyNote, ct);
 
 		return TypedResults.NoContent();
 	}

@@ -92,7 +92,7 @@ public class AuthController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userSessions = await authQueryService.GetSessionsPagedAsync(userId, page, ct);
+		var userSessions = await authQueryService.GetSessionsPageAsync(userId, page, ct);
 
 		return TypedResults.Ok(userSessions.Map(ApiMapper.ToResponse));
 	}
