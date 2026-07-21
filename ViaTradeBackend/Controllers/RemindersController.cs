@@ -3,13 +3,13 @@ using Application.Auth.Interfaces;
 using Application.Common.Models;
 using Application.Reminders.Interfaces;
 using Application.Reminders.Models;
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Attribute;
 using ViaTradeBackend.Contracts.Reminders;
 using ViaTradeBackend.Contracts.Statistics;
+using ViaTradeBackend.Mappings;
 
 namespace ViaTradeBackend.Controllers;
 
@@ -28,7 +28,7 @@ public class RemindersController(
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var statistics = await reminderQueryService.GetStatisticsAsync(userId, ct);
 
-		return TypedResults.Ok(statistics.Adapt<ReminderStatisticsResponse>());
+		return TypedResults.Ok(ApiMapper.ToResponse(statistics));
 	}
 
 	[ServicePassword]
@@ -37,7 +37,7 @@ public class RemindersController(
 	{
 		var reminders = await reminderQueryService.GetAsync(ct);
 
-		return TypedResults.Ok(reminders.Adapt<IEnumerable<ReminderResponse>>());
+		return TypedResults.Ok(reminders.Select(ApiMapper.ToResponse));
 	}
 
 	[ServicePassword]
@@ -59,7 +59,7 @@ public class RemindersController(
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var userReminders = await reminderQueryService.GetAsync(userId, page, sort, ct);
 
-		return TypedResults.Ok(userReminders.Map(r => r.Adapt<ReminderResponse>()));
+		return TypedResults.Ok(userReminders.Map(ApiMapper.ToResponse));
 	}
 
 	[Authorize]
@@ -74,7 +74,7 @@ public class RemindersController(
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var reminders = await reminderQueryService.GetAsync(userId, tradeCodeId, page, sort, ct);
 
-		return TypedResults.Ok(reminders.Map(r => r.Adapt<ReminderResponse>()));
+		return TypedResults.Ok(reminders.Map(ApiMapper.ToResponse));
 	}
 
 	[Authorize]
@@ -84,7 +84,7 @@ public class RemindersController(
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var reminder = await reminderQueryService.GetAsync(id, userId, ct);
 
-		return TypedResults.Ok(reminder.Adapt<ReminderResponse>());
+		return TypedResults.Ok(ApiMapper.ToResponse(reminder));
 	}
 
 	[Authorize]

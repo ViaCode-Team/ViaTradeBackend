@@ -3,12 +3,12 @@ using Application.Auth.Interfaces;
 using Application.Common.Models;
 using Application.Strategies.Interfaces;
 using Application.Strategies.Models;
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Contracts.Statistics;
 using ViaTradeBackend.Contracts.Strategies;
+using ViaTradeBackend.Mappings;
 
 namespace ViaTradeBackend.Controllers;
 
@@ -27,7 +27,7 @@ public class StrategiesController(
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var strategyStatistics = await strategyQueryService.GetStatisticsAsync(userId, ct);
 
-		return TypedResults.Ok(strategyStatistics.Adapt<StrategyStatisticResponse>());
+		return TypedResults.Ok(ApiMapper.ToResponse(strategyStatistics));
 	}
 
 	[HttpGet]
@@ -41,14 +41,14 @@ public class StrategiesController(
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var pagedStrategies = await strategyQueryService.GetAsync(userId, filter, sort, page, ct);
 
-		return TypedResults.Ok(pagedStrategies.Map(s => s.Adapt<TradeStrategyResponse>()));
+		return TypedResults.Ok(pagedStrategies.Map(ApiMapper.ToResponse));
 	}
 
 	[HttpGet("{id}")]
 	public async Task<Ok<TradeStrategyResponse>> GetStrategyById([FromRoute, Required] int id, CancellationToken ct)
 	{
 		var strategy = await strategyQueryService.GetAsync(id, ct);
-		return TypedResults.Ok(strategy.Adapt<TradeStrategyResponse>());
+		return TypedResults.Ok(ApiMapper.ToResponse(strategy));
 	}
 
 	[HttpGet("byuser")]
@@ -60,7 +60,7 @@ public class StrategiesController(
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var userStrategies = await strategyQueryService.GetUserLinkedAsync(userId, page, ct);
 
-		return TypedResults.Ok(userStrategies.Map(s => s.Adapt<UserTradeStrategyResponse>()));
+		return TypedResults.Ok(userStrategies.Map(ApiMapper.ToResponse));
 	}
 
 	[HttpGet("codes/byuser")]
@@ -72,7 +72,7 @@ public class StrategiesController(
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var userStrategyCodes = await strategyQueryService.GetUserLinkedCodesAsync(userId, page, ct);
 
-		return TypedResults.Ok(userStrategyCodes.Map(s => s.Adapt<UserStrategyTradeCodeResponse>()));
+		return TypedResults.Ok(userStrategyCodes.Map(ApiMapper.ToResponse));
 	}
 
 	[HttpPost("codes/byuser")]

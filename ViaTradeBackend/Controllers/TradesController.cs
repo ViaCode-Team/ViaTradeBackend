@@ -3,12 +3,12 @@ using Application.Auth.Interfaces;
 using Application.Common.Models;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Contracts.Statistics;
 using ViaTradeBackend.Contracts.Trades;
+using ViaTradeBackend.Mappings;
 
 namespace ViaTradeBackend.Controllers;
 
@@ -27,7 +27,7 @@ public class TradesController(
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var tradeStatistics = await tradeQueryService.GetStatisticsAsync(userId, ct);
 
-		return TypedResults.Ok(tradeStatistics.Adapt<GlobalStatisticResponse>());
+		return TypedResults.Ok(ApiMapper.ToResponse(tradeStatistics));
 	}
 
 	[HttpGet("byuser")]
@@ -40,7 +40,7 @@ public class TradesController(
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var userTrades = await tradeQueryService.GetAsync(userId, filter, page, ct);
 
-		return TypedResults.Ok(userTrades.Map(t => t.Adapt<TradeResponse>()));
+		return TypedResults.Ok(userTrades.Map(ApiMapper.ToResponse));
 	}
 
 	[HttpGet("{id}")]
@@ -49,7 +49,7 @@ public class TradesController(
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var trade = await tradeQueryService.GetAsync(id, userId, ct);
 
-		return TypedResults.Ok(trade.Adapt<TradeResponse>());
+		return TypedResults.Ok(ApiMapper.ToResponse(trade));
 	}
 
 	[HttpPost("byuser")]
@@ -59,9 +59,9 @@ public class TradesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var trade = await tradeCommandService.CreateAsync(userId, request.Adapt<TradeInputDto>(), ct);
+		var trade = await tradeCommandService.CreateAsync(userId, ApiMapper.ToInput(request), ct);
 
-		return TypedResults.Created($"/api/Trades/{trade.Id}", trade.Adapt<TradeResponse>());
+		return TypedResults.Created($"/api/Trades/{trade.Id}", ApiMapper.ToResponse(trade));
 	}
 
 	[HttpPut("byuser/{id}")]
@@ -72,7 +72,7 @@ public class TradesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await tradeCommandService.UpdateAsync(id, userId, request.Adapt<TradeInputDto>(), ct);
+		await tradeCommandService.UpdateAsync(id, userId, ApiMapper.ToInput(request), ct);
 
 		return TypedResults.NoContent();
 	}

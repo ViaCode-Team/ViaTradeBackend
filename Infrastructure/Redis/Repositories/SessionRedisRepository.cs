@@ -88,6 +88,7 @@ public class SessionRedisRepository(IConnectionMultiplexer redis) : ISessionRepo
 
 		var sessionIds = await _db.SortedSetRangeByRankAsync(UserSessionsKey(userId), start, stop, Order.Descending);
 		List<UserSessionDto> result = [];
+
 		if (sessionIds.Length > 0)
 		{
 			var keys = sessionIds

@@ -78,8 +78,6 @@ public static class DependencyInjection
 
 		services.AddHostedService<SessionCleanupService>();
 
-		services.AddMapster();
-
 		return services;
 	}
 

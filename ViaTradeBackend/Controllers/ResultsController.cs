@@ -2,11 +2,11 @@ using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
 using Application.Interfaces;
 using Application.Trades.Models;
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Contracts.Statistics;
+using ViaTradeBackend.Mappings;
 
 namespace ViaTradeBackend.Controllers;
 
@@ -21,7 +21,7 @@ public class ResultsController(ITradeResultsService tradeResultsService, IJwtHel
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var signalStatistics = await tradeResultsService.GetStatisticsAsync(userId, ct);
 
-		return TypedResults.Ok(signalStatistics.Adapt<SignalStatisticResponse>());
+		return TypedResults.Ok(ApiMapper.ToResponse(signalStatistics));
 	}
 
 	[HttpGet("strategy")]

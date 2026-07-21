@@ -4,12 +4,12 @@ using Application.Common.Models;
 using Application.Notes.Interfaces;
 using Application.Notes.Models;
 using Domain.Notes.Enums;
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Contracts.Notes;
 using ViaTradeBackend.Contracts.Statistics;
+using ViaTradeBackend.Mappings;
 
 namespace ViaTradeBackend.Controllers;
 
@@ -28,7 +28,7 @@ public class NotesController(
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var noteStatistics = await noteQueryService.GetStatisticsAsync(userId, ct);
 
-		return TypedResults.Ok(noteStatistics.Adapt<NoteStatisticResponse>());
+		return TypedResults.Ok(ApiMapper.ToResponse(noteStatistics));
 	}
 
 	[HttpGet("byuser")]
@@ -41,7 +41,7 @@ public class NotesController(
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var userNotes = await noteQueryService.GetAsync(userId, filter, page, ct);
 
-		return TypedResults.Ok(userNotes.Map(n => n.Adapt<NoteResponse>()));
+		return TypedResults.Ok(userNotes.Map(ApiMapper.ToResponse));
 	}
 
 	[HttpGet("byuser/instrument/{tradeCodeId}")]
@@ -53,7 +53,7 @@ public class NotesController(
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var note = await noteQueryService.GetAsync(tradeCodeId, userId, NoteType.TradeCodeNote, ct);
 
-		return TypedResults.Ok(note.Adapt<NoteResponse>());
+		return TypedResults.Ok(ApiMapper.ToResponse(note));
 	}
 
 	[HttpGet("byuser/strategy/{strategyId}")]
@@ -62,7 +62,7 @@ public class NotesController(
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var note = await noteQueryService.GetAsync(strategyId, userId, NoteType.TradeStrategyNote, ct);
 
-		return TypedResults.Ok(note.Adapt<NoteResponse>());
+		return TypedResults.Ok(ApiMapper.ToResponse(note));
 	}
 
 	[HttpPost("byuser/instrument/{tradeCodeId}")]

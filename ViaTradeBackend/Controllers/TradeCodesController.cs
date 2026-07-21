@@ -3,12 +3,12 @@ using Application.Common.Models;
 using Application.TradeCodes.Interfaces;
 using Application.TradeCodes.Models;
 using Domain.Enums;
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Contracts.Statistics;
 using ViaTradeBackend.Contracts.Trades;
+using ViaTradeBackend.Mappings;
 
 namespace ViaTradeBackend.Controllers;
 
@@ -22,7 +22,7 @@ public class TradeCodesController(ITradeCodeQueryService tradeCodeQueryService) 
 	{
 		var stockStatistic = await tradeCodeQueryService.GetStatisticsAsync(ct);
 
-		return TypedResults.Ok(stockStatistic.Adapt<StockStatisticResponse>());
+		return TypedResults.Ok(ApiMapper.ToResponse(stockStatistic));
 	}
 
 	[HttpGet("stocks")]
@@ -34,7 +34,7 @@ public class TradeCodesController(ITradeCodeQueryService tradeCodeQueryService) 
 	{
 		var pagedCodes = await tradeCodeQueryService.GetAsync(page, sort, ct);
 
-		return TypedResults.Ok(pagedCodes.Map(c => c.Adapt<TradeCodeResponse>()));
+		return TypedResults.Ok(pagedCodes.Map(ApiMapper.ToResponse));
 	}
 
 	[HttpGet("sys/stocks")]
@@ -42,7 +42,7 @@ public class TradeCodesController(ITradeCodeQueryService tradeCodeQueryService) 
 	{
 		var sysCodes = await tradeCodeQueryService.GetFileMetadataAsync(TradeDataType.Stocks, ct);
 
-		return TypedResults.Ok(sysCodes.Adapt<List<TradeCodeFileResponse>>());
+		return TypedResults.Ok(sysCodes.Select(ApiMapper.ToResponse).ToList());
 	}
 
 	[HttpGet("sys/stocks/{id}")]
@@ -53,6 +53,6 @@ public class TradeCodesController(ITradeCodeQueryService tradeCodeQueryService) 
 	{
 		var sysCode = await tradeCodeQueryService.GetFileMetadataAsync(TradeDataType.Stocks, id, ct);
 
-		return TypedResults.Ok(sysCode.Adapt<TradeCodeFileResponse>());
+		return TypedResults.Ok(ApiMapper.ToResponse(sysCode));
 	}
 }

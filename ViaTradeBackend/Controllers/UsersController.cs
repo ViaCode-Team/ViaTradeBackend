@@ -1,12 +1,12 @@
 using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
 using Application.Users.Interfaces;
-using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Attribute;
 using ViaTradeBackend.Contracts.Users;
+using ViaTradeBackend.Mappings;
 
 namespace ViaTradeBackend.Controllers;
 
@@ -31,7 +31,7 @@ public class UsersController(
 		if (user == null)
 			return TypedResults.NotFound();
 
-		return TypedResults.Ok(user.Adapt<UserMeResponse>());
+		return TypedResults.Ok(ApiMapper.ToUserMeResponse(user));
 	}
 
 	[Authorize]
@@ -70,6 +70,6 @@ public class UsersController(
 
 		var users = await userQueryService.GetWithTgLinkAsync(ct);
 
-		return TypedResults.Ok(users.Adapt<List<UserTelegramResponse>>());
+		return TypedResults.Ok(users.Select(ApiMapper.ToUserTelegramResponse).ToList());
 	}
 }
