@@ -1,0 +1,11 @@
+using Domain.Trades.Enums;
+
+namespace Application.Trades.Models;
+
+public record TradeFilter(
+	TradeSignal? Signal,
+	TradeStatus? Status,
+	string? TradeTypeName,
+	DateTime? StartDate,
+	DateTime? EndDate
+);

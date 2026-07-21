@@ -1,4 +1,4 @@
-using Application.Notes.Queries;
+using Application.Notes.Models;
 using Domain.Notes.Entities;
 using Domain.Notes.Enums;
 

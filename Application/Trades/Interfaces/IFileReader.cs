@@ -1,4 +1,5 @@
-using Domain.Trades.Entities;
+using Domain.Enums;
+using Domain.Models.Trade;
 
 namespace Application.Trades.Interfaces;
 

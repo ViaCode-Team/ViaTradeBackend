@@ -1,10 +1,11 @@
+using Domain.Entities;
 using Domain.Notes.Entities;
 using Domain.Reminders.Entities;
 using Domain.Strategies.Entities;
 using Domain.TradeCodes.Entities;
-using Domain.Trades.Entities;
 using Domain.Users.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Infrastructure.DataBase;
 
@@ -66,7 +67,6 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 		{
 			entity.HasIndex(x => x.UserId);
 			entity.Property(t => t.Price).HasColumnType("decimal(18,2)");
-			entity.Ignore(t => t.NetIncome);
 		});
 
 		modelBuilder
@@ -137,5 +137,59 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 					CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
 				}
 			);
+
+		ConfigureUtcDateTimeStorage(modelBuilder);
+	}
+
+	private static void ConfigureUtcDateTimeStorage(ModelBuilder modelBuilder)
+	{
+		var utcConverter = new ValueConverter<DateTime, DateTime>(
+			value => NormalizeUtc(value),
+			value => SetUtcKind(value)
+		);
+		var nullableUtcConverter = new ValueConverter<DateTime?, DateTime?>(
+			value => NormalizeUtc(value),
+			value => SetUtcKind(value)
+		);
+
+		foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+		{
+			foreach (var property in entityType.GetProperties())
+			{
+				if (property.ClrType == typeof(DateTime))
+					property.SetValueConverter(utcConverter);
+				else if (property.ClrType == typeof(DateTime?))
+					property.SetValueConverter(nullableUtcConverter);
+			}
+		}
+	}
+
+	private static DateTime NormalizeUtc(DateTime value)
+	{
+		if (value.Kind == DateTimeKind.Utc)
+			return value;
+
+		return value.ToUniversalTime();
+	}
+
+	private static DateTime? NormalizeUtc(DateTime? value)
+	{
+		if (!value.HasValue)
+			return null;
+
+		return NormalizeUtc(value.Value);
+	}
+
+	private static DateTime SetUtcKind(DateTime value)
+	{
+		return DateTime.SpecifyKind(value, DateTimeKind.Utc);
+	}
+
+	private static DateTime? SetUtcKind(DateTime? value)
+	{
+		if (!value.HasValue)
+			return null;
+
+		return SetUtcKind(value.Value);
 	}
 }

@@ -1,25 +1,26 @@
-using Application.Common.Queries;
-using Application.Statistics.Models;
+using Application.Common.Models;
 using Application.TradeCodes.Interfaces;
-using Application.TradeCodes.Queries;
+using Application.TradeCodes.Models;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
+using Domain.Enums;
 using Domain.TradeCodes.Entities;
-using Domain.Trades.Entities;
 
 namespace Application.TradeCodes;
 
 public class TradeCodeQueryService(IFileReader tradefileReader, ITradeCodeRepository tradeCodeRepository)
 	: ITradeCodeQueryService
 {
+	public async Task<StockStatisticDto> GetStatisticsAsync(CancellationToken ct)
+	{
+		int totalStocksCount = await tradeCodeRepository.CountAsync(ct);
+
+		return new StockStatisticDto(totalStocksCount);
+	}
+
 	public async Task<PageResult<TradeCode>> GetAsync(PageOptions page, TradeCodeSort sort, CancellationToken ct)
 	{
 		return await tradeCodeRepository.GetCodesPagedAsync(page, sort, ct);
-	}
-
-	public async Task<StockStatisticReadModel> GetStatisticsAsync(CancellationToken ct)
-	{
-		return new StockStatisticReadModel { TotalStocks = await tradeCodeRepository.CountAsync(ct) };
 	}
 
 	public async Task<IEnumerable<TradeCodeFileDto>> GetFileMetadataAsync(TradeDataType dataType, CancellationToken ct)

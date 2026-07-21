@@ -1,5 +1,5 @@
 using System.Linq.Expressions;
-using Application.Common.Queries;
+using Application.Common.Models;
 using Domain.Entities;
 
 namespace Application.Common.Interfaces.Repositories;
@@ -17,6 +17,7 @@ public interface IRepository<TEntity>
 	);
 	Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
 	Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
+	Task<TEntity?> FirstOrDefaultAsync(CancellationToken ct = default);
 	Task<PageResult<TEntity>> FindPagedAsync(
 		Expression<Func<TEntity, bool>> predicate,
 		PageOptions page,
@@ -27,5 +28,7 @@ public interface IRepository<TEntity>
 	void Remove(TEntity entity);
 	Task<int> ExecuteDeleteAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
 	Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
+	Task<bool> ExistsAsync(CancellationToken ct = default);
 	Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
+	Task<int> CountAsync(CancellationToken ct = default);
 }

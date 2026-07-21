@@ -1,5 +1,5 @@
-using Application.Trades.Queries;
-using Domain.Trades.Entities;
+using Application.Trades.Models;
+using Domain.Entities;
 using Domain.Trades.Enums;
 
 namespace Application.Common.Specifications;

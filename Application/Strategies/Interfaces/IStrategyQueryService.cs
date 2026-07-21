@@ -1,13 +1,13 @@
-using Application.Common.Queries;
-using Application.Statistics.Models;
-using Application.Strategies.Queries;
+using Application.Common.Models;
+using Application.Notes.Models;
+using Application.Strategies.Models;
 using Domain.Strategies.Entities;
 
 namespace Application.Strategies.Interfaces;
 
 public interface IStrategyQueryService
 {
-	Task<StrategyStatisticReadModel> GetStatisticsAsync(int userId, CancellationToken ct);
+	Task<StrategyStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct);
 	Task<PageResult<TradeStrategy>> GetAsync(
 		int userId,
 		StrategyFilter filter,

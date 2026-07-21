@@ -1,7 +1,7 @@
-using Application.Common.Queries;
+using Application.Common.Models;
 using Application.Common.Specifications;
 using Application.Reminders.Interfaces;
-using Application.Reminders.Queries;
+using Application.Reminders.Models;
 using Domain.Reminders.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -11,7 +11,7 @@ public class ReminderEfRepository(AppDbContext context) : GenericEfRepository<Re
 {
 	public async Task<IEnumerable<Reminder>> GetDueRemindersAsync(CancellationToken ct)
 	{
-		return await _dbSet.Where(r => r.DateTime <= DateTime.Now).ToListAsync(ct);
+		return await _dbSet.Where(r => r.DateTime <= DateTime.UtcNow).ToListAsync(ct);
 	}
 
 	public async Task<PageResult<Reminder>> GetByUserPagedAsync(
@@ -50,8 +50,12 @@ public class ReminderEfRepository(AppDbContext context) : GenericEfRepository<Re
 		CancellationToken ct
 	)
 	{
-		return await _dbSet
-			.Where(r => r.Id == reminderId && r.UserId == userId)
-			.ExecuteUpdateAsync(s => s.SetProperty(r => r.Text, text).SetProperty(r => r.DateTime, dateTime), ct);
+		var affectedRows = await EfDatabaseOperation.ExecuteAsync(() =>
+			_dbSet
+				.Where(r => r.Id == reminderId && r.UserId == userId)
+				.ExecuteUpdateAsync(s => s.SetProperty(r => r.Text, text).SetProperty(r => r.DateTime, dateTime), ct)
+		);
+
+		return affectedRows;
 	}
 }

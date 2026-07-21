@@ -25,8 +25,10 @@ public class UserEfRepository(AppDbContext context) : GenericEfRepository<User>(
 
 	public async Task<int> UpdateLastLoginDateAsync(int userId, DateTime lastLoginDate, CancellationToken ct)
 	{
-		return await _dbSet
-			.Where(u => u.Id == userId)
-			.ExecuteUpdateAsync(s => s.SetProperty(u => u.LastLoginDate, lastLoginDate), ct);
+		return await EfDatabaseOperation.ExecuteAsync(() =>
+			_dbSet
+				.Where(u => u.Id == userId)
+				.ExecuteUpdateAsync(s => s.SetProperty(u => u.LastLoginDate, lastLoginDate), ct)
+		);
 	}
 }

@@ -69,11 +69,17 @@ public class AuthCommandService(
 
 	public async Task<AuthTokens> RefreshTokenAsync(string refreshToken, CancellationToken ct)
 	{
-		var sessionId =
-			await refreshTokenRepository.GetSessionIdAsync(refreshToken) ?? throw new InvalidTokenException();
+		var sessionId = await refreshTokenRepository.GetSessionIdAsync(refreshToken);
+		if (sessionId == null)
+			throw new InvalidTokenException();
 
-		var session = await sessionRepository.GetAsync(sessionId) ?? throw new InvalidTokenException();
-		var user = await userRepository.GetByIdAsync(session.UserId, ct) ?? throw new InvalidTokenException();
+		var session = await sessionRepository.GetAsync(sessionId);
+		if (session == null)
+			throw new InvalidTokenException();
+
+		var user = await userRepository.GetByIdAsync(session.UserId, ct);
+		if (user == null)
+			throw new InvalidTokenException();
 
 		session.LastSeen = DateTime.UtcNow;
 		await sessionRepository.CreateAsync(session, _sessionTtl);

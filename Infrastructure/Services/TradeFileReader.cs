@@ -1,7 +1,8 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Application.Trades.Interfaces;
-using Domain.Trades.Entities;
+using Domain.Enums;
+using Domain.Models.Trade;
 using Infrastructure.Configuration;
 using Microsoft.Extensions.Options;
 

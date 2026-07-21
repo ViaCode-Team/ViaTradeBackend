@@ -1,18 +1,8 @@
 using System.Linq.Expressions;
-using Domain.Trades.Entities;
+using Domain.Entities;
 using Domain.Trades.Enums;
 
 namespace Domain.Statistics.Services;
-
-public class TradeGroupAggregation
-{
-	public int TotalTrades { get; set; }
-	public int WinTrades { get; set; }
-	public int LoseTrades { get; set; }
-	public double TotalAbsoluteIncome { get; set; }
-	public double TotalProfit { get; set; }
-	public double TotalLoss { get; set; }
-}
 
 public static class TradeStatisticsCalcService
 {

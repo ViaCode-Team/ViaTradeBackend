@@ -1,4 +1,4 @@
-using Application.Strategies.Queries;
+using Application.Strategies.Models;
 using Domain.Strategies.Entities;
 
 namespace Application.Common.Specifications;

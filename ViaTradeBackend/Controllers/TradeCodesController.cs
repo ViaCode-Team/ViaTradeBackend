@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using Application.Common.Queries;
+using Application.Common.Models;
 using Application.TradeCodes.Interfaces;
-using Application.TradeCodes.Queries;
-using Domain.Trades.Entities;
+using Application.TradeCodes.Models;
+using Domain.Enums;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;

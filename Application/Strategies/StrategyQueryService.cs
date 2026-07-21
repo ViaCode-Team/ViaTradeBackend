@@ -1,8 +1,9 @@
-using Application.Common.Queries;
+using Application.Common.Exceptions;
+using Application.Common.Models;
 using Application.Common.Specifications;
-using Application.Statistics.Models;
+using Application.Notes.Models;
 using Application.Strategies.Interfaces;
-using Application.Strategies.Queries;
+using Application.Strategies.Models;
 using Domain.Strategies.Entities;
 
 namespace Application.Strategies;
@@ -13,22 +14,28 @@ public class StrategyQueryService(
 	IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository
 ) : IStrategyQueryService
 {
-	public async Task<StrategyStatisticReadModel> GetStatisticsAsync(int userId, CancellationToken ct)
+	public async Task<StrategyStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		var totalStrategiesTask = tradeStrategyRepository.CountAsync(ct);
-		var activeStrategiesTask = userTradeStrategyRepository.CountByUserAsync(userId, ct);
+		var counts = await tradeStrategyRepository.GetStatisticAsync(userId, ct);
+		if (counts == null)
+			throw new KeyNotFoundException($"User with ID {userId} was not found for get stratagy statiscs.");
 
-		await Task.WhenAll(totalStrategiesTask, activeStrategiesTask);
-
-		var totalStrategies = await totalStrategiesTask;
-		var activeStrategies = await activeStrategiesTask;
-
-		return new StrategyStatisticReadModel
+		long notLinkedStratagiesCount = counts.TotalStrategiesCount - counts.ActiveStrategiesCount;
+		if (notLinkedStratagiesCount < 0)
 		{
-			TotalStrategies = totalStrategies,
-			ActiveStrategies = activeStrategies,
-			DisabledStrategies = Math.Max(totalStrategies - activeStrategies, 0),
-		};
+			throw new DataIntegrityException(
+				$"Active strategy count exceeds total strategy count. "
+					+ $"UserId={userId}, "
+					+ $"Total={counts.TotalStrategiesCount}, "
+					+ $"Active={counts.ActiveStrategiesCount}."
+			);
+		}
+
+		return new StrategyStatisticDto(
+			counts.TotalStrategiesCount,
+			counts.ActiveStrategiesCount,
+			notLinkedStratagiesCount
+		);
 	}
 
 	public async Task<PageResult<TradeStrategy>> GetAsync(

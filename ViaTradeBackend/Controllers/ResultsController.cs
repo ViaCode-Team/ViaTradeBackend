@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
 using Application.Interfaces;
 using Application.Trades.Models;
-using Application.Trades.Queries;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;

@@ -1,6 +1,7 @@
 using Application.Auth;
 using Application.Auth.Interfaces;
 using Application.Common.Interfaces;
+using Application.Common.Interfaces.Repositories;
 using Application.Interfaces;
 using Application.Notes;
 using Application.Notes.Interfaces;
@@ -12,7 +13,6 @@ using Application.TradeCodes;
 using Application.TradeCodes.Interfaces;
 using Application.Trades;
 using Application.Trades.Interfaces;
-using Application.Trades.Services;
 using Application.Users;
 using Application.Users.Interfaces;
 using Infrastructure.Configuration;
@@ -74,6 +74,7 @@ public static class DependencyInjection
 		services.AddRepositories();
 
 		services.AddScoped<IUnitOfWork, EfUnitOfWork>();
+		services.AddSingleton<ISeparateContextQueryExecutor, SeparateContextQueryExecutor>();
 
 		services.AddHostedService<SessionCleanupService>();
 
@@ -100,7 +101,7 @@ public static class DependencyInjection
 			configuration.GetConnectionString("MySql")
 			?? throw new InvalidOperationException("Connection string 'MySql' is not configured.");
 
-		services.AddDbContext<AppDbContext>(options =>
+		void ConfigureDbContext(DbContextOptionsBuilder options)
 		{
 			options
 				.UseMySql(
@@ -109,7 +110,9 @@ public static class DependencyInjection
 					mySqlOptions => mySqlOptions.EnableStringComparisonTranslations()
 				)
 				.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-		});
+		}
+
+		services.AddDbContext<AppDbContext>(ConfigureDbContext);
 
 		return services;
 	}

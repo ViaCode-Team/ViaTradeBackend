@@ -1,7 +1,7 @@
 namespace ViaTradeBackend.Contracts.Statistics;
 
 public record GlobalStatisticResponse(
-	TradeStatisticResponse TradeStatisticResponse,
+	TradeStatisticResponse TradeStatistic,
 	IncomeTradeStatisticResponse IncomeStatistic,
 	WinrateTradeStatisticResponse WinrateStatistic
 );

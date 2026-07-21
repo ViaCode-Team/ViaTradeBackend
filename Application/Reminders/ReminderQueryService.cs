@@ -1,24 +1,23 @@
-using Application.Common.Queries;
+using Application.Common.Models;
 using Application.Common.Specifications;
 using Application.Reminders.Interfaces;
 using Application.Reminders.Models;
-using Application.Reminders.Queries;
 using Domain.Reminders.Entities;
 
 namespace Application.Reminders;
 
 public class ReminderQueryService(IReminderRepository reminderRepository) : IReminderQueryService
 {
-	public async Task<ReminderStatistics> GetStatisticsAsync(int userId, CancellationToken ct)
+	public async Task<ReminderStatisticsDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
 		int total = await reminderRepository.CountAsync(x => x.UserId == userId, ct);
 
-		return new ReminderStatistics(total);
+		return new ReminderStatisticsDto(total);
 	}
 
 	public async Task<IEnumerable<Reminder>> GetAsync(CancellationToken ct)
 	{
-		return await reminderRepository.FindAsync(x => x.DateTime <= DateTime.UtcNow, ct);
+		return await reminderRepository.GetDueRemindersAsync(ct);
 	}
 
 	public async Task<Reminder> GetAsync(int reminderId, int userId, CancellationToken ct)

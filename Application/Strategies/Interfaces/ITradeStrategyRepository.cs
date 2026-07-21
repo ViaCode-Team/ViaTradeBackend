@@ -1,13 +1,14 @@
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Queries;
+using Application.Common.Models;
+using Application.Strategies.Models;
 using Domain.Strategies.Entities;
 
 namespace Application.Strategies.Interfaces;
 
 public interface ITradeStrategyRepository : IRepository<TradeStrategy>
 {
-	Task<int> CountAsync(CancellationToken ct = default);
+	Task<StrategyCountsDto> GetStatisticAsync(int userId, CancellationToken ct = default);
 	Task<TradeStrategy?> GetByNameAsync(string name, CancellationToken ct = default);
 	Task<PageResult<TradeStrategy>> GetPagedFilteredAsync(
 		int userId,

@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
-using Application.Common.Queries;
+using Application.Common.Models;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
-using Application.Trades.Queries;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -60,7 +59,7 @@ public class TradesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var trade = await tradeCommandService.CreateAsync(userId, request.Adapt<TradeInput>(), ct);
+		var trade = await tradeCommandService.CreateAsync(userId, request.Adapt<TradeInputDto>(), ct);
 
 		return TypedResults.Created($"/api/Trades/{trade.Id}", trade.Adapt<TradeResponse>());
 	}
@@ -73,7 +72,7 @@ public class TradesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await tradeCommandService.UpdateAsync(id, userId, request.Adapt<TradeInput>(), ct);
+		await tradeCommandService.UpdateAsync(id, userId, request.Adapt<TradeInputDto>(), ct);
 
 		return TypedResults.NoContent();
 	}

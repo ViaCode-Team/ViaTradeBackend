@@ -1,6 +1,6 @@
-using Application.Common.Queries;
+using Application.Common.Models;
 using Application.TradeCodes.Interfaces;
-using Application.TradeCodes.Queries;
+using Application.TradeCodes.Models;
 using Domain.TradeCodes.Entities;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -9,11 +9,6 @@ namespace Infrastructure.DataBase.Repositories;
 
 public class TradeCodeEfRepository(AppDbContext context) : GenericEfRepository<TradeCode>(context), ITradeCodeRepository
 {
-	public async Task<int> CountAsync(CancellationToken ct)
-	{
-		return await _dbSet.CountAsync(ct);
-	}
-
 	public async Task<TradeCode?> GetByExchangeIdAsync(string code, CancellationToken ct)
 	{
 		return await _dbSet.Where(e => e.ExchangeId == code).FirstOrDefaultAsync(ct);

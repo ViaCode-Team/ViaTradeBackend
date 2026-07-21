@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
-using Application.Common.Queries;
+using Application.Common.Models;
 using Application.Notes.Interfaces;
-using Application.Notes.Queries;
+using Application.Notes.Models;
 using Domain.Notes.Enums;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;

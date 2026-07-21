@@ -1,13 +1,11 @@
-using Application.Common.Queries;
-using Application.Statistics.Models;
-using Application.Trades.Queries;
-using Domain.Trades.Entities;
+using Application.Common.Models;
+using Application.Trades.Models;
 
 namespace Application.Trades.Interfaces;
 
 public interface ITradeQueryService
 {
-	Task<GlobalStatisticReadModel> GetStatisticsAsync(int userId, CancellationToken ct);
-	Task<Trade> GetAsync(int id, int userId, CancellationToken ct);
-	Task<PageResult<Trade>> GetAsync(int userId, TradeFilter filter, PageOptions page, CancellationToken ct);
+	Task<GlobalTradeStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct);
+	Task<TradeDto> GetAsync(int id, int userId, CancellationToken ct);
+	Task<PageResult<TradeDto>> GetAsync(int userId, TradeFilter filter, PageOptions page, CancellationToken ct);
 }

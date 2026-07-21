@@ -1,9 +1,8 @@
 using Application.Common.Exceptions;
-using Application.Common.Queries;
+using Application.Common.Models;
 using Application.Common.Specifications;
 using Application.Notes.Interfaces;
-using Application.Notes.Queries;
-using Application.Statistics.Models;
+using Application.Notes.Models;
 using Domain.Notes.Entities;
 using Domain.Notes.Enums;
 
@@ -11,22 +10,14 @@ namespace Application.Notes;
 
 public class NoteQueryService(INoteRepository noteRepository) : INoteQueryService
 {
-	public async Task<NoteStatisticReadModel> GetStatisticsAsync(int userId, CancellationToken ct)
+	public async Task<NoteStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
 		return await noteRepository.GetNoteStatisticAsync(userId, ct);
 	}
 
 	public async Task<Note> GetAsync(int relatedId, int userId, NoteType noteType, CancellationToken ct)
 	{
-		var existingNotes = await noteRepository.FindAsync(
-			x =>
-				x.UserId == userId
-				&& (noteType == NoteType.TradeCodeNote ? x.TradeCodeId == relatedId : x.TradeStrategyId == relatedId),
-			ct
-		);
-
-		var existingNote = existingNotes.FirstOrDefault();
-
+		var existingNote = await noteRepository.FindByTargetAsync(userId, relatedId, noteType, ct);
 		if (existingNote == null)
 			throw new NotFoundException("Note not found.", "note_not_found");
 

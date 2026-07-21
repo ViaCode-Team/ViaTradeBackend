@@ -4,8 +4,8 @@ namespace Infrastructure.DataBase;
 
 public class EfUnitOfWork(AppDbContext context) : IUnitOfWork
 {
-	public async Task<int> SaveChangesAsync(CancellationToken ct = default)
+	public Task<int> SaveChangesAsync(CancellationToken ct)
 	{
-		return await context.SaveChangesAsync(ct);
+		return EfDatabaseOperation.ExecuteAsync(() => context.SaveChangesAsync(ct));
 	}
 }

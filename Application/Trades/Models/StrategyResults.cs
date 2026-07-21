@@ -1,4 +1,4 @@
-using Domain.Trades.Entities;
+using Domain.Models.Trade;
 
 namespace Application.Trades.Models;
 

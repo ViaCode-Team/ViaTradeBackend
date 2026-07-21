@@ -1,12 +1,10 @@
-using Application.Statistics.Models;
 using Application.Trades.Models;
-using Application.Trades.Queries;
 
 namespace Application.Interfaces;
 
 public interface ITradeResultsService
 {
-	Task<SignalStatisticReadModel> GetStatisticsAsync(int userId, CancellationToken ct);
+	Task<SignalStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct);
 
 	Task<StrategyResults> GetAsync(
 		int userId,

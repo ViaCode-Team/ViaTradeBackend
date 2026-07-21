@@ -1,4 +1,4 @@
-using Application.Common.Queries;
+using Application.Common.Models;
 using Application.Strategies.Interfaces;
 using Domain.Strategies.Entities;
 using Infrastructure.Utils;
@@ -10,6 +10,11 @@ public class UserTradeStrategyEfRepository(AppDbContext context)
 	: GenericEfRepository<UserTradeStrategy>(context),
 		IUserTradeStrategyRepository
 {
+	public async Task<int> CountByUserAsync(int userId, CancellationToken ct)
+	{
+		return await _dbSet.CountAsync(e => e.UserId == userId, ct);
+	}
+
 	public async Task<PageResult<UserTradeStrategy>> GetByUserPagedAsync(
 		int userId,
 		PageOptions page,
@@ -17,11 +22,6 @@ public class UserTradeStrategyEfRepository(AppDbContext context)
 	)
 	{
 		return await FindPagedAsync(e => e.UserId == userId, page, ct);
-	}
-
-	public async Task<int> CountByUserAsync(int userId, CancellationToken ct)
-	{
-		return await _dbSet.CountAsync(e => e.UserId == userId, ct);
 	}
 
 	public async Task<Dictionary<string, List<string>>> GetUserPreferencesAsync(int userId, CancellationToken ct)

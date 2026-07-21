@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
-using Application.Common.Queries;
+using Application.Common.Models;
 using Application.Strategies.Interfaces;
-using Application.Strategies.Queries;
+using Application.Strategies.Models;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;

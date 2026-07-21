@@ -1,5 +1,5 @@
 using Application.Notes.Interfaces;
-using Application.Statistics.Models;
+using Application.Notes.Models;
 using Domain.Notes.Entities;
 using Domain.Notes.Enums;
 using Microsoft.EntityFrameworkCore;
@@ -8,28 +8,18 @@ namespace Infrastructure.DataBase.Repositories;
 
 public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(context), INoteRepository
 {
-	public async Task<NoteStatisticReadModel> GetNoteStatisticAsync(int userId, CancellationToken ct = default)
+	public async Task<NoteStatisticDto> GetNoteStatisticAsync(int userId, CancellationToken ct = default)
 	{
 		var baseQuery = _dbSet.Where(n => n.UserId == userId);
 
 		var totalNotes = await baseQuery.CountAsync(ct);
 		if (totalNotes == 0)
-			return new NoteStatisticReadModel
-			{
-				TotalNotes = 0,
-				StockNotes = 0,
-				StrategyNotes = 0,
-			};
+			return new NoteStatisticDto(0, 0, 0);
 
 		var stockNotes = await baseQuery.CountAsync(n => n.TradeCodeId != null, ct);
 		var strategyNotes = await baseQuery.CountAsync(n => n.TradeStrategyId != null, ct);
 
-		return new NoteStatisticReadModel
-		{
-			TotalNotes = totalNotes,
-			StockNotes = stockNotes,
-			StrategyNotes = strategyNotes,
-		};
+		return new NoteStatisticDto(totalNotes, stockNotes, strategyNotes);
 	}
 
 	public async Task<Note?> FindByTargetAsync(int userId, int relatedId, NoteType noteType, CancellationToken ct) =>
@@ -86,7 +76,7 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 		_dbSet.Add(note);
 	}
 
-	public async Task ExecuteUpdateUserNoteAsync(
+	public async Task<int> ExecuteUpdateUserNoteAsync(
 		int id,
 		NoteType noteType,
 		int userId,
@@ -94,39 +84,29 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 		CancellationToken ct
 	)
 	{
-		int affectedRows = noteType switch
-		{
-			NoteType.TradeCodeNote => await _dbSet
-				.Where(n => n.TradeCodeId == id && n.UserId == userId)
-				.ExecuteUpdateAsync(s => s.SetProperty(n => n.NoteText, noteText), ct),
+		var query = GetTargetQuery(id, userId, noteType);
 
-			NoteType.TradeStrategyNote => await _dbSet
-				.Where(n => n.TradeStrategyId == id && n.UserId == userId)
-				.ExecuteUpdateAsync(s => s.SetProperty(n => n.NoteText, noteText), ct),
-
-			_ => throw new KeyNotFoundException(),
-		};
-
-		if (affectedRows == 0)
-			throw new KeyNotFoundException();
+		return await EfDatabaseOperation.ExecuteAsync(() =>
+			query.ExecuteUpdateAsync(setters => setters.SetProperty(note => note.NoteText, noteText), ct)
+		);
 	}
 
-	public async Task DeleteUserNoteAsync(int id, int userId, NoteType noteType, CancellationToken ct)
+	public async Task<int> DeleteUserNoteAsync(int id, int userId, NoteType noteType, CancellationToken ct)
 	{
-		int affectedRows = noteType switch
+		var query = GetTargetQuery(id, userId, noteType);
+
+		return await query.ExecuteDeleteAsync(ct);
+	}
+
+	private IQueryable<Note> GetTargetQuery(int id, int userId, NoteType noteType)
+	{
+		return noteType switch
 		{
-			NoteType.TradeCodeNote => await _dbSet
-				.Where(n => n.TradeCodeId == id && n.UserId == userId)
-				.ExecuteDeleteAsync(ct),
+			NoteType.TradeCodeNote => _dbSet.Where(note => note.TradeCodeId == id && note.UserId == userId),
 
-			NoteType.TradeStrategyNote => await _dbSet
-				.Where(n => n.TradeStrategyId == id && n.UserId == userId)
-				.ExecuteDeleteAsync(ct),
+			NoteType.TradeStrategyNote => _dbSet.Where(note => note.TradeStrategyId == id && note.UserId == userId),
 
-			_ => throw new KeyNotFoundException(),
+			_ => throw new ArgumentOutOfRangeException(nameof(noteType), noteType, "Unsupported note type."),
 		};
-
-		if (affectedRows == 0)
-			throw new KeyNotFoundException();
 	}
 }

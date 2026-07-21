@@ -1,4 +1,4 @@
-using Application.Common.Queries;
+using Application.Common.Models;
 using Application.Strategies.Interfaces;
 using Domain.Strategies.Entities;
 

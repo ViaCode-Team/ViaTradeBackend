@@ -1,5 +1,5 @@
 using Application.Trades.Interfaces;
-using Domain.Trades.Entities;
+using Domain.Entities;
 
 namespace Infrastructure.DataBase.Repositories;
 

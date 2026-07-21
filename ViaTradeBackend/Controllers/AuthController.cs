@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
 using Application.Auth.Models;
-using Application.Common.Queries;
+using Application.Common.Models;
 using Infrastructure.Configuration;
 using Mapster;
 using Microsoft.AspNetCore.Authorization;

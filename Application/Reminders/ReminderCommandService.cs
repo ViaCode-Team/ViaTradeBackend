@@ -1,11 +1,16 @@
 using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Reminders.Interfaces;
+using Application.TradeCodes.Interfaces;
 using Domain.Reminders.Entities;
 
 namespace Application.Reminders;
 
-public class ReminderCommandService(IReminderRepository reminderRepository, IUnitOfWork uow) : IReminderCommandService
+public class ReminderCommandService(
+	IReminderRepository reminderRepository,
+	ITradeCodeRepository tradeCodeRepository,
+	IUnitOfWork uow
+) : IReminderCommandService
 {
 	public async Task CreateAsync(int userId, int tradeCodeId, string text, DateTime dateTime, CancellationToken ct)
 	{

@@ -1,6 +1,7 @@
 using Application.Common.Interfaces;
-using Application.Common.Queries;
+using Application.Common.Models;
 using Application.Strategies.Interfaces;
+using Application.Strategies.Models;
 using Domain.Strategies.Entities;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
@@ -11,9 +12,17 @@ public class TradeStrategyEfRepository(AppDbContext context)
 	: GenericEfRepository<TradeStrategy>(context),
 		ITradeStrategyRepository
 {
-	public async Task<int> CountAsync(CancellationToken ct = default)
+	public async Task<StrategyCountsDto> GetStatisticAsync(int userId, CancellationToken ct)
 	{
-		return await _dbSet.CountAsync(ct);
+		var query = _context
+			.Users.Where(user => user.Id == userId)
+			.Select(_ => new StrategyCountsDto(
+				_context.TradeStrategies.LongCount(),
+				_context.UserTradeStrategies.LongCount(link => link.UserId == userId)
+			));
+
+		return await query.SingleOrDefaultAsync(ct)
+			?? throw new KeyNotFoundException($"User with ID {userId} was not found.");
 	}
 
 	public async Task<TradeStrategy?> GetByNameAsync(string name, CancellationToken ct = default)

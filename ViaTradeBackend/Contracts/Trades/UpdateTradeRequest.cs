@@ -9,7 +9,7 @@ public record UpdateTradeRequest(
 	double TradeOpen,
 	double? TradeClose,
 	TradeSignal TradeSignal,
-	[Range(0, int.MaxValue)] int Count,
+	[Range(1, int.MaxValue)] int Count,
 	int TradeTypeId,
 	int TradeCodeId
 );

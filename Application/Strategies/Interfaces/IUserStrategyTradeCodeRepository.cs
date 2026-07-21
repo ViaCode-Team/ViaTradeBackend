@@ -1,5 +1,5 @@
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Queries;
+using Application.Common.Models;
 using Domain.Strategies.Entities;
 
 namespace Application.Strategies.Interfaces;

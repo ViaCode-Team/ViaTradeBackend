@@ -58,6 +58,7 @@ public class ExceptionHandlingMiddleware(
 			NotFoundException ex => new(404, "Not Found", ex.Code, ex.Message),
 			ConflictException ex => new(409, "Conflict", ex.Code, ex.Message),
 			BusinessRuleException ex => new(422, "Business Rule Violation", ex.Code, ex.Message),
+			DataIntegrityException ex => new(500, "Internal Server Error", ex.Code, "Server data is inconsistent."),
 			ArgumentException ex => new(400, "Bad Request", "invalid_argument", ex.Message),
 			KeyNotFoundException => new(404, "Not Found", "not_found", "The requested resource was not found."),
 			UnauthorizedAccessException => new(401, "Unauthorized", "unauthorized", "Authentication is required."),

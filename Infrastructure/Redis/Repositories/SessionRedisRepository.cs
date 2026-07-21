@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Application.Auth.Interfaces;
-using Application.Common.Queries;
+using Application.Common.Models;
 using Application.Users.Models;
 using StackExchange.Redis;
 

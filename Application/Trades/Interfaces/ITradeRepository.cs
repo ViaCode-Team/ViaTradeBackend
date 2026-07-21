@@ -1,15 +1,13 @@
-using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Queries;
-using Application.Statistics.Models;
+using Application.Common.Models;
 using Application.Trades.Models;
-using Domain.Trades.Entities;
+using Domain.Entities;
 
 namespace Application.Trades.Interfaces;
 
 public interface ITradeRepository : IRepository<Trade>
 {
-	Task<GlobalStatisticReadModel> GetGlobalStatisticAsync(int userId, CancellationToken ct = default);
+	Task<TradeStatisticAggregateDto> GetGlobalStatisticAsync(int userId, CancellationToken ct = default);
 	Task<PageResult<Trade>> GetByUserPagedAsync(int userId, PageOptions page, CancellationToken ct = default);
 	Task<PageResult<Trade>> GetByUserAndTradeCodePagedAsync(
 		int userId,
@@ -17,16 +15,10 @@ public interface ITradeRepository : IRepository<Trade>
 		PageOptions page,
 		CancellationToken ct = default
 	);
-	Task<PageResult<Trade>> GetPagedFilteredAsync(
-		IQuerySpecification<Trade> spec,
-		PageOptions page,
-		CancellationToken ct = default
-	);
-	Task<int> UpdateAsync(
+	Task<int> ExecuteUpdateAsync(
 		int id,
 		int userId,
-		TradeInput request,
-		double? netIncome,
+		TradeInputDto request,
 		decimal price,
 		CancellationToken ct = default
 	);

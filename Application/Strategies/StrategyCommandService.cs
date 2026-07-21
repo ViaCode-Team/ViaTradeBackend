@@ -13,19 +13,11 @@ public class StrategyCommandService(
 {
 	public async Task CreateCodeAsync(int userId, int strategyId, int tradeCodeId, CancellationToken ct)
 	{
-		bool exists = await userStrategyTradeCodeRepository.ExistsAsync(
-			e => e.UserId == userId && e.StrategyId == strategyId && e.TradeCodeId == tradeCodeId,
-			ct
-		);
-
-		if (exists)
-			throw new ConflictException("User strategy code already exists.", "strategy_code_already_exists");
-
 		var strategyCode = new UserStrategyTradeCode
 		{
 			UserId = userId,
-			TradeCodeId = tradeCodeId,
 			StrategyId = strategyId,
+			TradeCodeId = tradeCodeId,
 		};
 
 		await userStrategyTradeCodeRepository.AddAsync(strategyCode, ct);
@@ -34,14 +26,6 @@ public class StrategyCommandService(
 
 	public async Task CreateAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		bool exists = await userTradeStrategyRepository.ExistsAsync(
-			e => e.UserId == userId && e.TradeStrategyId == strategyId,
-			ct
-		);
-
-		if (exists)
-			throw new ConflictException("User strategy already exists.", "user_strategy_already_exists");
-
 		var strategyLink = new UserTradeStrategy { UserId = userId, TradeStrategyId = strategyId };
 
 		await userTradeStrategyRepository.AddAsync(strategyLink, ct);

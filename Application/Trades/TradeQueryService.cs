@@ -1,29 +1,55 @@
-using Application.Common.Queries;
+using Application.Common.Models;
 using Application.Common.Specifications;
-using Application.Statistics.Models;
 using Application.Trades.Interfaces;
-using Application.Trades.Queries;
-using Domain.Trades.Entities;
+using Application.Trades.Models;
+using Domain.Statistics.Services;
 
 namespace Application.Trades;
 
 public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQueryService
 {
-	public async Task<GlobalStatisticReadModel> GetStatisticsAsync(int userId, CancellationToken ct)
+	public async Task<GlobalTradeStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		return await tradeRepository.GetGlobalStatisticAsync(userId, ct);
+		var result = await tradeRepository.GetGlobalStatisticAsync(userId, ct);
+
+		var tradeStatistic = new TradeStatisticDto(result.TotalTrades, result.WinTrades, result.LoseTrades);
+
+		var incomeStatistic = new IncomeTradeStatisticDto(
+			Math.Round((decimal)result.TotalAbsoluteIncome, 2),
+			TradeStatisticsCalcService.CalculateAverageIncome((decimal)result.TotalAbsoluteIncome, result.TotalTrades)
+		);
+
+		var winrateStatistic = new WinrateTradeStatisticDto(
+			TradeStatisticsCalcService.CalculateWinrate(result.WinTrades, result.TotalTrades),
+			TradeStatisticsCalcService.CalculateProfitFactor(result.TotalProfit, result.TotalLoss)
+		);
+
+		return new GlobalTradeStatisticDto(tradeStatistic, incomeStatistic, winrateStatistic);
 	}
 
-	public async Task<Trade> GetAsync(int id, int userId, CancellationToken ct)
+	public async Task<TradeDto> GetAsync(int id, int userId, CancellationToken ct)
 	{
 		var trade = await tradeRepository.FirstOrDefaultAsync(x => x.Id == id && x.UserId == userId, ct);
 		if (trade == null)
 			throw new KeyNotFoundException();
 
-		return trade;
+		return new TradeDto(
+			trade.Id,
+			trade.DateOpen,
+			trade.DateClose,
+			trade.TradeOpen,
+			trade.TradeClose,
+			TradeStatisticsCalcService.CalculateNetIncome(trade.TradeOpen, trade.TradeClose, trade.TradeSignal),
+			trade.Count,
+			trade.Price,
+			trade.TradeSignal,
+			trade.TradeTypeId,
+			trade.TradeCodeId,
+			trade.UserId
+		);
 	}
 
-	public async Task<PageResult<Trade>> GetAsync(
+	public async Task<PageResult<TradeDto>> GetAsync(
 		int userId,
 		TradeFilter filter,
 		PageOptions page,
@@ -31,6 +57,23 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 	)
 	{
 		var spec = new TradeQuerySpecification(userId, filter);
-		return await tradeRepository.GetPagedFilteredAsync(spec, page, ct);
+		var trades = await tradeRepository.GetPagedAsync(spec, page, ct);
+
+		return trades.Map(trade =>
+			new TradeDto(
+				trade.Id,
+				trade.DateOpen,
+				trade.DateClose,
+				trade.TradeOpen,
+				trade.TradeClose,
+				TradeStatisticsCalcService.CalculateNetIncome(trade.TradeOpen, trade.TradeClose, trade.TradeSignal),
+				trade.Count,
+				trade.Price,
+				trade.TradeSignal,
+				trade.TradeTypeId,
+				trade.TradeCodeId,
+				trade.UserId
+			)
+		);
 	}
 }

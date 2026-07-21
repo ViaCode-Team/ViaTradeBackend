@@ -1,4 +1,4 @@
-using Application.Reminders.Queries;
+using Application.Reminders.Models;
 using Domain.Reminders.Entities;
 
 namespace Application.Common.Specifications;

@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Application.Trades.Interfaces;
-using Domain.Trades.Entities;
+using Domain.Models.Trade;
 
 namespace Infrastructure.Utils;
 

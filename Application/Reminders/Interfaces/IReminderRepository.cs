@@ -1,6 +1,6 @@
 using Application.Common.Interfaces.Repositories;
-using Application.Common.Queries;
-using Application.Reminders.Queries;
+using Application.Common.Models;
+using Application.Reminders.Models;
 using Domain.Reminders.Entities;
 
 namespace Application.Reminders.Interfaces;

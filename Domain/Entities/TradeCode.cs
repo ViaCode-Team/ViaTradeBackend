@@ -1,5 +1,4 @@
 using Domain.Entities;
-using Domain.Trades.Entities;
 
 namespace Domain.TradeCodes.Entities;
 
