@@ -1,4 +1,3 @@
-using System.Text.Json;
 using System.Text.Json.Serialization;
 using Infrastructure.Configuration;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +19,6 @@ builder
 	.AddJsonOptions(options =>
 	{
 		options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
-		options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase));
 	});
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>

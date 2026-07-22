@@ -7,16 +7,19 @@ public static class QueryableExtensions
 {
 	public static async Task<PageResult<T>> ToPagedAsync<T>(
 		this IQueryable<T> source,
-		PageOptions page,
+		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
 		var totalCount = await source.CountAsync(ct);
 		if (totalCount == 0)
-			return new PageResult<T>([], 0, page.Page, page.PageSize);
+			return new PageResult<T>([], 0, pageOptions.Page, pageOptions.PageSize);
 
-		var items = await source.Skip((page.Page - 1) * page.PageSize).Take(page.PageSize).ToListAsync(ct);
+		var items = await source
+			.Skip((pageOptions.Page - 1) * pageOptions.PageSize)
+			.Take(pageOptions.PageSize)
+			.ToListAsync(ct);
 
-		return new PageResult<T>(items, totalCount, page.Page, page.PageSize);
+		return new PageResult<T>(items, totalCount, pageOptions.Page, pageOptions.PageSize);
 	}
 }

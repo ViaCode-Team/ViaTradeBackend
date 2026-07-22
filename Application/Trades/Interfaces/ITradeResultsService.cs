@@ -10,7 +10,7 @@ public interface ITradeResultsService
 		int userId,
 		DateTime? startDate,
 		DateTime? endDate,
-		SignalSort sort,
+		SignalSort signalSort,
 		CancellationToken ct
 	);
 

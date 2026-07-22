@@ -32,13 +32,13 @@ public class TradesController(
 
 	[HttpGet("byuser")]
 	public async Task<Ok<PageResult<TradeResponse>>> GetUserTrades(
-		[FromQuery] TradeFilter filter,
-		[FromQuery] PageOptions page,
+		[FromQuery] TradeFilter tradeFilter,
+		[FromQuery] PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userTrades = await tradeQueryService.GetPageAsync(userId, filter, page, ct);
+		var userTrades = await tradeQueryService.GetPageAsync(userId, tradeFilter, pageOptions, ct);
 
 		return TypedResults.Ok(userTrades.Map(ApiMapper.ToResponse));
 	}

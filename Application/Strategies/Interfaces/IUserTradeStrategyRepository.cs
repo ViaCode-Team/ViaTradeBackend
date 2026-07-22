@@ -7,6 +7,10 @@ namespace Application.Strategies.Interfaces;
 public interface IUserTradeStrategyRepository : IRepository<UserTradeStrategy>
 {
 	Task<int> CountByUserAsync(int userId, CancellationToken ct);
-	Task<PageResult<UserTradeStrategy>> GetPageByUserAsync(int userId, PageOptions page, CancellationToken ct);
+	Task<PageResult<UserTradeStrategy>> GetPageByUserAsync(
+		int userId,
+		PageOptions pageOptions,
+		CancellationToken ct
+	);
 	Task<Dictionary<string, List<string>>> GetUserPreferencesAsync(int userId, CancellationToken ct);
 }

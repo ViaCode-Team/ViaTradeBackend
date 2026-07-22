@@ -43,6 +43,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 			})
 			.IsUnique();
 
+		modelBuilder
+			.Entity<UserStrategyTradeCode>()
+			.HasOne(x => x.TradeStrategy)
+			.WithMany()
+			.HasForeignKey(x => x.StrategyId)
+			.IsRequired();
+
 		modelBuilder.Entity<Reminder>().HasIndex(x => x.UserId);
 
 		modelBuilder.Entity<Reminder>().ToTable("TradeReminds");

@@ -5,5 +5,5 @@ namespace Application.Auth.Interfaces;
 
 public interface IAuthQueryService
 {
-	Task<PageResult<UserSessionDto>> GetSessionsPageAsync(int userId, PageOptions page, CancellationToken ct);
+	Task<PageResult<UserSessionDto>> GetSessionsPageAsync(int userId, PageOptions pageOptions, CancellationToken ct);
 }

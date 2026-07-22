@@ -51,13 +51,13 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 
 	public async Task<PageResult<TradeDto>> GetPageAsync(
 		int userId,
-		TradeFilter filter,
-		PageOptions page,
+		TradeFilter tradeFilter,
+		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		var spec = new TradeQuerySpecification(userId, filter);
-		var trades = await tradeRepository.GetPageAsync(spec, page, ct);
+		var spec = new TradeQuerySpecification(userId, tradeFilter);
+		var trades = await tradeRepository.GetPageAsync(spec, pageOptions, ct);
 
 		return trades.Map(trade => new TradeDto(
 			trade.Id,

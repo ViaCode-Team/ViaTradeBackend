@@ -9,10 +9,10 @@ public interface IRepository<TEntity>
 {
 	Task<TEntity?> FindByIdAsync(int id, CancellationToken ct = default);
 	Task<IReadOnlyList<TEntity>> ListAsync(CancellationToken ct = default);
-	Task<PageResult<TEntity>> GetPageAsync(PageOptions page, CancellationToken ct = default);
+	Task<PageResult<TEntity>> GetPageAsync(PageOptions pageOptions, CancellationToken ct = default);
 	Task<PageResult<TEntity>> GetPageAsync(
 		IQuerySpecification<TEntity> spec,
-		PageOptions page,
+		PageOptions pageOptions,
 		CancellationToken ct = default
 	);
 	Task<IReadOnlyList<TEntity>> ListByAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct = default);
@@ -20,7 +20,7 @@ public interface IRepository<TEntity>
 	Task<TEntity?> FindOneAsync(CancellationToken ct = default);
 	Task<PageResult<TEntity>> GetPageByAsync(
 		Expression<Func<TEntity, bool>> predicate,
-		PageOptions page,
+		PageOptions pageOptions,
 		CancellationToken ct = default
 	);
 	Task AddAsync(TEntity entity, CancellationToken ct = default);

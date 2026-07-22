@@ -30,7 +30,7 @@ public class TradeResultsService(
 		int userId,
 		DateTime? startDate,
 		DateTime? endDate,
-		SignalSort sort,
+		SignalSort signalSort,
 		CancellationToken ct
 	)
 	{
@@ -74,7 +74,7 @@ public class TradeResultsService(
 			}
 		}
 
-		var sortFields = sort.GetEffectiveSortBy();
+		var sortFields = signalSort.GetEffectiveSortBy();
 
 		var strategies = allResults
 			.GroupBy(x => x.StrategyName)

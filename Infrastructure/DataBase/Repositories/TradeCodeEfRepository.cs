@@ -36,16 +36,20 @@ public class TradeCodeEfRepository(AppDbContext context) : GenericEfRepository<T
 			);
 	}
 
-	public async Task<PageResult<TradeCode>> GetPageAsync(PageOptions page, TradeCodeSort sort, CancellationToken ct)
+	public async Task<PageResult<TradeCode>> GetPageAsync(
+		PageOptions pageOptions,
+		TradeCodeSort tradeCodeSort,
+		CancellationToken ct
+	)
 	{
-		var query = ApplySort(_dbSet, sort);
+		var query = ApplySort(_dbSet, tradeCodeSort);
 
-		return await query.ToPagedAsync(page, ct);
+		return await query.ToPagedAsync(pageOptions, ct);
 	}
 
-	private static IQueryable<TradeCode> ApplySort(IQueryable<TradeCode> query, TradeCodeSort sort)
+	private static IQueryable<TradeCode> ApplySort(IQueryable<TradeCode> query, TradeCodeSort tradeCodeSort)
 	{
-		var sortFields = sort.GetEffectiveSortBy();
+		var sortFields = tradeCodeSort.GetEffectiveSortBy();
 
 		if (sortFields.Count > 0)
 		{

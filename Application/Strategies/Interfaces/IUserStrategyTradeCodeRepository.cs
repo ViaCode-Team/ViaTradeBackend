@@ -8,7 +8,7 @@ public interface IUserStrategyTradeCodeRepository : IRepository<UserStrategyTrad
 {
 	Task<PageResult<UserStrategyTradeCode>> GetPageByUserAsync(
 		int userId,
-		PageOptions page,
+		PageOptions pageOptions,
 		CancellationToken ct = default
 	);
 }

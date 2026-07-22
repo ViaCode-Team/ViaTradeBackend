@@ -11,5 +11,9 @@ public interface ITradeCodeRepository : IRepository<TradeCode>
 	Task<int?> FindIdByExchangeIdAsync(string code, CancellationToken ct = default);
 	Task<string?> FindExchangeIdByIdAsync(int id, CancellationToken ct = default);
 	Task<Dictionary<string, int>> GetExchangeIdMapAsync(CancellationToken ct = default);
-	Task<PageResult<TradeCode>> GetPageAsync(PageOptions page, TradeCodeSort sort, CancellationToken ct = default);
+	Task<PageResult<TradeCode>> GetPageAsync(
+		PageOptions pageOptions,
+		TradeCodeSort tradeCodeSort,
+		CancellationToken ct = default
+	);
 }

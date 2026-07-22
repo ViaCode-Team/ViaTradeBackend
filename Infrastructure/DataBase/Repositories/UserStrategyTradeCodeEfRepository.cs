@@ -10,10 +10,10 @@ public class UserStrategyTradeCodeEfRepository(AppDbContext context)
 {
 	public async Task<PageResult<UserStrategyTradeCode>> GetPageByUserAsync(
 		int userId,
-		PageOptions page,
+		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		return await GetPageByAsync(strategyCode => strategyCode.UserId == userId, page, ct);
+		return await GetPageByAsync(strategyCode => strategyCode.UserId == userId, pageOptions, ct);
 	}
 }

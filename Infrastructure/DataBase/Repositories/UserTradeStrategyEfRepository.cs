@@ -17,11 +17,11 @@ public class UserTradeStrategyEfRepository(AppDbContext context)
 
 	public async Task<PageResult<UserTradeStrategy>> GetPageByUserAsync(
 		int userId,
-		PageOptions page,
+		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		return await GetPageByAsync(strategy => strategy.UserId == userId, page, ct);
+		return await GetPageByAsync(strategy => strategy.UserId == userId, pageOptions, ct);
 	}
 
 	public async Task<Dictionary<string, List<string>>> GetUserPreferencesAsync(int userId, CancellationToken ct)

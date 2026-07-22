@@ -40,14 +40,14 @@ public class StrategyQueryService(
 
 	public async Task<PageResult<TradeStrategy>> GetPageAsync(
 		int userId,
-		StrategyFilter filter,
-		StrategySort sort,
-		PageOptions page,
+		StrategyFilter strategyFilter,
+		StrategySort strategySort,
+		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		var spec = new StrategyQuerySpecification(userId, filter, sort);
-		return await tradeStrategyRepository.GetPageAsync(userId, spec, page, ct);
+		var spec = new StrategyQuerySpecification(userId, strategyFilter, strategySort);
+		return await tradeStrategyRepository.GetPageAsync(userId, spec, pageOptions, ct);
 	}
 
 	public async Task<TradeStrategy> GetAsync(int strategyId, CancellationToken ct)
@@ -61,19 +61,19 @@ public class StrategyQueryService(
 
 	public async Task<PageResult<UserTradeStrategy>> GetUserStrategiesPageAsync(
 		int userId,
-		PageOptions page,
+		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		return await userTradeStrategyRepository.GetPageByUserAsync(userId, page, ct);
+		return await userTradeStrategyRepository.GetPageByUserAsync(userId, pageOptions, ct);
 	}
 
 	public async Task<PageResult<UserStrategyTradeCode>> GetUserStrategyTradeCodesPageAsync(
 		int userId,
-		PageOptions page,
+		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		return await userStrategyTradeCodeRepository.GetPageByUserAsync(userId, page, ct);
+		return await userStrategyTradeCodeRepository.GetPageByUserAsync(userId, pageOptions, ct);
 	}
 }

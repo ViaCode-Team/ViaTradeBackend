@@ -30,14 +30,14 @@ public class GenericEfRepository<TEntity> : IRepository<TEntity>
 		return await _dbSet.ToListAsync(ct);
 	}
 
-	public async Task<PageResult<TEntity>> GetPageAsync(PageOptions page, CancellationToken ct)
+	public async Task<PageResult<TEntity>> GetPageAsync(PageOptions pageOptions, CancellationToken ct)
 	{
-		return await _dbSet.OrderBy(e => e.Id).ToPagedAsync(page, ct);
+		return await _dbSet.OrderBy(e => e.Id).ToPagedAsync(pageOptions, ct);
 	}
 
 	public async Task<PageResult<TEntity>> GetPageAsync(
 		IQuerySpecification<TEntity> spec,
-		PageOptions page,
+		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
@@ -45,7 +45,7 @@ public class GenericEfRepository<TEntity> : IRepository<TEntity>
 		if (spec.SortExpressions.Count == 0)
 			query = query.OrderBy(e => e.Id);
 
-		return await query.ToPagedAsync(page, ct);
+		return await query.ToPagedAsync(pageOptions, ct);
 	}
 
 	public async Task<IReadOnlyList<TEntity>> ListByAsync(
@@ -68,11 +68,11 @@ public class GenericEfRepository<TEntity> : IRepository<TEntity>
 
 	public async Task<PageResult<TEntity>> GetPageByAsync(
 		Expression<Func<TEntity, bool>> predicate,
-		PageOptions page,
+		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		return await _dbSet.Where(predicate).OrderBy(e => e.Id).ToPagedAsync(page, ct);
+		return await _dbSet.Where(predicate).OrderBy(e => e.Id).ToPagedAsync(pageOptions, ct);
 	}
 
 	public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct)

@@ -6,6 +6,10 @@ public sealed class PageResult<T>(IReadOnlyList<T> items, int totalCount, int pa
 
 	public int TotalCount { get; } = totalCount;
 
+	public int Page { get; } = pageNumber;
+
+	public int PageSize { get; } = pageSize;
+
 	public int TotalPages { get; } = CalculateTotalPages(totalCount, pageSize);
 
 	private static int CalculateTotalPages(int totalCount, int pageSize)
@@ -28,6 +32,6 @@ public sealed class PageResult<T>(IReadOnlyList<T> items, int totalCount, int pa
 		if (mapFunc == null)
 			throw new KeyNotFoundException(nameof(mapFunc));
 
-		return new PageResult<TResult>(Items.Select(mapFunc).ToList(), TotalCount, pageNumber, pageSize);
+		return new PageResult<TResult>(Items.Select(mapFunc).ToList(), TotalCount, Page, PageSize);
 	}
 }

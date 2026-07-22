@@ -28,12 +28,12 @@ public class ResultsController(ITradeResultsService tradeResultsService, IJwtHel
 	public async Task<Ok<StrategyResults>> GetStrategyResults(
 		[FromQuery] DateTime? startDate,
 		[FromQuery] DateTime? endTime,
-		[FromQuery] SignalSort sort,
+		[FromQuery] SignalSort signalSort,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var response = await tradeResultsService.GetStrategyResultsAsync(userId, startDate, endTime, sort, ct);
+		var response = await tradeResultsService.GetStrategyResultsAsync(userId, startDate, endTime, signalSort, ct);
 
 		return TypedResults.Ok(response);
 	}

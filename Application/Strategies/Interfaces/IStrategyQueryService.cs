@@ -10,16 +10,20 @@ public interface IStrategyQueryService
 	Task<StrategyStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct);
 	Task<PageResult<TradeStrategy>> GetPageAsync(
 		int userId,
-		StrategyFilter filter,
-		StrategySort sort,
-		PageOptions page,
+		StrategyFilter strategyFilter,
+		StrategySort strategySort,
+		PageOptions pageOptions,
 		CancellationToken ct
 	);
 	Task<TradeStrategy> GetAsync(int strategyId, CancellationToken ct);
-	Task<PageResult<UserTradeStrategy>> GetUserStrategiesPageAsync(int userId, PageOptions page, CancellationToken ct);
+	Task<PageResult<UserTradeStrategy>> GetUserStrategiesPageAsync(
+		int userId,
+		PageOptions pageOptions,
+		CancellationToken ct
+	);
 	Task<PageResult<UserStrategyTradeCode>> GetUserStrategyTradeCodesPageAsync(
 		int userId,
-		PageOptions page,
+		PageOptions pageOptions,
 		CancellationToken ct
 	);
 }

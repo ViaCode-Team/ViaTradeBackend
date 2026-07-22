@@ -9,5 +9,10 @@ public interface INoteQueryService
 {
 	Task<NoteStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct);
 	Task<Note> GetAsync(int userId, int relatedId, NoteType noteType, CancellationToken ct);
-	Task<PageResult<Note>> GetPageAsync(int userId, NoteFilter filter, PageOptions page, CancellationToken ct);
+	Task<PageResult<Note>> GetPageAsync(
+		int userId,
+		NoteFilter noteFilter,
+		PageOptions pageOptions,
+		CancellationToken ct
+	);
 }

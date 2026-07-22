@@ -27,12 +27,12 @@ public class TradeCodesController(ITradeCodeQueryService tradeCodeQueryService) 
 
 	[HttpGet("stocks")]
 	public async Task<Ok<PageResult<TradeCodeResponse>>> GetStockCodes(
-		[FromQuery] PageOptions page,
-		[FromQuery] TradeCodeSort sort,
+		[FromQuery] PageOptions pageOptions,
+		[FromQuery] TradeCodeSort tradeCodeSort,
 		CancellationToken ct
 	)
 	{
-		var pagedCodes = await tradeCodeQueryService.GetPageAsync(page, sort, ct);
+		var pagedCodes = await tradeCodeQueryService.GetPageAsync(pageOptions, tradeCodeSort, ct);
 
 		return TypedResults.Ok(pagedCodes.Map(ApiMapper.ToResponse));
 	}

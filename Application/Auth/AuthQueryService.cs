@@ -8,10 +8,10 @@ public class AuthQueryService(ISessionRepository sessionRepository) : IAuthQuery
 {
 	public async Task<PageResult<UserSessionDto>> GetSessionsPageAsync(
 		int userId,
-		PageOptions page,
+	PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		return await sessionRepository.GetPageByUserAsync(userId, page);
+		return await sessionRepository.GetPageByUserAsync(userId, pageOptions);
 	}
 }

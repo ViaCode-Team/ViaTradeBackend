@@ -87,12 +87,12 @@ public class AuthController(
 	[HttpGet("sessions")]
 	[Authorize]
 	public async Task<Ok<PageResult<UserSessionResponse>>> GetUserSessions(
-		[FromQuery] PageOptions page,
+		[FromQuery] PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userSessions = await authQueryService.GetSessionsPageAsync(userId, page, ct);
+		var userSessions = await authQueryService.GetSessionsPageAsync(userId, pageOptions, ct);
 
 		return TypedResults.Ok(userSessions.Map(ApiMapper.ToResponse));
 	}

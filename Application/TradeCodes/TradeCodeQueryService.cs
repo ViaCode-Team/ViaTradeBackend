@@ -18,9 +18,13 @@ public class TradeCodeQueryService(IFileReader tradefileReader, ITradeCodeReposi
 		return new StockStatisticDto(totalStocksCount);
 	}
 
-	public async Task<PageResult<TradeCode>> GetPageAsync(PageOptions page, TradeCodeSort sort, CancellationToken ct)
+	public async Task<PageResult<TradeCode>> GetPageAsync(
+		PageOptions pageOptions,
+		TradeCodeSort tradeCodeSort,
+		CancellationToken ct
+	)
 	{
-		return await tradeCodeRepository.GetPageAsync(page, sort, ct);
+		return await tradeCodeRepository.GetPageAsync(pageOptions, tradeCodeSort, ct);
 	}
 
 	public async Task<IReadOnlyList<TradeCodeFileDto>> ListFileMetadataAsync(

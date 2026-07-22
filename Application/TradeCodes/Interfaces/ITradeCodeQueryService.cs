@@ -9,7 +9,11 @@ namespace Application.TradeCodes.Interfaces;
 public interface ITradeCodeQueryService
 {
 	Task<StockStatisticDto> GetStatisticsAsync(CancellationToken ct);
-	Task<PageResult<TradeCode>> GetPageAsync(PageOptions page, TradeCodeSort sort, CancellationToken ct);
+	Task<PageResult<TradeCode>> GetPageAsync(
+		PageOptions pageOptions,
+		TradeCodeSort tradeCodeSort,
+		CancellationToken ct
+	);
 	Task<IReadOnlyList<TradeCodeFileDto>> ListFileMetadataAsync(TradeDataType dataType, CancellationToken ct);
 	Task<TradeCodeFileDto> GetFileMetadataAsync(TradeDataType dataType, string tradeIdString, CancellationToken ct);
 }

@@ -5,7 +5,7 @@ namespace Application.Common.Specifications;
 
 public class ReminderQuerySpecification : BaseQuerySpecification<Reminder>
 {
-	public ReminderQuerySpecification(int userId, int? tradeCodeId, ReminderSort sort)
+	public ReminderQuerySpecification(int userId, int? tradeCodeId, ReminderSort reminderSort)
 	{
 		AddCriteria(r => r.UserId == userId);
 
@@ -14,7 +14,7 @@ public class ReminderQuerySpecification : BaseQuerySpecification<Reminder>
 			AddCriteria(r => r.TradeCodeId == tradeCodeId.Value);
 		}
 
-		var sortFields = sort.GetEffectiveSortBy();
+		var sortFields = reminderSort.GetEffectiveSortBy();
 		foreach (var field in sortFields)
 		{
 			switch (field)

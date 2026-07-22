@@ -9,7 +9,7 @@ public interface ISessionRepository
 	Task<UserSessionDto?> FindByIdAsync(string sessionId);
 	Task RemoveAsync(string sessionId);
 	Task<IReadOnlyList<UserSessionDto>> ListByUserAsync(int userId);
-	Task<PageResult<UserSessionDto>> GetPageByUserAsync(int userId, PageOptions page);
+	Task<PageResult<UserSessionDto>> GetPageByUserAsync(int userId, PageOptions pageOptions);
 	IReadOnlyList<int> ListUserIds();
 	Task<int> CleanupExpiredSessionsAsync(DateTime threshold);
 }

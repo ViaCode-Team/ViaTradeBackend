@@ -33,23 +33,23 @@ public class ReminderQueryService(IReminderRepository reminderRepository) : IRem
 	public async Task<PageResult<Reminder>> GetPageAsync(
 		int userId,
 		int tradeCodeId,
-		PageOptions page,
-		ReminderSort sort,
+		PageOptions pageOptions,
+		ReminderSort reminderSort,
 		CancellationToken ct
 	)
 	{
-		var spec = new ReminderQuerySpecification(userId, tradeCodeId, sort);
-		return await reminderRepository.GetPageAsync(spec, page, ct);
+		var spec = new ReminderQuerySpecification(userId, tradeCodeId, reminderSort);
+		return await reminderRepository.GetPageAsync(spec, pageOptions, ct);
 	}
 
 	public async Task<PageResult<Reminder>> GetPageAsync(
 		int userId,
-		PageOptions page,
-		ReminderSort sort,
+		PageOptions pageOptions,
+		ReminderSort reminderSort,
 		CancellationToken ct
 	)
 	{
-		var spec = new ReminderQuerySpecification(userId, null, sort);
-		return await reminderRepository.GetPageAsync(spec, page, ct);
+		var spec = new ReminderQuerySpecification(userId, null, reminderSort);
+		return await reminderRepository.GetPageAsync(spec, pageOptions, ct);
 	}
 }

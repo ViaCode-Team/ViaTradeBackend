@@ -12,9 +12,14 @@ public interface IReminderQueryService
 	Task<PageResult<Reminder>> GetPageAsync(
 		int userId,
 		int tradeCodeId,
-		PageOptions page,
-		ReminderSort sort,
+		PageOptions pageOptions,
+		ReminderSort reminderSort,
 		CancellationToken ct
 	);
-	Task<PageResult<Reminder>> GetPageAsync(int userId, PageOptions page, ReminderSort sort, CancellationToken ct);
+	Task<PageResult<Reminder>> GetPageAsync(
+		int userId,
+		PageOptions pageOptions,
+		ReminderSort reminderSort,
+		CancellationToken ct
+	);
 }

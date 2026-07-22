@@ -14,7 +14,7 @@ public interface ITradeStrategyRepository : IRepository<TradeStrategy>
 	Task<PageResult<TradeStrategy>> GetPageAsync(
 		int userId,
 		IQuerySpecification<TradeStrategy> spec,
-		PageOptions page,
+		PageOptions pageOptions,
 		CancellationToken ct = default
 	);
 }

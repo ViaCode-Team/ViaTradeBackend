@@ -5,9 +5,9 @@ namespace Application.Common.Specifications;
 
 public class StrategyQuerySpecification : BaseQuerySpecification<TradeStrategy>
 {
-	public StrategyQuerySpecification(int userId, StrategyFilter filter, StrategySort sort)
+	public StrategyQuerySpecification(int userId, StrategyFilter strategyFilter, StrategySort strategySort)
 	{
-		if (filter.IsActive is bool isActive)
+		if (strategyFilter.IsActive is bool isActive)
 		{
 			if (isActive)
 				AddCriteria(x => x.UserTradeStrategies!.Any(uts => uts.UserId == userId));
@@ -15,7 +15,7 @@ public class StrategyQuerySpecification : BaseQuerySpecification<TradeStrategy>
 				AddCriteria(x => !x.UserTradeStrategies!.Any(uts => uts.UserId == userId));
 		}
 
-		var sortFields = sort.GetEffectiveSortBy();
+		var sortFields = strategySort.GetEffectiveSortBy();
 		foreach (var field in sortFields)
 		{
 			switch (field)

@@ -45,7 +45,7 @@ public class TradeStrategyEfRepository(AppDbContext context)
 	public async Task<PageResult<TradeStrategy>> GetPageAsync(
 		int userId,
 		IQuerySpecification<TradeStrategy> spec,
-		PageOptions page,
+		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
@@ -59,7 +59,7 @@ public class TradeStrategyEfRepository(AppDbContext context)
 				Strategy = strategy,
 				IsActive = strategy.UserTradeStrategies.Any(link => link.UserId == userId),
 			})
-			.ToPagedAsync(page, ct);
+			.ToPagedAsync(pageOptions, ct);
 
 		return pagedStrategies.Map(strategy =>
 		{

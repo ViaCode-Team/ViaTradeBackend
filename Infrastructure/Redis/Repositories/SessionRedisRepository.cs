@@ -79,12 +79,12 @@ public class SessionRedisRepository(IConnectionMultiplexer redis) : ISessionRepo
 		return result;
 	}
 
-	public async Task<PageResult<UserSessionDto>> GetPageByUserAsync(int userId, PageOptions page)
+	public async Task<PageResult<UserSessionDto>> GetPageByUserAsync(int userId, PageOptions pageOptions)
 	{
 		var totalCount = await _db.SortedSetLengthAsync(UserSessionsKey(userId));
 
-		int start = (page.Page - 1) * page.PageSize;
-		int stop = start + page.PageSize - 1;
+		int start = (pageOptions.Page - 1) * pageOptions.PageSize;
+		int stop = start + pageOptions.PageSize - 1;
 
 		var sessionIds = await _db.SortedSetRangeByRankAsync(UserSessionsKey(userId), start, stop, Order.Descending);
 		List<UserSessionDto> result = [];
@@ -110,7 +110,12 @@ public class SessionRedisRepository(IConnectionMultiplexer redis) : ISessionRepo
 			}
 		}
 
-		return new PageResult<UserSessionDto>(result, (int)totalCount, page.Page, page.PageSize);
+		return new PageResult<UserSessionDto>(
+			result,
+			(int)totalCount,
+			pageOptions.Page,
+			pageOptions.PageSize
+		);
 	}
 
 	// Cleaning old records from User`s Session SET <user:sessions:{userId}>

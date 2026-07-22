@@ -32,14 +32,20 @@ public class StrategiesController(
 
 	[HttpGet]
 	public async Task<Ok<PageResult<TradeStrategyResponse>>> GetStrategies(
-		[FromQuery] StrategyFilter filter,
-		[FromQuery] StrategySort sort,
-		[FromQuery] PageOptions page,
+		[FromQuery] StrategyFilter strategyFilter,
+		[FromQuery] StrategySort strategySort,
+		[FromQuery] PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var pagedStrategies = await strategyQueryService.GetPageAsync(userId, filter, sort, page, ct);
+		var pagedStrategies = await strategyQueryService.GetPageAsync(
+			userId,
+			strategyFilter,
+			strategySort,
+			pageOptions,
+			ct
+		);
 
 		return TypedResults.Ok(pagedStrategies.Map(ApiMapper.ToResponse));
 	}
@@ -53,24 +59,24 @@ public class StrategiesController(
 
 	[HttpGet("byuser")]
 	public async Task<Ok<PageResult<UserTradeStrategyResponse>>> GetUserStrategies(
-		[FromQuery] PageOptions page,
+		[FromQuery] PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userStrategies = await strategyQueryService.GetUserStrategiesPageAsync(userId, page, ct);
+		var userStrategies = await strategyQueryService.GetUserStrategiesPageAsync(userId, pageOptions, ct);
 
 		return TypedResults.Ok(userStrategies.Map(ApiMapper.ToResponse));
 	}
 
 	[HttpGet("codes/byuser")]
 	public async Task<Ok<PageResult<UserStrategyTradeCodeResponse>>> GetUserStrategyCodes(
-		[FromQuery] PageOptions page,
+		[FromQuery] PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userStrategyCodes = await strategyQueryService.GetUserStrategyTradeCodesPageAsync(userId, page, ct);
+		var userStrategyCodes = await strategyQueryService.GetUserStrategyTradeCodesPageAsync(userId, pageOptions, ct);
 
 		return TypedResults.Ok(userStrategyCodes.Map(ApiMapper.ToResponse));
 	}

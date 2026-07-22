@@ -33,13 +33,13 @@ public class NotesController(
 
 	[HttpGet("byuser")]
 	public async Task<Ok<PageResult<NoteResponse>>> GetUserNotes(
-		[FromQuery] NoteFilter filter,
-		[FromQuery] PageOptions page,
+		[FromQuery] NoteFilter noteFilter,
+		[FromQuery] PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userNotes = await noteQueryService.GetPageAsync(userId, filter, page, ct);
+		var userNotes = await noteQueryService.GetPageAsync(userId, noteFilter, pageOptions, ct);
 
 		return TypedResults.Ok(userNotes.Map(ApiMapper.ToResponse));
 	}

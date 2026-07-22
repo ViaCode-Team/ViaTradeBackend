@@ -637,7 +637,7 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
+            maximum: 21474837
             minimum: 1
             type: integer
             format: int32
@@ -906,7 +906,7 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
+            maximum: 21474837
             minimum: 1
             type: integer
             format: int32
@@ -2490,7 +2490,7 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
+            maximum: 21474837
             minimum: 1
             type: integer
             format: int32
@@ -2637,7 +2637,7 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
+            maximum: 21474837
             minimum: 1
             type: integer
             format: int32
@@ -3867,7 +3867,7 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
+            maximum: 21474837
             minimum: 1
             type: integer
             format: int32
@@ -4139,7 +4139,7 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
+            maximum: 21474837
             minimum: 1
             type: integer
             format: int32
@@ -4537,7 +4537,7 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
+            maximum: 21474837
             minimum: 1
             type: integer
             format: int32
@@ -5065,7 +5065,7 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
+            maximum: 21474837
             minimum: 1
             type: integer
             format: int32
@@ -5614,7 +5614,7 @@ paths:
         - name: page
           in: query
           schema:
-            maximum: 2147483647
+            maximum: 21474837
             minimum: 1
             type: integer
             format: int32
@@ -6922,6 +6922,8 @@ components:
     NoteResponsePageResult:
       required:
         - items
+        - page
+        - pageSize
         - totalCount
         - totalPages
       type: object
@@ -6931,6 +6933,13 @@ components:
           items:
             $ref: '#/components/schemas/NoteResponse'
         totalCount:
+          type: integer
+          format: int32
+        page:
+          type: integer
+          format: int32
+          readOnly: true
+        pageSize:
           type: integer
           format: int32
         totalPages:
@@ -7039,6 +7048,8 @@ components:
     ReminderResponsePageResult:
       required:
         - items
+        - page
+        - pageSize
         - totalCount
         - totalPages
       type: object
@@ -7048,6 +7059,13 @@ components:
           items:
             $ref: '#/components/schemas/ReminderResponse'
         totalCount:
+          type: integer
+          format: int32
+        page:
+          type: integer
+          format: int32
+          readOnly: true
+        pageSize:
           type: integer
           format: int32
         totalPages:
@@ -7231,6 +7249,8 @@ components:
     TradeCodeResponsePageResult:
       required:
         - items
+        - page
+        - pageSize
         - totalCount
         - totalPages
       type: object
@@ -7240,6 +7260,13 @@ components:
           items:
             $ref: '#/components/schemas/TradeCodeResponse'
         totalCount:
+          type: integer
+          format: int32
+        page:
+          type: integer
+          format: int32
+          readOnly: true
+        pageSize:
           type: integer
           format: int32
         totalPages:
@@ -7304,6 +7331,8 @@ components:
     TradeResponsePageResult:
       required:
         - items
+        - page
+        - pageSize
         - totalCount
         - totalPages
       type: object
@@ -7315,6 +7344,13 @@ components:
         totalCount:
           type: integer
           format: int32
+        page:
+          type: integer
+          format: int32
+          readOnly: true
+        pageSize:
+          type: integer
+          format: int32
         totalPages:
           type: integer
           format: int32
@@ -7322,10 +7358,11 @@ components:
       additionalProperties: false
     TradeSignal:
       enum:
-        - hold
-        - buy
-        - sell
-      type: string
+        - 0
+        - 1
+        - -1
+      type: integer
+      format: int32
     TradeStatisticResponse:
       required:
         - loseTrades
@@ -7381,6 +7418,8 @@ components:
     TradeStrategyResponsePageResult:
       required:
         - items
+        - page
+        - pageSize
         - totalCount
         - totalPages
       type: object
@@ -7390,6 +7429,13 @@ components:
           items:
             $ref: '#/components/schemas/TradeStrategyResponse'
         totalCount:
+          type: integer
+          format: int32
+        page:
+          type: integer
+          format: int32
+          readOnly: true
+        pageSize:
           type: integer
           format: int32
         totalPages:
@@ -7499,6 +7545,8 @@ components:
     UserSessionResponsePageResult:
       required:
         - items
+        - page
+        - pageSize
         - totalCount
         - totalPages
       type: object
@@ -7508,6 +7556,13 @@ components:
           items:
             $ref: '#/components/schemas/UserSessionResponse'
         totalCount:
+          type: integer
+          format: int32
+        page:
+          type: integer
+          format: int32
+          readOnly: true
+        pageSize:
           type: integer
           format: int32
         totalPages:
@@ -7535,6 +7590,8 @@ components:
     UserStrategyTradeCodeResponsePageResult:
       required:
         - items
+        - page
+        - pageSize
         - totalCount
         - totalPages
       type: object
@@ -7544,6 +7601,13 @@ components:
           items:
             $ref: '#/components/schemas/UserStrategyTradeCodeResponse'
         totalCount:
+          type: integer
+          format: int32
+        page:
+          type: integer
+          format: int32
+          readOnly: true
+        pageSize:
           type: integer
           format: int32
         totalPages:
@@ -7583,6 +7647,8 @@ components:
     UserTradeStrategyResponsePageResult:
       required:
         - items
+        - page
+        - pageSize
         - totalCount
         - totalPages
       type: object
@@ -7592,6 +7658,13 @@ components:
           items:
             $ref: '#/components/schemas/UserTradeStrategyResponse'
         totalCount:
+          type: integer
+          format: int32
+        page:
+          type: integer
+          format: int32
+          readOnly: true
+        pageSize:
           type: integer
           format: int32
         totalPages:

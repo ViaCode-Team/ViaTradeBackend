@@ -63,17 +63,19 @@ public static class SpecificationEvaluator
 		else
 			orderedQuery = query.OrderBy(FirstKeySelector);
 
-		return specification
+		var sortedQuery = specification
 			.SortExpressions.Skip(1)
 			.Aggregate(
 				orderedQuery,
-				(current, sort) =>
+				(current, sortExpression) =>
 				{
-					if (sort.IsDescending)
-						return current.ThenByDescending(sort.KeySelector);
+					if (sortExpression.IsDescending)
+						return current.ThenByDescending(sortExpression.KeySelector);
 
-					return current.ThenBy(sort.KeySelector);
+					return current.ThenBy(sortExpression.KeySelector);
 				}
 			);
+
+		return sortedQuery.ThenBy(entity => entity.Id);
 	}
 }

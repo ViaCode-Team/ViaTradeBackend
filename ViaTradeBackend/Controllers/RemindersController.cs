@@ -51,13 +51,13 @@ public class RemindersController(
 	[Authorize]
 	[HttpGet("byuser")]
 	public async Task<Ok<PageResult<ReminderResponse>>> GetUserReminders(
-		[FromQuery] PageOptions page,
-		[FromQuery] ReminderSort sort,
+		[FromQuery] PageOptions pageOptions,
+		[FromQuery] ReminderSort reminderSort,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userReminders = await reminderQueryService.GetPageAsync(userId, page, sort, ct);
+		var userReminders = await reminderQueryService.GetPageAsync(userId, pageOptions, reminderSort, ct);
 
 		return TypedResults.Ok(userReminders.Map(ApiMapper.ToResponse));
 	}
@@ -65,14 +65,14 @@ public class RemindersController(
 	[Authorize]
 	[HttpGet("byuser/instrument/{tradeCodeId}")]
 	public async Task<Ok<PageResult<ReminderResponse>>> GetUserRemindersByInstrument(
-		[FromQuery] PageOptions page,
-		[FromQuery] ReminderSort sort,
+		[FromQuery] PageOptions pageOptions,
+		[FromQuery] ReminderSort reminderSort,
 		[Required, FromRoute] int tradeCodeId,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var reminders = await reminderQueryService.GetPageAsync(userId, tradeCodeId, page, sort, ct);
+		var reminders = await reminderQueryService.GetPageAsync(userId, tradeCodeId, pageOptions, reminderSort, ct);
 
 		return TypedResults.Ok(reminders.Map(ApiMapper.ToResponse));
 	}
