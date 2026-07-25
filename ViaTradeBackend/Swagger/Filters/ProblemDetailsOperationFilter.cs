@@ -18,6 +18,7 @@ public class ProblemDetailsOperationFilter : IOperationFilter
 			[409] = "Conflict - Resource state conflict",
 			[422] = "Unprocessable Content - Business rule violation",
 			[500] = "Internal Server Error - Unexpected error",
+			[503] = "Service Unavailable - Temporary infrastructure issue",
 		};
 
 		foreach (var (statusCode, description) in errorResponses)

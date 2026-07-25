@@ -3,6 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Application.Auth.Interfaces;
+using Application.Common.Exceptions;
 using Application.Users.Models;
 using Infrastructure.Configuration;
 using Microsoft.Extensions.Options;
@@ -47,7 +48,7 @@ public class JwtHelper(IOptions<JwtOptions> options) : IJwtHelper
 	{
 		var jtiClaim = user.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti);
 		if (jtiClaim == null)
-			throw new InvalidOperationException("User claims do not contain 'jti'.");
+			throw new InvalidTokenException("Access token does not contain a session identifier.");
 
 		return jtiClaim.Value;
 	}
@@ -55,9 +56,9 @@ public class JwtHelper(IOptions<JwtOptions> options) : IJwtHelper
 	public int GetUserIdFromClaims(ClaimsPrincipal user)
 	{
 		var subClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-		if (subClaim == null)
-			throw new InvalidOperationException("User claims do not contain 'sub'.");
+		if (!int.TryParse(subClaim, out var userId))
+			throw new InvalidTokenException("Access token does not contain a valid user identifier.");
 
-		return int.Parse(subClaim);
+		return userId;
 	}
 }

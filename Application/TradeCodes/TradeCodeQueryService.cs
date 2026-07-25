@@ -1,3 +1,4 @@
+using Application.Common.Exceptions;
 using Application.Common.Models;
 using Application.TradeCodes.Interfaces;
 using Application.TradeCodes.Models;
@@ -61,7 +62,7 @@ public class TradeCodeQueryService(IFileReader tradefileReader, ITradeCodeReposi
 		{
 			exchangeId =
 				await tradeCodeRepository.FindExchangeIdByIdAsync(tradeCodeId, ct)
-				?? throw new KeyNotFoundException($"TradeCode with Id {tradeCodeId} not found in database");
+				?? throw new NotFoundException("Trade code not found.", "trade_code_not_found");
 
 			dbId = tradeCodeId;
 		}
@@ -74,11 +75,11 @@ public class TradeCodeQueryService(IFileReader tradefileReader, ITradeCodeReposi
 		var fileCodes = tradefileReader.GetTradeCodes(dataType, [exchangeId]);
 		var fileCode = fileCodes.FirstOrDefault();
 		if (fileCode == null)
-			throw new KeyNotFoundException($"No file data found for trade code '{exchangeId}'");
+			throw new NotFoundException("Trade code file not found.", "trade_code_file_not_found");
 
 		dbId ??= await tradeCodeRepository.FindIdByExchangeIdAsync(fileCode.TradeCode, ct);
 		if (dbId == null)
-			throw new KeyNotFoundException($"TradeCode '{exchangeId}' is not registered in database");
+			throw new NotFoundException("Trade code not found.", "trade_code_not_found");
 
 		return new TradeCodeFileDto
 		{

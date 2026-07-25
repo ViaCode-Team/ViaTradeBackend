@@ -136,6 +136,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   /api/Auth/register:
     post:
       tags:
@@ -268,6 +282,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   /api/Auth/refresh:
     post:
       tags:
@@ -384,6 +412,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -508,6 +550,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   /api/Auth/logout-all:
     post:
       tags:
@@ -624,6 +680,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -769,6 +839,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   /api/Notes/statistics:
     get:
       tags:
@@ -889,6 +973,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -1038,6 +1136,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   '/api/Notes/byuser/instrument/{tradeCodeId}':
     get:
       tags:
@@ -1165,6 +1277,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -1307,6 +1433,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
     put:
       tags:
         - Notes
@@ -1445,6 +1585,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
     delete:
       tags:
         - Notes
@@ -1567,6 +1721,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -1698,6 +1866,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -1840,6 +2022,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
     put:
       tags:
         - Notes
@@ -1978,6 +2174,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
     delete:
       tags:
         - Notes
@@ -2104,6 +2314,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   /api/Reminders/statistics:
     get:
       tags:
@@ -2224,6 +2448,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -2354,6 +2592,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   '/api/Reminders/byuser/actual/{id}':
     delete:
       tags:
@@ -2477,6 +2729,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -2624,6 +2890,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -2781,6 +3061,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
     post:
       tags:
         - Reminders
@@ -2919,6 +3213,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   '/api/Reminders/byuser/{id}':
     get:
       tags:
@@ -3046,6 +3354,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -3188,6 +3510,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
     delete:
       tags:
         - Reminders
@@ -3314,6 +3650,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   /api/Results/statistics:
     get:
       tags:
@@ -3434,6 +3784,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -3575,6 +3939,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -3724,6 +4102,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   /api/Strategies/statistics:
     get:
       tags:
@@ -3844,6 +4236,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -3999,6 +4405,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   '/api/Strategies/{id}':
     get:
       tags:
@@ -4126,6 +4546,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -4271,6 +4705,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
     post:
       tags:
         - Strategies
@@ -4402,6 +4850,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
     delete:
       tags:
         - Strategies
@@ -4524,6 +4986,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -4669,6 +5145,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
     post:
       tags:
         - Strategies
@@ -4796,6 +5286,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -4932,6 +5436,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   /api/TradeCodes/stocks/statistics:
     get:
       tags:
@@ -5052,6 +5570,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -5203,6 +5735,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   /api/TradeCodes/sys/stocks:
     get:
       tags:
@@ -5325,6 +5871,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -5459,6 +6019,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   /api/Trades/statistics:
     get:
       tags:
@@ -5579,6 +6153,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -5746,6 +6334,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
     post:
       tags:
         - Trades
@@ -5881,6 +6483,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   '/api/Trades/{id}':
     get:
       tags:
@@ -6008,6 +6624,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -6151,6 +6781,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
     delete:
       tags:
         - Trades
@@ -6277,6 +6921,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   /api/Users/me:
     get:
       tags:
@@ -6385,6 +7043,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -6509,6 +7181,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code
@@ -6644,6 +7330,20 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
   /api/Users/user:
     get:
       tags:
@@ -6766,6 +7466,20 @@ paths:
                 type: https://httpstatuses.io/500
                 title: Internal Server Error
                 status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
                 detail: Safe error description.
                 instance: /api/resource
                 code: error_code

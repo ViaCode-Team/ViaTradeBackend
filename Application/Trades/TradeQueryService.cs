@@ -1,3 +1,4 @@
+using Application.Common.Exceptions;
 using Application.Common.Models;
 using Application.Common.Specifications;
 using Application.Trades.Interfaces;
@@ -31,7 +32,7 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 	{
 		var trade = await tradeRepository.FindOneAsync(x => x.Id == id && x.UserId == userId, ct);
 		if (trade == null)
-			throw new KeyNotFoundException();
+			throw new NotFoundException("Trade not found.", "trade_not_found");
 
 		return new TradeDto(
 			trade.Id,

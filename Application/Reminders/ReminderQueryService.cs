@@ -1,3 +1,4 @@
+using Application.Common.Exceptions;
 using Application.Common.Models;
 using Application.Common.Specifications;
 using Application.Reminders.Interfaces;
@@ -25,7 +26,7 @@ public class ReminderQueryService(IReminderRepository reminderRepository) : IRem
 	{
 		var reminder = await reminderRepository.FindOneAsync(x => x.Id == reminderId && x.UserId == userId, ct);
 		if (reminder == null)
-			throw new KeyNotFoundException("Reminder not found.");
+			throw new NotFoundException("Reminder not found.", "reminder_not_found");
 
 		return reminder;
 	}

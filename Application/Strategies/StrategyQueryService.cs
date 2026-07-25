@@ -16,9 +16,9 @@ public class StrategyQueryService(
 {
 	public async Task<StrategyStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		var counts = await tradeStrategyRepository.GetStatisticsAsync(userId, ct);
+		var counts = await tradeStrategyRepository.FindStatisticsAsync(userId, ct);
 		if (counts == null)
-			throw new KeyNotFoundException($"User with ID {userId} was not found for get stratagy statiscs.");
+			throw new NotFoundException("User not found.", "user_not_found");
 
 		long notLinkedStratagiesCount = counts.TotalStrategiesCount - counts.ActiveStrategiesCount;
 		if (notLinkedStratagiesCount < 0)
@@ -54,7 +54,7 @@ public class StrategyQueryService(
 	{
 		var tradeStrategy = await tradeStrategyRepository.FindByIdAsync(strategyId, ct);
 		if (tradeStrategy == null)
-			throw new KeyNotFoundException();
+			throw new NotFoundException("Strategy not found.", "strategy_not_found");
 
 		return tradeStrategy;
 	}

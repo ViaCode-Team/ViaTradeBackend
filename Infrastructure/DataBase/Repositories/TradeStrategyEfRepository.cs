@@ -12,7 +12,7 @@ public class TradeStrategyEfRepository(AppDbContext context)
 	: GenericEfRepository<TradeStrategy>(context),
 		ITradeStrategyRepository
 {
-	public async Task<StrategyCountsDto> GetStatisticsAsync(int userId, CancellationToken ct)
+	public async Task<StrategyCountsDto?> FindStatisticsAsync(int userId, CancellationToken ct)
 	{
 		var query = _context
 			.Users.Where(user => user.Id == userId)
@@ -21,8 +21,7 @@ public class TradeStrategyEfRepository(AppDbContext context)
 				_context.UserTradeStrategies.LongCount(link => link.UserId == userId)
 			));
 
-		return await query.SingleOrDefaultAsync(ct)
-			?? throw new KeyNotFoundException($"User with ID {userId} was not found.");
+		return await query.SingleOrDefaultAsync(ct);
 	}
 
 	public async Task<Dictionary<string, int?>> GetAccuracyMapAsync(CancellationToken ct)

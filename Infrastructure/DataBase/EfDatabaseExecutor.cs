@@ -5,7 +5,24 @@ namespace Infrastructure.DataBase;
 
 internal static class EfDatabaseOperation
 {
-	public static async Task<T> ExecuteAsync<T>(Func<Task<T>> operation)
+	private readonly struct Unit;
+
+	public static Task<T> ExecuteAsync<T>(Func<Task<T>> operation)
+	{
+		return ExecuteCoreAsync(operation);
+	}
+
+	public static Task ExecuteAsync(Func<Task> operation)
+	{
+		return ExecuteCoreAsync(async () =>
+		{
+			await operation();
+
+			return default(Unit);
+		});
+	}
+
+	private static async Task<T> ExecuteCoreAsync<T>(Func<Task<T>> operation)
 	{
 		try
 		{
@@ -18,7 +35,7 @@ internal static class EfDatabaseOperation
 			if (mySqlException is null)
 				throw;
 
-			var translatedException = DatabaseExceptionTranslator.Translate(mySqlException);
+			var translatedException = DatabaseMySqlExceptionTranslator.Translate(mySqlException);
 
 			if (translatedException is null)
 				throw;
@@ -27,38 +44,7 @@ internal static class EfDatabaseOperation
 		}
 		catch (MySqlException exception)
 		{
-			var translatedException = DatabaseExceptionTranslator.Translate(exception);
-
-			if (translatedException is null)
-				throw;
-
-			throw translatedException;
-		}
-	}
-
-	public static async Task ExecuteAsync(Func<Task> operation)
-	{
-		try
-		{
-			await operation();
-		}
-		catch (DbUpdateException exception)
-		{
-			var mySqlException = FindMySqlException(exception);
-
-			if (mySqlException is null)
-				throw;
-
-			var translatedException = DatabaseExceptionTranslator.Translate(mySqlException);
-
-			if (translatedException is null)
-				throw;
-
-			throw translatedException;
-		}
-		catch (MySqlException exception)
-		{
-			var translatedException = DatabaseExceptionTranslator.Translate(exception);
+			var translatedException = DatabaseMySqlExceptionTranslator.Translate(exception);
 
 			if (translatedException is null)
 				throw;

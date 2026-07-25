@@ -8,7 +8,7 @@ namespace Application.Strategies.Interfaces;
 
 public interface ITradeStrategyRepository : IRepository<TradeStrategy>
 {
-	Task<StrategyCountsDto> GetStatisticsAsync(int userId, CancellationToken ct = default);
+	Task<StrategyCountsDto?> FindStatisticsAsync(int userId, CancellationToken ct = default);
 	Task<Dictionary<string, int?>> GetAccuracyMapAsync(CancellationToken ct = default);
 	Task<int?> FindAccuracyByNameAsync(string name, CancellationToken ct = default);
 	Task<PageResult<TradeStrategy>> GetPageAsync(

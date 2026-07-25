@@ -41,10 +41,14 @@ public class NoteCommandService(INoteRepository noteRepository, IUnitOfWork uow)
 				&& (noteType == NoteType.TradeCodeNote ? x.TradeCodeId == relatedId : x.TradeStrategyId == relatedId),
 			ct
 		);
+		if (affectedRows == 0)
+			throw new NotFoundException("Note not found.", "note_not_found");
 	}
 
 	public async Task UpdateAsync(int userId, int relatedId, NoteType noteType, string noteText, CancellationToken ct)
 	{
-		await noteRepository.ExecuteUpdateUserNoteAsync(userId, relatedId, noteType, noteText, ct);
+		var affectedRows = await noteRepository.ExecuteUpdateUserNoteAsync(userId, relatedId, noteType, noteText, ct);
+		if (affectedRows == 0)
+			throw new NotFoundException("Note not found.", "note_not_found");
 	}
 }

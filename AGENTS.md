@@ -12,6 +12,9 @@
 3. **User Edits**: Respect manual user code changes. Ask before reverting user-authored code.
 4. **Proactive Rules**: Propose `AGENTS.md` updates if users repeatedly ask for specific behaviors.
 5. **Complete Refactoring & Dead Code Removal**: When replacing an existing feature, property, or logic with a new implementation, you MUST thoroughly search for and delete the old, superseded code across the entire codebase. Never leave the old implementation alongside the new one, as it creates confusion and technical debt.
+6. **Explicit Change Scope**: Implement only items the user explicitly asks to change. When the user asks how to address a finding, explain the approach without modifying code unless they clearly request the implementation. Do not combine explanatory questions with implementation work by assumption.
+7. **Exception Ownership**: Repositories must not throw business exceptions. Keep data access errors technical in repositories; services must evaluate business conditions and throw domain-specific exceptions.
+8. **Generated Files**: Never create or edit migrations, model snapshots, or other generated files manually. Use the relevant official generator and include its output unchanged.
 
 ## Mandatory Agent Workflow
 1. **Build Verification**: After making ANY code changes, you MUST run `dotnet build` to verify the project compiles without errors.

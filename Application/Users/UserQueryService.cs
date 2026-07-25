@@ -1,3 +1,4 @@
+using Application.Common.Exceptions;
 using Application.Users.Interfaces;
 using Application.Users.Models;
 
@@ -15,7 +16,7 @@ public class UserQueryService(IUserRepository userRepository, ITelegramTokenRepo
 	{
 		var user = await userRepository.FindMeAsync(userId, ct);
 		if (user == null)
-			throw new KeyNotFoundException("User not found.");
+			throw new NotFoundException("User not found.", "user_not_found");
 
 		return user;
 	}

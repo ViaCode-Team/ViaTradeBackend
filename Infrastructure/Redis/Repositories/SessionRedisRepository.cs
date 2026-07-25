@@ -2,11 +2,13 @@ using System.Text.Json;
 using Application.Auth.Interfaces;
 using Application.Common.Models;
 using Application.Users.Models;
+using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 namespace Infrastructure.Redis.Repositories;
 
-public class SessionRedisRepository(IConnectionMultiplexer redis) : ISessionRepository
+public class SessionRedisRepository(IConnectionMultiplexer redis, ILogger<SessionRedisRepository> logger)
+	: ISessionRepository
 {
 	private readonly IDatabase _db = redis.GetDatabase();
 
@@ -110,12 +112,7 @@ public class SessionRedisRepository(IConnectionMultiplexer redis) : ISessionRepo
 			}
 		}
 
-		return new PageResult<UserSessionDto>(
-			result,
-			(int)totalCount,
-			pageOptions.Page,
-			pageOptions.PageSize
-		);
+		return new PageResult<UserSessionDto>(result, (int)totalCount, pageOptions.Page, pageOptions.PageSize);
 	}
 
 	// Cleaning old records from User`s Session SET <user:sessions:{userId}>
@@ -157,9 +154,14 @@ public class SessionRedisRepository(IConnectionMultiplexer redis) : ISessionRepo
 
 					totalDeleted++;
 				}
-				catch
+				catch (Exception exception)
 				{
-					// Log warning silently
+					logger.LogWarning(
+						exception,
+						"Unable to remove expired session: SessionId={SessionId}, UserSessionsKey={UserSessionsKey}",
+						sessionId,
+						userKey
+					);
 				}
 			}
 		}

@@ -1,3 +1,4 @@
+using Application.Common.Exceptions;
 using Application.Interfaces;
 using Application.Strategies.Interfaces;
 using Application.Trades.Interfaces;
@@ -108,7 +109,7 @@ public class TradeResultsService(
 		var preference = userPreferences.FirstOrDefault(x => x.Key == strategyName);
 
 		if (preference.Key == null || !preference.Value.Contains(tradeCode))
-			throw new KeyNotFoundException();
+			throw new NotFoundException("Strategy result not found.", "strategy_result_not_found");
 
 		var accuracy = await tradeStrategyRepository.FindAccuracyByNameAsync(strategyName, ct);
 
