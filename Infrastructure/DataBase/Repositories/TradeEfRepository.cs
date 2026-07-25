@@ -1,14 +1,37 @@
 using Application.Common.Models;
+using Application.Common.Interfaces;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
 using Domain.Entities;
 using Domain.Trades.Enums;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataBase.Repositories;
 
 public class TradeEfRepository(AppDbContext context) : GenericEfRepository<Trade>(context), ITradeRepository
 {
+	public async Task<TradeProjectionDto?> FindProjectionByUserAndIdAsync(int userId, int id, CancellationToken ct)
+	{
+		return await _dbSet
+			.Where(trade => trade.Id == id && trade.UserId == userId)
+			.Select(ToProjection())
+			.FirstOrDefaultAsync(ct);
+	}
+
+	public async Task<PageResult<TradeProjectionDto>> GetPageProjectionAsync(
+		IQuerySpecification<Trade> specification,
+		PageOptions pageOptions,
+		CancellationToken ct
+	)
+	{
+		var query = SpecificationEvaluator.GetQuery(_dbSet, specification);
+		if (specification.SortExpressions.Count == 0)
+			query = query.OrderBy(trade => trade.Id);
+
+		return await query.Select(ToProjection()).ToPagedAsync(pageOptions, ct);
+	}
+
 	public async Task<TradeStatisticAggregateDto> GetGlobalStatisticsAsync(int userId, CancellationToken ct)
 	{
 		var result = await _context
@@ -63,6 +86,23 @@ public class TradeEfRepository(AppDbContext context) : GenericEfRepository<Trade
 							.SetProperty(t => t.TradeCodeId, request.TradeCodeId),
 					ct
 				)
+		);
+	}
+
+	private static System.Linq.Expressions.Expression<Func<Trade, TradeProjectionDto>> ToProjection()
+	{
+		return trade => new TradeProjectionDto(
+			trade.Id,
+			trade.DateOpen,
+			trade.DateClose,
+			trade.TradeOpen,
+			trade.TradeClose,
+			trade.Count,
+			trade.Price,
+			trade.TradeSignal,
+			trade.TradeTypeId,
+			new TradeCodeSummaryDto(trade.TradeCode!.Id, trade.TradeCode.ExchangeId, trade.TradeCode.Description),
+			trade.UserId
 		);
 	}
 }

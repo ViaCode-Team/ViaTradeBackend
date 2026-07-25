@@ -1,3 +1,5 @@
+using ViaTradeBackend.Contracts.Trades;
+
 namespace ViaTradeBackend.Contracts.Reminders;
 
-public record ReminderResponse(int Id, string Text, DateTime DateTime, int TradeCodeId, int UserId);
+public record ReminderResponse(int Id, string Text, DateTime DateTime, TradeCodeBriefResponse? TradeCode, int UserId);

@@ -4,6 +4,7 @@ using Application.Common.Specifications;
 using Application.Notes.Models;
 using Application.Strategies.Interfaces;
 using Application.Strategies.Models;
+using Application.TradeCodes.Models;
 using Domain.Strategies.Entities;
 
 namespace Application.Strategies;
@@ -59,6 +60,12 @@ public class StrategyQueryService(
 		return tradeStrategy;
 	}
 
+	public async Task<RelatedTradeStrategyDto> GetByNameAsync(int userId, string name, CancellationToken ct)
+	{
+		return await tradeStrategyRepository.FindByNameAsync(userId, name, ct)
+			?? throw new NotFoundException("Strategy not found.", "strategy_not_found");
+	}
+
 	public async Task<PageResult<UserTradeStrategy>> GetUserStrategiesPageAsync(
 		int userId,
 		PageOptions pageOptions,
@@ -75,5 +82,41 @@ public class StrategyQueryService(
 	)
 	{
 		return await userStrategyTradeCodeRepository.GetPageByUserAsync(userId, pageOptions, ct);
+	}
+
+	public async Task<PageResult<RelatedTradeStrategyDto>> GetStrategiesByTradeCodePageAsync(
+		int userId,
+		int tradeCodeId,
+		StrategyFilter strategyFilter,
+		StrategySort strategySort,
+		PageOptions pageOptions,
+		CancellationToken ct
+	)
+	{
+		return await userStrategyTradeCodeRepository.GetStrategiesPageByTradeCodeAsync(
+			userId,
+			tradeCodeId,
+			strategyFilter,
+			strategySort,
+			pageOptions,
+			ct
+		);
+	}
+
+	public async Task<PageResult<RelatedTradeCodeDto>> GetTradeCodesByStrategyPageAsync(
+		int userId,
+		int strategyId,
+		TradeCodeSort tradeCodeSort,
+		PageOptions pageOptions,
+		CancellationToken ct
+	)
+	{
+		return await userStrategyTradeCodeRepository.GetTradeCodesPageByStrategyAsync(
+			userId,
+			strategyId,
+			tradeCodeSort,
+			pageOptions,
+			ct
+		);
 	}
 }

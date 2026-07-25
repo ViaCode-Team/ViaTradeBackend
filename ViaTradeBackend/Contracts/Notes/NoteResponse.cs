@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations;
+using ViaTradeBackend.Contracts.Strategies;
+using ViaTradeBackend.Contracts.Trades;
 
 namespace ViaTradeBackend.Contracts.Notes;
 
@@ -6,6 +8,6 @@ public record NoteResponse(
 	int Id,
 	[StringLength(1024)] string NoteText,
 	int UserId,
-	int? TradeCodeId,
-	int? TradeStrategyId
+	TradeCodeBriefResponse? TradeCode,
+	StrategyBriefResponse? Strategy
 );

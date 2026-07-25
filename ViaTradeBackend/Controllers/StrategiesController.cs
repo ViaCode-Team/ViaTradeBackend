@@ -3,11 +3,13 @@ using Application.Auth.Interfaces;
 using Application.Common.Models;
 using Application.Strategies.Interfaces;
 using Application.Strategies.Models;
+using Application.TradeCodes.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Contracts.Statistics;
 using ViaTradeBackend.Contracts.Strategies;
+using ViaTradeBackend.Contracts.Trades;
 using ViaTradeBackend.Mappings;
 
 namespace ViaTradeBackend.Controllers;
@@ -55,6 +57,38 @@ public class StrategiesController(
 	{
 		var strategy = await strategyQueryService.GetAsync(id, ct);
 		return TypedResults.Ok(ApiMapper.ToResponse(strategy));
+	}
+
+	[HttpGet("byname/{name}")]
+	public async Task<Ok<TradeStrategyResponse>> GetStrategyByName(
+		[FromRoute, Required] string name,
+		CancellationToken ct
+	)
+	{
+		var userId = jwtHelper.GetUserIdFromClaims(User);
+		var strategy = await strategyQueryService.GetByNameAsync(userId, name, ct);
+
+		return TypedResults.Ok(ApiMapper.ToResponse(strategy));
+	}
+
+	[HttpGet("{strategyId}/stocks")]
+	public async Task<Ok<PageResult<TradeCodeResponse>>> GetStocksByStrategy(
+		[FromRoute, Required] int strategyId,
+		[FromQuery] TradeCodeSort tradeCodeSort,
+		[FromQuery] PageOptions pageOptions,
+		CancellationToken ct
+	)
+	{
+		var userId = jwtHelper.GetUserIdFromClaims(User);
+		var tradeCodes = await strategyQueryService.GetTradeCodesByStrategyPageAsync(
+			userId,
+			strategyId,
+			tradeCodeSort,
+			pageOptions,
+			ct
+		);
+
+		return TypedResults.Ok(tradeCodes.Map(ApiMapper.ToResponse));
 	}
 
 	[HttpGet("byuser")]

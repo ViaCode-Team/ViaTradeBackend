@@ -9,6 +9,7 @@ namespace Application.TradeCodes.Interfaces;
 public interface ITradeCodeQueryService
 {
 	Task<StockStatisticDto> GetStatisticsAsync(CancellationToken ct);
+	Task<TradeCode> GetByTickerAsync(string ticker, CancellationToken ct);
 	Task<PageResult<TradeCode>> GetPageAsync(
 		PageOptions pageOptions,
 		TradeCodeSort tradeCodeSort,

@@ -19,6 +19,12 @@ public class TradeCodeQueryService(IFileReader tradefileReader, ITradeCodeReposi
 		return new StockStatisticDto(totalStocksCount);
 	}
 
+	public async Task<TradeCode> GetByTickerAsync(string ticker, CancellationToken ct)
+	{
+		return await tradeCodeRepository.FindByExchangeIdAsync(ticker, ct)
+			?? throw new NotFoundException("Trade code not found.", "trade_code_not_found");
+	}
+
 	public async Task<PageResult<TradeCode>> GetPageAsync(
 		PageOptions pageOptions,
 		TradeCodeSort tradeCodeSort,

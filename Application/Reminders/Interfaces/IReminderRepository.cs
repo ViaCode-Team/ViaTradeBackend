@@ -1,3 +1,4 @@
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Reminders.Models;
@@ -7,7 +8,13 @@ namespace Application.Reminders.Interfaces;
 
 public interface IReminderRepository : IRepository<Reminder>
 {
-	Task<IReadOnlyList<Reminder>> ListDueAsync(CancellationToken ct = default);
+	Task<IReadOnlyList<ReminderDto>> ListDueAsync(CancellationToken ct = default);
+	Task<PageResult<ReminderProjectionDto>> GetPageWithTradeCodeAsync(
+		IQuerySpecification<Reminder> specification,
+		PageOptions pageOptions,
+		CancellationToken ct = default
+	);
+	Task<Reminder?> FindByUserAndIdAsync(int userId, int reminderId, CancellationToken ct = default);
 	Task<int> CountByUserAsync(int userId, CancellationToken ct = default);
 	Task<int> ExecuteUpdateForUserAsync(
 		int userId,

@@ -13,6 +13,6 @@ public record TradeResponse(
 	decimal Price,
 	TradeSignal TradeSignal,
 	int TradeTypeId,
-	int TradeCodeId,
+	TradeCodeBriefResponse? TradeCode,
 	int UserId
 );

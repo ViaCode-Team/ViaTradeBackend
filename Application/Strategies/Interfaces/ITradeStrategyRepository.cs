@@ -11,6 +11,7 @@ public interface ITradeStrategyRepository : IRepository<TradeStrategy>
 	Task<StrategyCountsDto?> FindStatisticsAsync(int userId, CancellationToken ct = default);
 	Task<Dictionary<string, int?>> GetAccuracyMapAsync(CancellationToken ct = default);
 	Task<int?> FindAccuracyByNameAsync(string name, CancellationToken ct = default);
+	Task<RelatedTradeStrategyDto?> FindByNameAsync(int userId, string name, CancellationToken ct = default);
 	Task<PageResult<TradeStrategy>> GetPageAsync(
 		int userId,
 		IQuerySpecification<TradeStrategy> spec,

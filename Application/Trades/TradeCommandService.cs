@@ -8,7 +8,11 @@ using Domain.Statistics.Services;
 
 namespace Application.Trades;
 
-public class TradeCommandService(ITradeRepository tradeRepository, IUnitOfWork uow) : ITradeCommandService
+public class TradeCommandService(
+	ITradeRepository tradeRepository,
+	ITradeCodeRepository tradeCodeRepository,
+	IUnitOfWork uow
+) : ITradeCommandService
 {
 	public async Task<TradeDto> CreateAsync(int userId, TradeInputDto request, CancellationToken ct)
 	{
@@ -28,6 +32,9 @@ public class TradeCommandService(ITradeRepository tradeRepository, IUnitOfWork u
 
 		await tradeRepository.AddAsync(trade, ct);
 		await uow.SaveChangesAsync(ct);
+		var tradeCode = await tradeCodeRepository.FindByIdAsync(trade.TradeCodeId, ct);
+		if (tradeCode == null)
+			throw new DataIntegrityException($"Trade code was not found after trade creation. TradeCodeId={trade.TradeCodeId}.");
 
 		return new TradeDto(
 			trade.Id,
@@ -40,7 +47,7 @@ public class TradeCommandService(ITradeRepository tradeRepository, IUnitOfWork u
 			trade.Price,
 			trade.TradeSignal,
 			trade.TradeTypeId,
-			trade.TradeCodeId,
+			new TradeCodeSummaryDto(tradeCode.Id, tradeCode.ExchangeId, tradeCode.Description),
 			trade.UserId
 		);
 	}

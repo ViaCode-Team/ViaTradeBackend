@@ -41,6 +41,25 @@ public class TradeStrategyEfRepository(AppDbContext context)
 			.FirstOrDefaultAsync(ct);
 	}
 
+	public async Task<RelatedTradeStrategyDto?> FindByNameAsync(int userId, string name, CancellationToken ct)
+	{
+		return await _dbSet
+			.Where(strategy => strategy.Name == name)
+			.Select(strategy => new RelatedTradeStrategyDto(
+				strategy.Id,
+				strategy.Name,
+				strategy.Description,
+				strategy.Accuracy,
+				strategy.SignalFrequency,
+				strategy.InvestmentHorizon,
+				strategy.LogicDesc,
+				strategy.UseDesc,
+				strategy.LimitDesc,
+				strategy.UserTradeStrategies.Any(link => link.UserId == userId)
+			))
+			.FirstOrDefaultAsync(ct);
+	}
+
 	public async Task<PageResult<TradeStrategy>> GetPageAsync(
 		int userId,
 		IQuerySpecification<TradeStrategy> spec,

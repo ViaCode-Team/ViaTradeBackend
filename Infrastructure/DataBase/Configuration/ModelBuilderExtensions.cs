@@ -36,6 +36,7 @@ internal static class ModelBuilderExtensions
 					x.StrategyId,
 				})
 				.IsUnique();
+			entity.HasIndex(x => new { x.UserId, x.StrategyId, x.TradeCodeId });
 			entity.HasOne(x => x.TradeStrategy).WithMany().HasForeignKey(x => x.StrategyId).IsRequired();
 		});
 

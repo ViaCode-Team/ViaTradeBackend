@@ -1,6 +1,7 @@
 using Application.Common.Models;
 using Application.Notes.Models;
 using Application.Strategies.Models;
+using Application.TradeCodes.Models;
 using Domain.Strategies.Entities;
 
 namespace Application.Strategies.Interfaces;
@@ -16,6 +17,7 @@ public interface IStrategyQueryService
 		CancellationToken ct
 	);
 	Task<TradeStrategy> GetAsync(int strategyId, CancellationToken ct);
+	Task<RelatedTradeStrategyDto> GetByNameAsync(int userId, string name, CancellationToken ct);
 	Task<PageResult<UserTradeStrategy>> GetUserStrategiesPageAsync(
 		int userId,
 		PageOptions pageOptions,
@@ -23,6 +25,21 @@ public interface IStrategyQueryService
 	);
 	Task<PageResult<UserStrategyTradeCode>> GetUserStrategyTradeCodesPageAsync(
 		int userId,
+		PageOptions pageOptions,
+		CancellationToken ct
+	);
+	Task<PageResult<RelatedTradeStrategyDto>> GetStrategiesByTradeCodePageAsync(
+		int userId,
+		int tradeCodeId,
+		StrategyFilter strategyFilter,
+		StrategySort strategySort,
+		PageOptions pageOptions,
+		CancellationToken ct
+	);
+	Task<PageResult<RelatedTradeCodeDto>> GetTradeCodesByStrategyPageAsync(
+		int userId,
+		int strategyId,
+		TradeCodeSort tradeCodeSort,
 		PageOptions pageOptions,
 		CancellationToken ct
 	);

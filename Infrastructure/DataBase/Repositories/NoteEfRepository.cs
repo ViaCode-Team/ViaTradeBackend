@@ -1,7 +1,10 @@
+using Application.Common.Interfaces;
+using Application.Common.Models;
 using Application.Notes.Interfaces;
 using Application.Notes.Models;
 using Domain.Notes.Entities;
 using Domain.Notes.Enums;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataBase.Repositories;
@@ -22,14 +25,37 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 		return new NoteStatisticDto(totalNotes, stockNotes, strategyNotes);
 	}
 
+	public async Task<PageResult<NoteProjectionDto>> GetPageWithTargetsAsync(
+		IQuerySpecification<Note> specification,
+		PageOptions pageOptions,
+		CancellationToken ct
+	)
+	{
+		var query = SpecificationEvaluator.GetQuery(_dbSet, specification);
+
+		return await query
+			.Select(note => new NoteProjectionDto(
+				note.Id,
+				note.NoteText,
+				note.UserId,
+				note.TradeCodeId,
+				note.TradeCode!.ExchangeId,
+				note.TradeCode!.Description,
+				note.TradeStrategyId,
+				note.TradeStrategy!.Name,
+				note.TradeStrategy!.Description
+			))
+			.ToPagedAsync(pageOptions, ct);
+	}
+
 	public async Task<Note?> FindByTargetAsync(int userId, int relatedId, NoteType noteType, CancellationToken ct) =>
 		noteType switch
 		{
-			NoteType.TradeCodeNote => await _dbSet.FirstOrDefaultAsync(
+			NoteType.TradeCodeNote => await _dbSet.Include(note => note.TradeCode).FirstOrDefaultAsync(
 				note => note.TradeCodeId == relatedId && note.UserId == userId,
 				ct
 			),
-			NoteType.TradeStrategyNote => await _dbSet.FirstOrDefaultAsync(
+			NoteType.TradeStrategyNote => await _dbSet.Include(note => note.TradeStrategy).FirstOrDefaultAsync(
 				note => note.TradeStrategyId == relatedId && note.UserId == userId,
 				ct
 			),

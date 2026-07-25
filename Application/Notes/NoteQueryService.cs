@@ -24,7 +24,7 @@ public class NoteQueryService(INoteRepository noteRepository) : INoteQueryServic
 		return existingNote;
 	}
 
-	public async Task<PageResult<Note>> GetPageAsync(
+	public async Task<PageResult<NoteDto>> GetPageAsync(
 		int userId,
 		NoteFilter noteFilter,
 		PageOptions pageOptions,
@@ -32,6 +32,21 @@ public class NoteQueryService(INoteRepository noteRepository) : INoteQueryServic
 	)
 	{
 		var spec = new NoteQuerySpecification(userId, noteFilter);
-		return await noteRepository.GetPageAsync(spec, pageOptions, ct);
+		var notes = await noteRepository.GetPageWithTargetsAsync(spec, pageOptions, ct);
+
+		return notes.Map(ToDto);
+	}
+
+	private static NoteDto ToDto(NoteProjectionDto source)
+	{
+		TradeCodeBriefDto? tradeCode = null;
+		if (source.TradeCodeId.HasValue)
+			tradeCode = new TradeCodeBriefDto(source.TradeCodeId.Value, source.TradeCodeTicker!, source.TradeCodeName);
+
+		StrategyBriefDto? strategy = null;
+		if (source.StrategyId.HasValue)
+			strategy = new StrategyBriefDto(source.StrategyId.Value, source.StrategyName!, source.StrategyDescription);
+
+		return new NoteDto(source.Id, source.NoteText, source.UserId, tradeCode, strategy);
 	}
 }

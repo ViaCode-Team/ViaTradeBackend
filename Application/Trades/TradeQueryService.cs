@@ -30,24 +30,11 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 
 	public async Task<TradeDto> GetAsync(int userId, int id, CancellationToken ct)
 	{
-		var trade = await tradeRepository.FindOneAsync(x => x.Id == id && x.UserId == userId, ct);
+		var trade = await tradeRepository.FindProjectionByUserAndIdAsync(userId, id, ct);
 		if (trade == null)
 			throw new NotFoundException("Trade not found.", "trade_not_found");
 
-		return new TradeDto(
-			trade.Id,
-			trade.DateOpen,
-			trade.DateClose,
-			trade.TradeOpen,
-			trade.TradeClose,
-			TradeStatisticsCalcService.CalculateNetIncome(trade.TradeOpen, trade.TradeClose, trade.TradeSignal),
-			trade.Count,
-			trade.Price,
-			trade.TradeSignal,
-			trade.TradeTypeId,
-			trade.TradeCodeId,
-			trade.UserId
-		);
+		return ToDto(trade);
 	}
 
 	public async Task<PageResult<TradeDto>> GetPageAsync(
@@ -58,21 +45,24 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 	)
 	{
 		var spec = new TradeQuerySpecification(userId, tradeFilter);
-		var trades = await tradeRepository.GetPageAsync(spec, pageOptions, ct);
+		var trades = await tradeRepository.GetPageProjectionAsync(spec, pageOptions, ct);
 
-		return trades.Map(trade => new TradeDto(
-			trade.Id,
-			trade.DateOpen,
-			trade.DateClose,
-			trade.TradeOpen,
-			trade.TradeClose,
-			TradeStatisticsCalcService.CalculateNetIncome(trade.TradeOpen, trade.TradeClose, trade.TradeSignal),
-			trade.Count,
-			trade.Price,
-			trade.TradeSignal,
-			trade.TradeTypeId,
-			trade.TradeCodeId,
-			trade.UserId
-		));
+		return trades.Map(ToDto);
 	}
+
+	private static TradeDto ToDto(TradeProjectionDto source) =>
+		new(
+			source.Id,
+			source.DateOpen,
+			source.DateClose,
+			source.TradeOpen,
+			source.TradeClose,
+			TradeStatisticsCalcService.CalculateNetIncome(source.TradeOpen, source.TradeClose, source.TradeSignal),
+			source.Count,
+			source.Price,
+			source.TradeSignal,
+			source.TradeTypeId,
+			source.TradeCode,
+			source.UserId
+		);
 }

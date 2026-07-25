@@ -1,12 +1,16 @@
 using System.ComponentModel.DataAnnotations;
+using Application.Auth.Interfaces;
 using Application.Common.Models;
 using Application.TradeCodes.Interfaces;
 using Application.TradeCodes.Models;
+using Application.Strategies.Interfaces;
+using Application.Strategies.Models;
 using Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Contracts.Statistics;
+using ViaTradeBackend.Contracts.Strategies;
 using ViaTradeBackend.Contracts.Trades;
 using ViaTradeBackend.Mappings;
 
@@ -15,7 +19,11 @@ namespace ViaTradeBackend.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize]
-public class TradeCodesController(ITradeCodeQueryService tradeCodeQueryService) : ControllerBase
+public class TradeCodesController(
+	ITradeCodeQueryService tradeCodeQueryService,
+	IStrategyQueryService strategyQueryService,
+	IJwtHelper jwtHelper
+) : ControllerBase
 {
 	[HttpGet("stocks/statistics")]
 	public async Task<Ok<StockStatisticResponse>> GetStockStatistics(CancellationToken ct)
@@ -35,6 +43,39 @@ public class TradeCodesController(ITradeCodeQueryService tradeCodeQueryService) 
 		var pagedCodes = await tradeCodeQueryService.GetPageAsync(pageOptions, tradeCodeSort, ct);
 
 		return TypedResults.Ok(pagedCodes.Map(ApiMapper.ToResponse));
+	}
+
+	[HttpGet("stocks/byticker/{ticker}")]
+	public async Task<Ok<TradeCodeResponse>> GetStockCodeByTicker(
+		[FromRoute, Required] string ticker,
+		CancellationToken ct
+	)
+	{
+		var tradeCode = await tradeCodeQueryService.GetByTickerAsync(ticker, ct);
+
+		return TypedResults.Ok(ApiMapper.ToResponse(tradeCode));
+	}
+
+	[HttpGet("stocks/{tradeCodeId}/strategies")]
+	public async Task<Ok<PageResult<TradeStrategyResponse>>> GetStrategiesByStock(
+		[FromRoute, Required] int tradeCodeId,
+		[FromQuery] StrategyFilter strategyFilter,
+		[FromQuery] StrategySort strategySort,
+		[FromQuery] PageOptions pageOptions,
+		CancellationToken ct
+	)
+	{
+		var userId = jwtHelper.GetUserIdFromClaims(User);
+		var strategies = await strategyQueryService.GetStrategiesByTradeCodePageAsync(
+			userId,
+			tradeCodeId,
+			strategyFilter,
+			strategySort,
+			pageOptions,
+			ct
+		);
+
+		return TypedResults.Ok(strategies.Map(ApiMapper.ToResponse));
 	}
 
 	[HttpGet("sys/stocks")]
