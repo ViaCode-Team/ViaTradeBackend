@@ -1,39 +1,39 @@
-using Domain.Strategies.Entities;
+using Domain.Entities;
 using Infrastructure.DataBase;
 
 namespace Infrastructure.Utils;
 
 public static class UserPreferencesQueryBuilder
 {
-	public static IQueryable<UserStrategyTradeCode> GetUserCodesQuery(this AppDbContext context, int userId)
+	public static IQueryable<UserStrategyInstrument> GetUserCodesQuery(this AppDbContext context, int userId)
 	{
-		return context.UserStrategyTradeCodes.Where(ustc => ustc.UserId == userId);
+		return context.UserStrategyInstruments.Where(ustc => ustc.UserId == userId);
 	}
 
-	public static IQueryable<UserTradeStrategy> GetAllowedStrategiesQuery(this AppDbContext context, int userId)
+	public static IQueryable<UserStrategy> GetAllowedStrategiesQuery(this AppDbContext context, int userId)
 	{
-		return context.UserTradeStrategies.Where(uts => uts.UserId == userId);
+		return context.UserStrategies.Where(uts => uts.UserId == userId);
 	}
 
-	public static IQueryable<UserStrategyTradeCode> FilterByAllowedStrategies(
-		this IQueryable<UserStrategyTradeCode> codesQuery,
-		IQueryable<UserTradeStrategy> strategiesQuery
+	public static IQueryable<UserStrategyInstrument> FilterByAllowedStrategies(
+		this IQueryable<UserStrategyInstrument> codesQuery,
+		IQueryable<UserStrategy> strategiesQuery
 	)
 	{
-		return codesQuery.Where(ustc => strategiesQuery.Any(uts => uts.TradeStrategyId == ustc.StrategyId));
+		return codesQuery.Where(ustc => strategiesQuery.Any(uts => uts.StrategyId == ustc.StrategyId));
 	}
 
 	public static IQueryable<StrategyInstrumentProjection> ProjectToStrategyAndInstrument(
-		this IQueryable<UserStrategyTradeCode> query
+		this IQueryable<UserStrategyInstrument> query
 	)
 	{
 		return query.Select(ustc => new StrategyInstrumentProjection
 		{
 			StrategyId = ustc.StrategyId,
-			StrategyName = ustc.TradeStrategy!.Name,
-			InstrumentId = ustc.TradeCodeId,
-			Symbol = ustc.TradeCode!.ExchangeId,
-			Accuracy = ustc.TradeStrategy.Accuracy,
+			StrategyName = ustc.Strategy!.Name,
+			InstrumentId = ustc.InstrumentId,
+			Symbol = ustc.Instrument!.Symbol,
+			Accuracy = ustc.Strategy.Accuracy,
 		});
 	}
 }

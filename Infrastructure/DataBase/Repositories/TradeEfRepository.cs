@@ -3,7 +3,7 @@ using Application.Common.Models;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
 using Domain.Entities;
-using Domain.Trades.Enums;
+using Domain.Enums;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,14 +37,14 @@ public class TradeEfRepository(AppDbContext context) : GenericEfRepository<Trade
 		var result = await _context
 			.Trades.Where(trade =>
 				trade.UserId == userId
-				&& trade.TradeClose.HasValue
-				&& trade.TradeOpen != 0
-				&& trade.TradeSignal != TradeSignal.HOLD
+				&& trade.ExitPrice.HasValue
+				&& trade.EntryPrice != 0
+				&& trade.Signal != TradeSignal.HOLD
 			)
 			.Select(trade => new
 			{
 				Income = Math.Round(
-					(trade.TradeClose!.Value - trade.TradeOpen) / trade.TradeOpen * 100 * (int)trade.TradeSignal,
+					(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
 					2
 				),
 			})
@@ -75,15 +75,15 @@ public class TradeEfRepository(AppDbContext context) : GenericEfRepository<Trade
 				.Where(t => t.Id == id && t.UserId == userId)
 				.ExecuteUpdateAsync(
 					s =>
-						s.SetProperty(t => t.DateOpen, request.DateOpen)
-							.SetProperty(t => t.DateClose, request.DateClose)
-							.SetProperty(t => t.TradeOpen, request.TradeOpen)
-							.SetProperty(t => t.TradeClose, request.TradeClose)
-							.SetProperty(t => t.Count, request.Count)
-							.SetProperty(t => t.TradeSignal, request.TradeSignal)
-							.SetProperty(t => t.Price, price)
+						s.SetProperty(t => t.OpenedAt, request.OpenedAt)
+							.SetProperty(t => t.ClosedAt, request.ClosedAt)
+							.SetProperty(t => t.EntryPrice, request.EntryPrice)
+							.SetProperty(t => t.ExitPrice, request.ExitPrice)
+							.SetProperty(t => t.Quantity, request.Quantity)
+							.SetProperty(t => t.Signal, request.Signal)
+							.SetProperty(t => t.TotalPrice, price)
 							.SetProperty(t => t.TradeTypeId, request.TradeTypeId)
-							.SetProperty(t => t.TradeCodeId, request.TradeCodeId),
+							.SetProperty(t => t.InstrumentId, request.InstrumentId),
 					ct
 				)
 		);
@@ -93,15 +93,15 @@ public class TradeEfRepository(AppDbContext context) : GenericEfRepository<Trade
 	{
 		return trade => new TradeProjectionDto(
 			trade.Id,
-			trade.DateOpen,
-			trade.DateClose,
-			trade.TradeOpen,
-			trade.TradeClose,
-			trade.Count,
-			trade.Price,
-			trade.TradeSignal,
+			trade.OpenedAt,
+			trade.ClosedAt,
+			trade.EntryPrice,
+			trade.ExitPrice,
+			trade.Quantity,
+			trade.TotalPrice,
+			trade.Signal,
 			trade.TradeTypeId,
-			new InstrumentSummaryDto(trade.TradeCode!.Id, trade.TradeCode.ExchangeId, trade.TradeCode.Description),
+			new InstrumentSummaryDto(trade.Instrument!.Id, trade.Instrument.Symbol, trade.Instrument.Description),
 			trade.UserId
 		);
 	}

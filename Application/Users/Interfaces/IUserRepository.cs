@@ -1,6 +1,6 @@
 using Application.Common.Interfaces.Repositories;
 using Application.Users.Models;
-using Domain.Users.Entities;
+using Domain.Entities;
 
 namespace Application.Users.Interfaces;
 
@@ -11,5 +11,5 @@ public interface IUserRepository : IRepository<User>
 	Task<UserMeDto?> FindMeAsync(int userId, CancellationToken ct = default);
 	Task<IReadOnlyList<UserTelegramDto>> ListTelegramRecipientsAsync(CancellationToken ct = default);
 	Task<int> UpdateTelegramIdAsync(int userId, string telegramId, CancellationToken ct = default);
-	Task<int> UpdateLastLoginDateAsync(int userId, DateTime lastLoginDate, CancellationToken ct = default);
+	Task<int> UpdateLastLoginAtAsync(int userId, DateTime lastLoginDate, CancellationToken ct = default);
 }

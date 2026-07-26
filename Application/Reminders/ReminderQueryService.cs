@@ -4,7 +4,7 @@ using Application.Common.Specifications;
 using Application.Notes.Models;
 using Application.Reminders.Interfaces;
 using Application.Reminders.Models;
-using Domain.Reminders.Entities;
+using Domain.Entities;
 
 namespace Application.Reminders;
 
@@ -33,14 +33,14 @@ public class ReminderQueryService(IReminderRepository reminderRepository) : IRem
 
 	public async Task<PageResult<ReminderDto>> GetPageAsync(
 		int userId,
-		int tradeCodeId,
+		int instrumentId,
 		PageOptions pageOptions,
 		ReminderSort reminderSort,
 		CancellationToken ct
 	)
 	{
-		var spec = new ReminderQuerySpecification(userId, tradeCodeId, reminderSort);
-		var reminders = await reminderRepository.GetPageWithTradeCodeAsync(spec, pageOptions, ct);
+		var spec = new ReminderQuerySpecification(userId, instrumentId, reminderSort);
+		var reminders = await reminderRepository.GetPageWithInstrumentAsync(spec, pageOptions, ct);
 
 		return reminders.Map(ToDto);
 	}
@@ -53,14 +53,14 @@ public class ReminderQueryService(IReminderRepository reminderRepository) : IRem
 	)
 	{
 		var spec = new ReminderQuerySpecification(userId, null, reminderSort);
-		var reminders = await reminderRepository.GetPageWithTradeCodeAsync(spec, pageOptions, ct);
+		var reminders = await reminderRepository.GetPageWithInstrumentAsync(spec, pageOptions, ct);
 
 		return reminders.Map(ToDto);
 	}
 
 	private static ReminderDto ToDto(ReminderProjectionDto source)
 	{
-		var instrument = new InstrumentBriefDto(source.TradeCodeId, source.TradeCodeTicker, source.TradeCodeName);
+		var instrument = new InstrumentBriefDto(source.InstrumentId, source.InstrumentTicker, source.InstrumentName);
 
 		return new ReminderDto(source.Id, source.Text, source.RemindAt, instrument, source.UserId);
 	}

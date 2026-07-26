@@ -4,7 +4,7 @@ using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Users.Interfaces;
 using Application.Users.Models;
-using Domain.Users.Entities;
+using Domain.Entities;
 
 namespace Application.Auth;
 
@@ -23,7 +23,7 @@ public class AuthCommandService(
 	{
 		var user = await userRepository.FindLoginUserAsync(login, ct);
 
-		if (user == null || !passwordHasher.Verify(password, user.HashPassword))
+		if (user == null || !passwordHasher.Verify(password, user.PasswordHash))
 			throw new InvalidCredentialsException();
 
 		var sessionId = Guid.NewGuid().ToString();
@@ -100,8 +100,8 @@ public class AuthCommandService(
 		var user = new User
 		{
 			Login = login,
-			HashPassword = passwordHasher.Hash(password),
-			RegisterDate = DateTime.UtcNow,
+			PasswordHash = passwordHasher.Hash(password),
+			RegisteredAt = DateTime.UtcNow,
 		};
 
 		await userRepository.AddAsync(user, ct);

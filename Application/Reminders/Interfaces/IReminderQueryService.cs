@@ -1,6 +1,6 @@
 using Application.Common.Models;
 using Application.Reminders.Models;
-using Domain.Reminders.Entities;
+using Domain.Entities;
 
 namespace Application.Reminders.Interfaces;
 
@@ -11,7 +11,7 @@ public interface IReminderQueryService
 	Task<Reminder> GetAsync(int userId, int reminderId, CancellationToken ct);
 	Task<PageResult<ReminderDto>> GetPageAsync(
 		int userId,
-		int tradeCodeId,
+		int instrumentId,
 		PageOptions pageOptions,
 		ReminderSort reminderSort,
 		CancellationToken ct

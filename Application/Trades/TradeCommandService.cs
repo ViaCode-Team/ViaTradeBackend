@@ -1,16 +1,16 @@
 using Application.Common.Exceptions;
 using Application.Common.Interfaces;
-using Application.TradeCodes.Interfaces;
+using Application.Instruments.Interfaces;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
 using Domain.Entities;
-using Domain.Statistics.Services;
+using Domain.Services;
 
 namespace Application.Trades;
 
 public class TradeCommandService(
 	ITradeRepository tradeRepository,
-	ITradeCodeRepository tradeCodeRepository,
+	IInstrumentRepository instrumentRepository,
 	IUnitOfWork uow
 ) : ITradeCommandService
 {
@@ -18,38 +18,38 @@ public class TradeCommandService(
 	{
 		var trade = new Trade
 		{
-			DateOpen = request.DateOpen,
-			DateClose = request.DateClose,
-			TradeOpen = request.TradeOpen,
-			TradeClose = request.TradeClose,
-			Count = request.Count,
+			OpenedAt = request.OpenedAt,
+			ClosedAt = request.ClosedAt,
+			EntryPrice = request.EntryPrice,
+			ExitPrice = request.ExitPrice,
+			Quantity = request.Quantity,
 			TradeTypeId = request.TradeTypeId,
-			TradeCodeId = request.TradeCodeId,
+			InstrumentId = request.InstrumentId,
 			UserId = userId,
-			TradeSignal = request.TradeSignal,
-			Price = (decimal)request.TradeOpen * request.Count,
+			Signal = request.Signal,
+			TotalPrice = (decimal)request.EntryPrice * request.Quantity,
 		};
 
 		await tradeRepository.AddAsync(trade, ct);
 		await uow.SaveChangesAsync(ct);
-		var tradeCode = await tradeCodeRepository.FindByIdAsync(trade.TradeCodeId, ct);
-		if (tradeCode == null)
+		var instrument = await instrumentRepository.FindByIdAsync(trade.InstrumentId, ct);
+		if (instrument == null)
 			throw new DataIntegrityException(
-				$"Trade code was not found after trade creation. TradeCodeId={trade.TradeCodeId}."
+				$"Trade code was not found after trade creation. InstrumentId={trade.InstrumentId}."
 			);
 
 		return new TradeDto(
 			trade.Id,
-			trade.DateOpen,
-			trade.DateClose,
-			trade.TradeOpen,
-			trade.TradeClose,
-			TradeStatisticsCalcService.CalculateNetIncome(trade.TradeOpen, trade.TradeClose, trade.TradeSignal),
-			trade.Count,
-			trade.Price,
-			trade.TradeSignal,
+			trade.OpenedAt,
+			trade.ClosedAt,
+			trade.EntryPrice,
+			trade.ExitPrice,
+			TradeStatisticsCalcService.CalculateNetIncome(trade.EntryPrice, trade.ExitPrice, trade.Signal),
+			trade.Quantity,
+			trade.TotalPrice,
+			trade.Signal,
 			trade.TradeTypeId,
-			new InstrumentSummaryDto(tradeCode.Id, tradeCode.ExchangeId, tradeCode.Description),
+			new InstrumentSummaryDto(instrument.Id, instrument.Symbol, instrument.Description),
 			trade.UserId
 		);
 	}
@@ -64,7 +64,7 @@ public class TradeCommandService(
 
 	public async Task UpdateAsync(int userId, int id, TradeInputDto request, CancellationToken ct)
 	{
-		var price = (decimal)request.TradeOpen * request.Count;
+		var price = (decimal)request.EntryPrice * request.Quantity;
 
 		var affectedRows = await tradeRepository.ExecuteUpdateAsync(userId, id, request, price, ct);
 		if (affectedRows != 0)

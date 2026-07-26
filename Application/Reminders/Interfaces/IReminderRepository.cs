@@ -2,14 +2,14 @@ using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Reminders.Models;
-using Domain.Reminders.Entities;
+using Domain.Entities;
 
 namespace Application.Reminders.Interfaces;
 
 public interface IReminderRepository : IRepository<Reminder>
 {
 	Task<IReadOnlyList<ReminderDto>> ListDueAsync(CancellationToken ct = default);
-	Task<PageResult<ReminderProjectionDto>> GetPageWithTradeCodeAsync(
+	Task<PageResult<ReminderProjectionDto>> GetPageWithInstrumentAsync(
 		IQuerySpecification<Reminder> specification,
 		PageOptions pageOptions,
 		CancellationToken ct = default

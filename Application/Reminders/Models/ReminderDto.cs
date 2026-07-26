@@ -8,8 +8,8 @@ public record ReminderProjectionDto(
 	int Id,
 	string Text,
 	DateTime RemindAt,
-	int TradeCodeId,
-	string TradeCodeTicker,
-	string? TradeCodeName,
+	int InstrumentId,
+	string InstrumentTicker,
+	string? InstrumentName,
 	int UserId
 );

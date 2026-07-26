@@ -1,7 +1,7 @@
 using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Reminders.Interfaces;
-using Domain.Reminders.Entities;
+using Domain.Entities;
 
 namespace Application.Reminders;
 
@@ -9,7 +9,7 @@ public class ReminderCommandService(IReminderRepository reminderRepository, IUni
 {
 	public async Task<Reminder> CreateAsync(
 		int userId,
-		int tradeCodeId,
+		int instrumentId,
 		string text,
 		DateTime remindAt,
 		CancellationToken ct
@@ -17,9 +17,9 @@ public class ReminderCommandService(IReminderRepository reminderRepository, IUni
 	{
 		var reminder = new Reminder
 		{
-			TextRemind = text,
-			DateTime = remindAt,
-			TradeCodeId = tradeCodeId,
+			Text = text,
+			RemindAt = remindAt,
+			InstrumentId = instrumentId,
 			UserId = userId,
 		};
 
@@ -48,7 +48,7 @@ public class ReminderCommandService(IReminderRepository reminderRepository, IUni
 	public async Task DeleteDueAsync(int reminderId, CancellationToken ct)
 	{
 		int rows = await reminderRepository.ExecuteDeleteAsync(
-			x => x.Id == reminderId && x.DateTime <= DateTime.UtcNow,
+			x => x.Id == reminderId && x.RemindAt <= DateTime.UtcNow,
 			ct
 		);
 

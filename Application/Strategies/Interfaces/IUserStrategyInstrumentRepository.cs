@@ -1,14 +1,14 @@
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
+using Application.Instruments.Models;
 using Application.Strategies.Models;
-using Application.TradeCodes.Models;
-using Domain.Strategies.Entities;
+using Domain.Entities;
 
 namespace Application.Strategies.Interfaces;
 
-public interface IUserStrategyTradeCodeRepository : IRepository<UserStrategyTradeCode>
+public interface IUserStrategyInstrumentRepository : IRepository<UserStrategyInstrument>
 {
-	Task<PageResult<TradeStrategy>> GetStrategiesPageByInstrumentAsync(
+	Task<PageResult<Strategy>> GetStrategiesPageByInstrumentAsync(
 		int userId,
 		int instrumentId,
 		StrategyFilter strategyFilter,

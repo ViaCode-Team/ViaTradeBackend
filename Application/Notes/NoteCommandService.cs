@@ -1,8 +1,8 @@
 using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Notes.Interfaces;
-using Domain.Notes.Entities;
-using Domain.Notes.Enums;
+using Domain.Entities;
+using Domain.Enums;
 
 namespace Application.Notes;
 
@@ -16,18 +16,18 @@ public class NoteCommandService(INoteRepository noteRepository, IUnitOfWork uow)
 
 		var note = noteType switch
 		{
-			NoteType.TradeCodeNote => new Note
+			NoteType.InstrumentNote => new Note
 			{
 				UserId = userId,
-				NoteText = noteText,
-				TradeCodeId = relatedId,
+				Text = noteText,
+				InstrumentId = relatedId,
 			},
 
-			NoteType.TradeStrategyNote => new Note
+			NoteType.StrategyNote => new Note
 			{
 				UserId = userId,
-				NoteText = noteText,
-				TradeStrategyId = relatedId,
+				Text = noteText,
+				StrategyId = relatedId,
 			},
 
 			_ => throw new BadRequestException("Unsupported note target.", "invalid_note_target"),
@@ -42,7 +42,7 @@ public class NoteCommandService(INoteRepository noteRepository, IUnitOfWork uow)
 		var affectedRows = await noteRepository.ExecuteDeleteAsync(
 			x =>
 				x.UserId == userId
-				&& (noteType == NoteType.TradeCodeNote ? x.TradeCodeId == relatedId : x.TradeStrategyId == relatedId),
+				&& (noteType == NoteType.InstrumentNote ? x.InstrumentId == relatedId : x.StrategyId == relatedId),
 			ct
 		);
 		if (affectedRows == 0)

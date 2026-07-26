@@ -1,24 +1,24 @@
 using System.ComponentModel.DataAnnotations;
-using Domain.Trades.Enums;
+using Domain.Enums;
 
 namespace Application.Trades.Models;
 
 public record TradeInputDto
 {
-	public required DateTime DateOpen { get; set; }
+	public required DateTime OpenedAt { get; set; }
 
-	public DateTime? DateClose { get; set; }
+	public DateTime? ClosedAt { get; set; }
 
-	public required double TradeOpen { get; set; }
+	public required double EntryPrice { get; set; }
 
-	public double? TradeClose { get; set; }
+	public double? ExitPrice { get; set; }
 
-	public required TradeSignal TradeSignal { get; set; }
+	public required TradeSignal Signal { get; set; }
 
 	[Range(1, int.MaxValue)]
-	public int Count { get; set; }
+	public int Quantity { get; set; }
 
 	public required int TradeTypeId { get; set; }
 
-	public required int TradeCodeId { get; set; }
+	public required int InstrumentId { get; set; }
 }

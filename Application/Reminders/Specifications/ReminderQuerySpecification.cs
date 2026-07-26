@@ -1,17 +1,17 @@
 using Application.Reminders.Models;
-using Domain.Reminders.Entities;
+using Domain.Entities;
 
 namespace Application.Common.Specifications;
 
 public class ReminderQuerySpecification : BaseQuerySpecification<Reminder>
 {
-	public ReminderQuerySpecification(int userId, int? tradeCodeId, ReminderSort reminderSort)
+	public ReminderQuerySpecification(int userId, int? instrumentId, ReminderSort reminderSort)
 	{
 		AddCriteria(r => r.UserId == userId);
 
-		if (tradeCodeId.HasValue)
+		if (instrumentId.HasValue)
 		{
-			AddCriteria(r => r.TradeCodeId == tradeCodeId.Value);
+			AddCriteria(r => r.InstrumentId == instrumentId.Value);
 		}
 
 		var sortFields = reminderSort.GetEffectiveSortBy();
@@ -20,11 +20,11 @@ public class ReminderQuerySpecification : BaseQuerySpecification<Reminder>
 			switch (field)
 			{
 				case ReminderSortField.RemindAtAsc:
-					AddOrderBy(r => r.DateTime, false);
+					AddOrderBy(r => r.RemindAt, false);
 					break;
 				case ReminderSortField.RemindAtDesc:
 				default:
-					AddOrderBy(r => r.DateTime, true);
+					AddOrderBy(r => r.RemindAt, true);
 					break;
 			}
 		}

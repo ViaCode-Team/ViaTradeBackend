@@ -1,65 +1,65 @@
 using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Strategies.Interfaces;
-using Domain.Strategies.Entities;
+using Domain.Entities;
 
 namespace Application.Strategies;
 
 public class StrategyCommandService(
-	IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository,
-	IUserTradeStrategyRepository userTradeStrategyRepository,
+	IUserStrategyInstrumentRepository userStrategyInstrumentRepository,
+	IUserStrategyRepository userStrategyRepository,
 	IUnitOfWork uow
 ) : IStrategyCommandService
 {
 	public async Task LinkInstrumentAsync(int userId, int strategyId, int instrumentId, CancellationToken ct)
 	{
-		var strategyExists = await userTradeStrategyRepository.ExistsAsync(
-			strategy => strategy.UserId == userId && strategy.TradeStrategyId == strategyId,
+		var strategyExists = await userStrategyRepository.ExistsAsync(
+			strategy => strategy.UserId == userId && strategy.StrategyId == strategyId,
 			ct
 		);
 		if (!strategyExists)
 			throw new NotFoundException("Strategy not found.", "strategy_not_found");
 
-		var strategyCodeExists = await userStrategyTradeCodeRepository.ExistsAsync(
+		var strategyCodeExists = await userStrategyInstrumentRepository.ExistsAsync(
 			strategyCode =>
 				strategyCode.UserId == userId
 				&& strategyCode.StrategyId == strategyId
-				&& strategyCode.TradeCodeId == instrumentId,
+				&& strategyCode.InstrumentId == instrumentId,
 			ct
 		);
 		if (strategyCodeExists)
 			return;
 
-		var strategyCode = new UserStrategyTradeCode
+		var strategyCode = new UserStrategyInstrument
 		{
 			UserId = userId,
 			StrategyId = strategyId,
-			TradeCodeId = instrumentId,
+			InstrumentId = instrumentId,
 		};
 
-		await userStrategyTradeCodeRepository.AddAsync(strategyCode, ct);
+		await userStrategyInstrumentRepository.AddAsync(strategyCode, ct);
 		await uow.SaveChangesAsync(ct);
 	}
 
 	public async Task ActivateAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		var strategyExists = await userTradeStrategyRepository.ExistsAsync(
-			strategy => strategy.UserId == userId && strategy.TradeStrategyId == strategyId,
+		var strategyExists = await userStrategyRepository.ExistsAsync(
+			strategy => strategy.UserId == userId && strategy.StrategyId == strategyId,
 			ct
 		);
 		if (strategyExists)
 			return;
 
-		var strategyLink = new UserTradeStrategy { UserId = userId, TradeStrategyId = strategyId };
+		var strategyLink = new UserStrategy { UserId = userId, StrategyId = strategyId };
 
-		await userTradeStrategyRepository.AddAsync(strategyLink, ct);
+		await userStrategyRepository.AddAsync(strategyLink, ct);
 		await uow.SaveChangesAsync(ct);
 	}
 
 	public async Task UnlinkInstrumentAsync(int userId, int strategyId, int instrumentId, CancellationToken ct)
 	{
-		var affectedRows = await userStrategyTradeCodeRepository.ExecuteDeleteAsync(
-			e => e.UserId == userId && e.StrategyId == strategyId && e.TradeCodeId == instrumentId,
+		var affectedRows = await userStrategyInstrumentRepository.ExecuteDeleteAsync(
+			e => e.UserId == userId && e.StrategyId == strategyId && e.InstrumentId == instrumentId,
 			ct
 		);
 
@@ -69,8 +69,8 @@ public class StrategyCommandService(
 
 	public async Task DeactivateAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		var affectedRows = await userTradeStrategyRepository.ExecuteDeleteAsync(
-			e => e.UserId == userId && e.TradeStrategyId == strategyId,
+		var affectedRows = await userStrategyRepository.ExecuteDeleteAsync(
+			e => e.UserId == userId && e.StrategyId == strategyId,
 			ct
 		);
 

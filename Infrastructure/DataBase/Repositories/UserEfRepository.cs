@@ -1,6 +1,6 @@
 using Application.Users.Interfaces;
 using Application.Users.Models;
-using Domain.Users.Entities;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataBase.Repositories;
@@ -11,7 +11,7 @@ public class UserEfRepository(AppDbContext context) : GenericEfRepository<User>(
 	{
 		return await _dbSet
 			.Where(user => user.Login == login)
-			.Select(user => new UserLoginDto(user.Id, user.Login, user.HashPassword))
+			.Select(user => new UserLoginDto(user.Id, user.Login, user.PasswordHash))
 			.FirstOrDefaultAsync(ct);
 	}
 
@@ -23,8 +23,8 @@ public class UserEfRepository(AppDbContext context) : GenericEfRepository<User>(
 			{
 				Id = user.Id,
 				Login = user.Login,
-				LastLoginDate = user.LastLoginDate,
-				RegisterDate = user.RegisterDate,
+				LastLoginAt = user.LastLoginAt,
+				RegisteredAt = user.RegisteredAt,
 				TelegramId = user.TelegramId,
 			})
 			.FirstOrDefaultAsync(ct);
@@ -53,12 +53,12 @@ public class UserEfRepository(AppDbContext context) : GenericEfRepository<User>(
 			.ExecuteUpdateAsync(s => s.SetProperty(u => u.TelegramId, telegramId), ct);
 	}
 
-	public async Task<int> UpdateLastLoginDateAsync(int userId, DateTime lastLoginDate, CancellationToken ct)
+	public async Task<int> UpdateLastLoginAtAsync(int userId, DateTime lastLoginDate, CancellationToken ct)
 	{
 		return await EfDatabaseOperation.ExecuteAsync(() =>
 			_dbSet
 				.Where(u => u.Id == userId)
-				.ExecuteUpdateAsync(s => s.SetProperty(u => u.LastLoginDate, lastLoginDate), ct)
+				.ExecuteUpdateAsync(s => s.SetProperty(u => u.LastLoginAt, lastLoginDate), ct)
 		);
 	}
 }

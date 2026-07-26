@@ -1,17 +1,17 @@
 using Application.Common.Models;
-using Application.TradeCodes.Models;
+using Application.Instruments.Models;
 using Application.Trades.Models;
+using Domain.Entities;
 using Domain.Enums;
-using Domain.TradeCodes.Entities;
 
-namespace Application.TradeCodes.Interfaces;
+namespace Application.Instruments.Interfaces;
 
 public interface IInstrumentQueryService
 {
 	Task<InstrumentStatisticsDto> GetStatisticsAsync(CancellationToken ct);
-	Task<TradeCode> GetAsync(int instrumentId, CancellationToken ct);
-	Task<TradeCode> GetBySymbolAsync(string symbol, CancellationToken ct);
-	Task<PageResult<TradeCode>> GetPageAsync(
+	Task<Instrument> GetAsync(int instrumentId, CancellationToken ct);
+	Task<Instrument> GetBySymbolAsync(string symbol, CancellationToken ct);
+	Task<PageResult<Instrument>> GetPageAsync(
 		InstrumentFilter instrumentFilter,
 		PageOptions pageOptions,
 		InstrumentSort instrumentSort,

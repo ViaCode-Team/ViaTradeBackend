@@ -2,15 +2,14 @@ using Application.Auth;
 using Application.Auth.Interfaces;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
-using Application.Interfaces;
+using Application.Instruments;
+using Application.Instruments.Interfaces;
 using Application.Notes;
 using Application.Notes.Interfaces;
 using Application.Reminders;
 using Application.Reminders.Interfaces;
 using Application.Strategies;
 using Application.Strategies.Interfaces;
-using Application.TradeCodes;
-using Application.TradeCodes.Interfaces;
 using Application.Trades;
 using Application.Trades.Interfaces;
 using Application.Users;
@@ -144,11 +143,11 @@ public static class DependencyInjection
 		services.AddScoped<ITradeRepository, TradeEfRepository>();
 		services.AddScoped<ITradeTypeRepository, TradeTypeEfRepository>();
 
-		services.AddScoped<ITradeStrategyRepository, TradeStrategyEfRepository>();
-		services.AddScoped<IUserTradeStrategyRepository, UserTradeStrategyEfRepository>();
-		services.AddScoped<IUserStrategyTradeCodeRepository, UserStrategyTradeCodeEfRepository>();
+		services.AddScoped<IStrategyRepository, StrategyEfRepository>();
+		services.AddScoped<IUserStrategyRepository, UserStrategyEfRepository>();
+		services.AddScoped<IUserStrategyInstrumentRepository, UserStrategyInstrumentEfRepository>();
 
-		services.AddScoped<ITradeCodeRepository, TradeCodeEfRepository>();
+		services.AddScoped<IInstrumentRepository, InstrumentEfRepository>();
 
 		services.AddScoped<IReminderRepository, ReminderEfRepository>();
 		services.AddScoped<INoteRepository, NoteEfRepository>();

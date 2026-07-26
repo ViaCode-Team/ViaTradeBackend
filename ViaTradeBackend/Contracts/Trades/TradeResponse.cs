@@ -1,18 +1,18 @@
-using Domain.Trades.Enums;
+using Domain.Enums;
 using ViaTradeBackend.Contracts.Instruments;
 
 namespace ViaTradeBackend.Contracts.Trades;
 
 public record TradeResponse(
 	int Id,
-	DateTime DateOpen,
-	DateTime? DateClose,
-	double TradeOpen,
-	double? TradeClose,
+	DateTime OpenedAt,
+	DateTime? ClosedAt,
+	double EntryPrice,
+	double? ExitPrice,
 	double? NetIncome,
-	int Count,
-	decimal Price,
-	TradeSignal TradeSignal,
+	int Quantity,
+	decimal TotalPrice,
+	TradeSignal Signal,
 	int TradeTypeId,
 	InstrumentBriefResponse? Instrument,
 	int UserId

@@ -1,4 +1,4 @@
-namespace Domain.Trades.Enums;
+namespace Domain.Enums;
 
 public enum TradeSignal
 {

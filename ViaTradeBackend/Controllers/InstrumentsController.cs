@@ -1,14 +1,14 @@
 using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
 using Application.Common.Models;
+using Application.Instruments.Interfaces;
+using Application.Instruments.Models;
 using Application.Notes.Interfaces;
 using Application.Reminders.Interfaces;
 using Application.Reminders.Models;
 using Application.Strategies.Interfaces;
 using Application.Strategies.Models;
-using Application.TradeCodes.Interfaces;
-using Application.TradeCodes.Models;
-using Domain.Notes.Enums;
+using Domain.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Contracts.Instruments;
@@ -93,7 +93,7 @@ public class InstrumentsController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var note = await noteQueryService.GetAsync(userId, instrumentId, NoteType.TradeCodeNote, ct);
+		var note = await noteQueryService.GetAsync(userId, instrumentId, NoteType.InstrumentNote, ct);
 
 		return TypedResults.Ok(ApiMapper.ToResponse(note));
 	}
@@ -106,7 +106,7 @@ public class InstrumentsController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await noteCommandService.UpsertAsync(userId, instrumentId, NoteType.TradeCodeNote, request.NoteText, ct);
+		await noteCommandService.UpsertAsync(userId, instrumentId, NoteType.InstrumentNote, request.Text, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -115,7 +115,7 @@ public class InstrumentsController(
 	public async Task<NoContent> DeleteNote([FromRoute, Range(1, int.MaxValue)] int instrumentId, CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await noteCommandService.DeleteAsync(userId, instrumentId, NoteType.TradeCodeNote, ct);
+		await noteCommandService.DeleteAsync(userId, instrumentId, NoteType.InstrumentNote, ct);
 
 		return TypedResults.NoContent();
 	}

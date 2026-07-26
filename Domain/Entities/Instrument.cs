@@ -1,6 +1,4 @@
-using Domain.Entities;
-
-namespace Domain.Instruments.Entities;
+namespace Domain.Entities;
 
 public sealed class Instrument : BaseEntity<int>
 {

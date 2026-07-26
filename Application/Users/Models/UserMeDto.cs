@@ -6,9 +6,9 @@ public class UserMeDto
 
 	public required string Login { get; set; }
 
-	public required DateTime LastLoginDate { get; set; }
+	public required DateTime LastLoginAt { get; set; }
 
-	public required DateTime RegisterDate { get; set; }
+	public required DateTime RegisteredAt { get; set; }
 
 	public string? TelegramId { get; set; }
 }

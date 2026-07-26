@@ -1,29 +1,29 @@
 using System.Linq.Expressions;
 using Domain.Entities;
-using Domain.Trades.Enums;
+using Domain.Enums;
 
-namespace Domain.Statistics.Services;
+namespace Domain.Services;
 
 public static class TradeStatisticsCalcService
 {
 	public static Expression<Func<Trade, double>> AbsoluteIncomeExpression =>
 		trade =>
-			trade.TradeClose == null
+			trade.ExitPrice == null
 				? 0
-				: (trade.TradeClose.Value - trade.TradeOpen) * trade.Count * (int)trade.TradeSignal;
+				: (trade.ExitPrice.Value - trade.EntryPrice) * trade.Quantity * (int)trade.Signal;
 
 	public static Expression<Func<Trade, double>> AbsoluteIncomeAbsExpression =>
 		trade =>
-			trade.TradeClose == null
+			trade.ExitPrice == null
 				? 0
-				: Math.Abs((trade.TradeClose.Value - trade.TradeOpen) * trade.Count * (int)trade.TradeSignal);
+				: Math.Abs((trade.ExitPrice.Value - trade.EntryPrice) * trade.Quantity * (int)trade.Signal);
 
 	public static double CalculateAbsoluteIncome(Trade trade)
 	{
-		if (trade.TradeClose == null)
+		if (trade.ExitPrice == null)
 			return 0;
 
-		return (trade.TradeClose.Value - trade.TradeOpen) * trade.Count * (int)trade.TradeSignal;
+		return (trade.ExitPrice.Value - trade.EntryPrice) * trade.Quantity * (int)trade.Signal;
 	}
 
 	public static float CalculateProfitFactor(double totalProfit, double totalLoss)

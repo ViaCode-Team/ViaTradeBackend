@@ -1,15 +1,14 @@
-using Application.Common.Models;
 using Application.Strategies.Interfaces;
 using Application.Trades.Models;
-using Domain.Strategies.Entities;
+using Domain.Entities;
 using Infrastructure.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataBase.Repositories;
 
-public class UserTradeStrategyEfRepository(AppDbContext context)
-	: GenericEfRepository<UserTradeStrategy>(context),
-		IUserTradeStrategyRepository
+public class UserStrategyEfRepository(AppDbContext context)
+	: GenericEfRepository<UserStrategy>(context),
+		IUserStrategyRepository
 {
 	public async Task<int> CountByUserAsync(int userId, CancellationToken ct)
 	{

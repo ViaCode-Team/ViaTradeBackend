@@ -7,8 +7,8 @@ public record StrategyResponse(
 	int? Accuracy,
 	string? SignalFrequency,
 	string? InvestmentHorizon,
-	string? LogicDesc,
-	string? UseDesc,
-	string? LimitDesc,
+	string? LogicDescription,
+	string? UsageDescription,
+	string? LimitationsDescription,
 	bool IsActive
 );

@@ -3,7 +3,6 @@ using Application.Users.Interfaces;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Attribute;
-using ViaTradeBackend.Contracts.Auth;
 using ViaTradeBackend.Contracts.Users;
 using ViaTradeBackend.Mappings;
 

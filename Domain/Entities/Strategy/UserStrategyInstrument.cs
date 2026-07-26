@@ -1,14 +1,10 @@
 namespace Domain.Entities;
 
-public sealed class Note : BaseEntity<int>
+public sealed class UserStrategyInstrument : BaseEntity<int>
 {
 	public required int UserId { get; set; }
-
-	public required string Text { get; set; }
-
-	public int? InstrumentId { get; set; }
-
-	public int? StrategyId { get; set; }
+	public required int InstrumentId { get; set; }
+	public required int StrategyId { get; set; }
 
 	public User? User { get; set; }
 

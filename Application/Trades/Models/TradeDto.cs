@@ -1,17 +1,17 @@
-using Domain.Trades.Enums;
+using Domain.Enums;
 
 namespace Application.Trades.Models;
 
 public record TradeDto(
 	int Id,
-	DateTime DateOpen,
-	DateTime? DateClose,
-	double TradeOpen,
-	double? TradeClose,
+	DateTime OpenedAt,
+	DateTime? ClosedAt,
+	double EntryPrice,
+	double? ExitPrice,
 	double? NetIncome,
-	int Count,
-	decimal Price,
-	TradeSignal TradeSignal,
+	int Quantity,
+	decimal TotalPrice,
+	TradeSignal Signal,
 	int TradeTypeId,
 	InstrumentSummaryDto? Instrument,
 	int UserId
@@ -21,13 +21,13 @@ public record InstrumentSummaryDto(int Id, string Symbol, string? Name);
 
 public record TradeProjectionDto(
 	int Id,
-	DateTime DateOpen,
-	DateTime? DateClose,
-	double TradeOpen,
-	double? TradeClose,
-	int Count,
-	decimal Price,
-	TradeSignal TradeSignal,
+	DateTime OpenedAt,
+	DateTime? ClosedAt,
+	double EntryPrice,
+	double? ExitPrice,
+	int Quantity,
+	decimal TotalPrice,
+	TradeSignal Signal,
 	int TradeTypeId,
 	InstrumentSummaryDto? Instrument,
 	int UserId

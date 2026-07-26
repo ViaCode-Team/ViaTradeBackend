@@ -1,15 +1,11 @@
-using Domain.Entities;
-using Domain.TradeCodes.Entities;
-using Domain.Users.Entities;
-
-namespace Domain.Reminders.Entities;
+namespace Domain.Entities;
 
 public sealed class Reminder : BaseEntity<int>
 {
-	public required string TextRemind { get; set; }
-	public required DateTime DateTime { get; set; }
-	public required int TradeCodeId { get; set; }
+	public required string Text { get; set; }
+	public required DateTime RemindAt { get; set; }
+	public required int InstrumentId { get; set; }
 	public required int UserId { get; set; }
-	public TradeCode? TradeCode { get; set; }
+	public Instrument? Instrument { get; set; }
 	public User? User { get; set; }
 }

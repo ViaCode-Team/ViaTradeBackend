@@ -34,8 +34,8 @@ public class UserCommandService(IUserRepository userRepository, ITelegramTokenRe
 			throw new NotFoundException("User not found.", "user_not_found");
 	}
 
-	public async Task UpdateLastLoginDateAsync(int userId, CancellationToken ct)
+	public async Task UpdateLastLoginAtAsync(int userId, CancellationToken ct)
 	{
-		await userRepository.UpdateLastLoginDateAsync(userId, DateTime.UtcNow, ct);
+		await userRepository.UpdateLastLoginAtAsync(userId, DateTime.UtcNow, ct);
 	}
 }

@@ -3,8 +3,8 @@ using Application.Common.Models;
 using Application.Common.Specifications;
 using Application.Notes.Interfaces;
 using Application.Notes.Models;
-using Domain.Notes.Entities;
-using Domain.Notes.Enums;
+using Domain.Entities;
+using Domain.Enums;
 
 namespace Application.Notes;
 
@@ -46,17 +46,17 @@ public class NoteQueryService(INoteRepository noteRepository) : INoteQueryServic
 	private static NoteDto ToDto(NoteProjectionDto source)
 	{
 		InstrumentBriefDto? instrument = null;
-		if (source.TradeCodeId.HasValue)
+		if (source.InstrumentId.HasValue)
 			instrument = new InstrumentBriefDto(
-				source.TradeCodeId.Value,
-				source.TradeCodeTicker!,
-				source.TradeCodeName
+				source.InstrumentId.Value,
+				source.InstrumentTicker!,
+				source.InstrumentName
 			);
 
 		StrategyBriefDto? strategy = null;
 		if (source.StrategyId.HasValue)
 			strategy = new StrategyBriefDto(source.StrategyId.Value, source.StrategyName!, source.StrategyDescription);
 
-		return new NoteDto(source.Id, source.NoteText, source.UserId, instrument, strategy);
+		return new NoteDto(source.Id, source.Text, source.UserId, instrument, strategy);
 	}
 }

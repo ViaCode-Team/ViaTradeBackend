@@ -1,6 +1,5 @@
 using Application.Common.Exceptions;
 using Application.Common.Models;
-using Application.Interfaces;
 using Application.Strategies.Interfaces;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
@@ -9,12 +8,12 @@ using Domain.Models.Trade;
 
 namespace Application.Trades;
 
-public class SignalQueryService(IFileReader tradefileReader, IUserTradeStrategyRepository userTradeStrategyRepository)
+public class SignalQueryService(IFileReader tradefileReader, IUserStrategyRepository userStrategyRepository)
 	: ISignalQueryService
 {
 	public async Task<SignalStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		var sources = await userTradeStrategyRepository.ListSignalSourcesAsync(userId, ct);
+		var sources = await userStrategyRepository.ListSignalSourcesAsync(userId, ct);
 		var signals = ListSignals(sources, null, null, new SignalSort());
 
 		return new SignalStatisticDto(
@@ -32,7 +31,7 @@ public class SignalQueryService(IFileReader tradefileReader, IUserTradeStrategyR
 		CancellationToken ct
 	)
 	{
-		var sources = await userTradeStrategyRepository.ListSignalSourcesAsync(userId, ct);
+		var sources = await userStrategyRepository.ListSignalSourcesAsync(userId, ct);
 		sources = sources
 			.Where(source => source.StrategyId == signalHistoryFilter.StrategyId)
 			.Where(source => source.InstrumentId == signalHistoryFilter.InstrumentId)
@@ -50,7 +49,7 @@ public class SignalQueryService(IFileReader tradefileReader, IUserTradeStrategyR
 		CancellationToken ct
 	)
 	{
-		var sources = await userTradeStrategyRepository.ListSignalSourcesAsync(userId, ct);
+		var sources = await userStrategyRepository.ListSignalSourcesAsync(userId, ct);
 		var signals = ListSignals(sources, null, null, new SignalSort())
 			.GroupBy(signal => (signal.StrategyId, signal.InstrumentId))
 			.Select(group => group.First())

@@ -3,7 +3,7 @@ using Application.Common.Models;
 using Application.Notes.Models;
 using Application.Reminders.Interfaces;
 using Application.Reminders.Models;
-using Domain.Reminders.Entities;
+using Domain.Entities;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,22 +14,22 @@ public class ReminderEfRepository(AppDbContext context) : GenericEfRepository<Re
 	public async Task<IReadOnlyList<ReminderDto>> ListDueAsync(CancellationToken ct)
 	{
 		return await _dbSet
-			.Where(reminder => reminder.DateTime <= DateTime.UtcNow)
+			.Where(reminder => reminder.RemindAt <= DateTime.UtcNow)
 			.Select(reminder => new ReminderDto(
 				reminder.Id,
-				reminder.TextRemind,
-				reminder.DateTime,
+				reminder.Text,
+				reminder.RemindAt,
 				new InstrumentBriefDto(
-					reminder.TradeCode!.Id,
-					reminder.TradeCode.ExchangeId,
-					reminder.TradeCode.Description
+					reminder.Instrument!.Id,
+					reminder.Instrument.Symbol,
+					reminder.Instrument.Description
 				),
 				reminder.UserId
 			))
 			.ToListAsync(ct);
 	}
 
-	public async Task<PageResult<ReminderProjectionDto>> GetPageWithTradeCodeAsync(
+	public async Task<PageResult<ReminderProjectionDto>> GetPageWithInstrumentAsync(
 		IQuerySpecification<Reminder> specification,
 		PageOptions pageOptions,
 		CancellationToken ct
@@ -40,11 +40,11 @@ public class ReminderEfRepository(AppDbContext context) : GenericEfRepository<Re
 		return await query
 			.Select(reminder => new ReminderProjectionDto(
 				reminder.Id,
-				reminder.TextRemind,
-				reminder.DateTime,
-				reminder.TradeCodeId,
-				reminder.TradeCode!.ExchangeId,
-				reminder.TradeCode!.Description,
+				reminder.Text,
+				reminder.RemindAt,
+				reminder.InstrumentId,
+				reminder.Instrument!.Symbol,
+				reminder.Instrument!.Description,
 				reminder.UserId
 			))
 			.ToPagedAsync(pageOptions, ct);
@@ -53,7 +53,7 @@ public class ReminderEfRepository(AppDbContext context) : GenericEfRepository<Re
 	public async Task<Reminder?> FindByUserAndIdAsync(int userId, int reminderId, CancellationToken ct)
 	{
 		return await _dbSet
-			.Include(reminder => reminder.TradeCode)
+			.Include(reminder => reminder.Instrument)
 			.FirstOrDefaultAsync(reminder => reminder.Id == reminderId && reminder.UserId == userId, ct);
 	}
 
@@ -73,10 +73,7 @@ public class ReminderEfRepository(AppDbContext context) : GenericEfRepository<Re
 		var affectedRows = await EfDatabaseOperation.ExecuteAsync(() =>
 			_dbSet
 				.Where(r => r.Id == reminderId && r.UserId == userId)
-				.ExecuteUpdateAsync(
-					s => s.SetProperty(r => r.TextRemind, text).SetProperty(r => r.DateTime, remindAt),
-					ct
-				)
+				.ExecuteUpdateAsync(s => s.SetProperty(r => r.Text, text).SetProperty(r => r.RemindAt, remindAt), ct)
 		);
 
 		return affectedRows;

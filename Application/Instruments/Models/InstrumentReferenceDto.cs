@@ -1,3 +1,3 @@
-namespace Application.TradeCodes.Models;
+namespace Application.Instruments.Models;
 
 public sealed record InstrumentReferenceDto(int Id, string Symbol);

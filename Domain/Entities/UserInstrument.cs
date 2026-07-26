@@ -1,7 +1,4 @@
-using Domain.Entities;
-using Domain.Users.Entities;
-
-namespace Domain.Instruments.Entities;
+namespace Domain.Entities;
 
 public sealed class UserInstrument : BaseEntity<int>
 {

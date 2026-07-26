@@ -1,22 +1,22 @@
 using Application.Common.Exceptions;
 using Application.Common.Models;
 using Application.Common.Specifications;
+using Application.Instruments.Models;
 using Application.Notes.Models;
 using Application.Strategies.Interfaces;
 using Application.Strategies.Models;
-using Application.TradeCodes.Models;
-using Domain.Strategies.Entities;
+using Domain.Entities;
 
 namespace Application.Strategies;
 
 public class StrategyQueryService(
-	ITradeStrategyRepository tradeStrategyRepository,
-	IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository
+	IStrategyRepository strategyRepository,
+	IUserStrategyInstrumentRepository userStrategyInstrumentRepository
 ) : IStrategyQueryService
 {
 	public async Task<StrategyStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		var counts = await tradeStrategyRepository.FindStatisticsAsync(userId, ct);
+		var counts = await strategyRepository.FindStatisticsAsync(userId, ct);
 		if (counts == null)
 			throw new NotFoundException("User not found.", "user_not_found");
 
@@ -38,7 +38,7 @@ public class StrategyQueryService(
 		);
 	}
 
-	public async Task<PageResult<TradeStrategy>> GetPageAsync(
+	public async Task<PageResult<Strategy>> GetPageAsync(
 		int userId,
 		StrategyFilter strategyFilter,
 		StrategySort strategySort,
@@ -47,19 +47,19 @@ public class StrategyQueryService(
 	)
 	{
 		var spec = new StrategyQuerySpecification(userId, strategyFilter, strategySort);
-		return await tradeStrategyRepository.GetPageAsync(userId, spec, pageOptions, ct);
+		return await strategyRepository.GetPageAsync(userId, spec, pageOptions, ct);
 	}
 
-	public async Task<TradeStrategy> GetAsync(int userId, int strategyId, CancellationToken ct)
+	public async Task<Strategy> GetAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		var tradeStrategy = await tradeStrategyRepository.FindForUserAsync(userId, strategyId, ct);
-		if (tradeStrategy == null)
+		var strategy = await strategyRepository.FindForUserAsync(userId, strategyId, ct);
+		if (strategy == null)
 			throw new NotFoundException("Strategy not found.", "strategy_not_found");
 
-		return tradeStrategy;
+		return strategy;
 	}
 
-	public async Task<PageResult<TradeStrategy>> GetPageByInstrumentAsync(
+	public async Task<PageResult<Strategy>> GetPageByInstrumentAsync(
 		int userId,
 		int instrumentId,
 		StrategyFilter strategyFilter,
@@ -68,7 +68,7 @@ public class StrategyQueryService(
 		CancellationToken ct
 	)
 	{
-		return await userStrategyTradeCodeRepository.GetStrategiesPageByInstrumentAsync(
+		return await userStrategyInstrumentRepository.GetStrategiesPageByInstrumentAsync(
 			userId,
 			instrumentId,
 			strategyFilter,
@@ -86,7 +86,7 @@ public class StrategyQueryService(
 		CancellationToken ct
 	)
 	{
-		return await userStrategyTradeCodeRepository.GetInstrumentsPageByStrategyAsync(
+		return await userStrategyInstrumentRepository.GetInstrumentsPageByStrategyAsync(
 			userId,
 			strategyId,
 			instrumentSort,

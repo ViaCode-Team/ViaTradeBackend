@@ -1,17 +1,17 @@
 using Application.Common.Models;
+using Application.Instruments.Models;
 using Application.Strategies.Interfaces;
 using Application.Strategies.Models;
-using Application.TradeCodes.Models;
-using Domain.Strategies.Entities;
+using Domain.Entities;
 using Infrastructure.Extensions;
 
 namespace Infrastructure.DataBase.Repositories;
 
-public class UserStrategyTradeCodeEfRepository(AppDbContext context)
-	: GenericEfRepository<UserStrategyTradeCode>(context),
-		IUserStrategyTradeCodeRepository
+public class UserStrategyInstrumentEfRepository(AppDbContext context)
+	: GenericEfRepository<UserStrategyInstrument>(context),
+		IUserStrategyInstrumentRepository
 {
-	public async Task<PageResult<TradeStrategy>> GetStrategiesPageByInstrumentAsync(
+	public async Task<PageResult<Strategy>> GetStrategiesPageByInstrumentAsync(
 		int userId,
 		int instrumentId,
 		StrategyFilter strategyFilter,
@@ -21,8 +21,8 @@ public class UserStrategyTradeCodeEfRepository(AppDbContext context)
 	)
 	{
 		var query = _dbSet
-			.Where(link => link.UserId == userId && link.TradeCodeId == instrumentId)
-			.Select(link => link.TradeStrategy!);
+			.Where(link => link.UserId == userId && link.InstrumentId == instrumentId)
+			.Select(link => link.Strategy!);
 
 		if (!string.IsNullOrWhiteSpace(strategyFilter.Name))
 			query = query.Where(strategy => strategy.Name == strategyFilter.Name);
@@ -47,53 +47,50 @@ public class UserStrategyTradeCodeEfRepository(AppDbContext context)
 	{
 		var query = _dbSet
 			.Where(link => link.UserId == userId && link.StrategyId == strategyId)
-			.Select(link => link.TradeCode!);
+			.Select(link => link.Instrument!);
 
 		query = ApplyInstrumentSort(query, instrumentSort);
 
 		return await query
-			.Select(tradeCode => new RelatedInstrumentDto(tradeCode.Id, tradeCode.ExchangeId, tradeCode.Description))
+			.Select(instrument => new RelatedInstrumentDto(instrument.Id, instrument.Symbol, instrument.Description))
 			.ToPagedAsync(pageOptions, ct);
 	}
 
-	private static IQueryable<Domain.TradeCodes.Entities.TradeCode> ApplyInstrumentSort(
-		IQueryable<Domain.TradeCodes.Entities.TradeCode> query,
+	private static IQueryable<Domain.Entities.Instrument> ApplyInstrumentSort(
+		IQueryable<Domain.Entities.Instrument> query,
 		InstrumentSort instrumentSort
 	)
 	{
-		IOrderedQueryable<Domain.TradeCodes.Entities.TradeCode>? orderedQuery = null;
+		IOrderedQueryable<Domain.Entities.Instrument>? orderedQuery = null;
 		foreach (var field in instrumentSort.GetEffectiveSortBy())
 		{
 			if (orderedQuery == null)
 			{
 				orderedQuery = field switch
 				{
-					InstrumentSortField.SymbolDesc => query.OrderByDescending(tradeCode => tradeCode.ExchangeId),
-					_ => query.OrderBy(tradeCode => tradeCode.ExchangeId),
+					InstrumentSortField.SymbolDesc => query.OrderByDescending(instrument => instrument.Symbol),
+					_ => query.OrderBy(instrument => instrument.Symbol),
 				};
 			}
 			else
 			{
 				orderedQuery = field switch
 				{
-					InstrumentSortField.SymbolDesc => orderedQuery.ThenByDescending(tradeCode => tradeCode.ExchangeId),
-					_ => orderedQuery.ThenBy(tradeCode => tradeCode.ExchangeId),
+					InstrumentSortField.SymbolDesc => orderedQuery.ThenByDescending(instrument => instrument.Symbol),
+					_ => orderedQuery.ThenBy(instrument => instrument.Symbol),
 				};
 			}
 		}
 
 		if (orderedQuery == null)
-			return query.OrderBy(tradeCode => tradeCode.Id);
+			return query.OrderBy(instrument => instrument.Id);
 
-		return orderedQuery.ThenBy(tradeCode => tradeCode.Id);
+		return orderedQuery.ThenBy(instrument => instrument.Id);
 	}
 
-	private static IQueryable<TradeStrategy> ApplyStrategySort(
-		IQueryable<TradeStrategy> query,
-		StrategySort strategySort
-	)
+	private static IQueryable<Strategy> ApplyStrategySort(IQueryable<Strategy> query, StrategySort strategySort)
 	{
-		IOrderedQueryable<TradeStrategy>? orderedQuery = null;
+		IOrderedQueryable<Strategy>? orderedQuery = null;
 		foreach (var field in strategySort.GetEffectiveSortBy())
 		{
 			if (orderedQuery == null)

@@ -1,13 +1,13 @@
 using System.Text.Json.Serialization;
 
-namespace Domain.Notes.Enums;
+namespace Domain.Enums;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum NoteType
 {
-	[JsonStringEnumMemberName("tradeCodeNote")]
-	TradeCodeNote,
+	[JsonStringEnumMemberName("instrumentNote")]
+	InstrumentNote,
 
-	[JsonStringEnumMemberName("tradeStrategyNote")]
-	TradeStrategyNote,
+	[JsonStringEnumMemberName("strategyNote")]
+	StrategyNote,
 }

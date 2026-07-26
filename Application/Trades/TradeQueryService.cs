@@ -3,7 +3,7 @@ using Application.Common.Models;
 using Application.Common.Specifications;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
-using Domain.Statistics.Services;
+using Domain.Services;
 
 namespace Application.Trades;
 
@@ -53,14 +53,14 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 	private static TradeDto ToDto(TradeProjectionDto source) =>
 		new(
 			source.Id,
-			source.DateOpen,
-			source.DateClose,
-			source.TradeOpen,
-			source.TradeClose,
-			TradeStatisticsCalcService.CalculateNetIncome(source.TradeOpen, source.TradeClose, source.TradeSignal),
-			source.Count,
-			source.Price,
-			source.TradeSignal,
+			source.OpenedAt,
+			source.ClosedAt,
+			source.EntryPrice,
+			source.ExitPrice,
+			TradeStatisticsCalcService.CalculateNetIncome(source.EntryPrice, source.ExitPrice, source.Signal),
+			source.Quantity,
+			source.TotalPrice,
+			source.Signal,
 			source.TradeTypeId,
 			source.Instrument,
 			source.UserId

@@ -1,7 +1,7 @@
 using Application.Common.Models;
 using Application.Trades.Models;
 
-namespace Application.Interfaces;
+namespace Application.Trades.Interfaces;
 
 public interface ISignalQueryService
 {

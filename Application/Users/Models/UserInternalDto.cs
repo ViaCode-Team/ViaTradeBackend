@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Application.Common.Models;
+namespace Application.Users.Models;
 
 public class UserInternalDto
 {
@@ -8,11 +8,11 @@ public class UserInternalDto
 
 	public required string Login { get; set; }
 
-	public required string HashPassword { get; set; }
+	public required string PasswordHash { get; set; }
 
-	public DateTime LastLoginDate { get; set; } = DateTime.UtcNow;
+	public DateTime LastLoginAt { get; set; } = DateTime.UtcNow;
 
-	public required DateTime RegisterDate { get; set; }
+	public required DateTime RegisteredAt { get; set; }
 
 	[MaxLength(512)]
 	public string? TelegramId { get; set; }

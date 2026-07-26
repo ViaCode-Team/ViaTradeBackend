@@ -4,16 +4,19 @@ using Infrastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Infrastructure.Migrations
+namespace Infrastructure.DataBase.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260726180051_RebaseRenamedEntities")]
+    partial class RebaseRenamedEntities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,31 +34,39 @@ namespace Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime?>("ClosedAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DateClose");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
                     b.Property<double>("EntryPrice")
-                        .HasColumnType("double");
+                        .HasColumnType("double")
+                        .HasColumnName("TradeOpen");
 
                     b.Property<double?>("ExitPrice")
-                        .HasColumnType("double");
+                        .HasColumnType("double")
+                        .HasColumnName("TradeClose");
 
                     b.Property<int>("InstrumentId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("TradeCodeId");
 
                     b.Property<DateTime>("OpenedAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DateOpen");
 
                     b.Property<int>("Quantity")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("Count");
 
                     b.Property<int>("Signal")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("TradeSignal");
 
                     b.Property<decimal>("TotalPrice")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18,2)")
+                        .HasColumnName("Price");
 
                     b.Property<int>("TradeTypeId")
                         .HasColumnType("int");
@@ -73,7 +84,7 @@ namespace Infrastructure.Migrations
 
                     b.ToTable("Trades", t =>
                         {
-                            t.HasCheckConstraint("CK_Trades_PositiveQuantity", "`Quantity` > 0");
+                            t.HasCheckConstraint("CK_Trade_PositiveCount", "`Count` > 0");
                         });
                 });
 
@@ -130,14 +141,15 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("Symbol")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasColumnType("varchar(255)")
+                        .HasColumnName("ExchangeId");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Symbol")
                         .IsUnique();
 
-                    b.ToTable("Instruments");
+                    b.ToTable("TradeCodes", (string)null);
 
                     b.HasData(
                         new
@@ -168,7 +180,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<int>("InstrumentId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("TradeCodeId");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -180,7 +193,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId", "InstrumentId")
                         .IsUnique();
 
-                    b.ToTable("UserInstruments");
+                    b.ToTable("UserTradeCode", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Notes.Entities.Note", b =>
@@ -195,14 +208,17 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<int?>("InstrumentId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("TradeCodeId");
 
                     b.Property<int?>("StrategyId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("TradeStrategyId");
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("NoteText");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -223,7 +239,7 @@ namespace Infrastructure.Migrations
 
                     b.ToTable("Notes", t =>
                         {
-                            t.HasCheckConstraint("CK_Notes_ExclusiveTarget", "(`InstrumentId` IS NOT NULL AND `StrategyId` IS NULL) OR (`InstrumentId` IS NULL AND `StrategyId` IS NOT NULL)");
+                            t.HasCheckConstraint("CK_Note_ExclusiveTarget", "(`TradeCodeId` IS NOT NULL AND `TradeStrategyId` IS NULL) OR (`TradeCodeId` IS NULL AND `TradeStrategyId` IS NOT NULL)");
                         });
                 });
 
@@ -239,14 +255,17 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<int>("InstrumentId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("TradeCodeId");
 
                     b.Property<DateTime>("RemindAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("DateTime");
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("TextRemind");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -257,7 +276,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Reminders");
+                    b.ToTable("TradeReminds", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Strategies.Entities.Strategy", b =>
@@ -284,10 +303,12 @@ namespace Infrastructure.Migrations
                         .HasColumnType("tinyint(1)");
 
                     b.Property<string>("LimitationsDescription")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("LimitDesc");
 
                     b.Property<string>("LogicDescription")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("LogicDesc");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -297,14 +318,15 @@ namespace Infrastructure.Migrations
                         .HasColumnType("longtext");
 
                     b.Property<string>("UsageDescription")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("UseDesc");
 
                     b.HasKey("Id");
 
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Strategies");
+                    b.ToTable("TradeStrategies", (string)null);
 
                     b.HasData(
                         new
@@ -349,7 +371,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<int>("StrategyId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("TradeStrategyId");
 
                     b.Property<int>("UserId")
                         .HasColumnType("int");
@@ -361,7 +384,7 @@ namespace Infrastructure.Migrations
                     b.HasIndex("UserId", "StrategyId")
                         .IsUnique();
 
-                    b.ToTable("UserStrategies");
+                    b.ToTable("UserTradeStrategies", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Strategies.Entities.UserStrategyInstrument", b =>
@@ -376,7 +399,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<int>("InstrumentId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("TradeCodeId");
 
                     b.Property<int>("StrategyId")
                         .HasColumnType("int");
@@ -395,7 +419,7 @@ namespace Infrastructure.Migrations
 
                     b.HasIndex("UserId", "StrategyId", "InstrumentId");
 
-                    b.ToTable("UserStrategyInstruments");
+                    b.ToTable("UserStrategyTradeCodes", (string)null);
                 });
 
             modelBuilder.Entity("Domain.Users.Entities.User", b =>
@@ -410,7 +434,8 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("LastLoginAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("LastLoginDate");
 
                     b.Property<string>("Login")
                         .IsRequired()
@@ -419,13 +444,16 @@ namespace Infrastructure.Migrations
 
                     b.Property<string>("PasswordHash")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("HashPassword");
 
                     b.Property<DateTime>("RegisteredAt")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("datetime(6)")
+                        .HasColumnName("RegisterDate");
 
                     b.Property<string>("TelegramId")
-                        .HasColumnType("longtext");
+                        .HasColumnType("longtext")
+                        .HasColumnName("TgId");
 
                     b.HasKey("Id");
 

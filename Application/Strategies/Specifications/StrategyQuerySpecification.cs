@@ -1,13 +1,13 @@
 using Application.Strategies.Models;
-using Domain.Strategies.Entities;
+using Domain.Entities;
 
 namespace Application.Common.Specifications;
 
-public class StrategyQuerySpecification : BaseQuerySpecification<TradeStrategy>
+public class StrategyQuerySpecification : BaseQuerySpecification<Strategy>
 {
 	public StrategyQuerySpecification(int userId, StrategyFilter strategyFilter, StrategySort strategySort)
 	{
-		AddCriteria(x => x.UserTradeStrategies!.Any(uts => uts.UserId == userId));
+		AddCriteria(x => x.UserStrategies!.Any(uts => uts.UserId == userId));
 		if (!string.IsNullOrWhiteSpace(strategyFilter.Name))
 			AddCriteria(x => x.Name == strategyFilter.Name);
 

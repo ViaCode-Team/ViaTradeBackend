@@ -1,9 +1,4 @@
 using Domain.Entities;
-using Domain.Notes.Entities;
-using Domain.Reminders.Entities;
-using Domain.Strategies.Entities;
-using Domain.TradeCodes.Entities;
-using Domain.Users.Entities;
 using Infrastructure.DataBase.Configuration;
 using Microsoft.EntityFrameworkCore;
 
@@ -14,12 +9,13 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 	public DbSet<User> Users { get; set; }
 	public DbSet<Trade> Trades { get; set; }
 	public DbSet<TradeType> TradeTypes { get; set; }
-	public DbSet<TradeCode> TradeCodes { get; set; }
-	public DbSet<TradeStrategy> TradeStrategies { get; set; }
-	public DbSet<UserTradeStrategy> UserTradeStrategies { get; set; }
+	public DbSet<Instrument> Instruments { get; set; }
+	public DbSet<UserInstrument> UserInstruments { get; set; }
+	public DbSet<Strategy> Strategies { get; set; }
+	public DbSet<UserStrategy> UserStrategies { get; set; }
 	public DbSet<Note> Notes { get; set; }
 	public DbSet<Reminder> Reminders { get; set; }
-	public DbSet<UserStrategyTradeCode> UserStrategyTradeCodes { get; set; }
+	public DbSet<UserStrategyInstrument> UserStrategyInstruments { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder modelBuilder)
 	{

@@ -2,23 +2,21 @@ using Application.Common.Interfaces;
 using Application.Common.Models;
 using Application.Strategies.Interfaces;
 using Application.Strategies.Models;
-using Domain.Strategies.Entities;
+using Domain.Entities;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataBase.Repositories;
 
-public class TradeStrategyEfRepository(AppDbContext context)
-	: GenericEfRepository<TradeStrategy>(context),
-		ITradeStrategyRepository
+public class StrategyEfRepository(AppDbContext context) : GenericEfRepository<Strategy>(context), IStrategyRepository
 {
 	public async Task<StrategyCountsDto?> FindStatisticsAsync(int userId, CancellationToken ct)
 	{
 		var query = _context
 			.Users.Where(user => user.Id == userId)
 			.Select(_ => new StrategyCountsDto(
-				_context.TradeStrategies.LongCount(),
-				_context.UserTradeStrategies.LongCount(link => link.UserId == userId)
+				_context.Strategies.LongCount(),
+				_context.UserStrategies.LongCount(link => link.UserId == userId)
 			));
 
 		return await query.SingleOrDefaultAsync(ct);
@@ -26,17 +24,15 @@ public class TradeStrategyEfRepository(AppDbContext context)
 
 	public async Task<Dictionary<string, int?>> GetAccuracyMapAsync(CancellationToken ct)
 	{
-		var strategies = await _dbSet
-			.Select(tradeStrategy => new { tradeStrategy.Name, tradeStrategy.Accuracy })
-			.ToListAsync(ct);
+		var strategies = await _dbSet.Select(strategy => new { strategy.Name, strategy.Accuracy }).ToListAsync(ct);
 
-		return strategies.ToDictionary(tradeStrategy => tradeStrategy.Name, tradeStrategy => tradeStrategy.Accuracy);
+		return strategies.ToDictionary(strategy => strategy.Name, strategy => strategy.Accuracy);
 	}
 
-	public async Task<TradeStrategy?> FindForUserAsync(int userId, int strategyId, CancellationToken ct)
+	public async Task<Strategy?> FindForUserAsync(int userId, int strategyId, CancellationToken ct)
 	{
 		return await _dbSet.FirstOrDefaultAsync(
-			strategy => strategy.Id == strategyId && strategy.UserTradeStrategies.Any(link => link.UserId == userId),
+			strategy => strategy.Id == strategyId && strategy.UserStrategies.Any(link => link.UserId == userId),
 			ct
 		);
 	}
@@ -44,14 +40,14 @@ public class TradeStrategyEfRepository(AppDbContext context)
 	public async Task<int?> FindAccuracyByNameAsync(string name, CancellationToken ct)
 	{
 		return await _dbSet
-			.Where(tradeStrategy => tradeStrategy.Name == name)
-			.Select(tradeStrategy => tradeStrategy.Accuracy)
+			.Where(strategy => strategy.Name == name)
+			.Select(strategy => strategy.Accuracy)
 			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<PageResult<TradeStrategy>> GetPageAsync(
+	public async Task<PageResult<Strategy>> GetPageAsync(
 		int userId,
-		IQuerySpecification<TradeStrategy> spec,
+		IQuerySpecification<Strategy> spec,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
@@ -64,7 +60,7 @@ public class TradeStrategyEfRepository(AppDbContext context)
 			.Select(strategy => new
 			{
 				Strategy = strategy,
-				IsActive = strategy.UserTradeStrategies.Any(link => link.UserId == userId),
+				IsActive = strategy.UserStrategies.Any(link => link.UserId == userId),
 			})
 			.ToPagedAsync(pageOptions, ct);
 

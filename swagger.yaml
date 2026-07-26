@@ -6828,29 +6828,29 @@ components:
       additionalProperties: false
     CreateTradeRequest:
       required:
-        - count
-        - dateOpen
+        - entryPrice
         - instrumentId
-        - tradeOpen
-        - tradeSignal
+        - openedAt
+        - quantity
+        - signal
         - tradeTypeId
       type: object
       properties:
-        dateOpen:
+        openedAt:
           type: string
           format: date-time
-        dateClose:
+        closedAt:
           type: string
           format: date-time
-        tradeOpen:
+        entryPrice:
           type: number
           format: double
-        tradeClose:
+        exitPrice:
           type: number
           format: double
-        tradeSignal:
+        signal:
           $ref: '#/components/schemas/TradeSignal'
-        count:
+        quantity:
           type: integer
           format: int32
         tradeTypeId:
@@ -6971,14 +6971,14 @@ components:
     NoteResponse:
       required:
         - id
-        - noteText
+        - text
         - userId
       type: object
       properties:
         id:
           type: integer
           format: int32
-        noteText:
+        text:
           type: string
         userId:
           type: integer
@@ -7018,15 +7018,15 @@ components:
       additionalProperties: false
     NoteStatisticResponse:
       required:
+        - instrumentNotes
         - strategyNotes
         - totalNotes
-        - tradeCodeNotes
       type: object
       properties:
         totalNotes:
           type: integer
           format: int32
-        tradeCodeNotes:
+        instrumentNotes:
           type: integer
           format: int32
         strategyNotes:
@@ -7035,8 +7035,8 @@ components:
       additionalProperties: false
     NoteType:
       enum:
-        - tradeCodeNote
-        - tradeStrategyNote
+        - instrumentNote
+        - strategyNote
       type: string
     ProblemDetails:
       required:
@@ -7276,11 +7276,11 @@ components:
           type: string
         investmentHorizon:
           type: string
-        logicDesc:
+        logicDescription:
           type: string
-        useDesc:
+        usageDescription:
           type: string
-        limitDesc:
+        limitationsDescription:
           type: string
         isActive:
           type: boolean
@@ -7347,12 +7347,12 @@ components:
       additionalProperties: false
     TradeResponse:
       required:
-        - count
-        - dateOpen
+        - entryPrice
         - id
-        - price
-        - tradeOpen
-        - tradeSignal
+        - openedAt
+        - quantity
+        - signal
+        - totalPrice
         - tradeTypeId
         - userId
       type: object
@@ -7360,28 +7360,28 @@ components:
         id:
           type: integer
           format: int32
-        dateOpen:
+        openedAt:
           type: string
           format: date-time
-        dateClose:
+        closedAt:
           type: string
           format: date-time
-        tradeOpen:
+        entryPrice:
           type: number
           format: double
-        tradeClose:
+        exitPrice:
           type: number
           format: double
         netIncome:
           type: number
           format: double
-        count:
+        quantity:
           type: integer
           format: int32
-        price:
+        totalPrice:
           type: number
           format: double
-        tradeSignal:
+        signal:
           $ref: '#/components/schemas/TradeSignal'
         tradeTypeId:
           type: integer
@@ -7451,10 +7451,10 @@ components:
       type: string
     UpdateNoteRequest:
       required:
-        - noteText
+        - text
       type: object
       properties:
-        noteText:
+        text:
           type: string
       additionalProperties: false
     UpdateReminderRequest:
@@ -7471,29 +7471,29 @@ components:
       additionalProperties: false
     UpdateTradeRequest:
       required:
-        - count
-        - dateOpen
+        - entryPrice
         - instrumentId
-        - tradeOpen
-        - tradeSignal
+        - openedAt
+        - quantity
+        - signal
         - tradeTypeId
       type: object
       properties:
-        dateOpen:
+        openedAt:
           type: string
           format: date-time
-        dateClose:
+        closedAt:
           type: string
           format: date-time
-        tradeOpen:
+        entryPrice:
           type: number
           format: double
-        tradeClose:
+        exitPrice:
           type: number
           format: double
-        tradeSignal:
+        signal:
           $ref: '#/components/schemas/TradeSignal'
-        count:
+        quantity:
           type: integer
           format: int32
         tradeTypeId:
@@ -7506,9 +7506,9 @@ components:
     UserMeResponse:
       required:
         - id
-        - lastLoginDate
+        - lastLoginAt
         - login
-        - registerDate
+        - registeredAt
       type: object
       properties:
         id:
@@ -7516,10 +7516,10 @@ components:
           format: int32
         login:
           type: string
-        lastLoginDate:
+        lastLoginAt:
           type: string
           format: date-time
-        registerDate:
+        registeredAt:
           type: string
           format: date-time
         telegramId:

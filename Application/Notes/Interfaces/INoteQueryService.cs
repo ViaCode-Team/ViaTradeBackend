@@ -1,7 +1,7 @@
 using Application.Common.Models;
 using Application.Notes.Models;
-using Domain.Notes.Entities;
-using Domain.Notes.Enums;
+using Domain.Entities;
+using Domain.Enums;
 
 namespace Application.Notes.Interfaces;
 

@@ -1,6 +1,6 @@
 using Application.Notes.Models;
-using Domain.Notes.Entities;
-using Domain.Notes.Enums;
+using Domain.Entities;
+using Domain.Enums;
 
 namespace Application.Common.Specifications;
 
@@ -13,10 +13,10 @@ public class NoteQuerySpecification : BaseQuerySpecification<Note>
 		if (request.Target.HasValue)
 		{
 			var target = request.Target.Value;
-			if (target == NoteType.TradeCodeNote)
-				AddCriteria(x => x.TradeCodeId != null);
-			else if (target == NoteType.TradeStrategyNote)
-				AddCriteria(x => x.TradeStrategyId != null);
+			if (target == NoteType.InstrumentNote)
+				AddCriteria(x => x.InstrumentId != null);
+			else if (target == NoteType.StrategyNote)
+				AddCriteria(x => x.StrategyId != null);
 		}
 	}
 }

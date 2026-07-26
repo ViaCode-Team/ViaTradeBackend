@@ -1,44 +1,44 @@
 using Application.Common.Exceptions;
 using Application.Common.Models;
-using Application.TradeCodes.Interfaces;
-using Application.TradeCodes.Models;
+using Application.Instruments.Interfaces;
+using Application.Instruments.Models;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
+using Domain.Entities;
 using Domain.Enums;
-using Domain.TradeCodes.Entities;
 
-namespace Application.TradeCodes;
+namespace Application.Instruments;
 
-public class InstrumentQueryService(IFileReader tradefileReader, ITradeCodeRepository tradeCodeRepository)
+public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepository instrumentRepository)
 	: IInstrumentQueryService
 {
 	public async Task<InstrumentStatisticsDto> GetStatisticsAsync(CancellationToken ct)
 	{
-		int totalInstruments = await tradeCodeRepository.CountAsync(ct);
+		int totalInstruments = await instrumentRepository.CountAsync(ct);
 
 		return new InstrumentStatisticsDto(totalInstruments);
 	}
 
-	public async Task<TradeCode> GetAsync(int instrumentId, CancellationToken ct)
+	public async Task<Instrument> GetAsync(int instrumentId, CancellationToken ct)
 	{
-		return await tradeCodeRepository.FindByIdAsync(instrumentId, ct)
+		return await instrumentRepository.FindByIdAsync(instrumentId, ct)
 			?? throw new NotFoundException("Instrument not found.", "instrument_not_found");
 	}
 
-	public async Task<TradeCode> GetBySymbolAsync(string symbol, CancellationToken ct)
+	public async Task<Instrument> GetBySymbolAsync(string symbol, CancellationToken ct)
 	{
-		return await tradeCodeRepository.FindByTickerAsync(symbol, ct)
+		return await instrumentRepository.FindByTickerAsync(symbol, ct)
 			?? throw new NotFoundException("Instrument not found.", "instrument_not_found");
 	}
 
-	public async Task<PageResult<TradeCode>> GetPageAsync(
+	public async Task<PageResult<Instrument>> GetPageAsync(
 		InstrumentFilter instrumentFilter,
 		PageOptions pageOptions,
 		InstrumentSort instrumentSort,
 		CancellationToken ct
 	)
 	{
-		return await tradeCodeRepository.GetPageAsync(instrumentFilter, pageOptions, instrumentSort, ct);
+		return await instrumentRepository.GetPageAsync(instrumentFilter, pageOptions, instrumentSort, ct);
 	}
 
 	public async Task<IReadOnlyList<InstrumentFileDto>> ListFileMetadataAsync(
@@ -47,7 +47,7 @@ public class InstrumentQueryService(IFileReader tradefileReader, ITradeCodeRepos
 	)
 	{
 		var instrumentFiles = tradefileReader.GetInstruments(dataType);
-		var instrumentIdBySymbol = await tradeCodeRepository.GetTradeCodeIdByTickerAsync(ct);
+		var instrumentIdBySymbol = await instrumentRepository.GetInstrumentIdByTickerAsync(ct);
 
 		return instrumentFiles
 			.Where(file => instrumentIdBySymbol.ContainsKey(file.Symbol))
@@ -74,7 +74,7 @@ public class InstrumentQueryService(IFileReader tradefileReader, ITradeCodeRepos
 		if (int.TryParse(instrumentIdOrSymbol, out var parsedInstrumentId))
 		{
 			symbol =
-				await tradeCodeRepository.FindTickerByIdAsync(parsedInstrumentId, ct)
+				await instrumentRepository.FindTickerByIdAsync(parsedInstrumentId, ct)
 				?? throw new NotFoundException("Instrument not found.", "instrument_not_found");
 
 			instrumentId = parsedInstrumentId;
@@ -82,7 +82,7 @@ public class InstrumentQueryService(IFileReader tradefileReader, ITradeCodeRepos
 		else
 		{
 			symbol = instrumentIdOrSymbol;
-			instrumentId = await tradeCodeRepository.FindIdByTickerAsync(symbol, ct);
+			instrumentId = await instrumentRepository.FindIdByTickerAsync(symbol, ct);
 		}
 
 		var instrumentFiles = tradefileReader.GetInstruments(dataType, [symbol]);
@@ -90,7 +90,7 @@ public class InstrumentQueryService(IFileReader tradefileReader, ITradeCodeRepos
 		if (instrumentFile == null)
 			throw new NotFoundException("Instrument file not found.", "instrument_file_not_found");
 
-		instrumentId ??= await tradeCodeRepository.FindIdByTickerAsync(instrumentFile.Symbol, ct);
+		instrumentId ??= await instrumentRepository.FindIdByTickerAsync(instrumentFile.Symbol, ct);
 		if (instrumentId == null)
 			throw new NotFoundException("Instrument not found.", "instrument_not_found");
 

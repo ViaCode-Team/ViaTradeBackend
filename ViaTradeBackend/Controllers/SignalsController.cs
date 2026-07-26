@@ -1,7 +1,6 @@
-using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
 using Application.Common.Models;
-using Application.Interfaces;
+using Application.Trades.Interfaces;
 using Application.Trades.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;

@@ -1,15 +1,15 @@
 using System.ComponentModel.DataAnnotations;
-using Domain.Trades.Enums;
+using Domain.Enums;
 
 namespace ViaTradeBackend.Contracts.Trades;
 
 public record UpdateTradeRequest(
-	DateTime DateOpen,
-	DateTime? DateClose,
-	double TradeOpen,
-	double? TradeClose,
-	TradeSignal TradeSignal,
-	[Range(1, int.MaxValue)] int Count,
+	DateTime OpenedAt,
+	DateTime? ClosedAt,
+	double EntryPrice,
+	double? ExitPrice,
+	TradeSignal Signal,
+	[Range(1, int.MaxValue)] int Quantity,
 	int TradeTypeId,
 	int InstrumentId
 );

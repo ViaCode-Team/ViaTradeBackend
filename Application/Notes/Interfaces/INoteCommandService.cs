@@ -1,4 +1,4 @@
-using Domain.Notes.Enums;
+using Domain.Enums;
 
 namespace Application.Notes.Interfaces;
 

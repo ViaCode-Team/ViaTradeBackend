@@ -2,7 +2,7 @@ namespace Domain.Models.Trade;
 
 public class TickerResults
 {
-	public required string TradeCode { get; set; }
+	public required string Instrument { get; set; }
 
 	public int? Accuracy { get; set; }
 

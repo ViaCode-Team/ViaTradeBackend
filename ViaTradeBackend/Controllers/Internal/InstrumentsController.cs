@@ -1,5 +1,5 @@
 using System.ComponentModel.DataAnnotations;
-using Application.TradeCodes.Interfaces;
+using Application.Instruments.Interfaces;
 using Domain.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
