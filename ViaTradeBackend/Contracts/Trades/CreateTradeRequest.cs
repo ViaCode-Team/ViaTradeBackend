@@ -11,5 +11,5 @@ public record CreateTradeRequest(
 	TradeSignal TradeSignal,
 	[Range(1, int.MaxValue)] int Count,
 	int TradeTypeId,
-	int TradeCodeId
+	int InstrumentId
 );

@@ -13,11 +13,11 @@ public record TradeDto(
 	decimal Price,
 	TradeSignal TradeSignal,
 	int TradeTypeId,
-	TradeCodeSummaryDto? TradeCode,
+	InstrumentSummaryDto? Instrument,
 	int UserId
 );
 
-public record TradeCodeSummaryDto(int Id, string Ticker, string? Name);
+public record InstrumentSummaryDto(int Id, string Symbol, string? Name);
 
 public record TradeProjectionDto(
 	int Id,
@@ -29,6 +29,6 @@ public record TradeProjectionDto(
 	decimal Price,
 	TradeSignal TradeSignal,
 	int TradeTypeId,
-	TradeCodeSummaryDto? TradeCode,
+	InstrumentSummaryDto? Instrument,
 	int UserId
 );

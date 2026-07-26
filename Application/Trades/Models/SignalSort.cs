@@ -4,5 +4,5 @@ namespace Application.Trades.Models;
 
 public record SignalSort() : Sort<SignalSortField>
 {
-	protected override List<SignalSortField> DefaultSortBy => [SignalSortField.DateTimeDesc];
+	protected override List<SignalSortField> DefaultSortBy => [SignalSortField.SignalDateDesc];
 }

@@ -19,7 +19,7 @@ public class ReminderEfRepository(AppDbContext context) : GenericEfRepository<Re
 				reminder.Id,
 				reminder.TextRemind,
 				reminder.DateTime,
-				new TradeCodeBriefDto(
+				new InstrumentBriefDto(
 					reminder.TradeCode!.Id,
 					reminder.TradeCode.ExchangeId,
 					reminder.TradeCode.Description
@@ -66,7 +66,7 @@ public class ReminderEfRepository(AppDbContext context) : GenericEfRepository<Re
 		int userId,
 		int reminderId,
 		string text,
-		DateTime dateTime,
+		DateTime remindAt,
 		CancellationToken ct
 	)
 	{
@@ -74,7 +74,7 @@ public class ReminderEfRepository(AppDbContext context) : GenericEfRepository<Re
 			_dbSet
 				.Where(r => r.Id == reminderId && r.UserId == userId)
 				.ExecuteUpdateAsync(
-					s => s.SetProperty(r => r.TextRemind, text).SetProperty(r => r.DateTime, dateTime),
+					s => s.SetProperty(r => r.TextRemind, text).SetProperty(r => r.DateTime, remindAt),
 					ct
 				)
 		);

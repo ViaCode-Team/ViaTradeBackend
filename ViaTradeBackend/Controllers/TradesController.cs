@@ -11,7 +11,7 @@ using ViaTradeBackend.Mappings;
 
 namespace ViaTradeBackend.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/v1/[controller]")]
 [ApiController]
 public class TradesController(
 	ITradeCommandService tradeCommandService,
@@ -28,8 +28,8 @@ public class TradesController(
 		return TypedResults.Ok(ApiMapper.ToResponse(tradeStatistics));
 	}
 
-	[HttpGet("byuser")]
-	public async Task<Ok<PageResult<TradeResponse>>> GetUserTrades(
+	[HttpGet]
+	public async Task<Ok<PageResult<TradeResponse>>> GetTrades(
 		[FromQuery] TradeFilter tradeFilter,
 		[FromQuery] PageOptions pageOptions,
 		CancellationToken ct
@@ -41,17 +41,20 @@ public class TradesController(
 		return TypedResults.Ok(userTrades.Map(ApiMapper.ToResponse));
 	}
 
-	[HttpGet("{id}")]
-	public async Task<Ok<TradeResponse>> GetTradeById([Required] int id, CancellationToken ct)
+	[HttpGet("{tradeId:int}")]
+	public async Task<Ok<TradeResponse>> GetTradeById(
+		[FromRoute, Range(1, int.MaxValue)] int tradeId,
+		CancellationToken ct
+	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var trade = await tradeQueryService.GetAsync(userId, id, ct);
+		var trade = await tradeQueryService.GetAsync(userId, tradeId, ct);
 
 		return TypedResults.Ok(ApiMapper.ToResponse(trade));
 	}
 
-	[HttpPost("byuser")]
-	public async Task<Created<TradeResponse>> CreateUserTrade(
+	[HttpPost]
+	public async Task<Created<TradeResponse>> CreateTrade(
 		[FromBody, Required] CreateTradeRequest request,
 		CancellationToken ct
 	)
@@ -59,27 +62,27 @@ public class TradesController(
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var trade = await tradeCommandService.CreateAsync(userId, ApiMapper.ToInput(request), ct);
 
-		return TypedResults.Created($"/api/Trades/{trade.Id}", ApiMapper.ToResponse(trade));
+		return TypedResults.Created($"/api/v1/trades/{trade.Id}", ApiMapper.ToResponse(trade));
 	}
 
-	[HttpPut("byuser/{id}")]
-	public async Task<NoContent> UpdateUserTrade(
-		[FromRoute, Required] int id,
+	[HttpPut("{tradeId:int}")]
+	public async Task<NoContent> UpdateTrade(
+		[FromRoute, Range(1, int.MaxValue)] int tradeId,
 		[FromBody, Required] UpdateTradeRequest request,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await tradeCommandService.UpdateAsync(userId, id, ApiMapper.ToInput(request), ct);
+		await tradeCommandService.UpdateAsync(userId, tradeId, ApiMapper.ToInput(request), ct);
 
 		return TypedResults.NoContent();
 	}
 
-	[HttpDelete("byuser/{id}")]
-	public async Task<NoContent> DeleteUserTrade([FromRoute, Required] int id, CancellationToken ct)
+	[HttpDelete("{tradeId:int}")]
+	public async Task<NoContent> DeleteTrade([FromRoute, Range(1, int.MaxValue)] int tradeId, CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await tradeCommandService.DeleteAsync(userId, id, ct);
+		await tradeCommandService.DeleteAsync(userId, tradeId, ct);
 
 		return TypedResults.NoContent();
 	}

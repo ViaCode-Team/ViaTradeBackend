@@ -1,4 +1,5 @@
 using Domain.Trades.Enums;
+using ViaTradeBackend.Contracts.Instruments;
 
 namespace ViaTradeBackend.Contracts.Trades;
 
@@ -13,6 +14,6 @@ public record TradeResponse(
 	decimal Price,
 	TradeSignal TradeSignal,
 	int TradeTypeId,
-	TradeCodeBriefResponse? TradeCode,
+	InstrumentBriefResponse? Instrument,
 	int UserId
 );

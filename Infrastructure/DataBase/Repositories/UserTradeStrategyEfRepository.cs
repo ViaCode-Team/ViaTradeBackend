@@ -1,5 +1,6 @@
 using Application.Common.Models;
 using Application.Strategies.Interfaces;
+using Application.Trades.Models;
 using Domain.Strategies.Entities;
 using Infrastructure.Utils;
 using Microsoft.EntityFrameworkCore;
@@ -15,26 +16,23 @@ public class UserTradeStrategyEfRepository(AppDbContext context)
 		return await _dbSet.CountAsync(e => e.UserId == userId, ct);
 	}
 
-	public async Task<PageResult<UserTradeStrategy>> GetPageByUserAsync(
-		int userId,
-		PageOptions pageOptions,
-		CancellationToken ct
-	)
-	{
-		return await GetPageByAsync(strategy => strategy.UserId == userId, pageOptions, ct);
-	}
-
-	public async Task<Dictionary<string, List<string>>> GetUserPreferencesAsync(int userId, CancellationToken ct)
+	public async Task<List<SignalSourceDto>> ListSignalSourcesAsync(int userId, CancellationToken ct)
 	{
 		var userCodesQuery = _context.GetUserCodesQuery(userId);
 		var allowedStrategiesQuery = _context.GetAllowedStrategiesQuery(userId);
-
-		var projectedQuery = userCodesQuery
+		var projections = await userCodesQuery
 			.FilterByAllowedStrategies(allowedStrategiesQuery)
-			.ProjectToStrategyAndTradeCode();
+			.ProjectToStrategyAndInstrument()
+			.ToListAsync(ct);
 
-		var queryResults = await projectedQuery.ToListAsync(ct);
-
-		return queryResults.GroupByStrategyName();
+		return projections
+			.Select(source => new SignalSourceDto(
+				source.StrategyId,
+				source.StrategyName,
+				source.InstrumentId,
+				source.Symbol,
+				source.Accuracy
+			))
+			.ToList();
 	}
 }

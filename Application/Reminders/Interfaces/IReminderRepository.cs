@@ -20,7 +20,7 @@ public interface IReminderRepository : IRepository<Reminder>
 		int userId,
 		int reminderId,
 		string text,
-		DateTime dateTime,
+		DateTime remindAt,
 		CancellationToken ct = default
 	);
 }

@@ -24,6 +24,16 @@ public static class SwaggerServiceExtensions
 				}
 			);
 
+			options.SwaggerDoc(
+				"internal",
+				new OpenApiInfo
+				{
+					Title = "ViaTrade Internal API",
+					Version = "v1",
+					Description = "Сервисные endpoints для внутренних интеграций",
+				}
+			);
+
 			options.SupportNonNullableReferenceTypes();
 			options.NonNullableReferenceTypesAsRequired();
 			options.SchemaFilter<OptionalPropertiesAsNonNullableSchemaFilter>();
@@ -35,6 +45,24 @@ public static class SwaggerServiceExtensions
 					return methodInfo.Name;
 				}
 				return null;
+			});
+
+			options.DocInclusionPredicate(
+				(documentName, apiDesc) =>
+				{
+					if (documentName == "internal")
+						return apiDesc.GroupName == "internal";
+
+					return apiDesc.GroupName != "internal";
+				}
+			);
+
+			options.TagActionsBy(apiDesc =>
+			{
+				if (apiDesc.GroupName == "internal")
+					return ["Internal"];
+
+				return [apiDesc.ActionDescriptor.RouteValues["controller"] ?? "Default"];
 			});
 
 			options.DocumentFilter<ProblemDetailsDocumentFilter>();

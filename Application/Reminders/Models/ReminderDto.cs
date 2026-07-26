@@ -2,12 +2,12 @@ using Application.Notes.Models;
 
 namespace Application.Reminders.Models;
 
-public record ReminderDto(int Id, string Text, DateTime DateTime, TradeCodeBriefDto? TradeCode, int UserId);
+public record ReminderDto(int Id, string Text, DateTime RemindAt, InstrumentBriefDto? Instrument, int UserId);
 
 public record ReminderProjectionDto(
 	int Id,
 	string Text,
-	DateTime DateTime,
+	DateTime RemindAt,
 	int TradeCodeId,
 	string TradeCodeTicker,
 	string? TradeCodeName,

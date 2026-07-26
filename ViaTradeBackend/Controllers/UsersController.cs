@@ -1,23 +1,38 @@
 using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
 using Application.Users.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using ViaTradeBackend.Attribute;
+using ViaTradeBackend.Contracts.Auth;
 using ViaTradeBackend.Contracts.Users;
+using ViaTradeBackend.Cookies;
 using ViaTradeBackend.Mappings;
 
 namespace ViaTradeBackend.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/v1/[controller]")]
 [ApiController]
 public class UsersController(
+	IAuthCommandService authCommandService,
 	IUserCommandService userCommandService,
 	IUserQueryService userQueryService,
 	IJwtHelper jwtHelper,
+	IAuthCookieService authCookieService,
 	ILogger<UsersController> logger
 ) : ControllerBase
 {
+	[HttpPost]
+	[AllowAnonymous]
+	public async Task<NoContent> Register([FromBody, Required] RegisterRequest request, CancellationToken ct)
+	{
+		var userAgent = Request.Headers.UserAgent.ToString();
+		var tokens = await authCommandService.RegisterAsync(request.Login, request.Password, userAgent, ct);
+
+		authCookieService.SetAuthCookies(Response, tokens);
+		return TypedResults.NoContent();
+	}
+
 	[HttpGet("me")]
 	public async Task<Results<Ok<UserMeResponse>, NotFound>> GetMe(CancellationToken ct)
 	{
@@ -29,41 +44,16 @@ public class UsersController(
 		return TypedResults.Ok(ApiMapper.ToResponse(user));
 	}
 
-	[HttpGet("telegramToken")]
+	[HttpPost("me/telegramLinkToken")]
 	public async Task<Ok<TelegramTokenResponse>> GenerateTelegramToken(CancellationToken ct)
 	{
 		logger.LogInformation("Generating Telegram token for user");
 
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var token = await userCommandService.GenerateTgLinkAsync(userId, ct);
+
 		var response = new TelegramTokenResponse(token);
 
 		return TypedResults.Ok(response);
-	}
-
-	[ServicePassword]
-	[HttpPost("telegramToken")]
-	public async Task<Accepted> LinkTelegramToken(
-		[FromBody, Required] LinkTelegramRequest request,
-		CancellationToken ct
-	)
-	{
-		logger.LogInformation("Processing Telegram token for user");
-
-		await userCommandService.LinkTelegramAsync(request.TelegramToken, request.TelegramId, ct);
-
-		logger.LogInformation("Telegram token processed successfully");
-		return TypedResults.Accepted(string.Empty);
-	}
-
-	[ServicePassword]
-	[HttpGet("user")]
-	public async Task<Ok<List<UserTelegramResponse>>> GetUsersWithTgLink(CancellationToken ct)
-	{
-		logger.LogInformation("Getting all users with Telegram links");
-
-		var users = await userQueryService.ListTelegramRecipientsAsync(ct);
-
-		return TypedResults.Ok(users.Select(ApiMapper.ToResponse).ToList());
 	}
 }

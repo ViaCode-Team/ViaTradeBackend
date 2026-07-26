@@ -8,23 +8,18 @@ namespace Application.Strategies.Interfaces;
 
 public interface IUserStrategyTradeCodeRepository : IRepository<UserStrategyTradeCode>
 {
-	Task<PageResult<UserStrategyTradeCode>> GetPageByUserAsync(
+	Task<PageResult<TradeStrategy>> GetStrategiesPageByInstrumentAsync(
 		int userId,
-		PageOptions pageOptions,
-		CancellationToken ct = default
-	);
-	Task<PageResult<RelatedTradeStrategyDto>> GetStrategiesPageByTradeCodeAsync(
-		int userId,
-		int tradeCodeId,
+		int instrumentId,
 		StrategyFilter strategyFilter,
 		StrategySort strategySort,
 		PageOptions pageOptions,
 		CancellationToken ct = default
 	);
-	Task<PageResult<RelatedTradeCodeDto>> GetTradeCodesPageByStrategyAsync(
+	Task<PageResult<RelatedInstrumentDto>> GetInstrumentsPageByStrategyAsync(
 		int userId,
 		int strategyId,
-		TradeCodeSort tradeCodeSort,
+		InstrumentSort instrumentSort,
 		PageOptions pageOptions,
 		CancellationToken ct = default
 	);

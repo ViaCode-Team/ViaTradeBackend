@@ -4,5 +4,5 @@ namespace Application.Trades.Interfaces;
 
 public interface ITradeDataBuilder
 {
-	IEnumerable<TradeCodeFile> BuildTradeCodeFiles(IEnumerable<string>? fileNames);
+	IEnumerable<InstrumentFile> BuildInstrumentFiles(IEnumerable<string>? fileNames);
 }

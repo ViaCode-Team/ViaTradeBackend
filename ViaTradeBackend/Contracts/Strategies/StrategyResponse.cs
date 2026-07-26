@@ -1,6 +1,6 @@
-namespace Application.Strategies.Models;
+namespace ViaTradeBackend.Contracts.Strategies;
 
-public record RelatedTradeStrategyDto(
+public record StrategyResponse(
 	int Id,
 	string Name,
 	string? Description,

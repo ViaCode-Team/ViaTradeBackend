@@ -1,8 +1,11 @@
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Infrastructure.Configuration;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using ViaTradeBackend;
 using ViaTradeBackend.Middleware;
+using ViaTradeBackend.Routing;
 using ViaTradeBackend.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,10 +18,14 @@ builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ExceptionHandlingMiddleware>();
 
 builder
-	.Services.AddControllers()
+	.Services.AddControllers(options =>
+		options.Conventions.Add(new RouteTokenTransformerConvention(new CamelCaseRouteTokenTransformer()))
+	)
 	.AddJsonOptions(options =>
 	{
 		options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+		options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+		options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
 	});
 
 builder.Services.Configure<ApiBehaviorOptions>(options =>

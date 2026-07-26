@@ -16,30 +16,19 @@ public interface IStrategyQueryService
 		PageOptions pageOptions,
 		CancellationToken ct
 	);
-	Task<TradeStrategy> GetAsync(int strategyId, CancellationToken ct);
-	Task<RelatedTradeStrategyDto> GetByNameAsync(int userId, string name, CancellationToken ct);
-	Task<PageResult<UserTradeStrategy>> GetUserStrategiesPageAsync(
+	Task<TradeStrategy> GetAsync(int userId, int strategyId, CancellationToken ct);
+	Task<PageResult<TradeStrategy>> GetPageByInstrumentAsync(
 		int userId,
-		PageOptions pageOptions,
-		CancellationToken ct
-	);
-	Task<PageResult<UserStrategyTradeCode>> GetUserStrategyTradeCodesPageAsync(
-		int userId,
-		PageOptions pageOptions,
-		CancellationToken ct
-	);
-	Task<PageResult<RelatedTradeStrategyDto>> GetStrategiesByTradeCodePageAsync(
-		int userId,
-		int tradeCodeId,
+		int instrumentId,
 		StrategyFilter strategyFilter,
 		StrategySort strategySort,
 		PageOptions pageOptions,
 		CancellationToken ct
 	);
-	Task<PageResult<RelatedTradeCodeDto>> GetTradeCodesByStrategyPageAsync(
+	Task<PageResult<RelatedInstrumentDto>> GetInstrumentsByStrategyPageAsync(
 		int userId,
 		int strategyId,
-		TradeCodeSort tradeCodeSort,
+		InstrumentSort instrumentSort,
 		PageOptions pageOptions,
 		CancellationToken ct
 	);

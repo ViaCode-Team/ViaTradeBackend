@@ -1,8 +1,10 @@
-namespace Domain.Models.Trade;
+namespace Application.Trades.Models;
 
-public class TradeCodeFile
+public class InstrumentFileDto
 {
-	public required string TradeCode { get; set; }
+	public required int Id { get; set; }
+
+	public required string Symbol { get; set; }
 
 	public required string TimeFrame { get; set; }
 

@@ -23,27 +23,26 @@ public static class UserPreferencesQueryBuilder
 		return codesQuery.Where(ustc => strategiesQuery.Any(uts => uts.TradeStrategyId == ustc.StrategyId));
 	}
 
-	public static IQueryable<StrategyTradeCodeProjection> ProjectToStrategyAndTradeCode(
+	public static IQueryable<StrategyInstrumentProjection> ProjectToStrategyAndInstrument(
 		this IQueryable<UserStrategyTradeCode> query
 	)
 	{
-		return query.Select(ustc => new StrategyTradeCodeProjection
+		return query.Select(ustc => new StrategyInstrumentProjection
 		{
+			StrategyId = ustc.StrategyId,
 			StrategyName = ustc.TradeStrategy!.Name,
-			TradeCode = ustc.TradeCode!.ExchangeId,
+			InstrumentId = ustc.TradeCodeId,
+			Symbol = ustc.TradeCode!.ExchangeId,
+			Accuracy = ustc.TradeStrategy.Accuracy,
 		});
-	}
-
-	public static Dictionary<string, List<string>> GroupByStrategyName(this List<StrategyTradeCodeProjection> results)
-	{
-		return results
-			.GroupBy(x => x.StrategyName)
-			.ToDictionary(g => g.Key, g => g.Select(x => x.TradeCode).Distinct().ToList());
 	}
 }
 
-public record StrategyTradeCodeProjection
+public record StrategyInstrumentProjection
 {
+	public required int StrategyId { get; init; }
 	public required string StrategyName { get; init; }
-	public required string TradeCode { get; init; }
+	public required int InstrumentId { get; init; }
+	public required string Symbol { get; init; }
+	public int? Accuracy { get; init; }
 }

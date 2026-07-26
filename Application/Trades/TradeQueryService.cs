@@ -62,7 +62,7 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 			source.Price,
 			source.TradeSignal,
 			source.TradeTypeId,
-			source.TradeCode,
+			source.Instrument,
 			source.UserId
 		);
 }

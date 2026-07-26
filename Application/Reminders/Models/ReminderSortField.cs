@@ -5,9 +5,9 @@ namespace Application.Reminders.Models;
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ReminderSortField
 {
-	[JsonStringEnumMemberName("dateTimeAsc")]
-	DateTimeAsc,
+	[JsonStringEnumMemberName("remindAtAsc")]
+	RemindAtAsc,
 
-	[JsonStringEnumMemberName("dateTimeDesc")]
-	DateTimeDesc,
+	[JsonStringEnumMemberName("remindAtDesc")]
+	RemindAtDesc,
 }

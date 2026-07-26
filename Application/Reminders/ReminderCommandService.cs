@@ -7,23 +7,31 @@ namespace Application.Reminders;
 
 public class ReminderCommandService(IReminderRepository reminderRepository, IUnitOfWork uow) : IReminderCommandService
 {
-	public async Task CreateAsync(int userId, int tradeCodeId, string text, DateTime dateTime, CancellationToken ct)
+	public async Task<Reminder> CreateAsync(
+		int userId,
+		int tradeCodeId,
+		string text,
+		DateTime remindAt,
+		CancellationToken ct
+	)
 	{
 		var reminder = new Reminder
 		{
 			TextRemind = text,
-			DateTime = dateTime,
+			DateTime = remindAt,
 			TradeCodeId = tradeCodeId,
 			UserId = userId,
 		};
 
 		await reminderRepository.AddAsync(reminder, ct);
 		await uow.SaveChangesAsync(ct);
+
+		return reminder;
 	}
 
-	public async Task UpdateAsync(int userId, int reminderId, string text, DateTime dateTime, CancellationToken ct)
+	public async Task UpdateAsync(int userId, int reminderId, string text, DateTime remindAt, CancellationToken ct)
 	{
-		int rows = await reminderRepository.ExecuteUpdateForUserAsync(userId, reminderId, text, dateTime, ct);
+		int rows = await reminderRepository.ExecuteUpdateForUserAsync(userId, reminderId, text, remindAt, ct);
 
 		if (rows == 0)
 			throw new NotFoundException("Reminder not found.", "reminder_not_found");

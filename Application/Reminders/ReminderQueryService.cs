@@ -60,8 +60,8 @@ public class ReminderQueryService(IReminderRepository reminderRepository) : IRem
 
 	private static ReminderDto ToDto(ReminderProjectionDto source)
 	{
-		var tradeCode = new TradeCodeBriefDto(source.TradeCodeId, source.TradeCodeTicker, source.TradeCodeName);
+		var instrument = new InstrumentBriefDto(source.TradeCodeId, source.TradeCodeTicker, source.TradeCodeName);
 
-		return new ReminderDto(source.Id, source.Text, source.DateTime, tradeCode, source.UserId);
+		return new ReminderDto(source.Id, source.Text, source.RemindAt, instrument, source.UserId);
 	}
 }

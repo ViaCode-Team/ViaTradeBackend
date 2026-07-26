@@ -5,14 +5,13 @@ using Application.Reminders.Interfaces;
 using Application.Reminders.Models;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using ViaTradeBackend.Attribute;
 using ViaTradeBackend.Contracts.Reminders;
 using ViaTradeBackend.Contracts.Statistics;
 using ViaTradeBackend.Mappings;
 
 namespace ViaTradeBackend.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/v1/[controller]")]
 [ApiController]
 public class RemindersController(
 	IReminderCommandService reminderCommandService,
@@ -29,91 +28,52 @@ public class RemindersController(
 		return TypedResults.Ok(ApiMapper.ToResponse(statistics));
 	}
 
-	[ServicePassword]
-	[HttpGet("byuser/actual")]
-	public async Task<Ok<IEnumerable<ReminderResponse>>> GetDueReminders(CancellationToken ct)
-	{
-		var reminders = await reminderQueryService.ListDueAsync(ct);
-
-		return TypedResults.Ok(reminders.Select(ApiMapper.ToResponse));
-	}
-
-	[ServicePassword]
-	[HttpDelete("byuser/actual/{id}")]
-	public async Task<NoContent> DeleteDueReminder([FromRoute, Required] int id, CancellationToken ct)
-	{
-		await reminderCommandService.DeleteDueAsync(id, ct);
-		return TypedResults.NoContent();
-	}
-
-	[HttpGet("byuser")]
-	public async Task<Ok<PageResult<ReminderResponse>>> GetUserReminders(
+	[HttpGet]
+	public async Task<Ok<PageResult<ReminderResponse>>> GetReminders(
 		[FromQuery] PageOptions pageOptions,
 		[FromQuery] ReminderSort reminderSort,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userReminders = await reminderQueryService.GetPageAsync(userId, pageOptions, reminderSort, ct);
-
-		return TypedResults.Ok(userReminders.Map(ApiMapper.ToResponse));
-	}
-
-	[HttpGet("byuser/instrument/{tradeCodeId}")]
-	public async Task<Ok<PageResult<ReminderResponse>>> GetUserRemindersByInstrument(
-		[FromQuery] PageOptions pageOptions,
-		[FromQuery] ReminderSort reminderSort,
-		[Required, FromRoute] int tradeCodeId,
-		CancellationToken ct
-	)
-	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var reminders = await reminderQueryService.GetPageAsync(userId, tradeCodeId, pageOptions, reminderSort, ct);
+		var reminders = await reminderQueryService.GetPageAsync(userId, pageOptions, reminderSort, ct);
 
 		return TypedResults.Ok(reminders.Map(ApiMapper.ToResponse));
 	}
 
-	[HttpGet("byuser/{id}")]
-	public async Task<Ok<ReminderResponse>> GetUserReminderById([Required] int id, CancellationToken ct)
-	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var reminder = await reminderQueryService.GetAsync(userId, id, ct);
-
-		return TypedResults.Ok(ApiMapper.ToResponse(reminder));
-	}
-
-	[HttpPost("byuser/instrument/{tradeCodeId}")]
-	public async Task<Created> CreateUserRemind(
-		[Required, FromRoute] int tradeCodeId,
-		[FromBody, Required] CreateReminderRequest request,
+	[HttpGet("{reminderId:int}")]
+	public async Task<Ok<ReminderResponse>> GetReminderById(
+		[FromRoute, Range(1, int.MaxValue)] int reminderId,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
+		var reminder = await reminderQueryService.GetAsync(userId, reminderId, ct);
 
-		await reminderCommandService.CreateAsync(userId, tradeCodeId, request.Text, request.DateTime, ct);
-
-		return TypedResults.Created();
+		return TypedResults.Ok(ApiMapper.ToResponse(reminder));
 	}
 
-	[HttpPut("byuser/{id}")]
-	public async Task<NoContent> UpdateUserReminder(
-		[Required, FromRoute] int id,
+	[HttpPut("{reminderId:int}")]
+	public async Task<NoContent> UpdateReminder(
+		[FromRoute, Range(1, int.MaxValue)] int reminderId,
 		[FromBody, Required] UpdateReminderRequest request,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await reminderCommandService.UpdateAsync(userId, id, request.Text, request.DateTime, ct);
+		await reminderCommandService.UpdateAsync(userId, reminderId, request.Text, request.RemindAt, ct);
 
 		return TypedResults.NoContent();
 	}
 
-	[HttpDelete("byuser/{id}")]
-	public async Task<NoContent> DeleteUserReminder([Required, FromRoute] int id, CancellationToken ct)
+	[HttpDelete("{reminderId:int}")]
+	public async Task<NoContent> DeleteReminder(
+		[FromRoute, Range(1, int.MaxValue)] int reminderId,
+		CancellationToken ct
+	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await reminderCommandService.DeleteAsync(userId, id, ct);
+		await reminderCommandService.DeleteAsync(userId, reminderId, ct);
 
 		return TypedResults.NoContent();
 	}

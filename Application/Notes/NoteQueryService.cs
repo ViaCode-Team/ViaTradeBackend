@@ -15,6 +15,12 @@ public class NoteQueryService(INoteRepository noteRepository) : INoteQueryServic
 		return await noteRepository.GetStatisticsAsync(userId, ct);
 	}
 
+	public async Task<Note> GetByIdAsync(int userId, int noteId, CancellationToken ct)
+	{
+		return await noteRepository.FindByIdForUserAsync(userId, noteId, ct)
+			?? throw new NotFoundException("Note not found.", "note_not_found");
+	}
+
 	public async Task<Note> GetAsync(int userId, int relatedId, NoteType noteType, CancellationToken ct)
 	{
 		var existingNote = await noteRepository.FindByTargetAsync(userId, relatedId, noteType, ct);
@@ -39,14 +45,18 @@ public class NoteQueryService(INoteRepository noteRepository) : INoteQueryServic
 
 	private static NoteDto ToDto(NoteProjectionDto source)
 	{
-		TradeCodeBriefDto? tradeCode = null;
+		InstrumentBriefDto? instrument = null;
 		if (source.TradeCodeId.HasValue)
-			tradeCode = new TradeCodeBriefDto(source.TradeCodeId.Value, source.TradeCodeTicker!, source.TradeCodeName);
+			instrument = new InstrumentBriefDto(
+				source.TradeCodeId.Value,
+				source.TradeCodeTicker!,
+				source.TradeCodeName
+			);
 
 		StrategyBriefDto? strategy = null;
 		if (source.StrategyId.HasValue)
 			strategy = new StrategyBriefDto(source.StrategyId.Value, source.StrategyName!, source.StrategyDescription);
 
-		return new NoteDto(source.Id, source.NoteText, source.UserId, tradeCode, strategy);
+		return new NoteDto(source.Id, source.NoteText, source.UserId, instrument, strategy);
 	}
 }

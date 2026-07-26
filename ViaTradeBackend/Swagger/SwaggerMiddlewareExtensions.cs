@@ -11,7 +11,8 @@ public static class SwaggerMiddlewareExtensions
 			app.UseSwagger();
 			app.UseSwaggerUI(options =>
 			{
-				options.SwaggerEndpoint("/swagger/v1/swagger.yaml", "ViaTrade API v1 yaml");
+				options.SwaggerEndpoint("/swagger/v1/swagger.yaml", "ViaTrade Public API v1");
+				options.SwaggerEndpoint("/swagger/internal/swagger.yaml", "ViaTrade Internal API v1");
 
 				options.RoutePrefix = string.Empty;
 				options.ConfigObject.AdditionalItems.Add("withCredentials", true);

@@ -11,7 +11,6 @@ namespace Application.Strategies;
 
 public class StrategyQueryService(
 	ITradeStrategyRepository tradeStrategyRepository,
-	IUserTradeStrategyRepository userTradeStrategyRepository,
 	IUserStrategyTradeCodeRepository userStrategyTradeCodeRepository
 ) : IStrategyQueryService
 {
@@ -51,51 +50,27 @@ public class StrategyQueryService(
 		return await tradeStrategyRepository.GetPageAsync(userId, spec, pageOptions, ct);
 	}
 
-	public async Task<TradeStrategy> GetAsync(int strategyId, CancellationToken ct)
+	public async Task<TradeStrategy> GetAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		var tradeStrategy = await tradeStrategyRepository.FindByIdAsync(strategyId, ct);
+		var tradeStrategy = await tradeStrategyRepository.FindForUserAsync(userId, strategyId, ct);
 		if (tradeStrategy == null)
 			throw new NotFoundException("Strategy not found.", "strategy_not_found");
 
 		return tradeStrategy;
 	}
 
-	public async Task<RelatedTradeStrategyDto> GetByNameAsync(int userId, string name, CancellationToken ct)
-	{
-		return await tradeStrategyRepository.FindByNameAsync(userId, name, ct)
-			?? throw new NotFoundException("Strategy not found.", "strategy_not_found");
-	}
-
-	public async Task<PageResult<UserTradeStrategy>> GetUserStrategiesPageAsync(
+	public async Task<PageResult<TradeStrategy>> GetPageByInstrumentAsync(
 		int userId,
-		PageOptions pageOptions,
-		CancellationToken ct
-	)
-	{
-		return await userTradeStrategyRepository.GetPageByUserAsync(userId, pageOptions, ct);
-	}
-
-	public async Task<PageResult<UserStrategyTradeCode>> GetUserStrategyTradeCodesPageAsync(
-		int userId,
-		PageOptions pageOptions,
-		CancellationToken ct
-	)
-	{
-		return await userStrategyTradeCodeRepository.GetPageByUserAsync(userId, pageOptions, ct);
-	}
-
-	public async Task<PageResult<RelatedTradeStrategyDto>> GetStrategiesByTradeCodePageAsync(
-		int userId,
-		int tradeCodeId,
+		int instrumentId,
 		StrategyFilter strategyFilter,
 		StrategySort strategySort,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		return await userStrategyTradeCodeRepository.GetStrategiesPageByTradeCodeAsync(
+		return await userStrategyTradeCodeRepository.GetStrategiesPageByInstrumentAsync(
 			userId,
-			tradeCodeId,
+			instrumentId,
 			strategyFilter,
 			strategySort,
 			pageOptions,
@@ -103,18 +78,18 @@ public class StrategyQueryService(
 		);
 	}
 
-	public async Task<PageResult<RelatedTradeCodeDto>> GetTradeCodesByStrategyPageAsync(
+	public async Task<PageResult<RelatedInstrumentDto>> GetInstrumentsByStrategyPageAsync(
 		int userId,
 		int strategyId,
-		TradeCodeSort tradeCodeSort,
+		InstrumentSort instrumentSort,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		return await userStrategyTradeCodeRepository.GetTradeCodesPageByStrategyAsync(
+		return await userStrategyTradeCodeRepository.GetInstrumentsPageByStrategyAsync(
 			userId,
 			strategyId,
-			tradeCodeSort,
+			instrumentSort,
 			pageOptions,
 			ct
 		);

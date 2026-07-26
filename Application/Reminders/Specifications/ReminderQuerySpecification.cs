@@ -19,10 +19,10 @@ public class ReminderQuerySpecification : BaseQuerySpecification<Reminder>
 		{
 			switch (field)
 			{
-				case ReminderSortField.DateTimeAsc:
+				case ReminderSortField.RemindAtAsc:
 					AddOrderBy(r => r.DateTime, false);
 					break;
-				case ReminderSortField.DateTimeDesc:
+				case ReminderSortField.RemindAtDesc:
 				default:
 					AddOrderBy(r => r.DateTime, true);
 					break;

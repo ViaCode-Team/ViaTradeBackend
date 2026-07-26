@@ -1,3 +1,6 @@
 namespace Application.Strategies.Models;
 
-public record StrategyFilter(bool? IsActive);
+public class StrategyFilter
+{
+	public string? Name { get; set; }
+}

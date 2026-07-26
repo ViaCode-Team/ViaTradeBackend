@@ -33,13 +33,13 @@ public class TradeFileReader : IFileReader
 		_tradeDataBuilder = tradeDataBuilder;
 	}
 
-	public IEnumerable<TradeCodeFile> GetTradeCodes(TradeDataType dataType, IEnumerable<string>? filterCodes = null)
+	public IEnumerable<InstrumentFile> GetInstruments(TradeDataType dataType, IEnumerable<string>? filterSymbols = null)
 	{
 		var directory = GetPath(dataType);
 		if (!Directory.Exists(directory))
 			yield break;
 
-		var filterSet = filterCodes
+		var filterSet = filterSymbols
 			?.Where(c => !string.IsNullOrWhiteSpace(c))
 			.Select(c => c.ToUpperInvariant())
 			.ToHashSet();
@@ -55,47 +55,47 @@ public class TradeFileReader : IFileReader
 				if (fileName == null)
 					return false;
 
-				var code = ExtractTradeCode(fileName);
-				if (code == null)
+				var symbol = ExtractSymbol(fileName);
+				if (symbol == null)
 					return false;
 
-				return filterSet?.Contains(code) ?? true;
+				return filterSet?.Contains(symbol) ?? true;
 			})
 			.Where(f => f != null)
 			.Cast<string>();
 
 		// Use builder to parse file names into response objects
-		foreach (var response in _tradeDataBuilder.BuildTradeCodeFiles(matchingFiles))
+		foreach (var response in _tradeDataBuilder.BuildInstrumentFiles(matchingFiles))
 		{
 			yield return response;
 		}
 	}
 
-	public IEnumerable<(string TradeCode, T Item)> ReadDataByCodes<T>(
+	public IEnumerable<(string Symbol, T Item)> ReadDataBySymbols<T>(
 		TradeDataType dataType,
-		IEnumerable<string> tradeCodes,
+		IEnumerable<string> symbols,
 		DateTime? startDate = null,
 		DateTime? endDate = null
 	)
 		where T : class
 	{
-		foreach (var code in tradeCodes)
+		foreach (var symbol in symbols)
 		{
-			var filePath = FindFilePathByCode(dataType, code);
+			var filePath = FindFilePathBySymbol(dataType, symbol);
 			if (filePath == null)
 				continue;
 
 			foreach (var item in ReadFile<T>(filePath, startDate, endDate))
 			{
 				// Return code context with each item
-				yield return (code, item);
+				yield return (symbol, item);
 			}
 		}
 	}
 
-	public IEnumerable<(string TradeCode, string StrategyName, T Item)> ReadDataByCodesWithStrategy<T>(
+	public IEnumerable<(string Symbol, string StrategyName, T Item)> ReadDataBySymbolsWithStrategy<T>(
 		TradeDataType dataType,
-		IEnumerable<string> tradeCodes,
+		IEnumerable<string> symbols,
 		DateTime? startDate = null,
 		DateTime? endDate = null
 	)
@@ -105,15 +105,15 @@ public class TradeFileReader : IFileReader
 		if (!Directory.Exists(directory))
 			yield break;
 
-		var tradeCodesSet = tradeCodes
+		var symbolsSet = symbols
 			.Where(c => !string.IsNullOrWhiteSpace(c))
 			.Select(c => c.ToUpperInvariant())
 			.ToHashSet();
 
 		var matchingFiles = Directory
 			.EnumerateFiles(directory, "*.csv")
-			.Select(filePath => new { Path = filePath, Code = ExtractTradeCode(Path.GetFileName(filePath)) })
-			.Where(x => x.Code != null && tradeCodesSet.Contains(x.Code));
+			.Select(filePath => new { Path = filePath, Symbol = ExtractSymbol(Path.GetFileName(filePath)) })
+			.Where(x => x.Symbol != null && symbolsSet.Contains(x.Symbol));
 
 		foreach (var file in matchingFiles)
 		{
@@ -123,7 +123,7 @@ public class TradeFileReader : IFileReader
 
 			foreach (var item in ReadFile<T>(file.Path, startDate, endDate))
 			{
-				yield return (file.Code!, strategyName, item);
+				yield return (file.Symbol!, strategyName, item);
 			}
 		}
 	}
@@ -149,7 +149,7 @@ public class TradeFileReader : IFileReader
 		return path;
 	}
 
-	private static string? ExtractTradeCode(string fileName)
+	private static string? ExtractSymbol(string fileName)
 	{
 		var name = Path.GetFileNameWithoutExtension(fileName);
 		var code = name.Split('_').FirstOrDefault();
@@ -161,13 +161,13 @@ public class TradeFileReader : IFileReader
 		return code.ToUpperInvariant();
 	}
 
-	private string? FindFilePathByCode(TradeDataType dataType, string tradeCode)
+	private string? FindFilePathBySymbol(TradeDataType dataType, string symbol)
 	{
 		var directory = GetPath(dataType);
 		if (!Directory.Exists(directory))
 			return null;
 
-		var prefix = $"{tradeCode.ToUpperInvariant()}_";
+		var prefix = $"{symbol.ToUpperInvariant()}_";
 
 		return Directory
 			.EnumerateFiles(directory, "*.csv")

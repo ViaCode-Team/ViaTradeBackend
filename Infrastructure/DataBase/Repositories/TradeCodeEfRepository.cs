@@ -9,27 +9,27 @@ namespace Infrastructure.DataBase.Repositories;
 
 public class TradeCodeEfRepository(AppDbContext context) : GenericEfRepository<TradeCode>(context), ITradeCodeRepository
 {
-	public async Task<TradeCode?> FindByExchangeIdAsync(string code, CancellationToken ct)
+	public async Task<TradeCode?> FindByTickerAsync(string ticker, CancellationToken ct)
 	{
-		return await _dbSet.Where(e => e.ExchangeId == code).FirstOrDefaultAsync(ct);
+		return await _dbSet.Where(e => e.ExchangeId == ticker).FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<int?> FindIdByExchangeIdAsync(string code, CancellationToken ct)
+	public async Task<int?> FindIdByTickerAsync(string ticker, CancellationToken ct)
 	{
-		return await _dbSet.Where(e => e.ExchangeId == code).Select(e => (int?)e.Id).FirstOrDefaultAsync(ct);
+		return await _dbSet.Where(e => e.ExchangeId == ticker).Select(e => (int?)e.Id).FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<string?> FindExchangeIdByIdAsync(int id, CancellationToken ct)
+	public async Task<string?> FindTickerByIdAsync(int tradeCodeId, CancellationToken ct)
 	{
-		return await _dbSet.Where(e => e.Id == id).Select(e => e.ExchangeId).FirstOrDefaultAsync(ct);
+		return await _dbSet.Where(e => e.Id == tradeCodeId).Select(e => e.ExchangeId).FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<Dictionary<string, int>> GetExchangeIdMapAsync(CancellationToken ct)
+	public async Task<Dictionary<string, int>> GetTradeCodeIdByTickerAsync(CancellationToken ct)
 	{
 		return await _dbSet
-			.Select(tradeCode => new TradeCodeReferenceDto(tradeCode.Id, tradeCode.ExchangeId))
+			.Select(tradeCode => new InstrumentReferenceDto(tradeCode.Id, tradeCode.ExchangeId))
 			.ToDictionaryAsync(
-				tradeCode => tradeCode.ExchangeId,
+				tradeCode => tradeCode.Symbol,
 				tradeCode => tradeCode.Id,
 				StringComparer.OrdinalIgnoreCase,
 				ct
@@ -37,19 +37,27 @@ public class TradeCodeEfRepository(AppDbContext context) : GenericEfRepository<T
 	}
 
 	public async Task<PageResult<TradeCode>> GetPageAsync(
+		InstrumentFilter instrumentFilter,
 		PageOptions pageOptions,
-		TradeCodeSort tradeCodeSort,
+		InstrumentSort instrumentSort,
 		CancellationToken ct
 	)
 	{
-		var query = ApplySort(_dbSet, tradeCodeSort);
+		var query = _dbSet.AsQueryable();
+		if (!string.IsNullOrWhiteSpace(instrumentFilter.Symbol))
+		{
+			var pattern = $"%{instrumentFilter.Symbol}%";
+			query = query.Where(tradeCode => EF.Functions.Like(tradeCode.ExchangeId, pattern));
+		}
+
+		query = ApplySort(query, instrumentSort);
 
 		return await query.ToPagedAsync(pageOptions, ct);
 	}
 
-	private static IQueryable<TradeCode> ApplySort(IQueryable<TradeCode> query, TradeCodeSort tradeCodeSort)
+	private static IQueryable<TradeCode> ApplySort(IQueryable<TradeCode> query, InstrumentSort instrumentSort)
 	{
-		var sortFields = tradeCodeSort.GetEffectiveSortBy();
+		var sortFields = instrumentSort.GetEffectiveSortBy();
 
 		if (sortFields.Count > 0)
 		{
@@ -60,7 +68,7 @@ public class TradeCodeEfRepository(AppDbContext context) : GenericEfRepository<T
 				{
 					orderedQuery = field switch
 					{
-						TradeCodeSortField.NameDesc => query.OrderByDescending(e => e.ExchangeId),
+						InstrumentSortField.SymbolDesc => query.OrderByDescending(e => e.ExchangeId),
 						_ => query.OrderBy(e => e.ExchangeId),
 					};
 				}
@@ -68,7 +76,7 @@ public class TradeCodeEfRepository(AppDbContext context) : GenericEfRepository<T
 				{
 					orderedQuery = field switch
 					{
-						TradeCodeSortField.NameDesc => orderedQuery.ThenByDescending(e => e.ExchangeId),
+						InstrumentSortField.SymbolDesc => orderedQuery.ThenByDescending(e => e.ExchangeId),
 						_ => orderedQuery.ThenBy(e => e.ExchangeId),
 					};
 				}

@@ -5,17 +5,17 @@ namespace Application.Trades.Models;
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum SignalSortField
 {
-	[JsonStringEnumMemberName("dateTimeAsc")]
-	DateTimeAsc,
+	[JsonStringEnumMemberName("signalDateAsc")]
+	SignalDateAsc,
 
-	[JsonStringEnumMemberName("dateTimeDesc")]
-	DateTimeDesc,
+	[JsonStringEnumMemberName("signalDateDesc")]
+	SignalDateDesc,
 
-	[JsonStringEnumMemberName("assetAsc")]
-	AssetAsc,
+	[JsonStringEnumMemberName("symbolAsc")]
+	SymbolAsc,
 
-	[JsonStringEnumMemberName("assetDesc")]
-	AssetDesc,
+	[JsonStringEnumMemberName("symbolDesc")]
+	SymbolDesc,
 
 	[JsonStringEnumMemberName("accuracyAsc")]
 	AccuracyAsc,

@@ -8,8 +8,12 @@ namespace Application.Notes;
 
 public class NoteCommandService(INoteRepository noteRepository, IUnitOfWork uow) : INoteCommandService
 {
-	public async Task AddAsync(int userId, int relatedId, NoteType noteType, string noteText, CancellationToken ct)
+	public async Task UpsertAsync(int userId, int relatedId, NoteType noteType, string noteText, CancellationToken ct)
 	{
+		var affectedRows = await noteRepository.ExecuteUpdateUserNoteAsync(userId, relatedId, noteType, noteText, ct);
+		if (affectedRows != 0)
+			return;
+
 		var note = noteType switch
 		{
 			NoteType.TradeCodeNote => new Note
@@ -41,13 +45,6 @@ public class NoteCommandService(INoteRepository noteRepository, IUnitOfWork uow)
 				&& (noteType == NoteType.TradeCodeNote ? x.TradeCodeId == relatedId : x.TradeStrategyId == relatedId),
 			ct
 		);
-		if (affectedRows == 0)
-			throw new NotFoundException("Note not found.", "note_not_found");
-	}
-
-	public async Task UpdateAsync(int userId, int relatedId, NoteType noteType, string noteText, CancellationToken ct)
-	{
-		var affectedRows = await noteRepository.ExecuteUpdateUserNoteAsync(userId, relatedId, noteType, noteText, ct);
 		if (affectedRows == 0)
 			throw new NotFoundException("Note not found.", "note_not_found");
 	}

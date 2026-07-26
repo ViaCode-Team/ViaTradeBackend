@@ -7,13 +7,9 @@ public class StrategyQuerySpecification : BaseQuerySpecification<TradeStrategy>
 {
 	public StrategyQuerySpecification(int userId, StrategyFilter strategyFilter, StrategySort strategySort)
 	{
-		if (strategyFilter.IsActive is bool isActive)
-		{
-			if (isActive)
-				AddCriteria(x => x.UserTradeStrategies!.Any(uts => uts.UserId == userId));
-			else
-				AddCriteria(x => !x.UserTradeStrategies!.Any(uts => uts.UserId == userId));
-		}
+		AddCriteria(x => x.UserTradeStrategies!.Any(uts => uts.UserId == userId));
+		if (!string.IsNullOrWhiteSpace(strategyFilter.Name))
+			AddCriteria(x => x.Name == strategyFilter.Name);
 
 		var sortFields = strategySort.GetEffectiveSortBy();
 		foreach (var field in sortFields)

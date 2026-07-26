@@ -4,5 +4,5 @@ namespace Application.Reminders.Models;
 
 public record ReminderSort() : Sort<ReminderSortField>
 {
-	protected override List<ReminderSortField> DefaultSortBy => [ReminderSortField.DateTimeDesc];
+	protected override List<ReminderSortField> DefaultSortBy => [ReminderSortField.RemindAtDesc];
 }

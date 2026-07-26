@@ -19,10 +19,10 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 		if (totalNotes == 0)
 			return new NoteStatisticDto(0, 0, 0);
 
-		var stockNotes = await baseQuery.CountAsync(n => n.TradeCodeId != null, ct);
+		var tradeCodeNotes = await baseQuery.CountAsync(n => n.TradeCodeId != null, ct);
 		var strategyNotes = await baseQuery.CountAsync(n => n.TradeStrategyId != null, ct);
 
-		return new NoteStatisticDto(totalNotes, stockNotes, strategyNotes);
+		return new NoteStatisticDto(totalNotes, tradeCodeNotes, strategyNotes);
 	}
 
 	public async Task<PageResult<NoteProjectionDto>> GetPageWithTargetsAsync(
@@ -59,6 +59,14 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 				.FirstOrDefaultAsync(note => note.TradeStrategyId == relatedId && note.UserId == userId, ct),
 			_ => null,
 		};
+
+	public async Task<Note?> FindByIdForUserAsync(int userId, int noteId, CancellationToken ct)
+	{
+		return await _dbSet
+			.Include(note => note.TradeCode)
+			.Include(note => note.TradeStrategy)
+			.FirstOrDefaultAsync(note => note.Id == noteId && note.UserId == userId, ct);
+	}
 
 	public async Task AddUserNoteAsync(
 		int relatedId,

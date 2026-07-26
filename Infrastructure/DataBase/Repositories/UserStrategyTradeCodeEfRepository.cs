@@ -11,18 +11,9 @@ public class UserStrategyTradeCodeEfRepository(AppDbContext context)
 	: GenericEfRepository<UserStrategyTradeCode>(context),
 		IUserStrategyTradeCodeRepository
 {
-	public async Task<PageResult<UserStrategyTradeCode>> GetPageByUserAsync(
+	public async Task<PageResult<TradeStrategy>> GetStrategiesPageByInstrumentAsync(
 		int userId,
-		PageOptions pageOptions,
-		CancellationToken ct
-	)
-	{
-		return await GetPageByAsync(strategyCode => strategyCode.UserId == userId, pageOptions, ct);
-	}
-
-	public async Task<PageResult<RelatedTradeStrategyDto>> GetStrategiesPageByTradeCodeAsync(
-		int userId,
-		int tradeCodeId,
+		int instrumentId,
 		StrategyFilter strategyFilter,
 		StrategySort strategySort,
 		PageOptions pageOptions,
@@ -30,32 +21,26 @@ public class UserStrategyTradeCodeEfRepository(AppDbContext context)
 	)
 	{
 		var query = _dbSet
-			.Where(link => link.UserId == userId && link.TradeCodeId == tradeCodeId)
+			.Where(link => link.UserId == userId && link.TradeCodeId == instrumentId)
 			.Select(link => link.TradeStrategy!);
 
-		query = ApplyStrategyFilter(query, userId, strategyFilter);
-		query = ApplyStrategySort(query, strategySort);
+		if (!string.IsNullOrWhiteSpace(strategyFilter.Name))
+			query = query.Where(strategy => strategy.Name == strategyFilter.Name);
 
-		return await query
-			.Select(strategy => new RelatedTradeStrategyDto(
-				strategy.Id,
-				strategy.Name,
-				strategy.Description,
-				strategy.Accuracy,
-				strategy.SignalFrequency,
-				strategy.InvestmentHorizon,
-				strategy.LogicDesc,
-				strategy.UseDesc,
-				strategy.LimitDesc,
-				strategy.UserTradeStrategies.Any(link => link.UserId == userId)
-			))
-			.ToPagedAsync(pageOptions, ct);
+		query = ApplyStrategySort(query, strategySort);
+		var pagedStrategies = await query.ToPagedAsync(pageOptions, ct);
+
+		return pagedStrategies.Map(strategy =>
+		{
+			strategy.IsActive = true;
+			return strategy;
+		});
 	}
 
-	public async Task<PageResult<RelatedTradeCodeDto>> GetTradeCodesPageByStrategyAsync(
+	public async Task<PageResult<RelatedInstrumentDto>> GetInstrumentsPageByStrategyAsync(
 		int userId,
 		int strategyId,
-		TradeCodeSort tradeCodeSort,
+		InstrumentSort instrumentSort,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
@@ -64,26 +49,43 @@ public class UserStrategyTradeCodeEfRepository(AppDbContext context)
 			.Where(link => link.UserId == userId && link.StrategyId == strategyId)
 			.Select(link => link.TradeCode!);
 
-		query = ApplyTradeCodeSort(query, tradeCodeSort);
+		query = ApplyInstrumentSort(query, instrumentSort);
 
 		return await query
-			.Select(tradeCode => new RelatedTradeCodeDto(tradeCode.Id, tradeCode.ExchangeId, tradeCode.Description))
+			.Select(tradeCode => new RelatedInstrumentDto(tradeCode.Id, tradeCode.ExchangeId, tradeCode.Description))
 			.ToPagedAsync(pageOptions, ct);
 	}
 
-	private static IQueryable<TradeStrategy> ApplyStrategyFilter(
-		IQueryable<TradeStrategy> query,
-		int userId,
-		StrategyFilter strategyFilter
+	private static IQueryable<Domain.TradeCodes.Entities.TradeCode> ApplyInstrumentSort(
+		IQueryable<Domain.TradeCodes.Entities.TradeCode> query,
+		InstrumentSort instrumentSort
 	)
 	{
-		if (strategyFilter.IsActive is not bool isActive)
-			return query;
+		IOrderedQueryable<Domain.TradeCodes.Entities.TradeCode>? orderedQuery = null;
+		foreach (var field in instrumentSort.GetEffectiveSortBy())
+		{
+			if (orderedQuery == null)
+			{
+				orderedQuery = field switch
+				{
+					InstrumentSortField.SymbolDesc => query.OrderByDescending(tradeCode => tradeCode.ExchangeId),
+					_ => query.OrderBy(tradeCode => tradeCode.ExchangeId),
+				};
+			}
+			else
+			{
+				orderedQuery = field switch
+				{
+					InstrumentSortField.SymbolDesc => orderedQuery.ThenByDescending(tradeCode => tradeCode.ExchangeId),
+					_ => orderedQuery.ThenBy(tradeCode => tradeCode.ExchangeId),
+				};
+			}
+		}
 
-		if (isActive)
-			return query.Where(strategy => strategy.UserTradeStrategies.Any(link => link.UserId == userId));
+		if (orderedQuery == null)
+			return query.OrderBy(tradeCode => tradeCode.Id);
 
-		return query.Where(strategy => !strategy.UserTradeStrategies.Any(link => link.UserId == userId));
+		return orderedQuery.ThenBy(tradeCode => tradeCode.Id);
 	}
 
 	private static IQueryable<TradeStrategy> ApplyStrategySort(
@@ -120,37 +122,5 @@ public class UserStrategyTradeCodeEfRepository(AppDbContext context)
 			return query.OrderBy(strategy => strategy.Id);
 
 		return orderedQuery.ThenBy(strategy => strategy.Id);
-	}
-
-	private static IQueryable<Domain.TradeCodes.Entities.TradeCode> ApplyTradeCodeSort(
-		IQueryable<Domain.TradeCodes.Entities.TradeCode> query,
-		TradeCodeSort tradeCodeSort
-	)
-	{
-		IOrderedQueryable<Domain.TradeCodes.Entities.TradeCode>? orderedQuery = null;
-		foreach (var field in tradeCodeSort.GetEffectiveSortBy())
-		{
-			if (orderedQuery == null)
-			{
-				orderedQuery = field switch
-				{
-					TradeCodeSortField.NameDesc => query.OrderByDescending(tradeCode => tradeCode.ExchangeId),
-					_ => query.OrderBy(tradeCode => tradeCode.ExchangeId),
-				};
-			}
-			else
-			{
-				orderedQuery = field switch
-				{
-					TradeCodeSortField.NameDesc => orderedQuery.ThenByDescending(tradeCode => tradeCode.ExchangeId),
-					_ => orderedQuery.ThenBy(tradeCode => tradeCode.ExchangeId),
-				};
-			}
-		}
-
-		if (orderedQuery == null)
-			return query.OrderBy(tradeCode => tradeCode.Id);
-
-		return orderedQuery.ThenBy(tradeCode => tradeCode.Id);
 	}
 }

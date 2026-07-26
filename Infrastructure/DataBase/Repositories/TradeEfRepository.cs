@@ -101,7 +101,7 @@ public class TradeEfRepository(AppDbContext context) : GenericEfRepository<Trade
 			trade.Price,
 			trade.TradeSignal,
 			trade.TradeTypeId,
-			new TradeCodeSummaryDto(trade.TradeCode!.Id, trade.TradeCode.ExchangeId, trade.TradeCode.Description),
+			new InstrumentSummaryDto(trade.TradeCode!.Id, trade.TradeCode.ExchangeId, trade.TradeCode.Description),
 			trade.UserId
 		);
 	}

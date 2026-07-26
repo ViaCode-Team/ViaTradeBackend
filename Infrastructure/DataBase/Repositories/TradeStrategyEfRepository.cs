@@ -33,30 +33,19 @@ public class TradeStrategyEfRepository(AppDbContext context)
 		return strategies.ToDictionary(tradeStrategy => tradeStrategy.Name, tradeStrategy => tradeStrategy.Accuracy);
 	}
 
+	public async Task<TradeStrategy?> FindForUserAsync(int userId, int strategyId, CancellationToken ct)
+	{
+		return await _dbSet.FirstOrDefaultAsync(
+			strategy => strategy.Id == strategyId && strategy.UserTradeStrategies.Any(link => link.UserId == userId),
+			ct
+		);
+	}
+
 	public async Task<int?> FindAccuracyByNameAsync(string name, CancellationToken ct)
 	{
 		return await _dbSet
 			.Where(tradeStrategy => tradeStrategy.Name == name)
 			.Select(tradeStrategy => tradeStrategy.Accuracy)
-			.FirstOrDefaultAsync(ct);
-	}
-
-	public async Task<RelatedTradeStrategyDto?> FindByNameAsync(int userId, string name, CancellationToken ct)
-	{
-		return await _dbSet
-			.Where(strategy => strategy.Name == name)
-			.Select(strategy => new RelatedTradeStrategyDto(
-				strategy.Id,
-				strategy.Name,
-				strategy.Description,
-				strategy.Accuracy,
-				strategy.SignalFrequency,
-				strategy.InvestmentHorizon,
-				strategy.LogicDesc,
-				strategy.UseDesc,
-				strategy.LimitDesc,
-				strategy.UserTradeStrategies.Any(link => link.UserId == userId)
-			))
 			.FirstOrDefaultAsync(ct);
 	}
 

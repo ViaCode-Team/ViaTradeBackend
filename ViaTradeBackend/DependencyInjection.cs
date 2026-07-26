@@ -27,6 +27,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 using ViaTradeBackend.BackgroundServices;
+using ViaTradeBackend.Cookies;
 using ViaTradeBackend.Handler;
 using ViaTradeBackend.OptionsSetup;
 
@@ -44,13 +45,13 @@ public static class DependencyInjection
 
 		services.AddScoped<ITradeCommandService, TradeCommandService>();
 		services.AddScoped<ITradeQueryService, TradeQueryService>();
-		services.AddScoped<ITradeResultsService, TradeResultsService>();
+		services.AddScoped<ISignalQueryService, SignalQueryService>();
 		services.AddScoped<ITradeDataBuilder, TradeDataBuilder>();
 		services.AddScoped<IFileReader, TradeFileReader>();
 
 		services.AddScoped<IStrategyCommandService, StrategyCommandService>();
 		services.AddScoped<IStrategyQueryService, StrategyQueryService>();
-		services.AddScoped<ITradeCodeQueryService, TradeCodeQueryService>();
+		services.AddScoped<IInstrumentQueryService, InstrumentQueryService>();
 
 		services.AddScoped<INoteCommandService, NoteCommandService>();
 		services.AddScoped<INoteQueryService, NoteQueryService>();
@@ -86,6 +87,7 @@ public static class DependencyInjection
 		services.Configure<JwtOptions>(configuration.GetSection("Jwt"));
 		services.Configure<ServiceSecurity>(configuration.GetSection("ServiceSecurity"));
 		services.Configure<AuthCookieOptions>(configuration.GetSection("AuthCookies"));
+		services.AddSingleton<IAuthCookieService, AuthCookieService>();
 
 		services.AddJwtAuthentication();
 		services.AddApplicationAuthorization();

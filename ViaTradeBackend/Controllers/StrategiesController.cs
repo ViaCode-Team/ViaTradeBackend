@@ -1,23 +1,28 @@
 using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
 using Application.Common.Models;
+using Application.Notes.Interfaces;
 using Application.Strategies.Interfaces;
 using Application.Strategies.Models;
 using Application.TradeCodes.Models;
+using Domain.Notes.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using ViaTradeBackend.Contracts.Instruments;
+using ViaTradeBackend.Contracts.Notes;
 using ViaTradeBackend.Contracts.Statistics;
 using ViaTradeBackend.Contracts.Strategies;
-using ViaTradeBackend.Contracts.Trades;
 using ViaTradeBackend.Mappings;
 
 namespace ViaTradeBackend.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/v1/[controller]")]
 [ApiController]
 public class StrategiesController(
 	IStrategyCommandService strategyCommandService,
 	IStrategyQueryService strategyQueryService,
+	INoteCommandService noteCommandService,
+	INoteQueryService noteQueryService,
 	IJwtHelper jwtHelper
 ) : ControllerBase
 {
@@ -31,7 +36,7 @@ public class StrategiesController(
 	}
 
 	[HttpGet]
-	public async Task<Ok<PageResult<TradeStrategyResponse>>> GetStrategies(
+	public async Task<Ok<PageResult<StrategyResponse>>> GetStrategies(
 		[FromQuery] StrategyFilter strategyFilter,
 		[FromQuery] StrategySort strategySort,
 		[FromQuery] PageOptions pageOptions,
@@ -50,116 +55,118 @@ public class StrategiesController(
 		return TypedResults.Ok(pagedStrategies.Map(ApiMapper.ToResponse));
 	}
 
-	[HttpGet("{id}")]
-	public async Task<Ok<TradeStrategyResponse>> GetStrategyById([FromRoute, Required] int id, CancellationToken ct)
-	{
-		var strategy = await strategyQueryService.GetAsync(id, ct);
-		return TypedResults.Ok(ApiMapper.ToResponse(strategy));
-	}
-
-	[HttpGet("byname/{name}")]
-	public async Task<Ok<TradeStrategyResponse>> GetStrategyByName(
-		[FromRoute, Required] string name,
+	[HttpGet("{strategyId:int}")]
+	public async Task<Ok<StrategyResponse>> GetStrategyById(
+		[FromRoute, Range(1, int.MaxValue)] int strategyId,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var strategy = await strategyQueryService.GetByNameAsync(userId, name, ct);
-
+		var strategy = await strategyQueryService.GetAsync(userId, strategyId, ct);
 		return TypedResults.Ok(ApiMapper.ToResponse(strategy));
 	}
 
-	[HttpGet("{strategyId}/stocks")]
-	public async Task<Ok<PageResult<TradeCodeResponse>>> GetStocksByStrategy(
-		[FromRoute, Required] int strategyId,
-		[FromQuery] TradeCodeSort tradeCodeSort,
+	[HttpGet("{strategyId:int}/instruments")]
+	public async Task<Ok<PageResult<InstrumentResponse>>> GetInstrumentsByStrategy(
+		[FromRoute, Range(1, int.MaxValue)] int strategyId,
+		[FromQuery] InstrumentSort instrumentSort,
 		[FromQuery] PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var tradeCodes = await strategyQueryService.GetTradeCodesByStrategyPageAsync(
+		await strategyQueryService.GetAsync(userId, strategyId, ct);
+		var instruments = await strategyQueryService.GetInstrumentsByStrategyPageAsync(
 			userId,
 			strategyId,
-			tradeCodeSort,
+			instrumentSort,
 			pageOptions,
 			ct
 		);
 
-		return TypedResults.Ok(tradeCodes.Map(ApiMapper.ToResponse));
+		return TypedResults.Ok(instruments.Map(ApiMapper.ToResponse));
 	}
 
-	[HttpGet("byuser")]
-	public async Task<Ok<PageResult<UserTradeStrategyResponse>>> GetUserStrategies(
-		[FromQuery] PageOptions pageOptions,
+	[HttpGet("{strategyId:int}/note")]
+	public async Task<Ok<NoteResponse>> GetNote(
+		[FromRoute, Range(1, int.MaxValue)] int strategyId,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userStrategies = await strategyQueryService.GetUserStrategiesPageAsync(userId, pageOptions, ct);
+		var note = await noteQueryService.GetAsync(userId, strategyId, NoteType.TradeStrategyNote, ct);
 
-		return TypedResults.Ok(userStrategies.Map(ApiMapper.ToResponse));
+		return TypedResults.Ok(ApiMapper.ToResponse(note));
 	}
 
-	[HttpGet("codes/byuser")]
-	public async Task<Ok<PageResult<UserStrategyTradeCodeResponse>>> GetUserStrategyCodes(
-		[FromQuery] PageOptions pageOptions,
+	[HttpPut("{strategyId:int}/note")]
+	public async Task<NoContent> UpsertNote(
+		[FromRoute, Range(1, int.MaxValue)] int strategyId,
+		[FromBody, Required] UpdateNoteRequest request,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userStrategyCodes = await strategyQueryService.GetUserStrategyTradeCodesPageAsync(userId, pageOptions, ct);
-
-		return TypedResults.Ok(userStrategyCodes.Map(ApiMapper.ToResponse));
-	}
-
-	[HttpPost("codes/byuser")]
-	public async Task<Created> CreateUserStrategyCode(
-		[FromBody, Required] CreateUserStrategyTradeCodeRequest userStrategyCodeRequest,
-		CancellationToken ct
-	)
-	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await strategyCommandService.CreateCodeAsync(
-			userId,
-			userStrategyCodeRequest.StrategyId,
-			userStrategyCodeRequest.TradeCodeId,
-			ct
-		);
-
-		return TypedResults.Created();
-	}
-
-	[HttpDelete("codes/byuser")]
-	public async Task<NoContent> DeleteUserStrategyCode(
-		[FromQuery, Required] int strategyId,
-		[FromQuery, Required] int tradeCodeId,
-		CancellationToken ct
-	)
-	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await strategyCommandService.DeleteCodeAsync(userId, strategyId, tradeCodeId, ct);
+		await noteCommandService.UpsertAsync(userId, strategyId, NoteType.TradeStrategyNote, request.NoteText, ct);
 
 		return TypedResults.NoContent();
 	}
 
-	[HttpPost("byuser")]
-	public async Task<Created> CreateUserStrategy(
-		[FromBody, Required] CreateUserStrategyRequest userStrategyRequest,
+	[HttpDelete("{strategyId:int}/note")]
+	public async Task<NoContent> DeleteNote([FromRoute, Range(1, int.MaxValue)] int strategyId, CancellationToken ct)
+	{
+		var userId = jwtHelper.GetUserIdFromClaims(User);
+		await noteCommandService.DeleteAsync(userId, strategyId, NoteType.TradeStrategyNote, ct);
+
+		return TypedResults.NoContent();
+	}
+
+	[HttpPut("{strategyId:int}/instruments/{instrumentId:int}")]
+	public async Task<NoContent> AddInstrumentToStrategy(
+		[FromRoute, Range(1, int.MaxValue)] int strategyId,
+		[FromRoute, Range(1, int.MaxValue)] int instrumentId,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await strategyCommandService.CreateAsync(userId, userStrategyRequest.StrategyId, ct);
+		await strategyCommandService.LinkInstrumentAsync(userId, strategyId, instrumentId, ct);
 
-		return TypedResults.Created();
+		return TypedResults.NoContent();
 	}
 
-	[HttpDelete("byuser")]
-	public async Task<NoContent> DeleteUserStrategy([FromQuery, Required] int strategyId, CancellationToken ct)
+	[HttpDelete("{strategyId:int}/instruments/{instrumentId:int}")]
+	public async Task<NoContent> DeleteInstrumentFromStrategy(
+		[FromRoute, Range(1, int.MaxValue)] int strategyId,
+		[FromRoute, Range(1, int.MaxValue)] int instrumentId,
+		CancellationToken ct
+	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await strategyCommandService.DeleteAsync(userId, strategyId, ct);
+		await strategyCommandService.UnlinkInstrumentAsync(userId, strategyId, instrumentId, ct);
+
+		return TypedResults.NoContent();
+	}
+
+	[HttpPut("{strategyId:int}")]
+	public async Task<NoContent> ActivateStrategy(
+		[FromRoute, Range(1, int.MaxValue)] int strategyId,
+		CancellationToken ct
+	)
+	{
+		var userId = jwtHelper.GetUserIdFromClaims(User);
+		await strategyCommandService.ActivateAsync(userId, strategyId, ct);
+
+		return TypedResults.NoContent();
+	}
+
+	[HttpDelete("{strategyId:int}")]
+	public async Task<NoContent> DeactivateStrategy(
+		[FromRoute, Range(1, int.MaxValue)] int strategyId,
+		CancellationToken ct
+	)
+	{
+		var userId = jwtHelper.GetUserIdFromClaims(User);
+		await strategyCommandService.DeactivateAsync(userId, strategyId, ct);
 
 		return TypedResults.NoContent();
 	}

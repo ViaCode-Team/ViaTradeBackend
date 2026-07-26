@@ -49,7 +49,7 @@ public class TradeCommandService(
 			trade.Price,
 			trade.TradeSignal,
 			trade.TradeTypeId,
-			new TradeCodeSummaryDto(tradeCode.Id, tradeCode.ExchangeId, tradeCode.Description),
+			new InstrumentSummaryDto(tradeCode.Id, tradeCode.ExchangeId, tradeCode.Description),
 			trade.UserId
 		);
 	}
