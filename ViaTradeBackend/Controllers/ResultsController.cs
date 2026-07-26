@@ -2,7 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
 using Application.Interfaces;
 using Application.Trades.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Contracts.Statistics;
@@ -12,7 +11,6 @@ namespace ViaTradeBackend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
 public class ResultsController(ITradeResultsService tradeResultsService, IJwtHelper jwtHelper) : ControllerBase
 {
 	[HttpGet("statistics")]
@@ -25,7 +23,7 @@ public class ResultsController(ITradeResultsService tradeResultsService, IJwtHel
 	}
 
 	[HttpGet("strategy")]
-	public async Task<Ok<StrategyResults>> GetStrategyResults(
+	public async Task<Ok<StrategyResultsResponse>> GetStrategyResults(
 		[FromQuery] DateTime? startDate,
 		[FromQuery] DateTime? endTime,
 		[FromQuery] SignalSort signalSort,
@@ -35,11 +33,11 @@ public class ResultsController(ITradeResultsService tradeResultsService, IJwtHel
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var response = await tradeResultsService.GetStrategyResultsAsync(userId, startDate, endTime, signalSort, ct);
 
-		return TypedResults.Ok(response);
+		return TypedResults.Ok(ApiMapper.ToResponse(response));
 	}
 
 	[HttpGet("strategy/{strategyName}/{tradeCode}")]
-	public async Task<Ok<StrategyResults>> GetStrategyResultsByCode(
+	public async Task<Ok<StrategyResultsResponse>> GetStrategyResultsByCode(
 		[FromRoute, Required] string strategyName,
 		[FromRoute, Required] string tradeCode,
 		[FromQuery] DateTime? startDate,
@@ -57,6 +55,6 @@ public class ResultsController(ITradeResultsService tradeResultsService, IJwtHel
 			ct
 		);
 
-		return TypedResults.Ok(response);
+		return TypedResults.Ok(ApiMapper.ToResponse(response));
 	}
 }

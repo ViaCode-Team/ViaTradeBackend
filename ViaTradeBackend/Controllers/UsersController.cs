@@ -1,7 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
 using Application.Users.Interfaces;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Attribute;
@@ -19,7 +18,6 @@ public class UsersController(
 	ILogger<UsersController> logger
 ) : ControllerBase
 {
-	[Authorize]
 	[HttpGet("me")]
 	public async Task<Results<Ok<UserMeResponse>, NotFound>> GetMe(CancellationToken ct)
 	{
@@ -31,7 +29,6 @@ public class UsersController(
 		return TypedResults.Ok(ApiMapper.ToResponse(user));
 	}
 
-	[Authorize]
 	[HttpGet("telegramToken")]
 	public async Task<Ok<TelegramTokenResponse>> GenerateTelegramToken(CancellationToken ct)
 	{

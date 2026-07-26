@@ -5,7 +5,6 @@ using Application.Notes.Models;
 using Application.Reminders.Interfaces;
 using Application.Reminders.Models;
 using Domain.Reminders.Entities;
-using Domain.Strategies.Entities;
 
 namespace Application.Reminders;
 

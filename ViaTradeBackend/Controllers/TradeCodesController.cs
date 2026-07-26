@@ -1,12 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using Application.Auth.Interfaces;
 using Application.Common.Models;
-using Application.TradeCodes.Interfaces;
-using Application.TradeCodes.Models;
 using Application.Strategies.Interfaces;
 using Application.Strategies.Models;
+using Application.TradeCodes.Interfaces;
+using Application.TradeCodes.Models;
 using Domain.Enums;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Contracts.Statistics;
@@ -18,7 +17,6 @@ namespace ViaTradeBackend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
 public class TradeCodesController(
 	ITradeCodeQueryService tradeCodeQueryService,
 	IStrategyQueryService strategyQueryService,

@@ -51,14 +51,12 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 	public async Task<Note?> FindByTargetAsync(int userId, int relatedId, NoteType noteType, CancellationToken ct) =>
 		noteType switch
 		{
-			NoteType.TradeCodeNote => await _dbSet.Include(note => note.TradeCode).FirstOrDefaultAsync(
-				note => note.TradeCodeId == relatedId && note.UserId == userId,
-				ct
-			),
-			NoteType.TradeStrategyNote => await _dbSet.Include(note => note.TradeStrategy).FirstOrDefaultAsync(
-				note => note.TradeStrategyId == relatedId && note.UserId == userId,
-				ct
-			),
+			NoteType.TradeCodeNote => await _dbSet
+				.Include(note => note.TradeCode)
+				.FirstOrDefaultAsync(note => note.TradeCodeId == relatedId && note.UserId == userId, ct),
+			NoteType.TradeStrategyNote => await _dbSet
+				.Include(note => note.TradeStrategy)
+				.FirstOrDefaultAsync(note => note.TradeStrategyId == relatedId && note.UserId == userId, ct),
 			_ => null,
 		};
 

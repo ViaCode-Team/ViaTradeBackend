@@ -28,7 +28,13 @@ public static partial class ApiMapper
 	public static partial UserSessionResponse ToResponse(UserSessionDto source);
 
 	public static NoteResponse ToResponse(Note source) =>
-		new(source.Id, source.NoteText, source.UserId, ToBriefResponse(source.TradeCode), ToBriefResponse(source.TradeStrategy));
+		new(
+			source.Id,
+			source.NoteText,
+			source.UserId,
+			ToBriefResponse(source.TradeCode),
+			ToBriefResponse(source.TradeStrategy)
+		);
 
 	public static NoteResponse ToResponse(NoteDto source) =>
 		new(source.Id, source.NoteText, source.UserId, ToResponse(source.TradeCode), ToResponse(source.Strategy));
@@ -127,6 +133,23 @@ public static partial class ApiMapper
 	public static partial SignalStatisticResponse ToResponse(SignalStatisticDto source);
 
 	public static partial StrategyStatisticResponse ToResponse(StrategyStatisticDto source);
+
+	public static StrategyResultsResponse ToResponse(StrategyResults results)
+	{
+		return new StrategyResultsResponse(
+			results
+				.Strategies.Select(s => new StrategyDataResponse(
+					s.Name,
+					s.Tickers.Select(t => new TickerResultsResponse(
+							t.TradeCode,
+							t.Accuracy,
+							t.Results.Select(r => new StrategyResultResponse(r.Date, r.ClosePrice, r.Signal)).ToList()
+						))
+						.ToList()
+				))
+				.ToList()
+		);
+	}
 
 	public static partial StockStatisticResponse ToResponse(StockStatisticDto source);
 

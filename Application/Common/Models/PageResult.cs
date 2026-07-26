@@ -29,8 +29,7 @@ public sealed class PageResult<T>(IReadOnlyList<T> items, int totalCount, int pa
 
 	public PageResult<TResult> Map<TResult>(Func<T, TResult> mapFunc)
 	{
-		if (mapFunc == null)
-			throw new KeyNotFoundException(nameof(mapFunc));
+		ArgumentNullException.ThrowIfNull(mapFunc);
 
 		return new PageResult<TResult>(Items.Select(mapFunc).ToList(), TotalCount, Page, PageSize);
 	}

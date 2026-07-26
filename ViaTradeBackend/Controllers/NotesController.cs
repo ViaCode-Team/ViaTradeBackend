@@ -4,7 +4,6 @@ using Application.Common.Models;
 using Application.Notes.Interfaces;
 using Application.Notes.Models;
 using Domain.Notes.Enums;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Contracts.Notes;
@@ -15,7 +14,6 @@ namespace ViaTradeBackend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
 public class NotesController(
 	INoteCommandService noteCommandService,
 	INoteQueryService noteQueryService,

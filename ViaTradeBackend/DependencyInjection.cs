@@ -166,14 +166,12 @@ public static class DependencyInjection
 
 	private static IServiceCollection AddApplicationAuthorization(this IServiceCollection services)
 	{
-		services
-			.AddAuthorizationBuilder()
-			.SetDefaultPolicy(
-				new AuthorizationPolicyBuilder()
-					.RequireAuthenticatedUser()
-					.AddRequirements(new ActiveSessionRequirement())
-					.Build()
-			);
+		var defaultPolicy = new AuthorizationPolicyBuilder(JwtBearerDefaults.AuthenticationScheme)
+			.RequireAuthenticatedUser()
+			.AddRequirements(new ActiveSessionRequirement())
+			.Build();
+
+		services.AddAuthorizationBuilder().SetDefaultPolicy(defaultPolicy).SetFallbackPolicy(defaultPolicy);
 
 		services.AddScoped<IAuthorizationHandler, ActiveSessionHandler>();
 

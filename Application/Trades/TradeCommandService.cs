@@ -34,7 +34,9 @@ public class TradeCommandService(
 		await uow.SaveChangesAsync(ct);
 		var tradeCode = await tradeCodeRepository.FindByIdAsync(trade.TradeCodeId, ct);
 		if (tradeCode == null)
-			throw new DataIntegrityException($"Trade code was not found after trade creation. TradeCodeId={trade.TradeCodeId}.");
+			throw new DataIntegrityException(
+				$"Trade code was not found after trade creation. TradeCodeId={trade.TradeCodeId}."
+			);
 
 		return new TradeDto(
 			trade.Id,

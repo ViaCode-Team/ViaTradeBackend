@@ -25,6 +25,7 @@ public class AuthController(
 	private readonly AuthCookieOptions _authCookiOptions = authOptions.Value;
 
 	[HttpPost("login")]
+	[AllowAnonymous]
 	public async Task<NoContent> Login([FromBody, Required] LoginRequest request, CancellationToken ct)
 	{
 		var userAgent = Request.Headers.UserAgent.ToString();
@@ -35,6 +36,7 @@ public class AuthController(
 	}
 
 	[HttpPost("register")]
+	[AllowAnonymous]
 	public async Task<Created> Register([FromBody, Required] RegisterRequest request, CancellationToken ct)
 	{
 		var userAgent = Request.Headers.UserAgent.ToString();
@@ -45,6 +47,7 @@ public class AuthController(
 	}
 
 	[HttpPost("refresh")]
+	[AllowAnonymous]
 	public async Task<NoContent> RefreshToken(CancellationToken ct)
 	{
 		if (!Request.Cookies.TryGetValue(_authCookiOptions.RefreshTokenCookie, out var refreshToken))
@@ -57,7 +60,6 @@ public class AuthController(
 	}
 
 	[HttpPost("logout")]
-	[Authorize]
 	public async Task<NoContent> Logout(CancellationToken ct)
 	{
 		if (Request.Cookies.TryGetValue(_authCookiOptions.RefreshTokenCookie, out var refreshToken))
@@ -72,7 +74,6 @@ public class AuthController(
 	}
 
 	[HttpPost("logout-all")]
-	[Authorize]
 	public async Task<NoContent> LogoutAll(CancellationToken ct)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
@@ -85,7 +86,6 @@ public class AuthController(
 	}
 
 	[HttpGet("sessions")]
-	[Authorize]
 	public async Task<Ok<PageResult<UserSessionResponse>>> GetUserSessions(
 		[FromQuery] PageOptions pageOptions,
 		CancellationToken ct

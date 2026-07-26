@@ -16,7 +16,7 @@ public class TradeResultsService(
 {
 	public async Task<SignalStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		var signals = await GetStrategyResultsAsync(userId, DateTime.UtcNow, null, new SignalSort(), ct);
+		var signals = await GetStrategyResultsAsync(userId, null, null, new SignalSort(), ct);
 
 		var allResults = signals.Strategies.SelectMany(s => s.Tickers).SelectMany(t => t.Results);
 
@@ -106,9 +106,9 @@ public class TradeResultsService(
 	)
 	{
 		var userPreferences = await userTradeStrategyRepository.GetUserPreferencesAsync(userId, ct);
-		var preference = userPreferences.FirstOrDefault(x => x.Key == strategyName);
 
-		if (preference.Key == null || !preference.Value.Contains(tradeCode))
+		bool hasStrategy = userPreferences.TryGetValue(strategyName, out var tradeCodes);
+		if (!hasStrategy || tradeCodes == null || !tradeCodes.Contains(tradeCode))
 			throw new NotFoundException("Strategy result not found.", "strategy_result_not_found");
 
 		var accuracy = await tradeStrategyRepository.FindAccuracyByNameAsync(strategyName, ct);

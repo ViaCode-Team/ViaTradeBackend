@@ -3,7 +3,6 @@ using Application.Auth.Interfaces;
 using Application.Common.Models;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Contracts.Statistics;
@@ -14,7 +13,6 @@ namespace ViaTradeBackend.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
 public class TradesController(
 	ITradeCommandService tradeCommandService,
 	ITradeQueryService tradeQueryService,

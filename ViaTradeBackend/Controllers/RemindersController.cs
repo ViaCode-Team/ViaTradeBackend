@@ -3,7 +3,6 @@ using Application.Auth.Interfaces;
 using Application.Common.Models;
 using Application.Reminders.Interfaces;
 using Application.Reminders.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Attribute;
@@ -21,7 +20,6 @@ public class RemindersController(
 	IJwtHelper jwtHelper
 ) : ControllerBase
 {
-	[Authorize]
 	[HttpGet("statistics")]
 	public async Task<Ok<ReminderStatisticsResponse>> GetReminderStatistics(CancellationToken ct)
 	{
@@ -48,7 +46,6 @@ public class RemindersController(
 		return TypedResults.NoContent();
 	}
 
-	[Authorize]
 	[HttpGet("byuser")]
 	public async Task<Ok<PageResult<ReminderResponse>>> GetUserReminders(
 		[FromQuery] PageOptions pageOptions,
@@ -62,7 +59,6 @@ public class RemindersController(
 		return TypedResults.Ok(userReminders.Map(ApiMapper.ToResponse));
 	}
 
-	[Authorize]
 	[HttpGet("byuser/instrument/{tradeCodeId}")]
 	public async Task<Ok<PageResult<ReminderResponse>>> GetUserRemindersByInstrument(
 		[FromQuery] PageOptions pageOptions,
@@ -77,7 +73,6 @@ public class RemindersController(
 		return TypedResults.Ok(reminders.Map(ApiMapper.ToResponse));
 	}
 
-	[Authorize]
 	[HttpGet("byuser/{id}")]
 	public async Task<Ok<ReminderResponse>> GetUserReminderById([Required] int id, CancellationToken ct)
 	{
@@ -87,7 +82,6 @@ public class RemindersController(
 		return TypedResults.Ok(ApiMapper.ToResponse(reminder));
 	}
 
-	[Authorize]
 	[HttpPost("byuser/instrument/{tradeCodeId}")]
 	public async Task<Created> CreateUserRemind(
 		[Required, FromRoute] int tradeCodeId,
@@ -102,7 +96,6 @@ public class RemindersController(
 		return TypedResults.Created();
 	}
 
-	[Authorize]
 	[HttpPut("byuser/{id}")]
 	public async Task<NoContent> UpdateUserReminder(
 		[Required, FromRoute] int id,
@@ -116,7 +109,6 @@ public class RemindersController(
 		return TypedResults.NoContent();
 	}
 
-	[Authorize]
 	[HttpDelete("byuser/{id}")]
 	public async Task<NoContent> DeleteUserReminder([Required, FromRoute] int id, CancellationToken ct)
 	{

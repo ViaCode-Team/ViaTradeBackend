@@ -1,7 +1,6 @@
 using Application.Common.Interfaces;
 using Application.Common.Models;
 using Application.Notes.Models;
-using Application.Common.Specifications;
 using Application.Reminders.Interfaces;
 using Application.Reminders.Models;
 using Domain.Reminders.Entities;

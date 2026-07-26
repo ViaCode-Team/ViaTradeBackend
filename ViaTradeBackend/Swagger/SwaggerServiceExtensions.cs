@@ -1,4 +1,5 @@
 using System.Reflection;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using ViaTradeBackend.Swagger.Filters;
@@ -38,8 +39,31 @@ public static class SwaggerServiceExtensions
 
 			options.DocumentFilter<ProblemDetailsDocumentFilter>();
 
+			options.AddSecurityDefinition(
+				JwtBearerDefaults.AuthenticationScheme,
+				new OpenApiSecurityScheme
+				{
+					Description = "Write JWT token without the Bearer prefix.",
+					Type = SecuritySchemeType.Http,
+					Scheme = "bearer",
+					BearerFormat = "JWT",
+				}
+			);
+
+			options.AddSecurityDefinition(
+				"ServicePassword",
+				new OpenApiSecurityScheme
+				{
+					Description = "Write service password.",
+					Name = "TgBot-Service-Password",
+					In = ParameterLocation.Header,
+					Type = SecuritySchemeType.ApiKey,
+				}
+			);
+
 			options.OperationFilter<ProblemDetailsOperationFilter>();
 			options.OperationFilter<CamelCaseParameterFilter>();
+			options.OperationFilter<SecurityRequirementsOperationFilter>();
 
 			var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 			var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);

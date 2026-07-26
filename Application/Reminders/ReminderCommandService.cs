@@ -1,7 +1,6 @@
 using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Reminders.Interfaces;
-using Application.TradeCodes.Interfaces;
 using Domain.Reminders.Entities;
 
 namespace Application.Reminders;

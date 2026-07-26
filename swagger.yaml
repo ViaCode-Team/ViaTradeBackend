@@ -564,6 +564,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/Auth/logout-all:
     post:
       tags:
@@ -698,6 +700,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/Auth/sessions:
     get:
       tags:
@@ -853,6 +857,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/Notes/statistics:
     get:
       tags:
@@ -991,6 +997,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/Notes/byuser:
     get:
       tags:
@@ -1150,6 +1158,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   '/api/Notes/byuser/instrument/{tradeCodeId}':
     get:
       tags:
@@ -1295,6 +1305,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
     post:
       tags:
         - Notes
@@ -1447,6 +1459,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
     put:
       tags:
         - Notes
@@ -1599,6 +1613,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
     delete:
       tags:
         - Notes
@@ -1739,6 +1755,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   '/api/Notes/byuser/strategy/{strategyId}':
     get:
       tags:
@@ -1884,6 +1902,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
     post:
       tags:
         - Notes
@@ -2036,6 +2056,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
     put:
       tags:
         - Notes
@@ -2188,6 +2210,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
     delete:
       tags:
         - Notes
@@ -2328,6 +2352,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/Reminders/statistics:
     get:
       tags:
@@ -2466,6 +2492,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/Reminders/byuser/actual:
     get:
       tags:
@@ -2606,6 +2634,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - ServicePassword: [ ]
   '/api/Reminders/byuser/actual/{id}':
     delete:
       tags:
@@ -2747,6 +2777,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - ServicePassword: [ ]
   /api/Reminders/byuser:
     get:
       tags:
@@ -2908,6 +2940,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   '/api/Reminders/byuser/instrument/{tradeCodeId}':
     get:
       tags:
@@ -3075,6 +3109,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
     post:
       tags:
         - Reminders
@@ -3227,6 +3263,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   '/api/Reminders/byuser/{id}':
     get:
       tags:
@@ -3372,6 +3410,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
     put:
       tags:
         - Reminders
@@ -3524,6 +3564,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
     delete:
       tags:
         - Reminders
@@ -3664,6 +3706,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/Results/statistics:
     get:
       tags:
@@ -3802,6 +3846,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/Results/strategy:
     get:
       tags:
@@ -3830,7 +3876,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StrategyResults'
+                $ref: '#/components/schemas/StrategyResultsResponse'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3957,6 +4003,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   '/api/Results/strategy/{strategyName}/{tradeCode}':
     get:
       tags:
@@ -3989,7 +4037,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StrategyResults'
+                $ref: '#/components/schemas/StrategyResultsResponse'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4116,6 +4164,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/Strategies/statistics:
     get:
       tags:
@@ -4254,6 +4304,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/Strategies:
     get:
       tags:
@@ -4419,6 +4471,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   '/api/Strategies/{id}':
     get:
       tags:
@@ -4564,6 +4618,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   '/api/Strategies/byname/{name}':
     get:
       tags:
@@ -4708,6 +4764,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   '/api/Strategies/{strategyId}/stocks':
     get:
       tags:
@@ -4875,6 +4933,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/Strategies/byuser:
     get:
       tags:
@@ -5030,6 +5090,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
     post:
       tags:
         - Strategies
@@ -5175,6 +5237,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
     delete:
       tags:
         - Strategies
@@ -5315,6 +5379,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/Strategies/codes/byuser:
     get:
       tags:
@@ -5470,6 +5536,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
     post:
       tags:
         - Strategies
@@ -5615,6 +5683,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
     delete:
       tags:
         - Strategies
@@ -5761,6 +5831,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/TradeCodes/stocks/statistics:
     get:
       tags:
@@ -5899,6 +5971,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/TradeCodes/stocks:
     get:
       tags:
@@ -6060,6 +6134,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   '/api/TradeCodes/stocks/byticker/{ticker}':
     get:
       tags:
@@ -6204,6 +6280,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   '/api/TradeCodes/stocks/{tradeCodeId}/strategies':
     get:
       tags:
@@ -6375,6 +6453,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/TradeCodes/sys/stocks:
     get:
       tags:
@@ -6515,6 +6595,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   '/api/TradeCodes/sys/stocks/{id}':
     get:
       tags:
@@ -6659,6 +6741,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/Trades/statistics:
     get:
       tags:
@@ -6797,6 +6881,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/Trades/byuser:
     get:
       tags:
@@ -6974,6 +7060,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
     post:
       tags:
         - Trades
@@ -7123,6 +7211,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   '/api/Trades/{id}':
     get:
       tags:
@@ -7268,6 +7358,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   '/api/Trades/byuser/{id}':
     put:
       tags:
@@ -7421,6 +7513,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
     delete:
       tags:
         - Trades
@@ -7561,6 +7655,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/Users/me:
     get:
       tags:
@@ -7687,6 +7783,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/Users/telegramToken:
     get:
       tags:
@@ -7825,6 +7923,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
     post:
       tags:
         - Users
@@ -7970,6 +8070,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - ServicePassword: [ ]
   /api/Users/user:
     get:
       tags:
@@ -8110,6 +8212,8 @@ paths:
                 instance: /api/resource
                 code: error_code
                 traceId: 0HNABC123:00000001
+      security:
+        - ServicePassword: [ ]
 components:
   schemas:
     CreateNoteRequest:
@@ -8472,7 +8576,7 @@ components:
         description:
           type: string
       additionalProperties: false
-    StrategyData:
+    StrategyDataResponse:
       required:
         - name
         - tickers
@@ -8483,9 +8587,9 @@ components:
         tickers:
           type: array
           items:
-            $ref: '#/components/schemas/TickerResults'
+            $ref: '#/components/schemas/TickerResultsResponse'
       additionalProperties: false
-    StrategyResult:
+    StrategyResultResponse:
       required:
         - closePrice
         - date
@@ -8501,7 +8605,7 @@ components:
         signal:
           type: string
       additionalProperties: false
-    StrategyResults:
+    StrategyResultsResponse:
       required:
         - strategies
       type: object
@@ -8509,7 +8613,7 @@ components:
         strategies:
           type: array
           items:
-            $ref: '#/components/schemas/StrategyData'
+            $ref: '#/components/schemas/StrategyDataResponse'
       additionalProperties: false
     StrategySortField:
       enum:
@@ -8543,7 +8647,7 @@ components:
         telegramToken:
           type: string
       additionalProperties: false
-    TickerResults:
+    TickerResultsResponse:
       required:
         - results
         - tradeCode
@@ -8557,7 +8661,7 @@ components:
         results:
           type: array
           items:
-            $ref: '#/components/schemas/StrategyResult'
+            $ref: '#/components/schemas/StrategyResultResponse'
       additionalProperties: false
     TradeCodeBriefResponse:
       required:
@@ -9047,6 +9151,17 @@ components:
           type: number
           format: float
       additionalProperties: false
+  securitySchemes:
+    Bearer:
+      type: http
+      description: Write JWT token without the Bearer prefix.
+      scheme: bearer
+      bearerFormat: JWT
+    ServicePassword:
+      type: apiKey
+      description: Write service password.
+      name: TgBot-Service-Password
+      in: header
 tags:
   - name: Auth
   - name: Notes

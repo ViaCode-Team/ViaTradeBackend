@@ -7,10 +7,16 @@ namespace Domain.Statistics.Services;
 public static class TradeStatisticsCalcService
 {
 	public static Expression<Func<Trade, double>> AbsoluteIncomeExpression =>
-		trade => ((trade.TradeClose ?? 0) - trade.TradeOpen) * trade.Count * (int)trade.TradeSignal;
+		trade =>
+			trade.TradeClose == null
+				? 0
+				: (trade.TradeClose.Value - trade.TradeOpen) * trade.Count * (int)trade.TradeSignal;
 
 	public static Expression<Func<Trade, double>> AbsoluteIncomeAbsExpression =>
-		trade => Math.Abs(((trade.TradeClose ?? 0) - trade.TradeOpen) * trade.Count * (int)trade.TradeSignal);
+		trade =>
+			trade.TradeClose == null
+				? 0
+				: Math.Abs((trade.TradeClose.Value - trade.TradeOpen) * trade.Count * (int)trade.TradeSignal);
 
 	public static double CalculateAbsoluteIncome(Trade trade)
 	{

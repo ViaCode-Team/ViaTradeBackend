@@ -1,5 +1,5 @@
-using Application.Common.Models;
 using Application.Common.Interfaces;
+using Application.Common.Models;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
 using Domain.Entities;
