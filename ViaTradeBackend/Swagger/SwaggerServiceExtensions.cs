@@ -18,7 +18,7 @@ public static class SwaggerServiceExtensions
 				"v1",
 				new OpenApiInfo
 				{
-					Title = "ViaTrade API",
+					Title = "ViaTrade Web API",
 					Version = "v1",
 					Description = "API для платформы инвестиционного анализа ViaTrade",
 				}

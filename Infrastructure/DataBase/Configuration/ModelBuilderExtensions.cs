@@ -17,6 +17,8 @@ internal static class ModelBuilderExtensions
 
 		modelBuilder.Entity<User>().HasIndex(x => x.Login).IsUnique();
 
+		modelBuilder.Entity<User>().HasIndex(x => x.TelegramId).IsUnique();
+
 		modelBuilder.Entity<UserInstrument>().HasIndex(x => new { x.UserId, x.InstrumentId }).IsUnique();
 
 		modelBuilder.Entity<UserStrategy>().HasIndex(x => new { x.UserId, x.StrategyId }).IsUnique();

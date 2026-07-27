@@ -188,10 +188,13 @@ public class TradeFileReader : IFileReader
 
 	private IEnumerable<TradeBar> ReadTradeBars(string filePath, DateTime? startDate, DateTime? endDate)
 	{
-		var lines = File.ReadAllLines(filePath);
-		for (int i = 1; i < lines.Length; i++)
+		using var lines = File.ReadLines(filePath).GetEnumerator();
+		if (!lines.MoveNext())
+			yield break;
+
+		while (lines.MoveNext())
 		{
-			var parts = lines[i].Split(',');
+			var parts = lines.Current.Split(',');
 			if (parts.Length < 6)
 				continue;
 
@@ -213,10 +216,13 @@ public class TradeFileReader : IFileReader
 
 	private IEnumerable<StrategyResult> ReadStrategyResults(string filePath, DateTime? startDate, DateTime? endDate)
 	{
-		var lines = File.ReadAllLines(filePath);
-		for (int i = 1; i < lines.Length; i++)
+		using var lines = File.ReadLines(filePath).GetEnumerator();
+		if (!lines.MoveNext())
+			yield break;
+
+		while (lines.MoveNext())
 		{
-			var parts = lines[i].Split(',');
+			var parts = lines.Current.Split(',');
 			if (parts.Length < 3)
 				continue;
 
@@ -235,15 +241,15 @@ public class TradeFileReader : IFileReader
 
 	private IEnumerable<ScreenerData> ReadScreenerDataInternal(string filePath, DateTime? startDate, DateTime? endDate)
 	{
-		var lines = File.ReadAllLines(filePath);
-		if (lines.Length <= 1)
+		using var lines = File.ReadLines(filePath).GetEnumerator();
+		if (!lines.MoveNext())
 			yield break;
 
-		var headers = lines[0].Split(',').Select(h => h.Trim().ToLower()).ToArray();
+		var headers = lines.Current.Split(',').Select(h => h.Trim().ToLowerInvariant()).ToArray();
 
-		for (int i = 1; i < lines.Length; i++)
+		while (lines.MoveNext())
 		{
-			var parts = lines[i].Split(',');
+			var parts = lines.Current.Split(',');
 			if (parts.Length < 6)
 				continue;
 

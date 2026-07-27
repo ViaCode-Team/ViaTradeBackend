@@ -1,3 +1,5 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ViaTradeBackend.Contracts.Statistics;
 
-public record ReminderStatisticsResponse(int TotalReminders);
+public record ReminderStatisticsResponse([Range(0, int.MaxValue)] int TotalReminders);

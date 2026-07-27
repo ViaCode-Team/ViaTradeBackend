@@ -1,3 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ViaTradeBackend.Contracts.Strategies;
 
-public record StrategyBriefResponse(int Id, string Name, string? Description);
+public record StrategyBriefResponse(
+	[Range(1, int.MaxValue)] int Id,
+	[StringLength(255)] string Name,
+	string? Description
+);

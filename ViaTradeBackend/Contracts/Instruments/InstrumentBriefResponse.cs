@@ -1,3 +1,9 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace ViaTradeBackend.Contracts.Instruments;
 
-public record InstrumentBriefResponse(int Id, string Symbol, string? Name);
+public record InstrumentBriefResponse(
+	[Range(1, int.MaxValue)] int Id,
+	[StringLength(255)] string Symbol,
+	string? Name
+);

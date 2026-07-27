@@ -1,6 +1,6 @@
 openapi: 3.0.4
 info:
-  title: ViaTrade API
+  title: ViaTrade Web API
   description: API для платформы инвестиционного анализа ViaTrade
   version: v1
 paths:
