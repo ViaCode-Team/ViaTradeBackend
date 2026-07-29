@@ -11,4 +11,6 @@ public class UserSessionDto
 	public DateTime CreatedAt { get; set; }
 
 	public DateTime LastSeen { get; set; }
+
+	public DateTime ExpiresAt { get; set; }
 }

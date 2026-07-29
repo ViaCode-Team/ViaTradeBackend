@@ -18,14 +18,14 @@ public record CreateTradeRequest(
 	{
 		if (ClosedAt.HasValue && ClosedAt.Value < OpenedAt)
 			yield return new ValidationResult(
-			"closedAt must be greater than or equal to openedAt.",
-			[nameof(OpenedAt), nameof(ClosedAt)]
-		);
+				"closedAt must be greater than or equal to openedAt.",
+				[nameof(OpenedAt), nameof(ClosedAt)]
+			);
 
 		if (ClosedAt.HasValue != ExitPrice.HasValue)
 			yield return new ValidationResult(
-			"closedAt and exitPrice must either both be specified or both be omitted.",
-			[nameof(ClosedAt), nameof(ExitPrice)]
-		);
+				"closedAt and exitPrice must either both be specified or both be omitted.",
+				[nameof(ClosedAt), nameof(ExitPrice)]
+			);
 	}
 }

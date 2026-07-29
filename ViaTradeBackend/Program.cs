@@ -10,7 +10,7 @@ using ViaTradeBackend.Swagger;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddApplicationLayer();
+builder.Services.AddApplicationLayer(builder.Configuration);
 builder.Services.AddInfrastructureLayer(builder.Configuration);
 builder.Services.AddAuthLayer(builder.Configuration);
 builder.Services.Configure<AnalyzerDataOption>(builder.Configuration.GetSection("AnalyzerData"));

@@ -14,10 +14,12 @@ public class AuthCommandService(
 	IJwtHelper jwtHelper,
 	ISessionRepository sessionRepository,
 	IRefreshTokenRepository refreshTokenRepository,
-	IUnitOfWork uow
+	IUnitOfWork uow,
+	SessionLifetimeOptions sessionLifetimeOptions
 ) : IAuthCommandService
 {
-	private readonly TimeSpan _sessionTtl = TimeSpan.FromDays(7);
+	private readonly TimeSpan _idleSessionLifetime = sessionLifetimeOptions.IdleLifetime;
+	private readonly TimeSpan _absoluteSessionLifetime = sessionLifetimeOptions.AbsoluteLifetime;
 
 	public async Task<AuthTokens> LoginAsync(string login, string password, string userAgent, CancellationToken ct)
 	{
@@ -26,22 +28,25 @@ public class AuthCommandService(
 		if (user == null || !passwordHasher.Verify(password, user.PasswordHash))
 			throw new InvalidCredentialsException();
 
+		var now = DateTime.UtcNow;
 		var sessionId = Guid.NewGuid().ToString();
 		var session = new UserSessionDto
 		{
 			Id = sessionId,
 			UserId = user.Id,
 			UserAgent = userAgent,
-			CreatedAt = DateTime.UtcNow,
-			LastSeen = DateTime.UtcNow,
+			CreatedAt = now,
+			LastSeen = now,
+			ExpiresAt = CalculateExpiresAt(now, now),
 		};
+		var sessionTtl = session.ExpiresAt - now;
 
-		await sessionRepository.CreateAsync(session, _sessionTtl);
+		await sessionRepository.CreateAsync(session, sessionTtl);
 
 		var accessToken = jwtHelper.GenerateAccessToken(new UserTokenDto(user.Id, user.Login), sessionId);
 		var refreshToken = jwtHelper.GenerateRefreshToken();
 
-		await refreshTokenRepository.StoreAsync(sessionId, refreshToken, _sessionTtl);
+		await refreshTokenRepository.StoreAsync(sessionId, refreshToken, sessionTtl);
 
 		return new AuthTokens { AccessToken = accessToken, RefreshToken = refreshToken };
 	}
@@ -81,13 +86,23 @@ public class AuthCommandService(
 		if (user == null)
 			throw new InvalidTokenException();
 
-		session.LastSeen = DateTime.UtcNow;
-		await sessionRepository.CreateAsync(session, _sessionTtl);
+		var now = DateTime.UtcNow;
+		session.LastSeen = now;
+		session.ExpiresAt = CalculateExpiresAt(session.CreatedAt, now);
+		if (session.ExpiresAt <= now)
+		{
+			await refreshTokenRepository.RemoveAsync(sessionId);
+			await sessionRepository.RemoveAsync(sessionId);
+			throw new InvalidTokenException();
+		}
+
+		var sessionTtl = session.ExpiresAt - now;
+		await sessionRepository.CreateAsync(session, sessionTtl);
 
 		var newAccessToken = jwtHelper.GenerateAccessToken(user, sessionId);
 		var newRefreshToken = jwtHelper.GenerateRefreshToken();
 
-		await refreshTokenRepository.RotateAsync(sessionId, newRefreshToken, _sessionTtl);
+		await refreshTokenRepository.RotateAsync(sessionId, newRefreshToken, sessionTtl);
 
 		return new AuthTokens { AccessToken = newAccessToken, RefreshToken = newRefreshToken };
 	}
@@ -108,5 +123,15 @@ public class AuthCommandService(
 		await uow.SaveChangesAsync(ct);
 
 		return await LoginAsync(login, password, userAgent, ct);
+	}
+
+	private DateTime CalculateExpiresAt(DateTime createdAt, DateTime now)
+	{
+		var idleExpiresAt = now.Add(_idleSessionLifetime);
+		var absoluteExpiresAt = createdAt.Add(_absoluteSessionLifetime);
+		if (idleExpiresAt < absoluteExpiresAt)
+			return idleExpiresAt;
+
+		return absoluteExpiresAt;
 	}
 }

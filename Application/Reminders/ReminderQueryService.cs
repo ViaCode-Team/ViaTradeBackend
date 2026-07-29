@@ -1,9 +1,9 @@
 using Application.Common.Exceptions;
 using Application.Common.Models;
-using Application.Common.Specifications;
 using Application.Notes.Models;
 using Application.Reminders.Interfaces;
 using Application.Reminders.Models;
+using Application.Reminders.Specifications;
 using Domain.Entities;
 
 namespace Application.Reminders;

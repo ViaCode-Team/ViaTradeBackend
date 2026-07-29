@@ -1,7 +1,8 @@
+using Application.Common.Specifications;
 using Application.Reminders.Models;
 using Domain.Entities;
 
-namespace Application.Common.Specifications;
+namespace Application.Reminders.Specifications;
 
 public class ReminderQuerySpecification : BaseQuerySpecification<Reminder>
 {

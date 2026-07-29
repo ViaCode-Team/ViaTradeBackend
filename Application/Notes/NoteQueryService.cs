@@ -1,8 +1,8 @@
 using Application.Common.Exceptions;
 using Application.Common.Models;
-using Application.Common.Specifications;
 using Application.Notes.Interfaces;
 using Application.Notes.Models;
+using Application.Notes.Specifications;
 using Domain.Entities;
 using Domain.Enums;
 

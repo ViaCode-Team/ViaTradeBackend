@@ -13,6 +13,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Content Update="appsettings.Development.json">
+			<CopyToPublishDirectory>Never</CopyToPublishDirectory>
+		</Content>
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.10" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.12">
 			<PrivateAssets>all</PrivateAssets>
@@ -40,6 +46,7 @@
 		</PropertyGroup>
 
 		<Exec
+			EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development"
 			IgnoreExitCode="true"
 			Command="dotnet tool run swagger tofile --yaml --output &quot;$(SwaggerOutputPath)&quot; --openapiversion 3.0 &quot;$(TargetPath)&quot; v1"
 			WorkingDirectory="$(ProjectDir)"

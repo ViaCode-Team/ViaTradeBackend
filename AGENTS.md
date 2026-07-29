@@ -27,7 +27,8 @@
 2. **Secure by Default**: Do NOT remove global auth policies or add `[AllowAnonymous]` without explicit permission.
 3. **Data Leaks (DTOs)**: NEVER return raw DB entities. Always use DTOs. Never leak hashes, secrets, or internal states.
 4. **Destructive Safety**: Double-check predicates in `ExecuteDeleteAsync/ExecuteUpdateAsync`. Missing `UserId` filters wipe tables!
-5. **Secrets & DOS**: NEVER hardcode secrets/connection strings. Enforce pagination/limits to prevent resource exhaustion.
+5. **Secrets & DOS**: NEVER hardcode production secrets/connection strings. Enforce pagination/limits to prevent resource exhaustion.
+6. **Configuration**: Keep only shared, non-sensitive defaults in `appsettings.json`; local-only values belong in `appsettings.Development.json`; production secrets and connections must use environment variables or a secret store.
 
 ## C# Coding Guidelines (C# 12+)
 1. **General**: File-scoped namespaces. **`using` directives MUST be placed BEFORE the `namespace` declaration**. Exactly 1 empty line after `using` directives, after `namespace`, between methods, between fields/methods, and at EOF.

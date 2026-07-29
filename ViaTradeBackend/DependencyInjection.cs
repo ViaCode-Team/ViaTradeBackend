@@ -1,5 +1,6 @@
 using Application.Auth;
 using Application.Auth.Interfaces;
+using Application.Auth.Models;
 using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Application.Instruments;
@@ -34,8 +35,26 @@ namespace ViaTradeBackend;
 
 public static class DependencyInjection
 {
-	public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
+	public static IServiceCollection AddApplicationLayer(this IServiceCollection services, IConfiguration configuration)
 	{
+		var authCookieOptions = configuration.GetSection("AuthCookies").Get<AuthCookieOptions>();
+		if (authCookieOptions == null)
+			throw new InvalidOperationException("Auth cookie options are not configured.");
+
+		if (authCookieOptions.RefreshTokenExpiryDays < 1)
+			throw new InvalidOperationException("Refresh token expiry must be at least one day.");
+
+		if (authCookieOptions.AbsoluteSessionLifetimeDays < 1)
+			throw new InvalidOperationException("Absolute session lifetime must be at least one day.");
+
+		services.AddSingleton(
+			new SessionLifetimeOptions
+			{
+				IdleLifetime = TimeSpan.FromDays(authCookieOptions.RefreshTokenExpiryDays),
+				AbsoluteLifetime = TimeSpan.FromDays(authCookieOptions.AbsoluteSessionLifetimeDays),
+			}
+		);
+
 		services.AddScoped<IJwtHelper, JwtHelper>();
 		services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
 

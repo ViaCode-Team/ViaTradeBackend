@@ -10,11 +10,16 @@ namespace Infrastructure.Redis.Repositories;
 public class SessionRedisRepository(IConnectionMultiplexer redis, ILogger<SessionRedisRepository> logger)
 	: ISessionRepository
 {
+	private const int CleanupBatchSize = 1_000;
 	private readonly IDatabase _db = redis.GetDatabase();
 
 	private static string SessionKey(string sessionId) => $"session:{sessionId}";
 
 	private static string UserSessionsKey(int userId) => $"user:sessions:{userId}";
+
+	private static RedisKey SessionExpirationsKey => "sessions:expires";
+
+	private static string ExpirationMember(UserSessionDto session) => $"{session.UserId}:{session.Id}";
 
 	public async Task CreateAsync(UserSessionDto session, TimeSpan ttl)
 	{
@@ -23,6 +28,11 @@ public class SessionRedisRepository(IConnectionMultiplexer redis, ILogger<Sessio
 		var tran = _db.CreateTransaction();
 		var setSession = tran.StringSetAsync(SessionKey(session.Id), json, ttl);
 		var addToUser = tran.SortedSetAddAsync(UserSessionsKey(session.UserId), session.Id, session.CreatedAt.Ticks);
+		var addExpiration = tran.SortedSetAddAsync(
+			SessionExpirationsKey,
+			ExpirationMember(session),
+			session.ExpiresAt.Ticks
+		);
 
 		bool committed = await tran.ExecuteAsync();
 		if (!committed)
@@ -47,6 +57,7 @@ public class SessionRedisRepository(IConnectionMultiplexer redis, ILogger<Sessio
 		var tran = _db.CreateTransaction();
 		var delSession = tran.KeyDeleteAsync(SessionKey(sessionId));
 		var removeFromUser = tran.SortedSetRemoveAsync(UserSessionsKey(session.UserId), sessionId);
+		var removeExpiration = tran.SortedSetRemoveAsync(SessionExpirationsKey, ExpirationMember(session));
 
 		bool committed = await tran.ExecuteAsync();
 		if (!committed)
@@ -115,71 +126,66 @@ public class SessionRedisRepository(IConnectionMultiplexer redis, ILogger<Sessio
 		return new PageResult<UserSessionDto>(result, (int)totalCount, pageOptions.Page, pageOptions.PageSize);
 	}
 
-	// Cleaning old records from User`s Session SET <user:sessions:{userId}>
-
-	public async Task<int> CleanupExpiredSessionsAsync(DateTime threshold)
+	public async Task<int> CleanupExpiredSessionsAsync(DateTime utcNow)
 	{
-		var server = _db.Multiplexer.GetServer(_db.Multiplexer.GetEndPoints()[0]);
-		var userKeys = server.Keys(pattern: "user:sessions:*", pageSize: 1000);
-
 		int totalDeleted = 0;
-		var thresholdTicks = threshold.Ticks;
+		var expiredSessions = await _db.SortedSetRangeByScoreWithScoresAsync(
+			SessionExpirationsKey,
+			double.NegativeInfinity,
+			utcNow.Ticks,
+			Exclude.None,
+			Order.Ascending,
+			0,
+			CleanupBatchSize
+		);
 
-		foreach (var userKey in userKeys)
+		foreach (var expiredSession in expiredSessions)
 		{
-			var expiredSessionIds = await _db.SortedSetRangeByScoreAsync(
-				userKey,
-				double.NegativeInfinity,
-				thresholdTicks
-			);
-
-			if (expiredSessionIds.Length == 0)
-				continue;
-
-			foreach (var sessionId in expiredSessionIds)
+			if (!TryParseExpirationMember(expiredSession.Element, out var userId, out var sessionId))
 			{
-				if (string.IsNullOrEmpty(sessionId))
-					continue;
+				await _db.SortedSetRemoveAsync(SessionExpirationsKey, expiredSession.Element);
+				totalDeleted++;
+				continue;
+			}
 
-				try
-				{
-					string idString = sessionId.ToString();
-					var sessionValue = await _db.StringGetAsync(SessionKey(idString));
-					if (!sessionValue.IsNullOrEmpty)
-					{
-						await _db.KeyDeleteAsync(SessionKey(idString));
-					}
+			try
+			{
+				var transaction = _db.CreateTransaction();
+				transaction.AddCondition(Condition.KeyNotExists(SessionKey(sessionId)));
+				transaction.AddCondition(
+					Condition.SortedSetEqual(SessionExpirationsKey, expiredSession.Element, expiredSession.Score)
+				);
+				var removeExpiration = transaction.SortedSetRemoveAsync(SessionExpirationsKey, expiredSession.Element);
+				var removeFromUser = transaction.SortedSetRemoveAsync(UserSessionsKey(userId), sessionId);
 
-					await _db.SortedSetRemoveAsync(userKey, sessionId);
-
+				if (await transaction.ExecuteAsync())
 					totalDeleted++;
-				}
-				catch (Exception exception)
-				{
-					logger.LogWarning(
-						exception,
-						"Unable to remove expired session: SessionId={SessionId}, UserSessionsKey={UserSessionsKey}",
-						sessionId,
-						userKey
-					);
-				}
+			}
+			catch (Exception exception)
+			{
+				logger.LogWarning(
+					exception,
+					"Unable to remove expired session index: SessionId={SessionId}, UserId={UserId}",
+					sessionId,
+					userId
+				);
 			}
 		}
 
 		return totalDeleted;
 	}
 
-	public IReadOnlyList<int> ListUserIds()
+	private static bool TryParseExpirationMember(RedisValue value, out int userId, out string sessionId)
 	{
-		var server = _db.Multiplexer.GetServer(_db.Multiplexer.GetEndPoints()[0]);
-		var keys = server.Keys(pattern: "user:sessions:*", pageSize: 10000);
-
-		List<int> ids = [];
-		foreach (var key in keys)
+		var parts = value.ToString().Split(':', 2);
+		if (parts.Length == 2 && int.TryParse(parts[0], out userId) && !string.IsNullOrWhiteSpace(parts[1]))
 		{
-			if (int.TryParse(key.ToString().Split(':').Last(), out var userId))
-				ids.Add(userId);
+			sessionId = parts[1];
+			return true;
 		}
-		return ids;
+
+		userId = default;
+		sessionId = string.Empty;
+		return false;
 	}
 }

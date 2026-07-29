@@ -7,4 +7,6 @@ public class AuthCookieOptions
 	public required string RefreshTokenCookie { get; set; }
 
 	public int RefreshTokenExpiryDays { get; set; }
+
+	public int AbsoluteSessionLifetimeDays { get; set; } = 30;
 }

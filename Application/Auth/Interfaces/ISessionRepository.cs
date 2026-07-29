@@ -10,6 +10,5 @@ public interface ISessionRepository
 	Task RemoveAsync(string sessionId);
 	Task<IReadOnlyList<UserSessionDto>> ListByUserAsync(int userId);
 	Task<PageResult<UserSessionDto>> GetPageByUserAsync(int userId, PageOptions pageOptions);
-	IReadOnlyList<int> ListUserIds();
-	Task<int> CleanupExpiredSessionsAsync(DateTime threshold);
+	Task<int> CleanupExpiredSessionsAsync(DateTime utcNow);
 }

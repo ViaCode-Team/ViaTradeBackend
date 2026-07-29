@@ -1,10 +1,10 @@
 using Application.Common.Exceptions;
 using Application.Common.Models;
-using Application.Common.Specifications;
 using Application.Instruments.Models;
 using Application.Notes.Models;
 using Application.Strategies.Interfaces;
 using Application.Strategies.Models;
+using Application.Strategies.Specifications;
 using Domain.Entities;
 
 namespace Application.Strategies;

@@ -1,8 +1,9 @@
+using Application.Common.Specifications;
 using Application.Notes.Models;
 using Domain.Entities;
 using Domain.Enums;
 
-namespace Application.Common.Specifications;
+namespace Application.Notes.Specifications;
 
 public class NoteQuerySpecification : BaseQuerySpecification<Note>
 {

@@ -1,8 +1,9 @@
+using Application.Common.Specifications;
 using Application.Trades.Models;
 using Domain.Entities;
 using Domain.Enums;
 
-namespace Application.Common.Specifications;
+namespace Application.Trades.Specifications;
 
 public class TradeQuerySpecification : BaseQuerySpecification<Trade>
 {

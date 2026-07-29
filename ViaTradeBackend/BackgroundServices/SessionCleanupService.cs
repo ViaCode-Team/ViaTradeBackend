@@ -1,17 +1,10 @@
 using Application.Auth.Interfaces;
-using Infrastructure.Configuration;
-using Microsoft.Extensions.Options;
 
 namespace ViaTradeBackend.BackgroundServices;
 
-public class SessionCleanupService(
-	IServiceProvider services,
-	ILogger<SessionCleanupService> logger,
-	IOptions<AuthCookieOptions> options
-) : BackgroundService
+public class SessionCleanupService(IServiceProvider services, ILogger<SessionCleanupService> logger) : BackgroundService
 {
-	private readonly TimeSpan _cleanupInterval = TimeSpan.FromHours(24);
-	private readonly int _sessionLifetimeDays = options.Value.RefreshTokenExpiryDays;
+	private readonly TimeSpan _cleanupInterval = TimeSpan.FromMinutes(5);
 
 	protected override async Task ExecuteAsync(CancellationToken stoppingToken)
 	{
@@ -21,18 +14,16 @@ public class SessionCleanupService(
 		{
 			try
 			{
-				await Task.Delay(_cleanupInterval, stoppingToken);
-
 				using var scope = services.CreateScope();
 
 				var sessionRepo = scope.ServiceProvider.GetRequiredService<ISessionRepository>();
 
-				var threshold = DateTime.UtcNow.AddDays(-_sessionLifetimeDays);
-				logger.LogInformation("Starting cleanup: sessions older than {Threshold}", threshold);
+				var deletedCount = await sessionRepo.CleanupExpiredSessionsAsync(DateTime.UtcNow);
 
-				var deletedCount = await sessionRepo.CleanupExpiredSessionsAsync(threshold);
+				if (deletedCount > 0)
+					logger.LogInformation("Session cleanup removed {Count} expired session indexes", deletedCount);
 
-				logger.LogInformation("Cleanup finished: removed {Count} expired sessions", deletedCount);
+				await Task.Delay(_cleanupInterval, stoppingToken);
 			}
 			catch (OperationCanceledException)
 			{
@@ -41,6 +32,7 @@ public class SessionCleanupService(
 			catch (Exception ex)
 			{
 				logger.LogError(ex, "Error during cleanup cycle");
+				await Task.Delay(_cleanupInterval, stoppingToken);
 			}
 		}
 	}

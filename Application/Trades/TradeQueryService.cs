@@ -1,8 +1,8 @@
 using Application.Common.Exceptions;
 using Application.Common.Models;
-using Application.Common.Specifications;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
+using Application.Trades.Specifications;
 using Domain.Services;
 
 namespace Application.Trades;

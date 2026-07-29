@@ -1,7 +1,8 @@
+using Application.Common.Specifications;
 using Application.Strategies.Models;
 using Domain.Entities;
 
-namespace Application.Common.Specifications;
+namespace Application.Strategies.Specifications;
 
 public class StrategyQuerySpecification : BaseQuerySpecification<Strategy>
 {
