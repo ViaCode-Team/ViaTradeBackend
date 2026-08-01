@@ -12,6 +12,9 @@
 3. **User Edits**: Respect manual user code changes. Ask before reverting user-authored code.
 4. **Proactive Rules**: Propose `AGENTS.md` updates if users repeatedly ask for specific behaviors.
 5. **Complete Refactoring & Dead Code Removal**: When replacing an existing feature, property, or logic with a new implementation, you MUST thoroughly search for and delete the old, superseded code across the entire codebase. Never leave the old implementation alongside the new one, as it creates confusion and technical debt.
+6. **Explicit Change Scope**: Implement only items the user explicitly asks to change. When the user asks how to address a finding, explain the approach without modifying code unless they clearly request the implementation. Do not combine explanatory questions with implementation work by assumption.
+7. **Exception Ownership**: Repositories must not throw business exceptions. Keep data access errors technical in repositories; services must evaluate business conditions and throw domain-specific exceptions.
+8. **Generated Files**: Never create or edit migrations, model snapshots, or other generated files manually. Use the relevant official generator and include its output unchanged.
 
 ## Mandatory Agent Workflow
 1. **Build Verification**: After making ANY code changes, you MUST run `dotnet build` to verify the project compiles without errors.
@@ -24,11 +27,23 @@
 2. **Secure by Default**: Do NOT remove global auth policies or add `[AllowAnonymous]` without explicit permission.
 3. **Data Leaks (DTOs)**: NEVER return raw DB entities. Always use DTOs. Never leak hashes, secrets, or internal states.
 4. **Destructive Safety**: Double-check predicates in `ExecuteDeleteAsync/ExecuteUpdateAsync`. Missing `UserId` filters wipe tables!
-5. **Secrets & DOS**: NEVER hardcode secrets/connection strings. Enforce pagination/limits to prevent resource exhaustion.
+5. **Secrets & DOS**: NEVER hardcode production secrets/connection strings. Enforce pagination/limits to prevent resource exhaustion.
+6. **Configuration**: Keep only shared, non-sensitive defaults in `appsettings.json`; local-only values belong in `appsettings.Development.json`; production secrets and connections must use environment variables or a secret store.
 
 ## C# Coding Guidelines (C# 12+)
-1. **General**: File-scoped namespaces. Exactly 1 empty line after `namespace`, `using` directives, between methods, between fields/methods, and at EOF.
+1. **General**: File-scoped namespaces. **`using` directives MUST be placed BEFORE the `namespace` declaration**. Exactly 1 empty line after `using` directives, after `namespace`, between methods, between fields/methods, and at EOF.
 2. **Fields/Blocks**: Group related fields (NO empty lines between them). Use empty lines between execution stages (e.g. validation -> save -> return).
 3. **Syntax Constraints**: Use modern syntax (switch expressions). NO ternary operators (`? :`); use `if/else` or `switch`. NO spread collections `[..]` for fluent methods (prefer `.ToList()`). Regular collections `[]` allowed.
 4. **Clean Code**: Avoid unnecessary braces for single-line statements. Comments must be minimal, in English, and only for highly complex code.
 5. **Entity Framework**: The DbContext is globally configured with `QueryTrackingBehavior.NoTracking`. All read operations are untracked by default. DO NOT add `.AsNoTracking()` explicitly. When updating entities using `SaveChangesAsync()`, you MUST explicitly call `_dbSet.Update(entity)` beforehand. Prefer `ExecuteUpdateAsync/ExecuteDeleteAsync` where possible.
+
+## Method Naming
+
+- `Find...Async`: nullable result when absence is expected.
+- `Get...Async`: required result; services throw `NotFoundException` only when required by business rules.
+- `List...Async`: unpaged collection.
+- `Get...PageAsync`: paged result.
+- Overload only identical operations with the same result; extra parameters may only refine the query. Different operations require distinct names.
+- Repositories access/persist data; services apply business rules.
+- Prefix direct bulk operations with `Execute`: `ExecuteUpdate...Async`, `ExecuteDelete...Async`.
+- Parameter order: `userId`, primary ID, related IDs, required parameters, optional parameters, filters, paging, sorting, `CancellationToken`.

@@ -1,21 +1,21 @@
-using Application.Interfaces.Utils;
-using Domain.Models.TradeLogic;
 using System.Globalization;
 using System.Text.RegularExpressions;
+using Application.Trades.Interfaces;
+using Domain.Models.Trade;
 
 namespace Infrastructure.Utils;
 
 public class TradeDataBuilder : ITradeDataBuilder
 {
-	// Pattern: {TradeCode}_{TimeFrame}_{StartDate}_{EndDate}.csv
-	// TimeFrame может содержать цифры (HOUR_1), поэтому используем нежадный захват .*?
+	// Pattern: {Symbol}_{TimeFrame}_{StartDate}_{EndDate}.csv
+	// TimeFrame can contain numbers (e.g., HOUR_1), so use non-greedy capture .*?
 
 	private static readonly Regex FileNameRegex = new(
-		@"^(?<TradeCode>[A-Z0-9]+)_(?<TimeFrame>.*?)_(?<Start>\d{4}-\d{2}-\d{2})_(?<End>\d{4}-\d{2}-\d{2})_?\.csv$",
+		@"^(?<Symbol>[A-Z0-9]+)_(?<TimeFrame>.*?)_(?<Start>\d{4}-\d{2}-\d{2})_(?<End>\d{4}-\d{2}-\d{2})_?\.csv$",
 		RegexOptions.Compiled | RegexOptions.IgnoreCase
 	);
 
-	public IEnumerable<TradeCodeFile> BuildFileTradeResonse(IEnumerable<string>? fileNames)
+	public IEnumerable<InstrumentFile> BuildInstrumentFiles(IEnumerable<string>? fileNames)
 	{
 		if (fileNames == null)
 		{
@@ -32,7 +32,7 @@ public class TradeDataBuilder : ITradeDataBuilder
 		}
 	}
 
-	private static bool TryParseFileName(string fileName, out TradeCodeFile result)
+	private static bool TryParseFileName(string fileName, out InstrumentFile result)
 	{
 		result = null!;
 
@@ -44,23 +44,27 @@ public class TradeDataBuilder : ITradeDataBuilder
 			return false;
 
 		// Try to parse dates with invariant culture to avoid locale issues
-		if (!DateTime.TryParseExact(
+		if (
+			!DateTime.TryParseExact(
 				match.Groups["Start"].Value,
 				"yyyy-MM-dd",
 				CultureInfo.InvariantCulture,
 				DateTimeStyles.None,
-				out var startDate) ||
-			!DateTime.TryParseExact(
+				out var startDate
+			)
+			|| !DateTime.TryParseExact(
 				match.Groups["End"].Value,
 				"yyyy-MM-dd",
 				CultureInfo.InvariantCulture,
 				DateTimeStyles.None,
-				out var endDate))
+				out var endDate
+			)
+		)
 			return false;
 
-		result = new TradeCodeFile
+		result = new InstrumentFile
 		{
-			TradeCode = match.Groups["TradeCode"].Value.ToUpperInvariant(),
+			Symbol = match.Groups["Symbol"].Value.ToUpperInvariant(),
 			TimeFrame = match.Groups["TimeFrame"].Value,
 			StartDate = startDate,
 			EndDate = endDate,

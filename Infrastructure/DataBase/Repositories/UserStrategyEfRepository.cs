@@ -1,0 +1,37 @@
+using Application.Strategies.Interfaces;
+using Application.Trades.Models;
+using Domain.Entities;
+using Infrastructure.Utils;
+using Microsoft.EntityFrameworkCore;
+
+namespace Infrastructure.DataBase.Repositories;
+
+public class UserStrategyEfRepository(AppDbContext context)
+	: GenericEfRepository<UserStrategy>(context),
+		IUserStrategyRepository
+{
+	public async Task<int> CountByUserAsync(int userId, CancellationToken ct)
+	{
+		return await _dbSet.CountAsync(e => e.UserId == userId, ct);
+	}
+
+	public async Task<List<SignalSourceDto>> ListSignalSourcesAsync(int userId, CancellationToken ct)
+	{
+		var userCodesQuery = _context.GetUserCodesQuery(userId);
+		var allowedStrategiesQuery = _context.GetAllowedStrategiesQuery(userId);
+		var projections = await userCodesQuery
+			.FilterByAllowedStrategies(allowedStrategiesQuery)
+			.ProjectToStrategyAndInstrument()
+			.ToListAsync(ct);
+
+		return projections
+			.Select(source => new SignalSourceDto(
+				source.StrategyId,
+				source.StrategyName,
+				source.InstrumentId,
+				source.Symbol,
+				source.Accuracy
+			))
+			.ToList();
+	}
+}

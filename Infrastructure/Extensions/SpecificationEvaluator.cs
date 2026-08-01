@@ -1,5 +1,5 @@
-using Domain.Entities.DataBase;
-using Domain.Interfaces;
+using Application.Common.Interfaces;
+using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Extensions;
@@ -8,7 +8,9 @@ public static class SpecificationEvaluator
 {
 	public static IQueryable<TEntity> GetQuery<TEntity>(
 		IQueryable<TEntity> query,
-		IQuerySpecification<TEntity> specification) where TEntity : BaseEntity
+		IQuerySpecification<TEntity> specification
+	)
+		where TEntity : BaseEntity<int>
 	{
 		query = ApplyCriteria(query, specification);
 		query = ApplyIncludes(query, specification);
@@ -22,7 +24,9 @@ public static class SpecificationEvaluator
 
 	private static IQueryable<TEntity> ApplyCriteria<TEntity>(
 		IQueryable<TEntity> query,
-		IQuerySpecification<TEntity> specification) where TEntity : BaseEntity
+		IQuerySpecification<TEntity> specification
+	)
+		where TEntity : BaseEntity<int>
 	{
 		foreach (var criterion in specification.Criteria)
 			query = query.Where(criterion);
@@ -32,7 +36,9 @@ public static class SpecificationEvaluator
 
 	private static IQueryable<TEntity> ApplyIncludes<TEntity>(
 		IQueryable<TEntity> query,
-		IQuerySpecification<TEntity> specification) where TEntity : BaseEntity
+		IQuerySpecification<TEntity> specification
+	)
+		where TEntity : BaseEntity<int>
 	{
 		foreach (var include in specification.Includes)
 			query = query.Include(include);
@@ -42,28 +48,34 @@ public static class SpecificationEvaluator
 
 	private static IQueryable<TEntity> ApplySorting<TEntity>(
 		IQueryable<TEntity> query,
-		IQuerySpecification<TEntity> specification) where TEntity : BaseEntity
+		IQuerySpecification<TEntity> specification
+	)
+		where TEntity : BaseEntity<int>
 	{
 		if (specification.SortExpressions.Count == 0)
 			return query;
 
-		var firstSort = specification.SortExpressions[0];
 		IOrderedQueryable<TEntity> orderedQuery;
 
-		if (firstSort.IsDescending)
-			orderedQuery = query.OrderByDescending(firstSort.KeySelector);
+		var (FirstKeySelector, FirstIsDescending) = specification.SortExpressions[0];
+		if (FirstIsDescending)
+			orderedQuery = query.OrderByDescending(FirstKeySelector);
 		else
-			orderedQuery = query.OrderBy(firstSort.KeySelector);
+			orderedQuery = query.OrderBy(FirstKeySelector);
 
-		return specification.SortExpressions
-			.Skip(1)
-			.Aggregate(orderedQuery,
-				(current, sort) =>
+		var sortedQuery = specification
+			.SortExpressions.Skip(1)
+			.Aggregate(
+				orderedQuery,
+				(current, sortExpression) =>
 				{
-					if (sort.IsDescending)
-						return current.ThenByDescending(sort.KeySelector);
+					if (sortExpression.IsDescending)
+						return current.ThenByDescending(sortExpression.KeySelector);
 
-					return current.ThenBy(sort.KeySelector);
-				});
+					return current.ThenBy(sortExpression.KeySelector);
+				}
+			);
+
+		return sortedQuery.ThenBy(entity => entity.Id);
 	}
 }

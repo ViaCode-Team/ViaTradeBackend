@@ -1,6 +1,6 @@
-using Application.Interfaces.Repositories.Redis;
-using Microsoft.AspNetCore.Authorization;
 using System.IdentityModel.Tokens.Jwt;
+using Application.Auth.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ViaTradeBackend.Handler;
 
@@ -8,21 +8,20 @@ public class ActiveSessionRequirement : IAuthorizationRequirement { }
 
 public class ActiveSessionHandler(ISessionRepository sessionRepository) : AuthorizationHandler<ActiveSessionRequirement>
 {
-	private readonly ISessionRepository _sessionRepository = sessionRepository;
-
 	protected override async Task HandleRequirementAsync(
 		AuthorizationHandlerContext context,
-		ActiveSessionRequirement requirement)
+		ActiveSessionRequirement requirement
+	)
 	{
-		var sessionId = context.User.Claims
-			.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value;
+		var sessionId = context.User.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti)?.Value;
+
 		if (string.IsNullOrEmpty(sessionId))
 		{
 			context.Fail();
 			return;
 		}
 
-		var session = await _sessionRepository.GetAsync(sessionId);
+		var session = await sessionRepository.FindByIdAsync(sessionId);
 		if (session == null)
 		{
 			context.Fail();

@@ -1,16 +1,16 @@
-using Domain.Models.ConfigOptions;
+using System.Text;
+using Infrastructure.Configuration;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 
 namespace ViaTradeBackend.OptionsSetup;
 
-public class JwtBearerOptionsSetup(IOptions<JwtOptions> jwtOptions, IOptions<AuthCookiOptions> cookiOptions)
-			: IConfigureNamedOptions<JwtBearerOptions>
+public class JwtBearerOptionsSetup(IOptions<JwtOptions> jwtOptions, IOptions<AuthCookieOptions> cookiOptions)
+	: IConfigureNamedOptions<JwtBearerOptions>
 {
 	private readonly JwtOptions _jwt = jwtOptions.Value;
-	private readonly AuthCookiOptions _authCooki = cookiOptions.Value;
+	private readonly AuthCookieOptions _authCooki = cookiOptions.Value;
 
 	public void Configure(JwtBearerOptions options)
 	{
@@ -27,9 +27,8 @@ public class JwtBearerOptionsSetup(IOptions<JwtOptions> jwtOptions, IOptions<Aut
 			ValidateIssuerSigningKey = true,
 			ValidIssuer = _jwt.Issuer,
 			ValidAudience = _jwt.Audience,
-			IssuerSigningKey = new SymmetricSecurityKey(
-				Encoding.UTF8.GetBytes(_jwt.Secret)),
-			ClockSkew = TimeSpan.Zero
+			IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwt.Secret)),
+			ClockSkew = TimeSpan.Zero,
 		};
 
 		options.Events = new JwtBearerEvents
@@ -40,7 +39,7 @@ public class JwtBearerOptionsSetup(IOptions<JwtOptions> jwtOptions, IOptions<Aut
 					context.Token = token;
 
 				return Task.CompletedTask;
-			}
+			},
 		};
 	}
 }

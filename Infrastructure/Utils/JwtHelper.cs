@@ -1,12 +1,13 @@
-using Application.Interfaces.Utils;
-using Domain.Entities.DataBase;
-using Domain.Models.ConfigOptions;
-using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
+using Application.Auth.Interfaces;
+using Application.Common.Exceptions;
+using Application.Users.Models;
+using Infrastructure.Configuration;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.Utils;
 
@@ -14,13 +15,13 @@ public class JwtHelper(IOptions<JwtOptions> options) : IJwtHelper
 {
 	private readonly JwtOptions _options = options.Value;
 
-	public string GenerateAccessToken(User user, string sessionId)
+	public string GenerateAccessToken(UserTokenDto user, string sessionId, DateTime expiresAt)
 	{
 		var claims = new[]
 		{
 			new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
 			new Claim(JwtRegisteredClaimNames.Jti, sessionId),
-			new Claim(JwtRegisteredClaimNames.UniqueName, user.Login)
+			new Claim(JwtRegisteredClaimNames.UniqueName, user.Login),
 		};
 
 		var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Secret));
@@ -30,7 +31,7 @@ public class JwtHelper(IOptions<JwtOptions> options) : IJwtHelper
 			issuer: _options.Issuer,
 			audience: _options.Audience,
 			claims: claims,
-			expires: DateTime.UtcNow.AddMinutes(_options.AccessTokenMinutes),
+			expires: expiresAt,
 			signingCredentials: creds
 		);
 
@@ -47,17 +48,17 @@ public class JwtHelper(IOptions<JwtOptions> options) : IJwtHelper
 	{
 		var jtiClaim = user.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Jti);
 		if (jtiClaim == null)
-			throw new InvalidOperationException("User claims do not contain 'jti'.");
+			throw new InvalidTokenException("Access token does not contain a session identifier.");
 
 		return jtiClaim.Value;
 	}
 
 	public int GetUserIdFromClaims(ClaimsPrincipal user)
 	{
-		var subClaim = user.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier); // Fuck this auto-mapper from ASP
-		if (subClaim == null)
-			throw new InvalidOperationException("User claims do not contain 'sub'.");
+		var subClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+		if (!int.TryParse(subClaim, out var userId))
+			throw new InvalidTokenException("Access token does not contain a valid user identifier.");
 
-		return int.Parse(subClaim.Value);
+		return userId;
 	}
 }

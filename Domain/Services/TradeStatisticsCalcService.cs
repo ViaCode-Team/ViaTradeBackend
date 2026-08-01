@@ -1,35 +1,29 @@
-using Domain.Entities.DataBase;
 using System.Linq.Expressions;
+using Domain.Entities;
+using Domain.Enums;
 
 namespace Domain.Services;
 
-public class TradeGroupAggregation
-{
-	public int TotalTrades { get; set; }
-	public int WinTrades { get; set; }
-	public int LoseTrades { get; set; }
-	public double TotalAbsoluteIncome { get; set; }
-	public double TotalProfit { get; set; }
-	public double TotalLoss { get; set; }
-}
-
 public static class TradeStatisticsCalcService
 {
-
-
-	// Expression for LINQ (translation to SQL)
 	public static Expression<Func<Trade, double>> AbsoluteIncomeExpression =>
-		trade => ((trade.TradeClose ?? 0) - trade.TradeOpen) * trade.Count * (int)trade.TradeSignal;
+		trade =>
+			trade.ExitPrice == null
+				? 0
+				: (trade.ExitPrice.Value - trade.EntryPrice) * trade.Quantity * (int)trade.Signal;
 
 	public static Expression<Func<Trade, double>> AbsoluteIncomeAbsExpression =>
-		trade => Math.Abs(((trade.TradeClose ?? 0) - trade.TradeOpen) * trade.Count * (int)trade.TradeSignal);
+		trade =>
+			trade.ExitPrice == null
+				? 0
+				: Math.Abs((trade.ExitPrice.Value - trade.EntryPrice) * trade.Quantity * (int)trade.Signal);
 
 	public static double CalculateAbsoluteIncome(Trade trade)
 	{
-		if (trade.TradeClose == null)
+		if (trade.ExitPrice == null)
 			return 0;
 
-		return (trade.TradeClose.Value - trade.TradeOpen) * trade.Count * (int)trade.TradeSignal;
+		return (trade.ExitPrice.Value - trade.EntryPrice) * trade.Quantity * (int)trade.Signal;
 	}
 
 	public static float CalculateProfitFactor(double totalProfit, double totalLoss)
@@ -57,5 +51,20 @@ public static class TradeStatisticsCalcService
 			return 0m;
 
 		return Math.Round(totalIncome / totalTrades, 2);
+	}
+
+	public static double? CalculateNetIncome(double tradeOpen, double? tradeClose, TradeSignal tradeSignal)
+	{
+		if (tradeClose == null || tradeOpen == 0 || tradeSignal == TradeSignal.HOLD)
+			return null;
+
+		var basePercent = (tradeClose.Value - tradeOpen) / tradeOpen * 100;
+		double adjustedPercent = basePercent;
+		if (tradeSignal == TradeSignal.SELL)
+		{
+			adjustedPercent = -basePercent;
+		}
+
+		return Math.Round(adjustedPercent, 2);
 	}
 }
