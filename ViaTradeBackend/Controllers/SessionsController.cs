@@ -52,8 +52,8 @@ public class SessionsController(
 	[HttpDelete("current")]
 	public async Task<NoContent> DeleteCurrentSession(CancellationToken ct)
 	{
-		if (Request.Cookies.TryGetValue(_authCookieOptions.RefreshTokenCookie, out var refreshToken))
-			await authCommandService.LogoutSessionAsync(refreshToken, ct);
+		var sessionId = jwtHelper.GetSessionId(User);
+		await authCommandService.LogoutSessionAsync(sessionId, ct);
 
 		authCookieService.DeleteAuthCookies(Response);
 		return TypedResults.NoContent();
@@ -76,8 +76,9 @@ public class SessionsController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
+		var currentSessionId = jwtHelper.GetSessionId(User);
 		var userSessions = await authQueryService.GetSessionsPageAsync(userId, pageOptions, ct);
 
-		return TypedResults.Ok(userSessions.Map(ApiMapper.ToResponse));
+		return TypedResults.Ok(userSessions.Map(session => ApiMapper.ToResponse(session, currentSessionId)));
 	}
 }

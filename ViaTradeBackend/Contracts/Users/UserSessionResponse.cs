@@ -7,5 +7,6 @@ public record UserSessionResponse(
 	[Range(1, int.MaxValue)] int UserId,
 	[StringLength(1024)] string UserAgent,
 	DateTime CreatedAt,
-	DateTime LastSeen
+	DateTime LastSeen,
+	bool IsCurrent
 );

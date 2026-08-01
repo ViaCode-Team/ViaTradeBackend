@@ -13,20 +13,22 @@ public sealed class AuthCookieService(IOptions<AuthCookieOptions> authOptions) :
 		response.Cookies.Append(
 			_authCookieOptions.AccessTokenCookie,
 			tokens.AccessToken,
-			CreateCookieOptions(DateTimeOffset.UtcNow.AddHours(1))
+			CreateCookieOptions(tokens.AccessTokenExpiresAt)
 		);
 
 		response.Cookies.Append(
 			_authCookieOptions.RefreshTokenCookie,
 			tokens.RefreshToken,
-			CreateCookieOptions(DateTimeOffset.UtcNow.AddDays(_authCookieOptions.RefreshTokenExpiryDays))
+			CreateCookieOptions(tokens.RefreshTokenExpiresAt)
 		);
 	}
 
 	public void DeleteAuthCookies(HttpResponse response)
 	{
-		response.Cookies.Delete(_authCookieOptions.AccessTokenCookie);
-		response.Cookies.Delete(_authCookieOptions.RefreshTokenCookie);
+		var expiredCookieOptions = CreateCookieOptions(DateTimeOffset.UnixEpoch);
+
+		response.Cookies.Delete(_authCookieOptions.AccessTokenCookie, expiredCookieOptions);
+		response.Cookies.Delete(_authCookieOptions.RefreshTokenCookie, expiredCookieOptions);
 	}
 
 	private static CookieOptions CreateCookieOptions(DateTimeOffset expires)

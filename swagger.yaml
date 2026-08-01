@@ -7529,6 +7529,7 @@ components:
       required:
         - createdAt
         - id
+        - isCurrent
         - lastSeen
         - userAgent
         - userId
@@ -7547,6 +7548,8 @@ components:
         lastSeen:
           type: string
           format: date-time
+        isCurrent:
+          type: boolean
       additionalProperties: false
     UserSessionResponsePageResult:
       required:

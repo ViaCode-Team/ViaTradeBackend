@@ -15,7 +15,7 @@ public class JwtHelper(IOptions<JwtOptions> options) : IJwtHelper
 {
 	private readonly JwtOptions _options = options.Value;
 
-	public string GenerateAccessToken(UserTokenDto user, string sessionId)
+	public string GenerateAccessToken(UserTokenDto user, string sessionId, DateTime expiresAt)
 	{
 		var claims = new[]
 		{
@@ -31,7 +31,7 @@ public class JwtHelper(IOptions<JwtOptions> options) : IJwtHelper
 			issuer: _options.Issuer,
 			audience: _options.Audience,
 			claims: claims,
-			expires: DateTime.UtcNow.AddMinutes(_options.AccessTokenMinutes),
+			expires: expiresAt,
 			signingCredentials: creds
 		);
 

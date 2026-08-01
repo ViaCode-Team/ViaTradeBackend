@@ -23,7 +23,17 @@ public static partial class ApiMapper
 
 	public static partial UserTelegramResponse ToResponse(UserTelegramDto source);
 
-	public static partial UserSessionResponse ToResponse(UserSessionDto source);
+	public static UserSessionResponse ToResponse(UserSessionDto source, string currentSessionId)
+	{
+		return new UserSessionResponse(
+			source.Id,
+			source.UserId,
+			source.UserAgent,
+			source.CreatedAt,
+			source.LastSeen,
+			source.Id == currentSessionId
+		);
+	}
 
 	public static NoteResponse ToResponse(Note source) =>
 		new(

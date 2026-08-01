@@ -47,9 +47,14 @@ public static class DependencyInjection
 		if (authCookieOptions.AbsoluteSessionLifetimeDays < 1)
 			throw new InvalidOperationException("Absolute session lifetime must be at least one day.");
 
+		var jwtOptions = configuration.GetSection("Jwt").Get<JwtOptions>();
+		if (jwtOptions == null || jwtOptions.AccessTokenMinutes < 1)
+			throw new InvalidOperationException("Access token lifetime must be at least one minute.");
+
 		services.AddSingleton(
 			new SessionLifetimeOptions
 			{
+				AccessTokenLifetime = TimeSpan.FromMinutes(jwtOptions.AccessTokenMinutes),
 				IdleLifetime = TimeSpan.FromDays(authCookieOptions.RefreshTokenExpiryDays),
 				AbsoluteLifetime = TimeSpan.FromDays(authCookieOptions.AbsoluteSessionLifetimeDays),
 			}
@@ -157,7 +162,6 @@ public static class DependencyInjection
 
 		services.AddScoped<ITelegramTokenRepository, TelegramTokenRedisRepository>();
 		services.AddScoped<ISessionRepository, SessionRedisRepository>();
-		services.AddScoped<IRefreshTokenRepository, RefreshTokenRedisRepository>();
 
 		services.AddScoped<ITradeRepository, TradeEfRepository>();
 		services.AddScoped<ITradeTypeRepository, TradeTypeEfRepository>();
