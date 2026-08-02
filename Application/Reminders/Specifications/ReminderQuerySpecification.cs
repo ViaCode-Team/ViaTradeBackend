@@ -11,9 +11,7 @@ public class ReminderQuerySpecification : BaseQuerySpecification<Reminder>
 		AddCriteria(r => r.UserId == userId);
 
 		if (instrumentId.HasValue)
-		{
 			AddCriteria(r => r.InstrumentId == instrumentId.Value);
-		}
 
 		var sortFields = reminderSort.GetEffectiveSortBy();
 		foreach (var field in sortFields)

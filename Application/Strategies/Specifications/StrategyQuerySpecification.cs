@@ -8,7 +8,6 @@ public class StrategyQuerySpecification : BaseQuerySpecification<Strategy>
 {
 	public StrategyQuerySpecification(int userId, StrategyFilter strategyFilter, StrategySort strategySort)
 	{
-		AddCriteria(x => x.UserStrategies!.Any(uts => uts.UserId == userId));
 		if (!string.IsNullOrWhiteSpace(strategyFilter.Name))
 			AddCriteria(x => x.Name == strategyFilter.Name);
 
