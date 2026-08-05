@@ -25,12 +25,14 @@ public class SignalsController(ISignalQueryService signalQueryService, IJwtHelpe
 
 	[HttpGet("latest")]
 	public async Task<Ok<PageResult<SignalResponse>>> GetLatestSignals(
+		[FromQuery] LatestSignalFilter filter,
+		[FromQuery] SignalSort signalSort,
 		[FromQuery] PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var signals = await signalQueryService.GetLatestPageAsync(userId, pageOptions, ct);
+		var signals = await signalQueryService.GetLatestPageAsync(userId, filter, signalSort, pageOptions, ct);
 
 		return TypedResults.Ok(signals.Map(ApiMapper.ToResponse));
 	}

@@ -134,12 +134,7 @@ public class AuthCommandService(
 		return absoluteExpiresAt;
 	}
 
-	private AuthTokens CreateAuthTokens(
-		UserTokenDto user,
-		UserSessionDto session,
-		string refreshToken,
-		DateTime now
-	)
+	private AuthTokens CreateAuthTokens(UserTokenDto user, UserSessionDto session, string refreshToken, DateTime now)
 	{
 		var configuredAccessTokenExpiresAt = now.Add(_accessTokenLifetime);
 		var accessTokenExpiresAt = configuredAccessTokenExpiresAt;

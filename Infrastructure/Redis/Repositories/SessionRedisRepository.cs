@@ -38,7 +38,11 @@ public class SessionRedisRepository(IConnectionMultiplexer redis, ILogger<Sessio
 		var setSession = transaction.StringSetAsync(SessionKey(session.Id), json, ttl);
 		var setRefreshToken = transaction.StringSetAsync(TokenKey(session.Id), refreshToken, ttl);
 		var setRefreshTokenIndex = transaction.StringSetAsync(IndexKey(refreshToken), session.Id, ttl);
-		var addToUser = transaction.SortedSetAddAsync(UserSessionsKey(session.UserId), session.Id, session.CreatedAt.Ticks);
+		var addToUser = transaction.SortedSetAddAsync(
+			UserSessionsKey(session.UserId),
+			session.Id,
+			session.CreatedAt.Ticks
+		);
 		var addExpiration = transaction.SortedSetAddAsync(
 			SessionExpirationsKey,
 			ExpirationMember(session),
@@ -102,11 +106,7 @@ public class SessionRedisRepository(IConnectionMultiplexer redis, ILogger<Sessio
 		var setSession = transaction.StringSetAsync(SessionKey(session.Id), json, sessionTtl);
 		var setRefreshToken = transaction.StringSetAsync(TokenKey(session.Id), newRefreshToken, sessionTtl);
 		var removeRefreshTokenIndex = transaction.KeyDeleteAsync(IndexKey(refreshToken));
-		var setRefreshTokenIndex = transaction.StringSetAsync(
-			IndexKey(newRefreshToken),
-			session.Id,
-			sessionTtl
-		);
+		var setRefreshTokenIndex = transaction.StringSetAsync(IndexKey(newRefreshToken), session.Id, sessionTtl);
 		var setUsedRefreshToken = transaction.StringSetAsync(
 			UsedTokenKey(refreshTokenFingerprint),
 			session.Id,
@@ -320,5 +320,4 @@ public class SessionRedisRepository(IConnectionMultiplexer redis, ILogger<Sessio
 	{
 		return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken)));
 	}
-
 }

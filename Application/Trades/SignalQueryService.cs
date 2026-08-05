@@ -45,15 +45,23 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 
 	public async Task<PageResult<SignalDto>> GetLatestPageAsync(
 		int userId,
+		LatestSignalFilter filter,
+		SignalSort signalSort,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
 		var sources = await userStrategyRepository.ListSignalSourcesAsync(userId, ct);
-		var signals = ListSignals(sources, null, null, new SignalSort())
-			.GroupBy(signal => (signal.StrategyId, signal.InstrumentId))
-			.Select(group => group.First())
-			.ToList();
+		var signals = ListLatestSignals(sources);
+
+		if (filter.Direction.HasValue)
+			signals = signals
+				.Where(signal =>
+					string.Equals(signal.Signal, filter.Direction.Value.ToString(), StringComparison.OrdinalIgnoreCase)
+				)
+				.ToList();
+
+		signals = ApplySorting(signals, signalSort.GetEffectiveSortBy()).ToList();
 
 		return CreatePageResult(signals, pageOptions);
 	}
@@ -101,6 +109,44 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 			.ToList();
 
 		return ApplySorting(signals, signalSort.GetEffectiveSortBy()).ToList();
+	}
+
+	private List<SignalDto> ListLatestSignals(List<SignalSourceDto> sources)
+	{
+		if (sources.Count == 0)
+			return [];
+
+		var symbols = sources.Select(source => source.Symbol).Distinct().ToList();
+		var sourceByKey = sources.ToDictionary(source => (source.StrategyName, source.Symbol));
+		var latestBySource = new Dictionary<(int StrategyId, int InstrumentId), SignalDto>();
+		var results = tradefileReader.ReadDataBySymbolsWithStrategy<StrategyResult>(TradeDataType.Strategy, symbols);
+
+		foreach (var result in results)
+		{
+			if (result.Symbol == null || result.StrategyName == null)
+				continue;
+
+			var source = sourceByKey.GetValueOrDefault((result.StrategyName, result.Symbol));
+			if (source == null)
+				continue;
+
+			var signal = new SignalDto(
+				source.StrategyId,
+				source.StrategyName,
+				source.InstrumentId,
+				source.Symbol,
+				source.Accuracy,
+				result.Item.Date,
+				result.Item.ClosePrice,
+				result.Item.Signal
+			);
+			var key = (signal.StrategyId, signal.InstrumentId);
+
+			if (!latestBySource.TryGetValue(key, out var current) || signal.Date > current.Date)
+				latestBySource[key] = signal;
+		}
+
+		return latestBySource.Values.ToList();
 	}
 
 	private static PageResult<SignalDto> CreatePageResult(List<SignalDto> signals, PageOptions pageOptions)

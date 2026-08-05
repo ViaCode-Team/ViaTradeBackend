@@ -28,6 +28,27 @@ public class TradesController(
 		return TypedResults.Ok(ApiMapper.ToResponse(tradeStatistics));
 	}
 
+	[HttpGet("profitChart")]
+	public async Task<Ok<List<ProfitChartBucketResponse>>> GetProfitChart(
+		[FromQuery] ProfitChartFilter filter,
+		CancellationToken ct
+	)
+	{
+		var userId = jwtHelper.GetUserIdFromClaims(User);
+		var buckets = await tradeQueryService.GetProfitChartAsync(userId, filter, ct);
+
+		return TypedResults.Ok(buckets.Select(ApiMapper.ToResponse).ToList());
+	}
+
+	[HttpGet("profitChart/dateRange")]
+	public async Task<Ok<TradeDateRangeResponse>> GetTradeDateRange(CancellationToken ct)
+	{
+		var userId = jwtHelper.GetUserIdFromClaims(User);
+		var range = await tradeQueryService.GetTradeDateRangeAsync(userId, ct);
+
+		return TypedResults.Ok(ApiMapper.ToResponse(range));
+	}
+
 	[HttpGet]
 	public async Task<Ok<PageResult<TradeResponse>>> GetTrades(
 		[FromQuery] TradeFilter tradeFilter,

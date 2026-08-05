@@ -81,6 +81,10 @@ public static partial class ApiMapper
 
 	public static partial TradeResponse ToResponse(TradeDto source);
 
+	public static partial ProfitChartBucketResponse ToResponse(ProfitChartBucketDto source);
+
+	public static partial TradeDateRangeResponse ToResponse(TradeDateRangeDto source);
+
 	public static partial InstrumentBriefResponse? ToResponse(InstrumentBriefDto? source);
 
 	public static partial GlobalStatisticResponse ToResponse(GlobalTradeStatisticDto source);

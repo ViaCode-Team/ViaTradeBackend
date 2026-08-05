@@ -37,6 +37,10 @@
 4. **Clean Code**: Avoid unnecessary braces for single-line statements. Comments must be minimal, in English, and only for highly complex code.
 5. **Entity Framework**: The DbContext is globally configured with `QueryTrackingBehavior.NoTracking`. All read operations are untracked by default. DO NOT add `.AsNoTracking()` explicitly. When updating entities using `SaveChangesAsync()`, you MUST explicitly call `_dbSet.Update(entity)` beforehand. Prefer `ExecuteUpdateAsync/ExecuteDeleteAsync` where possible.
 
+## API Routing
+
+- Use camelCase for multi-word route segments, for example `/profitChart`; do not use kebab-case route segments.
+
 ## Method Naming
 
 - `Find...Async`: nullable result when absence is expected.

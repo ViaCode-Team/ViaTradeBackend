@@ -66,6 +66,7 @@ internal static class ModelBuilderExtensions
 		modelBuilder.Entity<Trade>(entity =>
 		{
 			entity.HasIndex(x => x.UserId);
+			entity.HasIndex(x => new { x.UserId, x.ClosedAt });
 			entity.Property(x => x.TotalPrice).HasColumnType("decimal(18,2)");
 			entity.ToTable(table => table.HasCheckConstraint("CK_Trades_PositiveQuantity", "`Quantity` > 0"));
 		});

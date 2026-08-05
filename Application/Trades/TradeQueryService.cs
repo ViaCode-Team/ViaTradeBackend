@@ -9,6 +9,28 @@ namespace Application.Trades;
 
 public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQueryService
 {
+	public async Task<List<ProfitChartBucketDto>> GetProfitChartAsync(
+		int userId,
+		ProfitChartFilter filter,
+		CancellationToken ct
+	)
+	{
+		var rows = await tradeRepository.GetProfitChartAsync(userId, filter, ct);
+
+		return rows.Select(row => new ProfitChartBucketDto(
+				GetBucketDate(row, filter.Granularity),
+				Math.Round(row.NetIncome, 2),
+				Math.Round(row.BuyNetIncome, 2),
+				Math.Round(row.SellNetIncome, 2)
+			))
+			.ToList();
+	}
+
+	public Task<TradeDateRangeDto> GetTradeDateRangeAsync(int userId, CancellationToken ct)
+	{
+		return tradeRepository.GetTradeDateRangeAsync(userId, ct);
+	}
+
 	public async Task<GlobalTradeStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
 		var result = await tradeRepository.GetGlobalStatisticsAsync(userId, ct);
@@ -65,4 +87,15 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 			source.Instrument,
 			source.UserId
 		);
+
+	private static DateOnly GetBucketDate(ProfitChartAggregateRow row, ProfitChartGranularity granularity)
+	{
+		if (granularity == ProfitChartGranularity.Day)
+			return new DateOnly(row.Year!.Value, row.Month!.Value, row.Day!.Value);
+
+		if (granularity == ProfitChartGranularity.Month)
+			return new DateOnly(row.Year!.Value, row.Month!.Value, 1);
+
+		return DateOnly.FromDateTime(new DateTime(1900, 1, 1).AddDays(row.WeekIndex!.Value * 7));
+	}
 }

@@ -15,5 +15,11 @@ public interface ISignalQueryService
 		CancellationToken ct
 	);
 
-	Task<PageResult<SignalDto>> GetLatestPageAsync(int userId, PageOptions pageOptions, CancellationToken ct);
+	Task<PageResult<SignalDto>> GetLatestPageAsync(
+		int userId,
+		LatestSignalFilter filter,
+		SignalSort signalSort,
+		PageOptions pageOptions,
+		CancellationToken ct
+	);
 }

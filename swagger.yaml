@@ -3470,6 +3470,16 @@ paths:
         - Signals
       operationId: GetLatestSignals
       parameters:
+        - name: direction
+          in: query
+          schema:
+            $ref: '#/components/schemas/SignalDirection'
+        - name: sortBy
+          in: query
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/SignalSortField'
         - name: page
           in: query
           schema:
@@ -5619,6 +5629,304 @@ paths:
                 traceId: 0HNABC123:00000001
       security:
         - Bearer: [ ]
+  /api/v1/trades/profitChart:
+    get:
+      tags:
+        - Trades
+      operationId: GetProfitChart
+      parameters:
+        - name: startDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: endDate
+          in: query
+          schema:
+            type: string
+            format: date
+        - name: granularity
+          in: query
+          required: true
+          schema:
+            $ref: '#/components/schemas/ProfitChartGranularity'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProfitChartBucketResponse'
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/400
+                title: Bad Request
+                status: 400
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '401':
+          description: Unauthorized - Authentication is required
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/401
+                title: Unauthorized
+                status: 401
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/403
+                title: Forbidden
+                status: 403
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/404
+                title: Not Found
+                status: 404
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '408':
+          description: Request Timeout - Operation timed out
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/408
+                title: Request Timeout
+                status: 408
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '409':
+          description: Conflict - Resource state conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/409
+                title: Conflict
+                status: 409
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '422':
+          description: Unprocessable Content - Business rule violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/422
+                title: Unprocessable Content
+                status: 422
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/500
+                title: Internal Server Error
+                status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
+  /api/v1/trades/profitChart/dateRange:
+    get:
+      tags:
+        - Trades
+      operationId: GetTradeDateRange
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradeDateRangeResponse'
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/400
+                title: Bad Request
+                status: 400
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '401':
+          description: Unauthorized - Authentication is required
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/401
+                title: Unauthorized
+                status: 401
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/403
+                title: Forbidden
+                status: 403
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/404
+                title: Not Found
+                status: 404
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '408':
+          description: Request Timeout - Operation timed out
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/408
+                title: Request Timeout
+                status: 408
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '409':
+          description: Conflict - Resource state conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/409
+                title: Conflict
+                status: 409
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '422':
+          description: Unprocessable Content - Business rule violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/422
+                title: Unprocessable Content
+                status: 422
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/500
+                title: Internal Server Error
+                status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   /api/v1/trades:
     get:
       tags:
@@ -7079,6 +7387,33 @@ components:
         instance: /api/trades
         code: validation_failed
         traceId: 0HNABC123:00000001
+    ProfitChartBucketResponse:
+      required:
+        - buyNetIncome
+        - date
+        - netIncome
+        - sellNetIncome
+      type: object
+      properties:
+        date:
+          type: string
+          format: date
+        netIncome:
+          type: number
+          format: double
+        buyNetIncome:
+          type: number
+          format: double
+        sellNetIncome:
+          type: number
+          format: double
+      additionalProperties: false
+    ProfitChartGranularity:
+      enum:
+        - day
+        - week
+        - month
+      type: string
     RegisterRequest:
       required:
         - login
@@ -7154,6 +7489,11 @@ components:
           type: integer
           format: int32
       additionalProperties: false
+    SignalDirection:
+      enum:
+        - BUY
+        - SELL
+      type: string
     SignalResponse:
       required:
         - closePrice
@@ -7344,6 +7684,16 @@ components:
       properties:
         telegramToken:
           type: string
+      additionalProperties: false
+    TradeDateRangeResponse:
+      type: object
+      properties:
+        minDate:
+          type: string
+          format: date
+        maxDate:
+          type: string
+          format: date
       additionalProperties: false
     TradeResponse:
       required:
