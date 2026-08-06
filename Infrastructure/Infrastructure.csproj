@@ -4,6 +4,11 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
+	<ItemGroup>
+	  <Compile Remove="DataBase\Repositories\Statistics\**" />
+	  <EmbeddedResource Remove="DataBase\Repositories\Statistics\**" />
+	  <None Remove="DataBase\Repositories\Statistics\**" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
@@ -20,9 +25,5 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Application\Application.csproj" />
 		<ProjectReference Include="..\Domain\Domain.csproj" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="DataBase\Repositories\Statistics\" />
 	</ItemGroup>
 </Project>

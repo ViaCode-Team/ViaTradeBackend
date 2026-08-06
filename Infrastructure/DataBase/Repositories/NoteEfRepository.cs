@@ -13,16 +13,17 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 {
 	public async Task<NoteStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct = default)
 	{
-		var baseQuery = _dbSet.Where(n => n.UserId == userId);
+		var statistics = await _dbSet
+			.Where(note => note.UserId == userId)
+			.GroupBy(_ => 1)
+			.Select(group => new NoteStatisticDto(
+				group.Count(),
+				group.Count(note => note.InstrumentId != null),
+				group.Count(note => note.StrategyId != null)
+			))
+			.SingleOrDefaultAsync(ct);
 
-		var totalNotes = await baseQuery.CountAsync(ct);
-		if (totalNotes == 0)
-			return new NoteStatisticDto(0, 0, 0);
-
-		var instrumentNotes = await baseQuery.CountAsync(n => n.InstrumentId != null, ct);
-		var strategyNotes = await baseQuery.CountAsync(n => n.StrategyId != null, ct);
-
-		return new NoteStatisticDto(totalNotes, instrumentNotes, strategyNotes);
+		return statistics ?? new NoteStatisticDto(0, 0, 0);
 	}
 
 	public async Task<PageResult<NoteProjectionDto>> GetPageWithTargetsAsync(
@@ -32,6 +33,8 @@ public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(
 	)
 	{
 		var query = SpecificationEvaluator.GetQuery(_dbSet, specification);
+		if (specification.SortExpressions.Count == 0)
+			query = query.OrderBy(note => note.Id);
 
 		return await query
 			.Select(note => new NoteProjectionDto(

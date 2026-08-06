@@ -19,88 +19,90 @@ public class TradeEfRepository(AppDbContext context) : GenericEfRepository<Trade
 		CancellationToken ct
 	)
 	{
-		var trades = await GetClosedTradesQuery(userId, filter.StartDate, filter.EndDate)
-			.Select(trade => new
-			{
-				ClosedAt = trade.ClosedAt!.Value,
-				trade.EntryPrice,
-				ExitPrice = trade.ExitPrice!.Value,
-				trade.Signal,
-			})
-			.ToListAsync(ct);
+		var tradesQuery = GetClosedTradesQuery(userId, filter.StartDate, filter.EndDate);
 
 		return filter.Granularity switch
 		{
-			ProfitChartGranularity.Day => trades
+			ProfitChartGranularity.Day => await tradesQuery
 				.GroupBy(trade => new
 				{
-					trade.ClosedAt.Year,
-					trade.ClosedAt.Month,
-					trade.ClosedAt.Day,
+					trade.ClosedAt!.Value.Year,
+					trade.ClosedAt.Value.Month,
+					trade.ClosedAt.Value.Day,
 				})
+				.OrderBy(group => group.Key.Year)
+				.ThenBy(group => group.Key.Month)
+				.ThenBy(group => group.Key.Day)
 				.Select(group => new ProfitChartAggregateRow(
 					group.Key.Year,
 					group.Key.Month,
 					group.Key.Day,
 					null,
-					group.Sum(trade => CalculateProfitChartIncome(trade.EntryPrice, trade.ExitPrice, trade.Signal)),
-					group
-						.Where(trade => trade.Signal == TradeSignal.BUY)
-						.Sum(trade => CalculateProfitChartIncome(trade.EntryPrice, trade.ExitPrice, trade.Signal)),
-					group
-						.Where(trade => trade.Signal == TradeSignal.SELL)
-						.Sum(trade => CalculateProfitChartIncome(trade.EntryPrice, trade.ExitPrice, trade.Signal))
+					group.Sum(trade => Math.Round(
+						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+						2
+					)),
+					group.Where(trade => trade.Signal == TradeSignal.BUY).Sum(trade => Math.Round(
+						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+						2
+					)),
+					group.Where(trade => trade.Signal == TradeSignal.SELL).Sum(trade => Math.Round(
+						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+						2
+					))
 				))
-				.OrderBy(row => row.Year)
-				.ThenBy(row => row.Month)
-				.ThenBy(row => row.Day)
-				.ToList(),
-			ProfitChartGranularity.Week => trades
-				.GroupBy(trade => Math.Floor((trade.ClosedAt.Date - WeekEpoch).TotalDays / 7))
+				.ToListAsync(ct),
+			ProfitChartGranularity.Week => await tradesQuery
+				.GroupBy(trade => EF.Functions.DateDiffWeek(WeekEpoch, trade.ClosedAt!.Value))
+				.OrderBy(group => group.Key)
 				.Select(group => new ProfitChartAggregateRow(
 					null,
 					null,
 					null,
 					group.Key,
-					group.Sum(trade => CalculateProfitChartIncome(trade.EntryPrice, trade.ExitPrice, trade.Signal)),
-					group
-						.Where(trade => trade.Signal == TradeSignal.BUY)
-						.Sum(trade => CalculateProfitChartIncome(trade.EntryPrice, trade.ExitPrice, trade.Signal)),
-					group
-						.Where(trade => trade.Signal == TradeSignal.SELL)
-						.Sum(trade => CalculateProfitChartIncome(trade.EntryPrice, trade.ExitPrice, trade.Signal))
+					group.Sum(trade => Math.Round(
+						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+						2
+					)),
+					group.Where(trade => trade.Signal == TradeSignal.BUY).Sum(trade => Math.Round(
+						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+						2
+					)),
+					group.Where(trade => trade.Signal == TradeSignal.SELL).Sum(trade => Math.Round(
+						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+						2
+					))
 				))
-				.OrderBy(row => row.WeekIndex)
-				.ToList(),
-			ProfitChartGranularity.Month => trades
-				.GroupBy(trade => new { trade.ClosedAt.Year, trade.ClosedAt.Month })
+				.ToListAsync(ct),
+			ProfitChartGranularity.Month => await tradesQuery
+				.GroupBy(trade => new { trade.ClosedAt!.Value.Year, trade.ClosedAt.Value.Month })
+				.OrderBy(group => group.Key.Year)
+				.ThenBy(group => group.Key.Month)
 				.Select(group => new ProfitChartAggregateRow(
 					group.Key.Year,
 					group.Key.Month,
 					null,
 					null,
-					group.Sum(trade => CalculateProfitChartIncome(trade.EntryPrice, trade.ExitPrice, trade.Signal)),
-					group
-						.Where(trade => trade.Signal == TradeSignal.BUY)
-						.Sum(trade => CalculateProfitChartIncome(trade.EntryPrice, trade.ExitPrice, trade.Signal)),
-					group
-						.Where(trade => trade.Signal == TradeSignal.SELL)
-						.Sum(trade => CalculateProfitChartIncome(trade.EntryPrice, trade.ExitPrice, trade.Signal))
+					group.Sum(trade => Math.Round(
+						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+						2
+					)),
+					group.Where(trade => trade.Signal == TradeSignal.BUY).Sum(trade => Math.Round(
+						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+						2
+					)),
+					group.Where(trade => trade.Signal == TradeSignal.SELL).Sum(trade => Math.Round(
+						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+						2
+					))
 				))
-				.OrderBy(row => row.Year)
-				.ThenBy(row => row.Month)
-				.ToList(),
+				.ToListAsync(ct),
 			_ => throw new ArgumentOutOfRangeException(
 				nameof(filter.Granularity),
 				filter.Granularity,
 				"Unsupported chart granularity."
 			),
 		};
-	}
-
-	private static double CalculateProfitChartIncome(double entryPrice, double exitPrice, TradeSignal signal)
-	{
-		return Math.Round((exitPrice - entryPrice) / entryPrice * 100 * (int)signal, 2);
 	}
 
 	public async Task<TradeDateRangeDto> GetTradeDateRangeAsync(int userId, CancellationToken ct)
