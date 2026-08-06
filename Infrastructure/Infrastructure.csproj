@@ -11,6 +11,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<EmbeddedResource Include="Redis\Scripts\*.lua">
+			<LogicalName>Infrastructure.Redis.Scripts.%(Filename)%(Extension)</LogicalName>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.12" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.12">

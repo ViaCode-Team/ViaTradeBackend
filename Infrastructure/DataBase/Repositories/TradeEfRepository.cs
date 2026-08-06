@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataBase.Repositories;
 
-public class TradeEfRepository(AppDbContext context) : GenericEfRepository<Trade>(context), ITradeRepository
+public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(context), ITradeRepository
 {
 	private static readonly DateTime WeekEpoch = new(1900, 1, 1);
 

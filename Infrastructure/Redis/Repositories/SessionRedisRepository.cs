@@ -1,82 +1,57 @@
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
 using Application.Auth.Interfaces;
 using Application.Common.Models;
 using Application.Users.Models;
+using Infrastructure.Redis.Utils;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 
 namespace Infrastructure.Redis.Repositories;
 
-public class SessionRedisRepository(IConnectionMultiplexer redis, ILogger<SessionRedisRepository> logger)
-	: ISessionRepository
+public class SessionRedisRepository(
+	IConnectionMultiplexer connectionMultiplexer,
+	ILogger<SessionRedisRepository> logger
+) : ISessionRepository
 {
-	private const int CleanupBatchSize = 1_000;
-	private const int TerminateSessionMaxAttempts = 3;
-
-	private readonly IDatabase _redis = redis.GetDatabase();
-
-	private static string SessionKey(string sessionId) => $"session:{sessionId}";
-
-	private static string UserSessionsKey(int userId) => $"user:sessions:{userId}";
-
-	private static RedisKey SessionExpirationsKey => "sessions:expires";
-
-	private static string ExpirationMember(UserSessionDto session) => $"{session.UserId}:{session.Id}";
-
-	private static string TokenKey(string sessionId) => $"refresh:{sessionId}";
-
-	private static string IndexKey(string refreshToken) => $"refresh:idx:{refreshToken}";
-
-	private static string UsedTokenKey(string refreshTokenFingerprint) => $"refresh:used:{refreshTokenFingerprint}";
+	private readonly SessionRedisStorageHelper _sessionStorageHelper = new(connectionMultiplexer.GetDatabase());
+	private readonly RefreshTokenRedisHelper _refreshTokenHelper = new(connectionMultiplexer.GetDatabase());
+	private readonly SessionRedisCleanupHelper _sessionCleanupHelper = new(connectionMultiplexer.GetDatabase());
 
 	public async Task CreateSessionAsync(UserSessionDto session, string refreshToken, TimeSpan ttl)
 	{
-		var json = JsonSerializer.Serialize(session);
-		var transaction = _redis.CreateTransaction();
-		var setSession = transaction.StringSetAsync(SessionKey(session.Id), json, ttl);
-		var setRefreshToken = transaction.StringSetAsync(TokenKey(session.Id), refreshToken, ttl);
-		var setRefreshTokenIndex = transaction.StringSetAsync(IndexKey(refreshToken), session.Id, ttl);
-		var addToUser = transaction.SortedSetAddAsync(
-			UserSessionsKey(session.UserId),
-			session.Id,
-			session.CreatedAt.Ticks
-		);
-		var addExpiration = transaction.SortedSetAddAsync(
-			SessionExpirationsKey,
-			ExpirationMember(session),
-			session.ExpiresAt.Ticks
-		);
+		var refreshTokenFingerprint = RefreshTokenRedisHelper.GetFingerprint(refreshToken);
+		var sessionJson = JsonSerializer.Serialize(session);
+		var wasCreated = await _sessionStorageHelper.TryCreateAsync(session, sessionJson, refreshTokenFingerprint, ttl);
+		if (wasCreated)
+			return;
 
-		if (!await transaction.ExecuteAsync())
-			throw new Exception("Failed to create session in Redis.");
-
-		await Task.WhenAll(setSession, setRefreshToken, setRefreshTokenIndex, addToUser, addExpiration);
+		logger.LogError("Redis transaction failed while creating session: SessionId={SessionId}", session.Id);
+		throw new InvalidOperationException("Failed to create session in Redis.");
 	}
 
 	public async Task<UserSessionDto?> FindByIdAsync(string sessionId)
 	{
-		var value = await _redis.StringGetAsync(SessionKey(sessionId));
+		var value = await _sessionStorageHelper.GetAsync(sessionId);
 		if (value.IsNullOrEmpty)
 			return null;
 
-		return JsonSerializer.Deserialize<UserSessionDto>(value.ToString());
+		return DeserializeSession(value, sessionId);
 	}
 
 	public async Task<UserSessionDto?> FindByRefreshTokenAsync(string refreshToken)
 	{
-		var sessionId = await _redis.StringGetAsync(IndexKey(refreshToken));
-		if (sessionId.IsNullOrEmpty)
-			return null;
+		var refreshTokenFingerprint = RefreshTokenRedisHelper.GetFingerprint(refreshToken);
+		var sessionId = await _refreshTokenHelper.FindSessionIdAsync(refreshTokenFingerprint);
+		if (!sessionId.IsNullOrEmpty)
+			return await FindByIdAsync(sessionId.ToString());
 
-		return await FindByIdAsync(sessionId.ToString());
+		return await FindAndMigrateLegacySessionAsync(refreshToken, refreshTokenFingerprint);
 	}
 
 	public async Task<bool> TryTerminateSessionByUsedRefreshTokenAsync(string refreshToken)
 	{
-		var refreshTokenFingerprint = GetRefreshTokenFingerprint(refreshToken);
-		var sessionId = await _redis.StringGetAsync(UsedTokenKey(refreshTokenFingerprint));
+		var refreshTokenFingerprint = RefreshTokenRedisHelper.GetFingerprint(refreshToken);
+		var sessionId = await _refreshTokenHelper.FindUsedSessionIdAsync(refreshTokenFingerprint);
 		if (sessionId.IsNullOrEmpty)
 			return false;
 
@@ -92,232 +67,122 @@ public class SessionRedisRepository(IConnectionMultiplexer redis, ILogger<Sessio
 		TimeSpan usedRefreshTokenTtl
 	)
 	{
-		var json = JsonSerializer.Serialize(session);
-		var refreshTokenFingerprint = GetRefreshTokenFingerprint(refreshToken);
+		var refreshTokenFingerprint = RefreshTokenRedisHelper.GetFingerprint(refreshToken);
+		var newRefreshTokenFingerprint = RefreshTokenRedisHelper.GetFingerprint(newRefreshToken);
 
-		var transaction = _redis.CreateTransaction();
-
-		transaction.AddCondition(Condition.KeyExists(SessionKey(session.Id)));
-		transaction.AddCondition(Condition.StringEqual(TokenKey(session.Id), refreshToken));
-		transaction.AddCondition(Condition.StringEqual(IndexKey(refreshToken), session.Id));
-		transaction.AddCondition(Condition.KeyNotExists(IndexKey(newRefreshToken)));
-		transaction.AddCondition(Condition.KeyNotExists(UsedTokenKey(refreshTokenFingerprint)));
-
-		var setSession = transaction.StringSetAsync(SessionKey(session.Id), json, sessionTtl);
-		var setRefreshToken = transaction.StringSetAsync(TokenKey(session.Id), newRefreshToken, sessionTtl);
-		var removeRefreshTokenIndex = transaction.KeyDeleteAsync(IndexKey(refreshToken));
-		var setRefreshTokenIndex = transaction.StringSetAsync(IndexKey(newRefreshToken), session.Id, sessionTtl);
-		var setUsedRefreshToken = transaction.StringSetAsync(
-			UsedTokenKey(refreshTokenFingerprint),
-			session.Id,
+		return await _refreshTokenHelper.TryRotateAsync(
+			session,
+			refreshTokenFingerprint,
+			newRefreshTokenFingerprint,
+			sessionTtl,
 			usedRefreshTokenTtl
 		);
-		var updateUserSession = transaction.SortedSetAddAsync(
-			UserSessionsKey(session.UserId),
-			session.Id,
-			session.CreatedAt.Ticks
-		);
-		var updateExpiration = transaction.SortedSetAddAsync(
-			SessionExpirationsKey,
-			ExpirationMember(session),
-			session.ExpiresAt.Ticks
-		);
-
-		if (!await transaction.ExecuteAsync())
-			return false;
-
-		await Task.WhenAll(
-			setSession,
-			setRefreshToken,
-			removeRefreshTokenIndex,
-			setRefreshTokenIndex,
-			setUsedRefreshToken,
-			updateUserSession,
-			updateExpiration
-		);
-
-		return true;
 	}
 
 	public async Task TerminateSessionAsync(string sessionId)
 	{
-		for (int attempt = 0; attempt < TerminateSessionMaxAttempts; attempt++)
-		{
-			var session = await FindByIdAsync(sessionId);
-			if (session == null)
-				return;
-
-			var refreshToken = await _redis.StringGetAsync(TokenKey(session.Id));
-
-			var transaction = _redis.CreateTransaction();
-
-			transaction.AddCondition(Condition.KeyExists(SessionKey(session.Id)));
-
-			if (refreshToken.IsNullOrEmpty)
-				transaction.AddCondition(Condition.KeyNotExists(TokenKey(session.Id)));
-			else
-				transaction.AddCondition(Condition.StringEqual(TokenKey(session.Id), refreshToken));
-
-			var removeSession = transaction.KeyDeleteAsync(SessionKey(session.Id));
-			var removeRefreshToken = transaction.KeyDeleteAsync(TokenKey(session.Id));
-			var removeFromUser = transaction.SortedSetRemoveAsync(UserSessionsKey(session.UserId), session.Id);
-			var removeExpiration = transaction.SortedSetRemoveAsync(SessionExpirationsKey, ExpirationMember(session));
-			Task<bool>? removeRefreshTokenIndex = null;
-
-			if (!refreshToken.IsNullOrEmpty)
-				removeRefreshTokenIndex = transaction.KeyDeleteAsync(IndexKey(refreshToken.ToString()));
-
-			if (!await transaction.ExecuteAsync())
-				continue;
-
-			if (removeRefreshTokenIndex == null)
-			{
-				await Task.WhenAll(removeSession, removeRefreshToken, removeFromUser, removeExpiration);
-				return;
-			}
-
-			await Task.WhenAll(
-				removeSession,
-				removeRefreshToken,
-				removeFromUser,
-				removeExpiration,
-				removeRefreshTokenIndex
-			);
+		var session = await FindByIdAsync(sessionId);
+		if (session == null)
 			return;
-		}
 
-		throw new InvalidOperationException("Failed to terminate session because it was modified concurrently.");
+		await _sessionStorageHelper.TerminateAsync(session);
 	}
 
 	public async Task<IReadOnlyList<UserSessionDto>> ListByUserAsync(int userId)
 	{
-		var sessionIds = await _redis.SortedSetRangeByRankAsync(UserSessionsKey(userId), 0, -1);
-		if (sessionIds.Length == 0)
-			return [];
+		var sessionIds = await _sessionStorageHelper.ListIdsByUserAsync(userId);
 
-		var keys = sessionIds
-			.Where(id => !id.IsNullOrEmpty)
-			.Select(id => (RedisKey)SessionKey(id.ToString()))
-			.ToArray();
-		var values = await _redis.StringGetAsync(keys);
-
-		List<UserSessionDto> result = [];
-
-		foreach (var value in values)
-		{
-			if (!value.IsNullOrEmpty)
-			{
-				var item = JsonSerializer.Deserialize<UserSessionDto>(value.ToString());
-				if (item != null)
-				{
-					result.Add(item);
-				}
-			}
-		}
-
-		return result;
+		return await LoadExistingSessionsAsync(userId, sessionIds);
 	}
 
 	public async Task<PageResult<UserSessionDto>> GetPageByUserAsync(int userId, PageOptions pageOptions)
 	{
-		var totalCount = await _redis.SortedSetLengthAsync(UserSessionsKey(userId));
+		var sessions = await ListByUserAsync(userId);
+		var start = (pageOptions.Page - 1) * pageOptions.PageSize;
+		var pageItems = sessions.Skip(start).Take(pageOptions.PageSize).ToList();
 
-		int start = (pageOptions.Page - 1) * pageOptions.PageSize;
-		int stop = start + pageOptions.PageSize - 1;
-
-		var sessionIds = await _redis.SortedSetRangeByRankAsync(UserSessionsKey(userId), start, stop, Order.Descending);
-
-		List<UserSessionDto> result = [];
-
-		if (sessionIds.Length > 0)
-		{
-			var keys = sessionIds
-				.Where(id => !id.IsNullOrEmpty)
-				.Select(id => (RedisKey)SessionKey(id.ToString()))
-				.ToArray();
-			var values = await _redis.StringGetAsync(keys);
-
-			foreach (var value in values)
-			{
-				if (!value.IsNullOrEmpty)
-				{
-					var item = JsonSerializer.Deserialize<UserSessionDto>(value.ToString());
-					if (item != null)
-					{
-						result.Add(item);
-					}
-				}
-			}
-		}
-
-		return new PageResult<UserSessionDto>(result, (int)totalCount, pageOptions.Page, pageOptions.PageSize);
+		return new PageResult<UserSessionDto>(pageItems, sessions.Count, pageOptions.Page, pageOptions.PageSize);
 	}
 
-	public async Task<int> CleanupExpiredSessionsAsync(DateTime utcNow)
-	{
-		int totalDeleted = 0;
-		var expiredSessions = await _redis.SortedSetRangeByScoreWithScoresAsync(
-			SessionExpirationsKey,
-			double.NegativeInfinity,
-			utcNow.Ticks,
-			Exclude.None,
-			Order.Ascending,
-			0,
-			CleanupBatchSize
-		);
+	public Task<int> CleanupExpiredSessionsAsync(DateTime utcNow) =>
+		_sessionCleanupHelper.CleanupExpiredSessionsAsync(utcNow);
 
-		foreach (var expiredSession in expiredSessions)
+	private async Task<List<UserSessionDto>> LoadExistingSessionsAsync(int userId, RedisValue[] sessionIds)
+	{
+		if (sessionIds.Length == 0)
+			return [];
+
+		var values = await _sessionStorageHelper.GetManyAsync(sessionIds);
+		List<UserSessionDto> sessions = [];
+		List<RedisValue> staleSessionIds = [];
+
+		for (var index = 0; index < sessionIds.Length; index++)
 		{
-			if (!TryParseExpirationMember(expiredSession.Element, out var userId, out var sessionId))
+			var sessionId = sessionIds[index].ToString();
+			var value = values[index];
+			if (value.IsNullOrEmpty)
 			{
-				await _redis.SortedSetRemoveAsync(SessionExpirationsKey, expiredSession.Element);
-				totalDeleted++;
+				staleSessionIds.Add(sessionIds[index]);
 				continue;
 			}
 
-			try
-			{
-				var transaction = _redis.CreateTransaction();
-				transaction.AddCondition(Condition.KeyNotExists(SessionKey(sessionId)));
-				transaction.AddCondition(
-					Condition.SortedSetEqual(SessionExpirationsKey, expiredSession.Element, expiredSession.Score)
-				);
-				var removeExpiration = transaction.SortedSetRemoveAsync(SessionExpirationsKey, expiredSession.Element);
-				var removeFromUser = transaction.SortedSetRemoveAsync(UserSessionsKey(userId), sessionId);
+			var session = DeserializeSession(value, sessionId);
+			if (session.UserId != userId)
+				throw new InvalidOperationException("Redis session index contains a session for a different user.");
 
-				if (await transaction.ExecuteAsync())
-					totalDeleted++;
-			}
-			catch (Exception exception)
-			{
-				logger.LogWarning(
-					exception,
-					"Unable to remove expired session index: SessionId={SessionId}, UserId={UserId}",
-					sessionId,
-					userId
-				);
-			}
+			sessions.Add(session);
 		}
 
-		return totalDeleted;
+		if (staleSessionIds.Count > 0)
+			await _sessionStorageHelper.RemoveFromUserIndexAsync(userId, staleSessionIds.ToArray());
+
+		return sessions;
 	}
 
-	private static bool TryParseExpirationMember(RedisValue value, out int userId, out string sessionId)
+	private async Task<UserSessionDto?> FindAndMigrateLegacySessionAsync(
+		string refreshToken,
+		string refreshTokenFingerprint
+	)
 	{
-		var parts = value.ToString().Split(':', 2);
-		if (parts.Length == 2 && int.TryParse(parts[0], out userId) && !string.IsNullOrWhiteSpace(parts[1]))
+		var sessionId = await _refreshTokenHelper.FindSessionIdAsync(refreshToken);
+		if (sessionId.IsNullOrEmpty)
+			return null;
+
+		var session = await FindByIdAsync(sessionId.ToString());
+		if (session == null)
+			return null;
+
+		var sessionTtl = await _sessionStorageHelper.GetTtlAsync(session.Id);
+		if (sessionTtl == null || sessionTtl <= TimeSpan.Zero)
+			return null;
+
+		var wasMigrated = await _refreshTokenHelper.TryMigrateLegacyAsync(
+			session,
+			refreshToken,
+			refreshTokenFingerprint,
+			sessionTtl.Value
+		);
+		if (!wasMigrated)
+			return null;
+
+		return session;
+	}
+
+	private UserSessionDto DeserializeSession(RedisValue value, string expectedSessionId)
+	{
+		try
 		{
-			sessionId = parts[1];
-			return true;
+			var session = JsonSerializer.Deserialize<UserSessionDto>(value.ToString());
+			if (session == null || session.Id != expectedSessionId)
+				throw new InvalidOperationException("Redis session data is invalid.");
+
+			return session;
 		}
-
-		userId = default;
-		sessionId = string.Empty;
-		return false;
+		catch (JsonException exception)
+		{
+			logger.LogError(exception, "Redis session data cannot be deserialized: SessionId={SessionId}", expectedSessionId);
+			throw new InvalidOperationException("Redis session data is invalid.", exception);
+		}
 	}
 
-	private static string GetRefreshTokenFingerprint(string refreshToken)
-	{
-		return Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(refreshToken)));
-	}
 }

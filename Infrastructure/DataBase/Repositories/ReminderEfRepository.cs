@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataBase.Repositories;
 
-public class ReminderEfRepository(AppDbContext context) : GenericEfRepository<Reminder>(context), IReminderRepository
+public class ReminderEfRepository(AppDbContext context) : BaseEfRepository<Reminder>(context), IReminderRepository
 {
 	public async Task<IReadOnlyList<ReminderDto>> ListDueAsync(CancellationToken ct)
 	{

@@ -8,7 +8,7 @@ using Infrastructure.Extensions;
 namespace Infrastructure.DataBase.Repositories;
 
 public class UserStrategyInstrumentEfRepository(AppDbContext context)
-	: GenericEfRepository<UserStrategyInstrument>(context),
+	: BaseEfRepository<UserStrategyInstrument>(context),
 		IUserStrategyInstrumentRepository
 {
 	public async Task<PageResult<Strategy>> GetStrategiesPageByInstrumentAsync(

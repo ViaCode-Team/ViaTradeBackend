@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataBase.Repositories;
 
-public class StrategyEfRepository(AppDbContext context) : GenericEfRepository<Strategy>(context), IStrategyRepository
+public class StrategyEfRepository(AppDbContext context) : BaseEfRepository<Strategy>(context), IStrategyRepository
 {
 	public async Task<StrategyCountsDto?> FindStatisticsAsync(int userId, CancellationToken ct)
 	{

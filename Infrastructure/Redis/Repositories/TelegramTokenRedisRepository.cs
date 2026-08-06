@@ -1,11 +1,12 @@
 using Application.Users.Interfaces;
 using Infrastructure.Redis.Entities;
+using Infrastructure.Redis.Keys;
 using StackExchange.Redis;
 
 namespace Infrastructure.Redis.Repositories;
 
-public class TelegramTokenRedisRepository(IConnectionMultiplexer redis)
-	: RedisRepository<TelegramTokenEntity>(redis, "TgToken:"),
+public class TelegramTokenRedisRepository(IConnectionMultiplexer connectionMultiplexer)
+	: BaseRedisRepository<TelegramTokenEntity>(connectionMultiplexer.GetDatabase(), RedisKeys.Cache.TelegramTokens),
 		ITelegramTokenRepository
 {
 	public async Task SetAsync(string token, int userId, TimeSpan expiry)

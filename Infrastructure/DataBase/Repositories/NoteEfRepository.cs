@@ -9,9 +9,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataBase.Repositories;
 
-public class NoteEfRepository(AppDbContext context) : GenericEfRepository<Note>(context), INoteRepository
+public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(context), INoteRepository
 {
-	public async Task<NoteStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct = default)
+	public async Task<NoteStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
 		var statistics = await _dbSet
 			.Where(note => note.UserId == userId)

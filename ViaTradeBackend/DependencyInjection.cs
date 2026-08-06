@@ -152,7 +152,6 @@ public static class DependencyInjection
 
 			return ConnectionMultiplexer.Connect(options);
 		});
-
 		return services;
 	}
 

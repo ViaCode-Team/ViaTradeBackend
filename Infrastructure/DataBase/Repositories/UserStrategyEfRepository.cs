@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Infrastructure.DataBase.Repositories;
 
 public class UserStrategyEfRepository(AppDbContext context)
-	: GenericEfRepository<UserStrategy>(context),
+	: BaseEfRepository<UserStrategy>(context),
 		IUserStrategyRepository
 {
 	public async Task<int> CountByUserAsync(int userId, CancellationToken ct)

@@ -8,13 +8,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataBase.Repositories;
 
-public class GenericEfRepository<TEntity> : IRepository<TEntity>
+public class BaseEfRepository<TEntity> : IRepository<TEntity>
 	where TEntity : BaseEntity<int>
 {
 	protected readonly AppDbContext _context;
 	protected readonly DbSet<TEntity> _dbSet;
 
-	public GenericEfRepository(AppDbContext context)
+	public BaseEfRepository(AppDbContext context)
 	{
 		_context = context;
 		_dbSet = _context.Set<TEntity>();
