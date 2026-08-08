@@ -10,6 +10,7 @@ using ViaTradeBackend.Contracts.Auth;
 using ViaTradeBackend.Contracts.Users;
 using ViaTradeBackend.Cookies;
 using ViaTradeBackend.Mappings;
+using ViaTradeBackend.Swagger.Attributes;
 
 namespace ViaTradeBackend.Controllers;
 
@@ -27,6 +28,7 @@ public class SessionsController(
 
 	[HttpPost]
 	[AllowAnonymous]
+	[SetsAuthCookies]
 	public async Task<NoContent> Login([FromBody, Required] LoginRequest request, CancellationToken ct)
 	{
 		var userAgent = Request.Headers.UserAgent.ToString();
@@ -40,7 +42,9 @@ public class SessionsController(
 	[AllowAnonymous]
 	public async Task<NoContent> RefreshCurrentSession(CancellationToken ct)
 	{
-		if (!Request.Cookies.TryGetValue(_authCookieOptions.RefreshTokenCookie, out var refreshToken))
+		var hasRefreshToken = Request.Cookies.TryGetValue(_authCookieOptions.RefreshTokenCookie, out var refreshToken);
+
+		if (!hasRefreshToken || string.IsNullOrWhiteSpace(refreshToken))
 			throw new UnauthorizedAccessException();
 
 		var tokens = await authCommandService.RefreshTokenAsync(refreshToken, ct);

@@ -38,18 +38,34 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 					group.Key.Month,
 					group.Key.Day,
 					null,
-					group.Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
-						2
-					)),
-					group.Where(trade => trade.Signal == TradeSignal.BUY).Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
-						2
-					)),
-					group.Where(trade => trade.Signal == TradeSignal.SELL).Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
-						2
-					))
+					group.Sum(trade =>
+						Math.Round(
+							(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+							2
+						)
+					),
+					group
+						.Where(trade => trade.Signal == TradeSignal.BUY)
+						.Sum(trade =>
+							Math.Round(
+								(trade.ExitPrice!.Value - trade.EntryPrice)
+									/ trade.EntryPrice
+									* 100
+									* (int)trade.Signal,
+								2
+							)
+						),
+					group
+						.Where(trade => trade.Signal == TradeSignal.SELL)
+						.Sum(trade =>
+							Math.Round(
+								(trade.ExitPrice!.Value - trade.EntryPrice)
+									/ trade.EntryPrice
+									* 100
+									* (int)trade.Signal,
+								2
+							)
+						)
 				))
 				.ToListAsync(ct),
 			ProfitChartGranularity.Week => await tradesQuery
@@ -60,18 +76,34 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 					null,
 					null,
 					group.Key,
-					group.Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
-						2
-					)),
-					group.Where(trade => trade.Signal == TradeSignal.BUY).Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
-						2
-					)),
-					group.Where(trade => trade.Signal == TradeSignal.SELL).Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
-						2
-					))
+					group.Sum(trade =>
+						Math.Round(
+							(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+							2
+						)
+					),
+					group
+						.Where(trade => trade.Signal == TradeSignal.BUY)
+						.Sum(trade =>
+							Math.Round(
+								(trade.ExitPrice!.Value - trade.EntryPrice)
+									/ trade.EntryPrice
+									* 100
+									* (int)trade.Signal,
+								2
+							)
+						),
+					group
+						.Where(trade => trade.Signal == TradeSignal.SELL)
+						.Sum(trade =>
+							Math.Round(
+								(trade.ExitPrice!.Value - trade.EntryPrice)
+									/ trade.EntryPrice
+									* 100
+									* (int)trade.Signal,
+								2
+							)
+						)
 				))
 				.ToListAsync(ct),
 			ProfitChartGranularity.Month => await tradesQuery
@@ -83,18 +115,34 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 					group.Key.Month,
 					null,
 					null,
-					group.Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
-						2
-					)),
-					group.Where(trade => trade.Signal == TradeSignal.BUY).Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
-						2
-					)),
-					group.Where(trade => trade.Signal == TradeSignal.SELL).Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
-						2
-					))
+					group.Sum(trade =>
+						Math.Round(
+							(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+							2
+						)
+					),
+					group
+						.Where(trade => trade.Signal == TradeSignal.BUY)
+						.Sum(trade =>
+							Math.Round(
+								(trade.ExitPrice!.Value - trade.EntryPrice)
+									/ trade.EntryPrice
+									* 100
+									* (int)trade.Signal,
+								2
+							)
+						),
+					group
+						.Where(trade => trade.Signal == TradeSignal.SELL)
+						.Sum(trade =>
+							Math.Round(
+								(trade.ExitPrice!.Value - trade.EntryPrice)
+									/ trade.EntryPrice
+									* 100
+									* (int)trade.Signal,
+								2
+							)
+						)
 				))
 				.ToListAsync(ct),
 			_ => throw new ArgumentOutOfRangeException(

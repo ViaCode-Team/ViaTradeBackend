@@ -35,7 +35,9 @@ public class JwtBearerOptionsSetup(IOptions<JwtOptions> jwtOptions, IOptions<Aut
 		{
 			OnMessageReceived = context =>
 			{
-				if (context.Request.Cookies.TryGetValue(_authCooki.AccessTokenCookie, out var token))
+				var hasToken = context.Request.Cookies.TryGetValue(_authCooki.AccessTokenCookie, out var token);
+
+				if (hasToken)
 					context.Token = token;
 
 				return Task.CompletedTask;

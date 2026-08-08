@@ -8,6 +8,7 @@ using ViaTradeBackend.Contracts.Auth;
 using ViaTradeBackend.Contracts.Users;
 using ViaTradeBackend.Cookies;
 using ViaTradeBackend.Mappings;
+using ViaTradeBackend.Swagger.Attributes;
 
 namespace ViaTradeBackend.Controllers;
 
@@ -24,6 +25,7 @@ public class UsersController(
 {
 	[HttpPost]
 	[AllowAnonymous]
+	[SetsAuthCookies]
 	public async Task<NoContent> Register([FromBody, Required] RegisterRequest request, CancellationToken ct)
 	{
 		var userAgent = Request.Headers.UserAgent.ToString();

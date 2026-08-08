@@ -66,7 +66,9 @@ internal sealed class RefreshTokenRedisHelper(IDatabase database)
 	{
 		var transaction = _database.CreateTransaction();
 		transaction.AddCondition(Condition.KeyExists(RedisKeys.Sessions.ById(session.Id)));
-		transaction.AddCondition(Condition.StringEqual(RedisKeys.Sessions.RefreshTokenFingerprint(session.Id), refreshToken));
+		transaction.AddCondition(
+			Condition.StringEqual(RedisKeys.Sessions.RefreshTokenFingerprint(session.Id), refreshToken)
+		);
 		transaction.AddCondition(Condition.StringEqual(RedisKeys.Sessions.RefreshTokenIndex(refreshToken), session.Id));
 		transaction.AddCondition(Condition.KeyNotExists(RedisKeys.Sessions.RefreshTokenIndex(refreshTokenFingerprint)));
 
@@ -75,7 +77,9 @@ internal sealed class RefreshTokenRedisHelper(IDatabase database)
 			refreshTokenFingerprint,
 			sessionTtl
 		);
-		var removeLegacyRefreshTokenIndex = transaction.KeyDeleteAsync(RedisKeys.Sessions.RefreshTokenIndex(refreshToken));
+		var removeLegacyRefreshTokenIndex = transaction.KeyDeleteAsync(
+			RedisKeys.Sessions.RefreshTokenIndex(refreshToken)
+		);
 		var setRefreshTokenIndex = transaction.StringSetAsync(
 			RedisKeys.Sessions.RefreshTokenIndex(refreshTokenFingerprint),
 			session.Id,

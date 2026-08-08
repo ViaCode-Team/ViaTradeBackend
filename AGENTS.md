@@ -21,6 +21,7 @@
 2. **Error Resolution**: If the build fails, you MUST fix all compilation errors and rebuild until the build succeeds.
 3. **Warning Resolution**: Whenever possible, fix compiler warnings as well.
 4. **Code Replacement Accuracy**: NEVER guess or hallucinate the `TargetContent` for the `replace_file_content` tool. ALWAYS use `view_file` or `grep_search` to read the exact lines from the file first. Providing inaccurate target content causes the fuzzy matcher to make unintended, destructive changes to the code.
+5. **Temporary Files**: Remove every temporary file and directory you create before completing the task.
 
 ## Strict Security (CRITICAL)
 1. **Prevent IDOR**: NEVER query/update/delete by ID alone. ALL DB actions MUST verify ownership (`&& e.UserId == currentUserId`).
@@ -33,7 +34,7 @@
 ## C# Coding Guidelines (C# 12+)
 1. **General**: File-scoped namespaces. **`using` directives MUST be placed BEFORE the `namespace` declaration**. Exactly 1 empty line after `using` directives, after `namespace`, between methods, between fields/methods, and at EOF.
 2. **Fields/Blocks**: Group related fields (NO empty lines between them). Use empty lines between execution stages (e.g. validation -> save -> return).
-3. **Syntax Constraints**: Use modern syntax (switch expressions). NO ternary operators (`? :`); use `if/else` or `switch`. NO spread collections `[..]` for fluent methods (prefer `.ToList()`). Regular collections `[]` allowed.
+3. **Syntax Constraints**: Use modern syntax (switch expressions). NO ternary operators (`? :`); use `if/else` or `switch`. Do not declare `out var` or pattern variables inside `if` conditions; assign them before the condition. NO spread collections `[..]` for fluent methods (prefer `.ToList()`). Regular collections `[]` allowed.
 4. **Clean Code**: Avoid unnecessary braces for single-line statements. Comments must be minimal, in English, and only for highly complex code.
 5. **Entity Framework**: The DbContext is globally configured with `QueryTrackingBehavior.NoTracking`. All read operations are untracked by default. DO NOT add `.AsNoTracking()` explicitly. When updating entities using `SaveChangesAsync()`, you MUST explicitly call `_dbSet.Update(entity)` beforehand. Prefer `ExecuteUpdateAsync/ExecuteDeleteAsync` where possible.
 

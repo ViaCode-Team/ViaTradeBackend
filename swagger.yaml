@@ -2636,7 +2636,12 @@ paths:
         required: true
       responses:
         '204':
-          description: No Content
+          description: Authentication succeeded. Access and refresh tokens are set as secure cookies.
+          headers:
+            Set-Cookie:
+              description: 'Sent twice: `access_token` and `refresh_token`. Both cookies are HttpOnly, Secure, SameSite=Strict, and Path=/.'
+              schema:
+                type: string
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -6725,7 +6730,12 @@ paths:
         required: true
       responses:
         '204':
-          description: No Content
+          description: Authentication succeeded. Access and refresh tokens are set as secure cookies.
+          headers:
+            Set-Cookie:
+              description: 'Sent twice: `access_token` and `refresh_token`. Both cookies are HttpOnly, Secure, SameSite=Strict, and Path=/.'
+              schema:
+                type: string
         '400':
           description: Bad Request - Invalid input data
           content:

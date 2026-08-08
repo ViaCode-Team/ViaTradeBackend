@@ -14,11 +14,13 @@ public class TradeQuerySpecification : BaseQuerySpecification<Trade>
 		if (request.Signal.HasValue)
 			AddCriteria(x => x.Signal == request.Signal.Value);
 
-		if (request.Status is TradeStatus status)
+		var status = request.Status;
+
+		if (status.HasValue)
 		{
-			if (status == TradeStatus.Open)
+			if (status.Value == TradeStatus.Open)
 				AddCriteria(x => x.ClosedAt == null);
-			else if (status == TradeStatus.Closed)
+			else if (status.Value == TradeStatus.Closed)
 				AddCriteria(x => x.ClosedAt != null);
 		}
 

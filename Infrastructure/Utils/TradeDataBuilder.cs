@@ -25,7 +25,9 @@ public class TradeDataBuilder : ITradeDataBuilder
 		foreach (var fileName in fileNames)
 		{
 			// Process only valid file names, skip invalid silently or log if needed
-			if (TryParseFileName(fileName, out var response))
+			var hasInstrumentFile = TryParseFileName(fileName, out var response);
+
+			if (hasInstrumentFile)
 			{
 				yield return response;
 			}
@@ -44,22 +46,26 @@ public class TradeDataBuilder : ITradeDataBuilder
 			return false;
 
 		// Try to parse dates with invariant culture to avoid locale issues
-		if (
-			!DateTime.TryParseExact(
-				match.Groups["Start"].Value,
-				"yyyy-MM-dd",
-				CultureInfo.InvariantCulture,
-				DateTimeStyles.None,
-				out var startDate
-			)
-			|| !DateTime.TryParseExact(
-				match.Groups["End"].Value,
-				"yyyy-MM-dd",
-				CultureInfo.InvariantCulture,
-				DateTimeStyles.None,
-				out var endDate
-			)
-		)
+		var hasStartDate = DateTime.TryParseExact(
+			match.Groups["Start"].Value,
+			"yyyy-MM-dd",
+			CultureInfo.InvariantCulture,
+			DateTimeStyles.None,
+			out var startDate
+		);
+
+		if (!hasStartDate)
+			return false;
+
+		var hasEndDate = DateTime.TryParseExact(
+			match.Groups["End"].Value,
+			"yyyy-MM-dd",
+			CultureInfo.InvariantCulture,
+			DateTimeStyles.None,
+			out var endDate
+		);
+
+		if (!hasEndDate)
 			return false;
 
 		result = new InstrumentFile
