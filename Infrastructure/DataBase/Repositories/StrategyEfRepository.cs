@@ -29,12 +29,39 @@ public class StrategyEfRepository(AppDbContext context) : BaseEfRepository<Strat
 		return strategies.ToDictionary(strategy => strategy.Name, strategy => strategy.Accuracy);
 	}
 
-	public async Task<Strategy?> FindForUserAsync(int userId, int strategyId, CancellationToken ct)
+	public async Task<Strategy?> FindWithActivityAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		return await _dbSet.FirstOrDefaultAsync(
-			strategy => strategy.Id == strategyId && strategy.UserStrategies.Any(link => link.UserId == userId),
-			ct
-		);
+		var result = await _dbSet
+			.Where(strategy => strategy.Id == strategyId)
+			.Select(strategy => new
+			{
+				Strategy = strategy,
+				IsActive = strategy.UserStrategies.Any(link => link.UserId == userId),
+			})
+			.FirstOrDefaultAsync(ct);
+		if (result == null)
+			return null;
+
+		result.Strategy.IsActive = result.IsActive;
+		return result.Strategy;
+	}
+
+	public async Task<StrategyInstrumentLinkState?> FindInstrumentLinkStateAsync(
+		int userId,
+		int strategyId,
+		int instrumentId,
+		CancellationToken ct
+	)
+	{
+		return await _dbSet
+			.Where(strategy => strategy.Id == strategyId)
+			.Select(_ => new StrategyInstrumentLinkState(
+				_context.Instruments.Any(instrument => instrument.Id == instrumentId),
+				_context.UserStrategyInstruments.Any(link =>
+					link.UserId == userId && link.StrategyId == strategyId && link.InstrumentId == instrumentId
+				)
+			))
+			.SingleOrDefaultAsync(ct);
 	}
 
 	public async Task<int?> FindAccuracyByNameAsync(string name, CancellationToken ct)

@@ -4,6 +4,7 @@ using Application.Strategies.Interfaces;
 using Application.Strategies.Models;
 using Domain.Entities;
 using Infrastructure.Extensions;
+using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataBase.Repositories;
 
@@ -20,24 +21,30 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 		CancellationToken ct
 	)
 	{
-		var query = _dbSet
-			.Where(link => link.UserId == userId && link.InstrumentId == instrumentId)
-			.Select(link => link.Strategy!);
+		var query = _dbSet.Where(link => link.UserId == userId && link.InstrumentId == instrumentId);
 
 		if (!string.IsNullOrWhiteSpace(strategyFilter.Name))
-			query = query.Where(strategy => strategy.Name == strategyFilter.Name);
+			query = query.Where(link => link.Strategy!.Name == strategyFilter.Name);
 
-		query = ApplyStrategySort(query, strategySort);
-		var pagedStrategies = await query.ToPagedAsync(pageOptions, ct);
+		var strategyQuery = ApplyStrategySort(query.Select(link => link.Strategy!), strategySort);
+		var pagedStrategies = await strategyQuery
+			.Select(strategy => new
+			{
+				Strategy = strategy,
+				IsActive = _context.UserStrategies.Any(userStrategy =>
+					userStrategy.UserId == userId && userStrategy.StrategyId == strategy.Id
+				),
+			})
+			.ToPagedAsync(pageOptions, ct);
 
-		return pagedStrategies.Map(strategy =>
+		return pagedStrategies.Map(result =>
 		{
-			strategy.IsActive = true;
-			return strategy;
+			result.Strategy.IsActive = result.IsActive;
+			return result.Strategy;
 		});
 	}
 
-	public async Task<PageResult<RelatedInstrumentDto>> GetInstrumentsPageByStrategyAsync(
+	public async Task<StrategyInstrumentsPageResult> GetInstrumentsPageByStrategyAsync(
 		int userId,
 		int strategyId,
 		InstrumentSort instrumentSort,
@@ -45,23 +52,41 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 		CancellationToken ct
 	)
 	{
+		var strategyPageInfo = await _context
+			.Strategies.Where(strategy => strategy.Id == strategyId)
+			.Select(_ => new
+			{
+				TotalCount = _dbSet.Count(link => link.UserId == userId && link.StrategyId == strategyId),
+			})
+			.SingleOrDefaultAsync(ct);
+
+		if (strategyPageInfo == null)
+		{
+			return new StrategyInstrumentsPageResult(
+				false,
+				new PageResult<RelatedInstrumentDto>([], 0, pageOptions.Page, pageOptions.PageSize)
+			);
+		}
+
 		var query = _dbSet
 			.Where(link => link.UserId == userId && link.StrategyId == strategyId)
 			.Select(link => link.Instrument!);
 
 		query = ApplyInstrumentSort(query, instrumentSort);
 
-		return await query
+		var instruments = await query
 			.Select(instrument => new RelatedInstrumentDto(instrument.Id, instrument.Symbol, instrument.Description))
-			.ToPagedAsync(pageOptions, ct);
+			.ToPagedAsync(pageOptions, strategyPageInfo.TotalCount, ct);
+
+		return new StrategyInstrumentsPageResult(true, instruments);
 	}
 
-	private static IQueryable<Domain.Entities.Instrument> ApplyInstrumentSort(
-		IQueryable<Domain.Entities.Instrument> query,
+	private static IQueryable<Instrument> ApplyInstrumentSort(
+		IQueryable<Instrument> query,
 		InstrumentSort instrumentSort
 	)
 	{
-		IOrderedQueryable<Domain.Entities.Instrument>? orderedQuery = null;
+		IOrderedQueryable<Instrument>? orderedQuery = null;
 		foreach (var field in instrumentSort.GetEffectiveSortBy())
 		{
 			if (orderedQuery == null)

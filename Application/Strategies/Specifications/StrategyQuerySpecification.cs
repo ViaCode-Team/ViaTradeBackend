@@ -6,7 +6,7 @@ namespace Application.Strategies.Specifications;
 
 public class StrategyQuerySpecification : BaseQuerySpecification<Strategy>
 {
-	public StrategyQuerySpecification(int userId, StrategyFilter strategyFilter, StrategySort strategySort)
+	public StrategyQuerySpecification(StrategyFilter strategyFilter, StrategySort strategySort)
 	{
 		if (!string.IsNullOrWhiteSpace(strategyFilter.Name))
 			AddCriteria(x => x.Name == strategyFilter.Name);

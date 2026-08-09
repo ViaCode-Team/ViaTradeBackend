@@ -20,8 +20,8 @@ public class TradeCommandService(
 		{
 			OpenedAt = request.OpenedAt,
 			ClosedAt = request.ClosedAt,
-			EntryPrice = request.EntryPrice,
-			ExitPrice = request.ExitPrice,
+			OpenPrice = request.EntryPrice,
+			ClosePrice = request.ExitPrice,
 			Quantity = request.Quantity,
 			TradeTypeId = request.TradeTypeId,
 			InstrumentId = request.InstrumentId,
@@ -32,6 +32,7 @@ public class TradeCommandService(
 
 		await tradeRepository.AddAsync(trade, ct);
 		await uow.SaveChangesAsync(ct);
+
 		var instrument = await instrumentRepository.FindByIdAsync(trade.InstrumentId, ct);
 		if (instrument == null)
 			throw new DataIntegrityException(
@@ -42,9 +43,9 @@ public class TradeCommandService(
 			trade.Id,
 			trade.OpenedAt,
 			trade.ClosedAt,
-			trade.EntryPrice,
-			trade.ExitPrice,
-			TradeStatisticsCalcService.CalculateNetIncome(trade.EntryPrice, trade.ExitPrice, trade.Signal),
+			trade.OpenPrice,
+			trade.ClosePrice,
+			TradeStatisticsCalcService.CalculateNetIncome(trade.OpenPrice, trade.ClosePrice, trade.Signal),
 			trade.Quantity,
 			trade.TotalPrice,
 			trade.Signal,

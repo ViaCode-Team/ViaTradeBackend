@@ -639,7 +639,7 @@ paths:
     get:
       tags:
         - Instruments
-      operationId: GetNote
+      operationId: GetInstrumentNote
       parameters:
         - name: instrumentId
           in: path
@@ -787,7 +787,7 @@ paths:
     put:
       tags:
         - Instruments
-      operationId: UpsertNote
+      operationId: UpsertInstrumentNote
       parameters:
         - name: instrumentId
           in: path
@@ -943,7 +943,7 @@ paths:
     delete:
       tags:
         - Instruments
-      operationId: DeleteNote
+      operationId: DeleteInstrumentNote
       parameters:
         - name: instrumentId
           in: path
@@ -1088,7 +1088,7 @@ paths:
     get:
       tags:
         - Instruments
-      operationId: GetReminders
+      operationId: GetInstrumentReminders
       parameters:
         - name: instrumentId
           in: path
@@ -1258,7 +1258,7 @@ paths:
     post:
       tags:
         - Instruments
-      operationId: CreateReminder
+      operationId: CreateInstrumentReminder
       parameters:
         - name: instrumentId
           in: path
@@ -4744,7 +4744,7 @@ paths:
     get:
       tags:
         - Strategies
-      operationId: GetNote
+      operationId: GetStrategyNote
       parameters:
         - name: strategyId
           in: path
@@ -4892,7 +4892,7 @@ paths:
     put:
       tags:
         - Strategies
-      operationId: UpsertNote
+      operationId: UpsertStrategyNote
       parameters:
         - name: strategyId
           in: path
@@ -5048,7 +5048,7 @@ paths:
     delete:
       tags:
         - Strategies
-      operationId: DeleteNote
+      operationId: DeleteStrategyNote
       parameters:
         - name: strategyId
           in: path

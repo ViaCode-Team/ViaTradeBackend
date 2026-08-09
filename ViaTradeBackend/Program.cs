@@ -1,6 +1,8 @@
+using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Infrastructure.Configuration;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using ViaTradeBackend;
@@ -16,6 +18,14 @@ builder.Services.AddAuthLayer(builder.Configuration);
 builder.Services.Configure<AnalyzerDataOption>(builder.Configuration.GetSection("AnalyzerData"));
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ExceptionHandlingMiddleware>();
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+	options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+	options.KnownIPNetworks.Clear();
+	options.KnownProxies.Clear();
+	options.KnownProxies.Add(IPAddress.Loopback);
+	options.KnownProxies.Add(IPAddress.IPv6Loopback);
+});
 
 builder
 	.Services.AddControllers(options =>
@@ -55,6 +65,7 @@ builder.Services.AddViaTradeSwagger();
 
 var app = builder.Build();
 
+app.UseForwardedHeaders();
 app.UseViaTradeSwagger();
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
