@@ -4,7 +4,6 @@ using Application.Instruments.Interfaces;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
 using Domain.Entities;
-using Domain.Services;
 
 namespace Application.Trades;
 
@@ -20,14 +19,14 @@ public class TradeCommandService(
 		{
 			OpenedAt = request.OpenedAt,
 			ClosedAt = request.ClosedAt,
-			OpenPrice = request.EntryPrice,
-			ClosePrice = request.ExitPrice,
+			OpenPrice = request.OpenPrice,
+			ClosePrice = request.ClosePrice,
 			Quantity = request.Quantity,
 			TradeTypeId = request.TradeTypeId,
 			InstrumentId = request.InstrumentId,
 			UserId = userId,
 			Signal = request.Signal,
-			TotalPrice = (decimal)request.EntryPrice * request.Quantity,
+			TotalPrice = (decimal)request.OpenPrice * request.Quantity,
 		};
 
 		await tradeRepository.AddAsync(trade, ct);
@@ -45,7 +44,7 @@ public class TradeCommandService(
 			trade.ClosedAt,
 			trade.OpenPrice,
 			trade.ClosePrice,
-			TradeStatisticsCalcService.CalculateNetIncome(trade.OpenPrice, trade.ClosePrice, trade.Signal),
+			trade.NetIncome,
 			trade.Quantity,
 			trade.TotalPrice,
 			trade.Signal,
@@ -65,7 +64,7 @@ public class TradeCommandService(
 
 	public async Task UpdateAsync(int userId, int id, TradeInputDto request, CancellationToken ct)
 	{
-		var price = (decimal)request.EntryPrice * request.Quantity;
+		var price = (decimal)request.OpenPrice * request.Quantity;
 
 		var affectedRows = await tradeRepository.ExecuteUpdateAsync(userId, id, request, price, ct);
 		if (affectedRows != 0)

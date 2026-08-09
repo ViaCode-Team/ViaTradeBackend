@@ -7146,9 +7146,9 @@ components:
       additionalProperties: false
     CreateTradeRequest:
       required:
-        - entryPrice
         - instrumentId
         - openedAt
+        - openPrice
         - quantity
         - signal
         - tradeTypeId
@@ -7160,10 +7160,10 @@ components:
         closedAt:
           type: string
           format: date-time
-        entryPrice:
+        openPrice:
           type: number
           format: double
-        exitPrice:
+        closePrice:
           type: number
           format: double
         signal:
@@ -7707,9 +7707,9 @@ components:
       additionalProperties: false
     TradeResponse:
       required:
-        - entryPrice
         - id
         - openedAt
+        - openPrice
         - quantity
         - signal
         - totalPrice
@@ -7726,10 +7726,10 @@ components:
         closedAt:
           type: string
           format: date-time
-        entryPrice:
+        openPrice:
           type: number
           format: double
-        exitPrice:
+        closePrice:
           type: number
           format: double
         netIncome:
@@ -7831,9 +7831,9 @@ components:
       additionalProperties: false
     UpdateTradeRequest:
       required:
-        - entryPrice
         - instrumentId
         - openedAt
+        - openPrice
         - quantity
         - signal
         - tradeTypeId
@@ -7845,10 +7845,10 @@ components:
         closedAt:
           type: string
           format: date-time
-        entryPrice:
+        openPrice:
           type: number
           format: double
-        exitPrice:
+        closePrice:
           type: number
           format: double
         signal:

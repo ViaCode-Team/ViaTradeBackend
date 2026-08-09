@@ -8,6 +8,7 @@ public sealed class Trade : BaseEntity<int>
 	public DateTime? ClosedAt { get; set; }
 	public required double OpenPrice { get; set; }
 	public double? ClosePrice { get; set; }
+	public double? NetIncome { get; private set; }
 	public required int Quantity { get; set; }
 
 	public required decimal TotalPrice { get; set; }

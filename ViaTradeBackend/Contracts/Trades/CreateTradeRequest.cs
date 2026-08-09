@@ -6,8 +6,8 @@ namespace ViaTradeBackend.Contracts.Trades;
 public record CreateTradeRequest(
 	DateTime OpenedAt,
 	DateTime? ClosedAt,
-	[Range(double.Epsilon, double.MaxValue)] double EntryPrice,
-	[Range(double.Epsilon, double.MaxValue)] double? ExitPrice,
+	[Range(double.Epsilon, double.MaxValue)] double OpenPrice,
+	[Range(double.Epsilon, double.MaxValue)] double? ClosePrice,
 	[EnumDataType(typeof(TradeSignal))] TradeSignal Signal,
 	[Range(1, int.MaxValue)] int Quantity,
 	[Range(1, int.MaxValue)] int TradeTypeId,
@@ -22,10 +22,10 @@ public record CreateTradeRequest(
 				[nameof(OpenedAt), nameof(ClosedAt)]
 			);
 
-		if (ClosedAt.HasValue != ExitPrice.HasValue)
+		if (ClosedAt.HasValue != ClosePrice.HasValue)
 			yield return new ValidationResult(
-				"closedAt and exitPrice must either both be specified or both be omitted.",
-				[nameof(ClosedAt), nameof(ExitPrice)]
+				"closedAt and closePrice must either both be specified or both be omitted.",
+				[nameof(ClosedAt), nameof(ClosePrice)]
 			);
 	}
 }

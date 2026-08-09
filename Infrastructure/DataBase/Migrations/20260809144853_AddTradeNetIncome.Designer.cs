@@ -4,16 +4,19 @@ using Infrastructure.DataBase;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Infrastructure.Migrations
+namespace Infrastructure.DataBase.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260809144853_AddTradeNetIncome")]
+    partial class AddTradeNetIncome
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -227,7 +230,8 @@ namespace Infrastructure.Migrations
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<double?>("ClosePrice")
-                        .HasColumnType("double");
+                        .HasColumnType("double")
+                        .HasColumnName("ExitPrice");
 
                     b.Property<DateTime?>("ClosedAt")
                         .HasColumnType("datetime(6)");
@@ -241,10 +245,11 @@ namespace Infrastructure.Migrations
                     b.Property<double?>("NetIncome")
                         .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("double")
-                        .HasComputedColumnSql("CASE\n	WHEN `ClosePrice` IS NULL OR `OpenPrice` = 0 OR `Signal` = 0 THEN NULL\n	ELSE ROUND((`ClosePrice` - `OpenPrice`) / `OpenPrice` * 100 * `Signal`, 2)\nEND", true);
+                        .HasComputedColumnSql("CASE\n	WHEN `ExitPrice` IS NULL OR `EntryPrice` = 0 OR `Signal` = 0 THEN NULL\n	ELSE ROUND((`ExitPrice` - `EntryPrice`) / `EntryPrice` * 100 * `Signal`, 2)\nEND", true);
 
                     b.Property<double>("OpenPrice")
-                        .HasColumnType("double");
+                        .HasColumnType("double")
+                        .HasColumnName("EntryPrice");
 
                     b.Property<DateTime>("OpenedAt")
                         .HasColumnType("datetime(6)");

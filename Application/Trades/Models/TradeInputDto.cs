@@ -9,9 +9,9 @@ public record TradeInputDto
 
 	public DateTime? ClosedAt { get; set; }
 
-	public required double EntryPrice { get; set; }
+	public required double OpenPrice { get; set; }
 
-	public double? ExitPrice { get; set; }
+	public double? ClosePrice { get; set; }
 
 	public required TradeSignal Signal { get; set; }
 
