@@ -37,6 +37,19 @@ public class NotesController(INoteQueryService noteQueryService, IJwtHelper jwtH
 		return TypedResults.Ok(userNotes.Map(ApiMapper.ToResponse));
 	}
 
+	[HttpGet]
+	public async Task<Ok<PageResult<NoteResponse>>> GetSearchNotes(
+		[FromQuery] NoteSearchFilter noteFilter,
+		[FromQuery] PageOptions pageOptions,
+		CancellationToken ct
+	)
+	{
+		var userId = jwtHelper.GetUserIdFromClaims(User);
+		var userNotes = await noteQueryService.GetSearchAsync(userId, noteFilter, pageOptions, ct);
+
+		return TypedResults.Ok(userNotes.Map(ApiMapper.ToResponse));
+	}
+
 	[HttpGet("{noteId:int}")]
 	public async Task<Ok<NoteResponse>> GetNoteById(
 		[FromRoute, Range(1, int.MaxValue)] int noteId,

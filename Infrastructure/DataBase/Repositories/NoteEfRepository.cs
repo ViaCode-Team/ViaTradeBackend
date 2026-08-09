@@ -30,11 +30,35 @@ public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(con
 		IQuerySpecification<Note> specification,
 		PageOptions pageOptions,
 		CancellationToken ct
-	)
+		)
 	{
 		var query = SpecificationEvaluator.GetQuery(_dbSet, specification);
 		if (specification.SortExpressions.Count == 0)
 			query = query.OrderBy(note => note.Id);
+
+		return await query
+			.Select(note => new NoteProjectionDto(
+				note.Id,
+				note.Text,
+				note.UserId,
+				note.InstrumentId,
+				note.Instrument!.Symbol,
+				note.Instrument!.Description,
+				note.StrategyId,
+				note.Strategy!.Name,
+				note.Strategy!.Description
+			))
+			.ToPagedAsync(pageOptions, ct);
+	}
+
+	public async Task<PageResult<NoteProjectionDto>> GetPageSearchAsync(
+		ISearchSpecification<Note> specification,
+		PageOptions pageOptions,
+		CancellationToken ct
+		)
+	{
+		var query = specification.Apply(_dbSet)
+			.OrderBy(note => note.Id);
 
 		return await query
 			.Select(note => new NoteProjectionDto(
