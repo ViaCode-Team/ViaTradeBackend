@@ -5,9 +5,9 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 	<ItemGroup>
-	  <Compile Remove="DataBase\Repositories\Statistics\**" />
-	  <EmbeddedResource Remove="DataBase\Repositories\Statistics\**" />
-	  <None Remove="DataBase\Repositories\Statistics\**" />
+		<Compile Remove="DataBase\Repositories\Statistics\**" />
+		<EmbeddedResource Remove="DataBase\Repositories\Statistics\**" />
+		<None Remove="DataBase\Repositories\Statistics\**" />
 	</ItemGroup>
 
 	<ItemGroup>

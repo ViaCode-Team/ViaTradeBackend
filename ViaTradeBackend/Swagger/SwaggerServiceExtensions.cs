@@ -40,7 +40,9 @@ public static class SwaggerServiceExtensions
 
 			options.CustomOperationIds(apiDesc =>
 			{
-				if (apiDesc.TryGetMethodInfo(out var methodInfo))
+				var hasMethodInfo = apiDesc.TryGetMethodInfo(out var methodInfo);
+
+				if (hasMethodInfo)
 				{
 					return methodInfo.Name;
 				}
@@ -92,6 +94,7 @@ public static class SwaggerServiceExtensions
 			options.OperationFilter<ProblemDetailsOperationFilter>();
 			options.OperationFilter<CamelCaseParameterFilter>();
 			options.OperationFilter<SecurityRequirementsOperationFilter>();
+			options.OperationFilter<AuthCookiesOperationFilter>();
 
 			var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
 			var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);

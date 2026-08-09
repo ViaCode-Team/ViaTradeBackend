@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using Domain.Entities;
-using Domain.Enums;
 
 namespace Domain.Services;
 
@@ -8,22 +7,22 @@ public static class TradeStatisticsCalcService
 {
 	public static Expression<Func<Trade, double>> AbsoluteIncomeExpression =>
 		trade =>
-			trade.ExitPrice == null
+			trade.ClosePrice == null
 				? 0
-				: (trade.ExitPrice.Value - trade.EntryPrice) * trade.Quantity * (int)trade.Signal;
+				: (trade.ClosePrice.Value - trade.OpenPrice) * trade.Quantity * (int)trade.Signal;
 
 	public static Expression<Func<Trade, double>> AbsoluteIncomeAbsExpression =>
 		trade =>
-			trade.ExitPrice == null
+			trade.ClosePrice == null
 				? 0
-				: Math.Abs((trade.ExitPrice.Value - trade.EntryPrice) * trade.Quantity * (int)trade.Signal);
+				: Math.Abs((trade.ClosePrice.Value - trade.OpenPrice) * trade.Quantity * (int)trade.Signal);
 
 	public static double CalculateAbsoluteIncome(Trade trade)
 	{
-		if (trade.ExitPrice == null)
+		if (trade.ClosePrice == null)
 			return 0;
 
-		return (trade.ExitPrice.Value - trade.EntryPrice) * trade.Quantity * (int)trade.Signal;
+		return (trade.ClosePrice.Value - trade.OpenPrice) * trade.Quantity * (int)trade.Signal;
 	}
 
 	public static float CalculateProfitFactor(double totalProfit, double totalLoss)
@@ -51,20 +50,5 @@ public static class TradeStatisticsCalcService
 			return 0m;
 
 		return Math.Round(totalIncome / totalTrades, 2);
-	}
-
-	public static double? CalculateNetIncome(double tradeOpen, double? tradeClose, TradeSignal tradeSignal)
-	{
-		if (tradeClose == null || tradeOpen == 0 || tradeSignal == TradeSignal.HOLD)
-			return null;
-
-		var basePercent = (tradeClose.Value - tradeOpen) / tradeOpen * 100;
-		double adjustedPercent = basePercent;
-		if (tradeSignal == TradeSignal.SELL)
-		{
-			adjustedPercent = -basePercent;
-		}
-
-		return Math.Round(adjustedPercent, 2);
 	}
 }

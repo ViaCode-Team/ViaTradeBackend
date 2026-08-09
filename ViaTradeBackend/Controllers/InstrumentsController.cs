@@ -87,7 +87,7 @@ public class InstrumentsController(
 	}
 
 	[HttpGet("{instrumentId:int}/note")]
-	public async Task<Ok<NoteResponse>> GetNote(
+	public async Task<Ok<NoteResponse>> GetInstrumentNote(
 		[FromRoute, Range(1, int.MaxValue)] int instrumentId,
 		CancellationToken ct
 	)
@@ -99,7 +99,7 @@ public class InstrumentsController(
 	}
 
 	[HttpPut("{instrumentId:int}/note")]
-	public async Task<NoContent> UpsertNote(
+	public async Task<NoContent> UpsertInstrumentNote(
 		[FromRoute, Range(1, int.MaxValue)] int instrumentId,
 		[FromBody, Required] UpdateNoteRequest request,
 		CancellationToken ct
@@ -112,7 +112,10 @@ public class InstrumentsController(
 	}
 
 	[HttpDelete("{instrumentId:int}/note")]
-	public async Task<NoContent> DeleteNote([FromRoute, Range(1, int.MaxValue)] int instrumentId, CancellationToken ct)
+	public async Task<NoContent> DeleteInstrumentNote(
+		[FromRoute, Range(1, int.MaxValue)] int instrumentId,
+		CancellationToken ct
+	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		await noteCommandService.DeleteAsync(userId, instrumentId, NoteType.InstrumentNote, ct);
@@ -121,7 +124,7 @@ public class InstrumentsController(
 	}
 
 	[HttpGet("{instrumentId:int}/reminders")]
-	public async Task<Ok<PageResult<ReminderResponse>>> GetReminders(
+	public async Task<Ok<PageResult<ReminderResponse>>> GetInstrumentReminders(
 		[FromRoute, Range(1, int.MaxValue)] int instrumentId,
 		[FromQuery] PageOptions pageOptions,
 		[FromQuery] ReminderSort reminderSort,
@@ -135,7 +138,7 @@ public class InstrumentsController(
 	}
 
 	[HttpPost("{instrumentId:int}/reminders")]
-	public async Task<Created<ReminderResponse>> CreateReminder(
+	public async Task<Created<ReminderResponse>> CreateInstrumentReminder(
 		[FromRoute, Range(1, int.MaxValue)] int instrumentId,
 		[FromBody, Required] CreateReminderRequest request,
 		CancellationToken ct

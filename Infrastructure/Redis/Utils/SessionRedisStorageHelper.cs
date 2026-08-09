@@ -9,7 +9,12 @@ internal sealed class SessionRedisStorageHelper(IDatabase database)
 {
 	private readonly IDatabase _database = database;
 
-	public async Task<bool> TryCreateAsync(UserSessionDto session, string sessionJson, string refreshTokenFingerprint, TimeSpan ttl)
+	public async Task<bool> TryCreateAsync(
+		UserSessionDto session,
+		string sessionJson,
+		string refreshTokenFingerprint,
+		TimeSpan ttl
+	)
 	{
 		var transaction = _database.CreateTransaction();
 		var setSession = transaction.StringSetAsync(RedisKeys.Sessions.ById(session.Id), sessionJson, ttl);

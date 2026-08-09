@@ -47,7 +47,13 @@ internal sealed class SessionRedisCleanupHelper(IDatabase database)
 
 		foreach (var expirationMember in expirationMembers)
 		{
-			if (!RedisKeys.Sessions.TryParseExpirationMember(expirationMember, out var userId, out var sessionId))
+			var hasExpirationMember = RedisKeys.Sessions.TryParseExpirationMember(
+				expirationMember,
+				out var userId,
+				out var sessionId
+			);
+
+			if (!hasExpirationMember)
 			{
 				invalidExpirationMembers.Add(expirationMember);
 				continue;
@@ -84,8 +90,8 @@ internal sealed class SessionRedisCleanupHelper(IDatabase database)
 		IReadOnlyList<ExpiredSessionIndex> staleIndexes
 	)
 	{
-		var expirationMembers = expiredSessionBatch.InvalidExpirationMembers
-			.Concat(staleIndexes.Select(index => index.ExpirationMember))
+		var expirationMembers = expiredSessionBatch
+			.InvalidExpirationMembers.Concat(staleIndexes.Select(index => index.ExpirationMember))
 			.ToArray();
 		if (expirationMembers.Length == 0)
 			return 0;

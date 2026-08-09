@@ -144,8 +144,11 @@ public class TradeFileReader : IFileReader
 
 	private string GetPath(TradeDataType dataType)
 	{
-		if (!_paths.TryGetValue(dataType, out var path))
+		var hasPath = _paths.TryGetValue(dataType, out var path);
+
+		if (!hasPath || path == null)
 			throw new ArgumentException($"Unknown data type: {dataType}", nameof(dataType));
+
 		return path;
 	}
 
@@ -296,20 +299,32 @@ public class TradeFileReader : IFileReader
 
 	private static DateTime ParseDate(string value)
 	{
-		if (
-			DateTime.TryParseExact(value, "yyyy-MM-dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var date)
-		)
+		var hasExactDate = DateTime.TryParseExact(
+			value,
+			"yyyy-MM-dd",
+			CultureInfo.InvariantCulture,
+			DateTimeStyles.None,
+			out var date
+		);
+
+		if (hasExactDate)
 			return date;
-		if (DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out date))
+
+		var hasParsedDate = DateTime.TryParse(value, CultureInfo.InvariantCulture, DateTimeStyles.None, out date);
+
+		if (hasParsedDate)
 			return date;
+
 		throw new FormatException($"Invalid date format: {value}");
 	}
 
 	private static decimal ParseDecimal(string value)
 	{
-		if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var r))
+		var hasDecimal = decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result);
+
+		if (hasDecimal)
 		{
-			return r;
+			return result;
 		}
 
 		return 0m;
@@ -320,9 +335,11 @@ public class TradeFileReader : IFileReader
 		if (string.IsNullOrWhiteSpace(value) || value == "null" || value == "NaN")
 			return null;
 
-		if (decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var r))
+		var hasDecimal = decimal.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result);
+
+		if (hasDecimal)
 		{
-			return r;
+			return result;
 		}
 
 		return null;
@@ -330,9 +347,11 @@ public class TradeFileReader : IFileReader
 
 	private static long ParseLong(string value)
 	{
-		if (long.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var r))
+		var hasLong = long.TryParse(value, NumberStyles.Number, CultureInfo.InvariantCulture, out var result);
+
+		if (hasLong)
 		{
-			return r;
+			return result;
 		}
 
 		return 0;

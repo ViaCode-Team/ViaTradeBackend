@@ -4,7 +4,6 @@ using Application.Instruments.Interfaces;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
 using Domain.Entities;
-using Domain.Services;
 
 namespace Application.Trades;
 
@@ -20,18 +19,19 @@ public class TradeCommandService(
 		{
 			OpenedAt = request.OpenedAt,
 			ClosedAt = request.ClosedAt,
-			EntryPrice = request.EntryPrice,
-			ExitPrice = request.ExitPrice,
+			OpenPrice = request.OpenPrice,
+			ClosePrice = request.ClosePrice,
 			Quantity = request.Quantity,
 			TradeTypeId = request.TradeTypeId,
 			InstrumentId = request.InstrumentId,
 			UserId = userId,
 			Signal = request.Signal,
-			TotalPrice = (decimal)request.EntryPrice * request.Quantity,
+			TotalPrice = (decimal)request.OpenPrice * request.Quantity,
 		};
 
 		await tradeRepository.AddAsync(trade, ct);
 		await uow.SaveChangesAsync(ct);
+
 		var instrument = await instrumentRepository.FindByIdAsync(trade.InstrumentId, ct);
 		if (instrument == null)
 			throw new DataIntegrityException(
@@ -42,9 +42,9 @@ public class TradeCommandService(
 			trade.Id,
 			trade.OpenedAt,
 			trade.ClosedAt,
-			trade.EntryPrice,
-			trade.ExitPrice,
-			TradeStatisticsCalcService.CalculateNetIncome(trade.EntryPrice, trade.ExitPrice, trade.Signal),
+			trade.OpenPrice,
+			trade.ClosePrice,
+			trade.NetIncome,
 			trade.Quantity,
 			trade.TotalPrice,
 			trade.Signal,
@@ -64,7 +64,7 @@ public class TradeCommandService(
 
 	public async Task UpdateAsync(int userId, int id, TradeInputDto request, CancellationToken ct)
 	{
-		var price = (decimal)request.EntryPrice * request.Quantity;
+		var price = (decimal)request.OpenPrice * request.Quantity;
 
 		var affectedRows = await tradeRepository.ExecuteUpdateAsync(userId, id, request, price, ct);
 		if (affectedRows != 0)

@@ -16,7 +16,7 @@ public interface IUserStrategyInstrumentRepository : IRepository<UserStrategyIns
 		PageOptions pageOptions,
 		CancellationToken ct = default
 	);
-	Task<PageResult<RelatedInstrumentDto>> GetInstrumentsPageByStrategyAsync(
+	Task<StrategyInstrumentsPageResult> GetInstrumentsPageByStrategyAsync(
 		int userId,
 		int strategyId,
 		InstrumentSort instrumentSort,

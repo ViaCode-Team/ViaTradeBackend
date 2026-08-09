@@ -3,9 +3,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataBase.Configuration;
 
-internal static class ModelBuilderExtensions
+internal static class DomainModelBuilderExtensions
 {
-	public static void ConfigureDatabaseSchema(this ModelBuilder modelBuilder)
+	public static void ConfigureDomainModel(this ModelBuilder modelBuilder)
 	{
 		modelBuilder.Entity<Instrument>().HasIndex(x => x.Symbol).IsUnique();
 
@@ -42,10 +42,7 @@ internal static class ModelBuilderExtensions
 			entity.HasOne(x => x.Strategy).WithMany().HasForeignKey(x => x.StrategyId).IsRequired();
 		});
 
-		modelBuilder.Entity<Reminder>(entity =>
-		{
-			entity.HasIndex(x => x.UserId);
-		});
+		modelBuilder.Entity<Reminder>().HasIndex(x => x.UserId);
 
 		modelBuilder.Entity<Note>(entity =>
 		{
@@ -55,20 +52,12 @@ internal static class ModelBuilderExtensions
 			entity.HasIndex(x => new { x.UserId, x.InstrumentId }).IsUnique();
 			entity.HasIndex(x => new { x.UserId, x.StrategyId }).IsUnique();
 			entity.HasIndex(x => x.UserId);
-			entity.ToTable(table =>
-				table.HasCheckConstraint(
-					"CK_Notes_ExclusiveTarget",
-					"(`InstrumentId` IS NOT NULL AND `StrategyId` IS NULL) OR (`InstrumentId` IS NULL AND `StrategyId` IS NOT NULL)"
-				)
-			);
 		});
 
 		modelBuilder.Entity<Trade>(entity =>
 		{
 			entity.HasIndex(x => x.UserId);
 			entity.HasIndex(x => new { x.UserId, x.ClosedAt });
-			entity.Property(x => x.TotalPrice).HasColumnType("decimal(18,2)");
-			entity.ToTable(table => table.HasCheckConstraint("CK_Trades_PositiveQuantity", "`Quantity` > 0"));
 		});
 	}
 }

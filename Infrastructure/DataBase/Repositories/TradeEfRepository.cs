@@ -38,18 +38,15 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 					group.Key.Month,
 					group.Key.Day,
 					null,
-					group.Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+					Math.Round(group.Sum(trade => trade.NetIncome!.Value), 2),
+					Math.Round(
+						group.Where(trade => trade.Signal == TradeSignal.BUY).Sum(trade => trade.NetIncome!.Value),
 						2
-					)),
-					group.Where(trade => trade.Signal == TradeSignal.BUY).Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+					),
+					Math.Round(
+						group.Where(trade => trade.Signal == TradeSignal.SELL).Sum(trade => trade.NetIncome!.Value),
 						2
-					)),
-					group.Where(trade => trade.Signal == TradeSignal.SELL).Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
-						2
-					))
+					)
 				))
 				.ToListAsync(ct),
 			ProfitChartGranularity.Week => await tradesQuery
@@ -60,18 +57,15 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 					null,
 					null,
 					group.Key,
-					group.Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+					Math.Round(group.Sum(trade => trade.NetIncome!.Value), 2),
+					Math.Round(
+						group.Where(trade => trade.Signal == TradeSignal.BUY).Sum(trade => trade.NetIncome!.Value),
 						2
-					)),
-					group.Where(trade => trade.Signal == TradeSignal.BUY).Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+					),
+					Math.Round(
+						group.Where(trade => trade.Signal == TradeSignal.SELL).Sum(trade => trade.NetIncome!.Value),
 						2
-					)),
-					group.Where(trade => trade.Signal == TradeSignal.SELL).Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
-						2
-					))
+					)
 				))
 				.ToListAsync(ct),
 			ProfitChartGranularity.Month => await tradesQuery
@@ -83,18 +77,15 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 					group.Key.Month,
 					null,
 					null,
-					group.Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+					Math.Round(group.Sum(trade => trade.NetIncome!.Value), 2),
+					Math.Round(
+						group.Where(trade => trade.Signal == TradeSignal.BUY).Sum(trade => trade.NetIncome!.Value),
 						2
-					)),
-					group.Where(trade => trade.Signal == TradeSignal.BUY).Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
+					),
+					Math.Round(
+						group.Where(trade => trade.Signal == TradeSignal.SELL).Sum(trade => trade.NetIncome!.Value),
 						2
-					)),
-					group.Where(trade => trade.Signal == TradeSignal.SELL).Sum(trade => Math.Round(
-						(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
-						2
-					))
+					)
 				))
 				.ToListAsync(ct),
 			_ => throw new ArgumentOutOfRangeException(
@@ -148,17 +139,11 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 		var result = await _context
 			.Trades.Where(trade =>
 				trade.UserId == userId
-				&& trade.ExitPrice.HasValue
-				&& trade.EntryPrice != 0
+				&& trade.ClosePrice.HasValue
+				&& trade.OpenPrice != 0
 				&& trade.Signal != TradeSignal.HOLD
 			)
-			.Select(trade => new
-			{
-				Income = Math.Round(
-					(trade.ExitPrice!.Value - trade.EntryPrice) / trade.EntryPrice * 100 * (int)trade.Signal,
-					2
-				),
-			})
+			.Select(trade => new { Income = trade.NetIncome!.Value })
 			.GroupBy(_ => 1)
 			.Select(group => new TradeStatisticAggregateDto(
 				group.Count(),
@@ -188,8 +173,8 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 					s =>
 						s.SetProperty(t => t.OpenedAt, request.OpenedAt)
 							.SetProperty(t => t.ClosedAt, request.ClosedAt)
-							.SetProperty(t => t.EntryPrice, request.EntryPrice)
-							.SetProperty(t => t.ExitPrice, request.ExitPrice)
+							.SetProperty(t => t.OpenPrice, request.OpenPrice)
+							.SetProperty(t => t.ClosePrice, request.ClosePrice)
 							.SetProperty(t => t.Quantity, request.Quantity)
 							.SetProperty(t => t.Signal, request.Signal)
 							.SetProperty(t => t.TotalPrice, price)
@@ -206,8 +191,9 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 			trade.Id,
 			trade.OpenedAt,
 			trade.ClosedAt,
-			trade.EntryPrice,
-			trade.ExitPrice,
+			trade.OpenPrice,
+			trade.ClosePrice,
+			trade.NetIncome,
 			trade.Quantity,
 			trade.TotalPrice,
 			trade.Signal,
@@ -222,8 +208,8 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 		var query = _context.Trades.Where(trade =>
 			trade.UserId == userId
 			&& trade.ClosedAt.HasValue
-			&& trade.EntryPrice != 0
-			&& trade.ExitPrice.HasValue
+			&& trade.OpenPrice != 0
+			&& trade.ClosePrice.HasValue
 			&& trade.Signal != TradeSignal.HOLD
 		);
 

@@ -46,13 +46,13 @@ public class StrategyQueryService(
 		CancellationToken ct
 	)
 	{
-		var spec = new StrategyQuerySpecification(userId, strategyFilter, strategySort);
+		var spec = new StrategyQuerySpecification(strategyFilter, strategySort);
 		return await strategyRepository.GetPageAsync(userId, spec, pageOptions, ct);
 	}
 
 	public async Task<Strategy> GetAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		var strategy = await strategyRepository.FindForUserAsync(userId, strategyId, ct);
+		var strategy = await strategyRepository.FindWithActivityAsync(userId, strategyId, ct);
 		if (strategy == null)
 			throw new NotFoundException("Strategy not found.", "strategy_not_found");
 
@@ -86,12 +86,17 @@ public class StrategyQueryService(
 		CancellationToken ct
 	)
 	{
-		return await userStrategyInstrumentRepository.GetInstrumentsPageByStrategyAsync(
+		var result = await userStrategyInstrumentRepository.GetInstrumentsPageByStrategyAsync(
 			userId,
 			strategyId,
 			instrumentSort,
 			pageOptions,
 			ct
 		);
+
+		if (!result.StrategyExists)
+			throw new NotFoundException("Strategy not found.", "strategy_not_found");
+
+		return result.Page;
 	}
 }

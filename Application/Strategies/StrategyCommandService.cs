@@ -8,26 +8,20 @@ namespace Application.Strategies;
 public class StrategyCommandService(
 	IUserStrategyInstrumentRepository userStrategyInstrumentRepository,
 	IUserStrategyRepository userStrategyRepository,
+	IStrategyRepository strategyRepository,
 	IUnitOfWork uow
 ) : IStrategyCommandService
 {
 	public async Task LinkInstrumentAsync(int userId, int strategyId, int instrumentId, CancellationToken ct)
 	{
-		var strategyExists = await userStrategyRepository.ExistsAsync(
-			strategy => strategy.UserId == userId && strategy.StrategyId == strategyId,
-			ct
-		);
-		if (!strategyExists)
+		var linkState = await strategyRepository.FindInstrumentLinkStateAsync(userId, strategyId, instrumentId, ct);
+		if (linkState == null)
 			throw new NotFoundException("Strategy not found.", "strategy_not_found");
 
-		var strategyCodeExists = await userStrategyInstrumentRepository.ExistsAsync(
-			strategyCode =>
-				strategyCode.UserId == userId
-				&& strategyCode.StrategyId == strategyId
-				&& strategyCode.InstrumentId == instrumentId,
-			ct
-		);
-		if (strategyCodeExists)
+		if (!linkState.InstrumentExists)
+			throw new NotFoundException("Instrument not found.", "instrument_not_found");
+
+		if (linkState.LinkExists)
 			return;
 
 		var strategyCode = new UserStrategyInstrument
@@ -43,11 +37,11 @@ public class StrategyCommandService(
 
 	public async Task ActivateAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		var strategyExists = await userStrategyRepository.ExistsAsync(
-			strategy => strategy.UserId == userId && strategy.StrategyId == strategyId,
-			ct
-		);
-		if (strategyExists)
+		var strategy = await strategyRepository.FindWithActivityAsync(userId, strategyId, ct);
+		if (strategy == null)
+			throw new NotFoundException("Strategy not found.", "strategy_not_found");
+
+		if (strategy.IsActive)
 			return;
 
 		var strategyLink = new UserStrategy { UserId = userId, StrategyId = strategyId };

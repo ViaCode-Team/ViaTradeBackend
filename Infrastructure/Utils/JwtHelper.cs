@@ -56,7 +56,9 @@ public class JwtHelper(IOptions<JwtOptions> options) : IJwtHelper
 	public int GetUserIdFromClaims(ClaimsPrincipal user)
 	{
 		var subClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-		if (!int.TryParse(subClaim, out var userId))
+		var hasUserId = int.TryParse(subClaim, out var userId);
+
+		if (!hasUserId)
 			throw new InvalidTokenException("Access token does not contain a valid user identifier.");
 
 		return userId;

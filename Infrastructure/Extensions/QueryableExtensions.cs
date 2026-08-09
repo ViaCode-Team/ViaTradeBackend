@@ -12,6 +12,16 @@ public static class QueryableExtensions
 	)
 	{
 		var totalCount = await source.CountAsync(ct);
+		return await source.ToPagedAsync(pageOptions, totalCount, ct);
+	}
+
+	public static async Task<PageResult<T>> ToPagedAsync<T>(
+		this IQueryable<T> source,
+		PageOptions pageOptions,
+		int totalCount,
+		CancellationToken ct
+	)
+	{
 		if (totalCount == 0)
 			return new PageResult<T>([], 0, pageOptions.Page, pageOptions.PageSize);
 

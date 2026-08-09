@@ -180,9 +180,12 @@ public class SessionRedisRepository(
 		}
 		catch (JsonException exception)
 		{
-			logger.LogError(exception, "Redis session data cannot be deserialized: SessionId={SessionId}", expectedSessionId);
+			logger.LogError(
+				exception,
+				"Redis session data cannot be deserialized: SessionId={SessionId}",
+				expectedSessionId
+			);
 			throw new InvalidOperationException("Redis session data is invalid.", exception);
 		}
 	}
-
 }

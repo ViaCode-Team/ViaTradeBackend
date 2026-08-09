@@ -31,12 +31,10 @@ internal static class EfDatabaseOperation
 		catch (DbUpdateException exception)
 		{
 			var mySqlException = FindMySqlException(exception);
-
 			if (mySqlException is null)
 				throw;
 
 			var translatedException = DatabaseMySqlExceptionTranslator.Translate(mySqlException);
-
 			if (translatedException is null)
 				throw;
 
@@ -45,7 +43,6 @@ internal static class EfDatabaseOperation
 		catch (MySqlException exception)
 		{
 			var translatedException = DatabaseMySqlExceptionTranslator.Translate(exception);
-
 			if (translatedException is null)
 				throw;
 
@@ -61,7 +58,9 @@ internal static class EfDatabaseOperation
 			currentException = currentException.InnerException
 		)
 		{
-			if (currentException is MySqlException mySqlException)
+			var mySqlException = currentException as MySqlException;
+
+			if (mySqlException != null)
 				return mySqlException;
 		}
 

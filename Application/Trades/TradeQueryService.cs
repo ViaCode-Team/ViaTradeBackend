@@ -19,9 +19,9 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 
 		return rows.Select(row => new ProfitChartBucketDto(
 				GetBucketDate(row, filter.Granularity),
-				Math.Round(row.NetIncome, 2),
-				Math.Round(row.BuyNetIncome, 2),
-				Math.Round(row.SellNetIncome, 2)
+				row.NetIncome,
+				row.BuyNetIncome,
+				row.SellNetIncome
 			))
 			.ToList();
 	}
@@ -77,9 +77,9 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 			source.Id,
 			source.OpenedAt,
 			source.ClosedAt,
-			source.EntryPrice,
-			source.ExitPrice,
-			TradeStatisticsCalcService.CalculateNetIncome(source.EntryPrice, source.ExitPrice, source.Signal),
+			source.OpenPrice,
+			source.ClosePrice,
+			source.NetIncome,
 			source.Quantity,
 			source.TotalPrice,
 			source.Signal,

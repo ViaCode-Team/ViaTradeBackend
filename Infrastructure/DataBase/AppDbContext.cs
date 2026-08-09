@@ -1,5 +1,6 @@
 using Domain.Entities;
 using Infrastructure.DataBase.Configuration;
+using Infrastructure.DataBase.Configuration.MySql;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataBase;
@@ -21,7 +22,8 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 	{
 		base.OnModelCreating(modelBuilder);
 
-		modelBuilder.ConfigureDatabaseSchema();
+		modelBuilder.ConfigureDomainModel();
+		modelBuilder.ConfigureMySqlModel();
 		modelBuilder.SeedReferenceData();
 		modelBuilder.ConfigureUtcDateTimeStorage();
 	}

@@ -1,0 +1,26 @@
+[Unit]
+Description=ViaTrade Backend API
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+User=viatrade
+Group=viatrade
+WorkingDirectory=/opt/viatrade/backend
+EnvironmentFile=/etc/viatrade/backend.env
+ExecStart=/usr/bin/dotnet /opt/viatrade/backend/ViaTradeBackend.dll
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=30
+KillSignal=SIGINT
+SyslogIdentifier=via-trade-backend
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/viatrade /srv/viatrade-analyzer
+
+[Install]
+WantedBy=multi-user.target

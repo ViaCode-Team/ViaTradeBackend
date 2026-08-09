@@ -63,6 +63,7 @@ public class StrategiesController(
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var strategy = await strategyQueryService.GetAsync(userId, strategyId, ct);
+
 		return TypedResults.Ok(ApiMapper.ToResponse(strategy));
 	}
 
@@ -75,7 +76,6 @@ public class StrategiesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await strategyQueryService.GetAsync(userId, strategyId, ct);
 		var instruments = await strategyQueryService.GetInstrumentsByStrategyPageAsync(
 			userId,
 			strategyId,
@@ -88,7 +88,7 @@ public class StrategiesController(
 	}
 
 	[HttpGet("{strategyId:int}/note")]
-	public async Task<Ok<NoteResponse>> GetNote(
+	public async Task<Ok<NoteResponse>> GetStrategyNote(
 		[FromRoute, Range(1, int.MaxValue)] int strategyId,
 		CancellationToken ct
 	)
@@ -100,7 +100,7 @@ public class StrategiesController(
 	}
 
 	[HttpPut("{strategyId:int}/note")]
-	public async Task<NoContent> UpsertNote(
+	public async Task<NoContent> UpsertStrategyNote(
 		[FromRoute, Range(1, int.MaxValue)] int strategyId,
 		[FromBody, Required] UpdateNoteRequest request,
 		CancellationToken ct
@@ -113,7 +113,10 @@ public class StrategiesController(
 	}
 
 	[HttpDelete("{strategyId:int}/note")]
-	public async Task<NoContent> DeleteNote([FromRoute, Range(1, int.MaxValue)] int strategyId, CancellationToken ct)
+	public async Task<NoContent> DeleteStrategyNote(
+		[FromRoute, Range(1, int.MaxValue)] int strategyId,
+		CancellationToken ct
+	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		await noteCommandService.DeleteAsync(userId, strategyId, NoteType.StrategyNote, ct);

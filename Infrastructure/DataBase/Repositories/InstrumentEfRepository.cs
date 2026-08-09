@@ -7,9 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.DataBase.Repositories;
 
-public class InstrumentEfRepository(AppDbContext context)
-	: BaseEfRepository<Instrument>(context),
-		IInstrumentRepository
+public class InstrumentEfRepository(AppDbContext context) : BaseEfRepository<Instrument>(context), IInstrumentRepository
 {
 	public async Task<Instrument?> FindByTickerAsync(string ticker, CancellationToken ct)
 	{

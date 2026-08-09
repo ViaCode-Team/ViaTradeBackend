@@ -21,18 +21,15 @@ internal static class RedisKeys
 		private static readonly RedisKeyBuilder UsedRefreshTokens = RefreshToken.Append("used");
 		private static readonly RedisKeyBuilder SessionIndexes = RedisKeyBuilder.Create("sessions");
 
-		public static string RefreshTokenFingerprintIndexPrefix { get; } =
-			RefreshTokenIndexes.Prefix;
+		public static string RefreshTokenFingerprintIndexPrefix { get; } = RefreshTokenIndexes.Prefix;
 
-		public static RedisKey ExpirationIndex { get; } =
-			SessionIndexes.Build("expires");
+		public static RedisKey ExpirationIndex { get; } = SessionIndexes.Build("expires");
 
 		public static RedisKey ById(string sessionId) => Session.Build(sessionId);
 
 		public static RedisKey ByUser(int userId) => UserSessions.Build(userId);
 
-		public static RedisKey RefreshTokenFingerprint(string sessionId) =>
-			RefreshToken.Build(sessionId);
+		public static RedisKey RefreshTokenFingerprint(string sessionId) => RefreshToken.Build(sessionId);
 
 		public static RedisKey RefreshTokenIndex(string refreshTokenFingerprint) =>
 			RefreshTokenIndexes.Build(refreshTokenFingerprint);

@@ -141,8 +141,15 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 				result.Item.Signal
 			);
 			var key = (signal.StrategyId, signal.InstrumentId);
+			var hasCurrentSignal = latestBySource.TryGetValue(key, out var current);
 
-			if (!latestBySource.TryGetValue(key, out var current) || signal.Date > current.Date)
+			if (!hasCurrentSignal)
+			{
+				latestBySource[key] = signal;
+				continue;
+			}
+
+			if (signal.Date > current!.Date)
 				latestBySource[key] = signal;
 		}
 
