@@ -5,7 +5,6 @@ using Application.Notes.Models;
 using Application.Strategies.Interfaces;
 using Application.Strategies.Models;
 using Application.Strategies.Specifications;
-using Domain.Entities;
 
 namespace Application.Strategies;
 
@@ -38,7 +37,7 @@ public class StrategyQueryService(
 		);
 	}
 
-	public async Task<PageResult<Strategy>> GetPageAsync(
+	public async Task<PageResult<StrategySubscriptionDto>> GetPageAsync(
 		int userId,
 		StrategyFilter strategyFilter,
 		StrategySort strategySort,
@@ -50,16 +49,16 @@ public class StrategyQueryService(
 		return await strategyRepository.GetPageAsync(userId, spec, pageOptions, ct);
 	}
 
-	public async Task<Strategy> GetAsync(int userId, int strategyId, CancellationToken ct)
+	public async Task<StrategySubscriptionDto> GetAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		var strategy = await strategyRepository.FindWithActivityAsync(userId, strategyId, ct);
+		var strategy = await strategyRepository.FindSubscriptionAsync(userId, strategyId, ct);
 		if (strategy == null)
 			throw new NotFoundException("Strategy not found.", "strategy_not_found");
 
 		return strategy;
 	}
 
-	public async Task<PageResult<Strategy>> GetPageByInstrumentAsync(
+	public async Task<PageResult<StrategySubscriptionDto>> GetPageByInstrumentAsync(
 		int userId,
 		int instrumentId,
 		StrategyFilter strategyFilter,

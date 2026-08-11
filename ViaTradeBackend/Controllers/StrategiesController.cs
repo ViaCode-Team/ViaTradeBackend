@@ -158,7 +158,7 @@ public class StrategiesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await strategyCommandService.SetActivityAsync(userId, strategyId, request.IsActive, ct);
+		await strategyCommandService.SetSubscriptionAsync(userId, strategyId, request.IsSubscribed, ct);
 
 		return TypedResults.NoContent();
 	}

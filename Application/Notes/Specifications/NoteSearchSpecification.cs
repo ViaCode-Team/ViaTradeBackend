@@ -17,16 +17,17 @@ public sealed class NoteSearchSpecification(int userId, NoteSearchFilter filter)
 			query = query.Where(x => x.Text.Contains(Filter.Text));
 
 		if (!string.IsNullOrWhiteSpace(Filter.InstrumentSymbol))
-			query = query.Where(x => x.Instrument != null
-				&& x.Instrument.Symbol.Contains(Filter.InstrumentSymbol));
+			query = query.Where(x => x.Instrument != null && x.Instrument.Symbol.Contains(Filter.InstrumentSymbol));
 
 		if (!string.IsNullOrWhiteSpace(Filter.InstrumentDescription))
-			query = query.Where(x => x.Instrument != null && x.Instrument.Description != null
-				&& x.Instrument.Description.Contains(Filter.InstrumentDescription));
+			query = query.Where(x =>
+				x.Instrument != null
+				&& x.Instrument.Description != null
+				&& x.Instrument.Description.Contains(Filter.InstrumentDescription)
+			);
 
 		if (!string.IsNullOrWhiteSpace(Filter.StrategyName))
-			query = query.Where(x => x.Strategy != null
-				&& x.Strategy.Name.Contains(Filter.StrategyName));
+			query = query.Where(x => x.Strategy != null && x.Strategy.Name.Contains(Filter.StrategyName));
 
 		return query;
 	}

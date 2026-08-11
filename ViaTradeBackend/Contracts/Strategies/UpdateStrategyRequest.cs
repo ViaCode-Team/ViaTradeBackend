@@ -1,3 +1,3 @@
 namespace ViaTradeBackend.Contracts.Strategies;
 
-public record UpdateStrategyRequest(bool IsActive);
+public record UpdateStrategyRequest(bool IsSubscribed);

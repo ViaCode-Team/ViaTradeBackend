@@ -175,7 +175,7 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 			return signals;
 
 		var signalStrings = filterSignals.Select(s => s.ToString()).ToList();
-		
+
 		return signals
 			.Where(signal => signalStrings.Contains(signal.Signal, StringComparer.OrdinalIgnoreCase))
 			.ToList();

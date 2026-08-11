@@ -1,6 +1,7 @@
 using Application.Instruments.Models;
 using Application.Notes.Models;
 using Application.Reminders.Models;
+using Application.Strategies.Models;
 using Application.Trades.Models;
 using Application.Users.Models;
 using Domain.Entities;
@@ -71,7 +72,22 @@ public static partial class ApiMapper
 		return new StrategyBriefResponse(source.Id, source.Name, source.Description);
 	}
 
-	public static partial StrategyResponse ToResponse(Strategy source);
+	public static StrategyResponse ToResponse(StrategySubscriptionDto source)
+	{
+		return new StrategyResponse(
+			source.Strategy.Id,
+			source.Strategy.Name,
+			source.Strategy.Description,
+			source.Strategy.DisplayName,
+			source.Strategy.Accuracy,
+			source.Strategy.SignalFrequency,
+			source.Strategy.InvestmentHorizon,
+			source.Strategy.LogicDescription,
+			source.Strategy.UsageDescription,
+			source.Strategy.LimitationsDescription,
+			source.IsSubscribed
+		);
+	}
 
 	public static partial InstrumentResponse ToResponse(Instrument source);
 

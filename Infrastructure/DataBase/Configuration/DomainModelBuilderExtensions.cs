@@ -9,7 +9,11 @@ internal static class DomainModelBuilderExtensions
 	{
 		modelBuilder.Entity<Instrument>().HasIndex(x => x.Symbol).IsUnique();
 
-		modelBuilder.Entity<Strategy>().HasIndex(x => x.Name).IsUnique();
+		modelBuilder.Entity<Strategy>(entity =>
+		{
+			entity.HasIndex(x => x.Name).IsUnique();
+			entity.HasQueryFilter(strategy => strategy.IsActive);
+		});
 
 		modelBuilder.Entity<TradeType>().HasIndex(x => x.Name).IsUnique();
 

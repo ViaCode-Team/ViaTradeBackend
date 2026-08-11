@@ -12,7 +12,7 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 	: BaseEfRepository<UserStrategyInstrument>(context),
 		IUserStrategyInstrumentRepository
 {
-	public async Task<PageResult<Strategy>> GetStrategiesPageByInstrumentAsync(
+	public async Task<PageResult<StrategySubscriptionDto>> GetStrategiesPageByInstrumentAsync(
 		int userId,
 		int instrumentId,
 		StrategyFilter strategyFilter,
@@ -27,21 +27,7 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 			query = query.Where(link => link.Strategy!.Name == strategyFilter.Name);
 
 		var strategyQuery = ApplyStrategySort(query.Select(link => link.Strategy!), strategySort);
-		var pagedStrategies = await strategyQuery
-			.Select(strategy => new
-			{
-				Strategy = strategy,
-				IsActive = _context.UserStrategies.Any(userStrategy =>
-					userStrategy.UserId == userId && userStrategy.StrategyId == strategy.Id
-				),
-			})
-			.ToPagedAsync(pageOptions, ct);
-
-		return pagedStrategies.Map(result =>
-		{
-			result.Strategy.IsActive = result.IsActive;
-			return result.Strategy;
-		});
+		return await strategyQuery.WithSubscriptionState(userId).ToPagedAsync(pageOptions, ct);
 	}
 
 	public async Task<StrategyInstrumentsPageResult> GetInstrumentsPageByStrategyAsync(

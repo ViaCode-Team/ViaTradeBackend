@@ -30,7 +30,7 @@ public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(con
 		IQuerySpecification<Note> specification,
 		PageOptions pageOptions,
 		CancellationToken ct
-		)
+	)
 	{
 		var query = SpecificationEvaluator.GetQuery(_dbSet, specification);
 		if (specification.SortExpressions.Count == 0)
@@ -55,10 +55,9 @@ public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(con
 		ISearchSpecification<Note> specification,
 		PageOptions pageOptions,
 		CancellationToken ct
-		)
+	)
 	{
-		var query = specification.Apply(_dbSet)
-			.OrderBy(note => note.Id);
+		var query = specification.Apply(_dbSet).OrderBy(note => note.Id);
 
 		return await query
 			.Select(note => new NoteProjectionDto(

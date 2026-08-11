@@ -8,7 +8,7 @@ namespace Application.Strategies.Interfaces;
 
 public interface IUserStrategyInstrumentRepository : IRepository<UserStrategyInstrument>
 {
-	Task<PageResult<Strategy>> GetStrategiesPageByInstrumentAsync(
+	Task<PageResult<StrategySubscriptionDto>> GetStrategiesPageByInstrumentAsync(
 		int userId,
 		int instrumentId,
 		StrategyFilter strategyFilter,

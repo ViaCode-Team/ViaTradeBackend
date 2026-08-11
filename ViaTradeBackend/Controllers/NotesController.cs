@@ -37,7 +37,7 @@ public class NotesController(INoteQueryService noteQueryService, IJwtHelper jwtH
 		return TypedResults.Ok(userNotes.Map(ApiMapper.ToResponse));
 	}
 
-	[HttpGet]
+	[HttpGet("search")]
 	public async Task<Ok<PageResult<NoteResponse>>> GetSearchNotes(
 		[FromQuery] NoteSearchFilter noteFilter,
 		[FromQuery] PageOptions pageOptions,

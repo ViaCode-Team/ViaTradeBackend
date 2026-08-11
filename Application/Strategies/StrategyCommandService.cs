@@ -35,28 +35,22 @@ public class StrategyCommandService(
 		await uow.SaveChangesAsync(ct);
 	}
 
-	public async Task SetActivityAsync(int userId, int strategyId, bool isActive, CancellationToken ct)
+	public async Task SetSubscriptionAsync(int userId, int strategyId, bool isSubscribed, CancellationToken ct)
 	{
-		var currentActivity = await strategyRepository.FindActivityAsync(userId, strategyId, ct);
-		if (currentActivity == null)
+		var strategyExists = await strategyRepository.ExistsAsync(strategy => strategy.Id == strategyId, ct);
+		if (!strategyExists)
 			throw new NotFoundException("Strategy not found.", "strategy_not_found");
 
-		if (currentActivity.Value == isActive)
-			return;
-
-		if (isActive)
+		if (!isSubscribed)
 		{
-			var strategyLink = new UserStrategy { UserId = userId, StrategyId = strategyId };
-
-			await userStrategyRepository.AddAsync(strategyLink, ct);
-			await uow.SaveChangesAsync(ct);
+			await userStrategyRepository.ExecuteUnsubscribeAsync(userId, strategyId, ct);
 			return;
 		}
 
-		await userStrategyRepository.ExecuteDeleteAsync(
-			e => e.UserId == userId && e.StrategyId == strategyId,
-			ct
-		);
+		var strategyLink = new UserStrategy { UserId = userId, StrategyId = strategyId };
+
+		await userStrategyRepository.AddAsync(strategyLink, ct);
+		await uow.SaveChangesAsync(ct);
 	}
 
 	public async Task UnlinkInstrumentAsync(int userId, int strategyId, int instrumentId, CancellationToken ct)

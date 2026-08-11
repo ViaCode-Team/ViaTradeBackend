@@ -20,5 +20,6 @@ public interface INoteQueryService
 		int userId,
 		NoteSearchFilter noteSearchFilter,
 		PageOptions pageOptions,
-		CancellationToken ct);
+		CancellationToken ct
+	);
 }

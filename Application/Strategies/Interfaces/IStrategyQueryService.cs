@@ -2,22 +2,21 @@ using Application.Common.Models;
 using Application.Instruments.Models;
 using Application.Notes.Models;
 using Application.Strategies.Models;
-using Domain.Entities;
 
 namespace Application.Strategies.Interfaces;
 
 public interface IStrategyQueryService
 {
 	Task<StrategyStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct);
-	Task<PageResult<Strategy>> GetPageAsync(
+	Task<PageResult<StrategySubscriptionDto>> GetPageAsync(
 		int userId,
 		StrategyFilter strategyFilter,
 		StrategySort strategySort,
 		PageOptions pageOptions,
 		CancellationToken ct
 	);
-	Task<Strategy> GetAsync(int userId, int strategyId, CancellationToken ct);
-	Task<PageResult<Strategy>> GetPageByInstrumentAsync(
+	Task<StrategySubscriptionDto> GetAsync(int userId, int strategyId, CancellationToken ct);
+	Task<PageResult<StrategySubscriptionDto>> GetPageByInstrumentAsync(
 		int userId,
 		int instrumentId,
 		StrategyFilter strategyFilter,

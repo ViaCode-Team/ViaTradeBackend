@@ -34,7 +34,8 @@ public class NoteQueryService(INoteRepository noteRepository) : INoteQueryServic
 		int userId,
 		NoteSearchFilter noteSearchFilter,
 		PageOptions pageOptions,
-		CancellationToken ct)
+		CancellationToken ct
+	)
 	{
 		var spec = new NoteSearchSpecification(userId, noteSearchFilter);
 		var notes = await noteRepository.GetPageSearchAsync(spec, pageOptions, ct);
