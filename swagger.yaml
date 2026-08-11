@@ -7557,6 +7557,7 @@ components:
       required:
         - closePrice
         - date
+        - displayName
         - instrumentId
         - signal
         - strategyId
@@ -7568,6 +7569,8 @@ components:
           type: integer
           format: int32
         strategyName:
+          type: string
+        displayName:
           type: string
         instrumentId:
           type: integer
@@ -7642,6 +7645,7 @@ components:
       additionalProperties: false
     StrategyBriefResponse:
       required:
+        - displayName
         - id
         - name
       type: object
@@ -7650,6 +7654,8 @@ components:
           type: integer
           format: int32
         name:
+          type: string
+        displayName:
           type: string
         description:
           type: string
@@ -7724,18 +7730,18 @@ components:
       type: string
     StrategyStatisticResponse:
       required:
-        - activeStrategiesCount
-        - notLinkedStrategiesCount
+        - subscribedStrategiesCount
         - totalStrategiesCount
+        - unsubscribedStrategiesCount
       type: object
       properties:
         totalStrategiesCount:
           type: integer
           format: int64
-        activeStrategiesCount:
+        subscribedStrategiesCount:
           type: integer
           format: int64
-        notLinkedStrategiesCount:
+        unsubscribedStrategiesCount:
           type: integer
           format: int64
       additionalProperties: false

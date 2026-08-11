@@ -19,21 +19,21 @@ public class StrategyQueryService(
 		if (counts == null)
 			throw new NotFoundException("User not found.", "user_not_found");
 
-		long notLinkedStratagiesCount = counts.TotalStrategiesCount - counts.ActiveStrategiesCount;
-		if (notLinkedStratagiesCount < 0)
+		long unsubscribedStrategiesCount = counts.TotalStrategiesCount - counts.SubscribedStrategiesCount;
+		if (unsubscribedStrategiesCount < 0)
 		{
 			throw new DataIntegrityException(
-				$"Active strategy count exceeds total strategy count. "
+				$"Subscribed strategy count exceeds total strategy count. "
 					+ $"UserId={userId}, "
 					+ $"Total={counts.TotalStrategiesCount}, "
-					+ $"Active={counts.ActiveStrategiesCount}."
+					+ $"Subscribed={counts.SubscribedStrategiesCount}."
 			);
 		}
 
 		return new StrategyStatisticDto(
 			counts.TotalStrategiesCount,
-			counts.ActiveStrategiesCount,
-			notLinkedStratagiesCount
+			counts.SubscribedStrategiesCount,
+			unsubscribedStrategiesCount
 		);
 	}
 

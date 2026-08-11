@@ -46,6 +46,7 @@ public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(con
 				note.Instrument!.Description,
 				note.StrategyId,
 				note.Strategy!.Name,
+				note.Strategy.DisplayName,
 				note.Strategy!.Description
 			))
 			.ToPagedAsync(pageOptions, ct);
@@ -69,6 +70,7 @@ public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(con
 				note.Instrument!.Description,
 				note.StrategyId,
 				note.Strategy!.Name,
+				note.Strategy.DisplayName,
 				note.Strategy!.Description
 			))
 			.ToPagedAsync(pageOptions, ct);

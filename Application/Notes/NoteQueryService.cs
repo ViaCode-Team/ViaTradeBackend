@@ -68,7 +68,12 @@ public class NoteQueryService(INoteRepository noteRepository) : INoteQueryServic
 
 		StrategyBriefDto? strategy = null;
 		if (source.StrategyId.HasValue)
-			strategy = new StrategyBriefDto(source.StrategyId.Value, source.StrategyName!, source.StrategyDescription);
+			strategy = new StrategyBriefDto(
+				source.StrategyId.Value,
+				source.StrategyName!,
+				source.StrategyDisplayName!,
+				source.StrategyDescription
+			);
 
 		return new NoteDto(source.Id, source.Text, source.UserId, instrument, strategy);
 	}

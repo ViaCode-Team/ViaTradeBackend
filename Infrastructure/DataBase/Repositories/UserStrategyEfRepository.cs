@@ -35,6 +35,7 @@ public class UserStrategyEfRepository(AppDbContext context)
 			.Select(source => new SignalSourceDto(
 				source.StrategyId,
 				source.StrategyName,
+				source.DisplayName,
 				source.InstrumentId,
 				source.Symbol,
 				source.Accuracy

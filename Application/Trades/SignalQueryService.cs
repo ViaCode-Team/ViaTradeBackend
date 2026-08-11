@@ -97,6 +97,7 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 			.Select(item => new SignalDto(
 				item.Source!.StrategyId,
 				item.Source.StrategyName,
+				item.Source.DisplayName,
 				item.Source.InstrumentId,
 				item.Source.Symbol,
 				item.Source.Accuracy,
@@ -131,6 +132,7 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 			var signal = new SignalDto(
 				source.StrategyId,
 				source.StrategyName,
+				source.DisplayName,
 				source.InstrumentId,
 				source.Symbol,
 				source.Accuracy,

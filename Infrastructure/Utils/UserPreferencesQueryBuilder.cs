@@ -31,6 +31,7 @@ public static class UserPreferencesQueryBuilder
 		{
 			StrategyId = ustc.StrategyId,
 			StrategyName = ustc.Strategy!.Name,
+			DisplayName = ustc.Strategy.DisplayName,
 			InstrumentId = ustc.InstrumentId,
 			Symbol = ustc.Instrument!.Symbol,
 			Accuracy = ustc.Strategy.Accuracy,
@@ -42,6 +43,7 @@ public record StrategyInstrumentProjection
 {
 	public required int StrategyId { get; init; }
 	public required string StrategyName { get; init; }
+	public required string DisplayName { get; init; }
 	public required int InstrumentId { get; init; }
 	public required string Symbol { get; init; }
 	public int? Accuracy { get; init; }

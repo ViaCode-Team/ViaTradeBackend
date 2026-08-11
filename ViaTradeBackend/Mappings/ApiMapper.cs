@@ -69,7 +69,7 @@ public static partial class ApiMapper
 		if (source == null)
 			return null;
 
-		return new StrategyBriefResponse(source.Id, source.Name, source.Description);
+		return new StrategyBriefResponse(source.Id, source.Name, source.DisplayName, source.Description);
 	}
 
 	public static StrategyResponse ToResponse(StrategySubscriptionDto source)

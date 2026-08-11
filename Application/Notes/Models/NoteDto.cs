@@ -4,7 +4,7 @@ public record NoteDto(int Id, string Text, int UserId, InstrumentBriefDto? Instr
 
 public record InstrumentBriefDto(int Id, string Symbol, string? Name);
 
-public record StrategyBriefDto(int Id, string Name, string? Description);
+public record StrategyBriefDto(int Id, string Name, string DisplayName, string? Description);
 
 public record NoteProjectionDto(
 	int Id,
@@ -15,5 +15,6 @@ public record NoteProjectionDto(
 	string? InstrumentName,
 	int? StrategyId,
 	string? StrategyName,
+	string? StrategyDisplayName,
 	string? StrategyDescription
 );
