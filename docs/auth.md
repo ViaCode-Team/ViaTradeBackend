@@ -173,7 +173,7 @@ sequenceDiagram
 
 ### 3. Refresh и ротация
 
-Клиент вызывает `POST /api/v1/sessions/current/refresh`. У endpoint есть `AllowAnonymous`, потому что запрос аутентифицируется cookie `refresh_token`, а не access JWT.
+Клиент вызывает `POST /api/v1/sessions/current/tokens`. У endpoint есть `AllowAnonymous`, потому что запрос аутентифицируется cookie `refresh_token`, а не access JWT.
 
 ```mermaid
 sequenceDiagram
@@ -182,7 +182,7 @@ sequenceDiagram
     participant R as Redis
     participant DB as MySQL
 
-    B->>API: POST /sessions/current/refresh + cookie refresh_token
+    B->>API: POST /sessions/current/tokens + cookie refresh_token
     API->>R: Поиск сессии через индекс fingerprint
     API->>DB: Проверка, что пользователь ещё существует
     API->>API: Пересчёт даты окончания сессии
@@ -222,7 +222,7 @@ sequenceDiagram
 
 1. Отправить credentials в endpoint входа или регистрации.
 2. Не пытаться читать, сохранять или вручную прикреплять токены: это `HttpOnly` cookie.
-3. При ошибке авторизации из-за истёкшего access token сделать ровно один запрос `POST /api/v1/sessions/current/refresh`.
+3. При ошибке авторизации из-за истёкшего access token сделать ровно один запрос `POST /api/v1/sessions/current/tokens`.
 4. Если refresh успешен — один раз повторить исходный запрос. Новые cookie уже получены браузером.
 5. Если refresh неуспешен — очистить локальное состояние интерфейса и показать экран входа.
 6. Не делать два refresh одновременно для одной браузерной сессии.

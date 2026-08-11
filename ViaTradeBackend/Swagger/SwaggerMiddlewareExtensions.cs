@@ -17,6 +17,8 @@ public static class SwaggerMiddlewareExtensions
 				options.RoutePrefix = string.Empty;
 				options.ConfigObject.AdditionalItems.Add("withCredentials", true);
 
+				options.EnableTryItOutByDefault();
+				options.EnablePersistAuthorization();
 				options.DisplayRequestDuration();
 				options.DisplayOperationId();
 			});

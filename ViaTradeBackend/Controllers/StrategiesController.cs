@@ -150,26 +150,15 @@ public class StrategiesController(
 		return TypedResults.NoContent();
 	}
 
-	[HttpPut("{strategyId:int}")]
-	public async Task<NoContent> ActivateStrategy(
+	[HttpPatch("{strategyId:int}")]
+	public async Task<NoContent> UpdateStrategy(
 		[FromRoute, Range(1, int.MaxValue)] int strategyId,
+		[FromBody, Required] UpdateStrategyRequest request,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await strategyCommandService.ActivateAsync(userId, strategyId, ct);
-
-		return TypedResults.NoContent();
-	}
-
-	[HttpDelete("{strategyId:int}")]
-	public async Task<NoContent> DeactivateStrategy(
-		[FromRoute, Range(1, int.MaxValue)] int strategyId,
-		CancellationToken ct
-	)
-	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await strategyCommandService.DeactivateAsync(userId, strategyId, ct);
+		await strategyCommandService.SetActivityAsync(userId, strategyId, request.IsActive, ct);
 
 		return TypedResults.NoContent();
 	}

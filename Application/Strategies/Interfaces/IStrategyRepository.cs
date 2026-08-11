@@ -10,6 +10,7 @@ public interface IStrategyRepository : IRepository<Strategy>
 {
 	Task<StrategyCountsDto?> FindStatisticsAsync(int userId, CancellationToken ct = default);
 	Task<Dictionary<string, int?>> GetAccuracyMapAsync(CancellationToken ct = default);
+	Task<bool?> FindActivityAsync(int userId, int strategyId, CancellationToken ct = default);
 	Task<Strategy?> FindWithActivityAsync(int userId, int strategyId, CancellationToken ct = default);
 	Task<StrategyInstrumentLinkState?> FindInstrumentLinkStateAsync(
 		int userId,

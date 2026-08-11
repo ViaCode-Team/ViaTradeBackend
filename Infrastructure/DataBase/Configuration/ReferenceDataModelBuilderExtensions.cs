@@ -14,13 +14,13 @@ internal static class ReferenceDataModelBuilderExtensions
 				{
 					Id = 1,
 					Name = "TrendFollowingStrategy",
-					Description = "Basic trend-following strategy for an asset. Minimal risk, rare signals.",
+					Description = "Базовая стратегия следования тренду для актива. Минимальный риск, редкие сигналы.",
 					Accuracy = 81,
-					SignalFrequency = "1-2 times a month",
-					InvestmentHorizon = "1-3 weeks",
-					LogicDescription = "Analysis of a long-term chart to confirm movement",
-					UsageDescription = "Follow the main trend, during low or medium volatility",
-					LimitationsDescription = "Strategy exclusively for following the trend",
+					SignalFrequency = "1–2 раза в месяц",
+					InvestmentHorizon = "1–3 недели",
+					LogicDescription = "Анализ долгосрочного графика для подтверждения движения",
+					UsageDescription = "Следуйте основному тренду при низкой или средней волатильности",
+					LimitationsDescription = "Стратегия предназначена исключительно для следования тренду",
 					CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
 					IsActive = true,
 				},
@@ -28,13 +28,13 @@ internal static class ReferenceDataModelBuilderExtensions
 				{
 					Id = 2,
 					Name = "Test",
-					Description = "Test strategy. 100000% profit per nanosecond",
+					Description = "Тестовая стратегия. 100000% прибыли в наносекунду",
 					Accuracy = 99,
-					SignalFrequency = "3 times a month",
-					InvestmentHorizon = "up to 1 week",
-					LogicDescription = "Very clear",
-					UsageDescription = "Use it however you like",
-					LimitationsDescription = "SuperStart",
+					SignalFrequency = "3 раза в месяц",
+					InvestmentHorizon = "до 1 недели",
+					LogicDescription = "Очень понятная",
+					UsageDescription = "Используйте как хотите",
+					LimitationsDescription = "Суперстарт",
 					CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
 					IsActive = true,
 				}
@@ -47,14 +47,14 @@ internal static class ReferenceDataModelBuilderExtensions
 				{
 					Id = 1,
 					Symbol = "GAZP",
-					Description = "Gazprom",
+					Description = "Газпром",
 					CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
 				},
 				new
 				{
 					Id = 2,
 					Symbol = "GMKN",
-					Description = "Nornickel",
+					Description = "Норникель",
 					CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
 				}
 			);
@@ -65,13 +65,13 @@ internal static class ReferenceDataModelBuilderExtensions
 				new
 				{
 					Id = 1,
-					Name = "Stock",
+					Name = "Акция",
 					CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
 				},
 				new
 				{
 					Id = 2,
-					Name = "Futures",
+					Name = "Фьючерс",
 					CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
 				}
 			);

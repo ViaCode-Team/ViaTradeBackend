@@ -29,6 +29,14 @@ public class StrategyEfRepository(AppDbContext context) : BaseEfRepository<Strat
 		return strategies.ToDictionary(strategy => strategy.Name, strategy => strategy.Accuracy);
 	}
 
+	public async Task<bool?> FindActivityAsync(int userId, int strategyId, CancellationToken ct)
+	{
+		return await _dbSet
+			.Where(strategy => strategy.Id == strategyId)
+			.Select(strategy => (bool?)strategy.UserStrategies.Any(link => link.UserId == userId))
+			.FirstOrDefaultAsync(ct);
+	}
+
 	public async Task<Strategy?> FindWithActivityAsync(int userId, int strategyId, CancellationToken ct)
 	{
 		var result = await _dbSet
@@ -39,6 +47,7 @@ public class StrategyEfRepository(AppDbContext context) : BaseEfRepository<Strat
 				IsActive = strategy.UserStrategies.Any(link => link.UserId == userId),
 			})
 			.FirstOrDefaultAsync(ct);
+
 		if (result == null)
 			return null;
 

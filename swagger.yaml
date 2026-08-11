@@ -3059,14 +3059,19 @@ paths:
                 traceId: 0HNABC123:00000001
       security:
         - Bearer: [ ]
-  /api/v1/sessions/current/refresh:
+  /api/v1/sessions/current/tokens:
     post:
       tags:
         - Sessions
-      operationId: RefreshCurrentSession
+      operationId: CreateCurrentSessionTokens
       responses:
         '204':
-          description: No Content
+          description: Authentication succeeded. Access and refresh tokens are set as secure cookies.
+          headers:
+            Set-Cookie:
+              description: 'Sent twice: `access_token` and `refresh_token`. Both cookies are HttpOnly, Secure, SameSite=Strict, and Path=/.'
+              schema:
+                type: string
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3475,10 +3480,12 @@ paths:
         - Signals
       operationId: GetLatestSignals
       parameters:
-        - name: direction
+        - name: signals
           in: query
           schema:
-            $ref: '#/components/schemas/SignalDirection'
+            type: array
+            items:
+              $ref: '#/components/schemas/TradeSignal'
         - name: sortBy
           in: query
           schema:
@@ -3668,6 +3675,12 @@ paths:
           schema:
             type: string
             format: date-time
+        - name: signals
+          in: query
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/TradeSignal'
         - name: sortBy
           in: query
           schema:
@@ -4281,10 +4294,10 @@ paths:
                 traceId: 0HNABC123:00000001
       security:
         - Bearer: [ ]
-    put:
+    patch:
       tags:
         - Strategies
-      operationId: ActivateStrategy
+      operationId: UpdateStrategy
       parameters:
         - name: strategyId
           in: path
@@ -4294,150 +4307,18 @@ paths:
             minimum: 1
             type: integer
             format: int32
-      responses:
-        '204':
-          description: No Content
-        '400':
-          description: Bad Request - Invalid input data
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.io/400
-                title: Bad Request
-                status: 400
-                detail: Safe error description.
-                instance: /api/resource
-                code: error_code
-                traceId: 0HNABC123:00000001
-        '401':
-          description: Unauthorized - Authentication is required
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.io/401
-                title: Unauthorized
-                status: 401
-                detail: Safe error description.
-                instance: /api/resource
-                code: error_code
-                traceId: 0HNABC123:00000001
-        '403':
-          description: Forbidden - Access denied
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.io/403
-                title: Forbidden
-                status: 403
-                detail: Safe error description.
-                instance: /api/resource
-                code: error_code
-                traceId: 0HNABC123:00000001
-        '404':
-          description: Not Found - Resource does not exist
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.io/404
-                title: Not Found
-                status: 404
-                detail: Safe error description.
-                instance: /api/resource
-                code: error_code
-                traceId: 0HNABC123:00000001
-        '408':
-          description: Request Timeout - Operation timed out
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.io/408
-                title: Request Timeout
-                status: 408
-                detail: Safe error description.
-                instance: /api/resource
-                code: error_code
-                traceId: 0HNABC123:00000001
-        '409':
-          description: Conflict - Resource state conflict
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.io/409
-                title: Conflict
-                status: 409
-                detail: Safe error description.
-                instance: /api/resource
-                code: error_code
-                traceId: 0HNABC123:00000001
-        '422':
-          description: Unprocessable Content - Business rule violation
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.io/422
-                title: Unprocessable Content
-                status: 422
-                detail: Safe error description.
-                instance: /api/resource
-                code: error_code
-                traceId: 0HNABC123:00000001
-        '500':
-          description: Internal Server Error - Unexpected error
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.io/500
-                title: Internal Server Error
-                status: 500
-                detail: Safe error description.
-                instance: /api/resource
-                code: error_code
-                traceId: 0HNABC123:00000001
-        '503':
-          description: Service Unavailable - Temporary infrastructure issue
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ProblemDetails'
-              example:
-                type: https://httpstatuses.io/503
-                title: Service Unavailable
-                status: 503
-                detail: Safe error description.
-                instance: /api/resource
-                code: error_code
-                traceId: 0HNABC123:00000001
-      security:
-        - Bearer: [ ]
-    delete:
-      tags:
-        - Strategies
-      operationId: DeactivateStrategy
-      parameters:
-        - name: strategyId
-          in: path
-          required: true
-          schema:
-            maximum: 2147483647
-            minimum: 1
-            type: integer
-            format: int32
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStrategyRequest'
+          text/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStrategyRequest'
+          application/*+json:
+            schema:
+              $ref: '#/components/schemas/UpdateStrategyRequest'
+        required: true
       responses:
         '204':
           description: No Content
@@ -7499,11 +7380,6 @@ components:
           type: integer
           format: int32
       additionalProperties: false
-    SignalDirection:
-      enum:
-        - BUY
-        - SELL
-      type: string
     SignalResponse:
       required:
         - closePrice
@@ -7829,6 +7705,14 @@ components:
           type: string
           format: date-time
       additionalProperties: false
+    UpdateStrategyRequest:
+      required:
+        - isActive
+      type: object
+      properties:
+        isActive:
+          type: boolean
+      additionalProperties: false
     UpdateTradeRequest:
       required:
         - instrumentId
@@ -7941,7 +7825,6 @@ components:
       additionalProperties: false
     WinrateTradeStatisticResponse:
       required:
-        - profitFactor
         - totalWinrate
       type: object
       properties:

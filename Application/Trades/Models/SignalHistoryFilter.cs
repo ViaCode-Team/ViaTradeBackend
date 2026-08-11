@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Domain.Enums;
 
 namespace Application.Trades.Models;
 
@@ -13,6 +14,8 @@ public sealed class SignalHistoryFilter : IValidatableObject
 	public DateTime? StartDate { get; set; }
 
 	public DateTime? EndDate { get; set; }
+
+	public List<TradeSignal>? Signals { get; set; }
 
 	public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
 	{

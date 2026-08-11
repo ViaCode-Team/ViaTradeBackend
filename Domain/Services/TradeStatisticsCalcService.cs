@@ -25,13 +25,13 @@ public static class TradeStatisticsCalcService
 		return (trade.ClosePrice.Value - trade.OpenPrice) * trade.Quantity * (int)trade.Signal;
 	}
 
-	public static float CalculateProfitFactor(double totalProfit, double totalLoss)
+	public static float? CalculateProfitFactor(double totalProfit, double totalLoss)
 	{
 		if (totalLoss > 0)
 			return (float)Math.Round(totalProfit / totalLoss, 3);
 
 		if (totalProfit > 0)
-			return float.PositiveInfinity;
+			return null;
 
 		return 0f;
 	}
