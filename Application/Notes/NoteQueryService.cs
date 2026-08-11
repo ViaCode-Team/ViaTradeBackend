@@ -30,6 +30,18 @@ public class NoteQueryService(INoteRepository noteRepository) : INoteQueryServic
 		return existingNote;
 	}
 
+	public async Task<PageResult<NoteDto>> GetSearchAsync(
+		int userId,
+		NoteSearchFilter noteSearchFilter,
+		PageOptions pageOptions,
+		CancellationToken ct)
+	{
+		var spec = new NoteSearchSpecification(userId, noteSearchFilter);
+		var notes = await noteRepository.GetPageSearchAsync(spec, pageOptions, ct);
+
+		return notes.Map(ToDto);
+	}
+
 	public async Task<PageResult<NoteDto>> GetPageAsync(
 		int userId,
 		NoteFilter noteFilter,
