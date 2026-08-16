@@ -311,6 +311,168 @@ paths:
                 traceId: 0HNABC123:00000001
       security:
         - Bearer: [ ]
+  /api/v1/instruments/search:
+    get:
+      tags:
+        - Instruments
+      operationId: GetSearchInstrument
+      parameters:
+        - name: searchText
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            maximum: 21474837
+            minimum: 1
+            type: integer
+            format: int32
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstrumentResponsePageResult'
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/400
+                title: Bad Request
+                status: 400
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '401':
+          description: Unauthorized - Authentication is required
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/401
+                title: Unauthorized
+                status: 401
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/403
+                title: Forbidden
+                status: 403
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/404
+                title: Not Found
+                status: 404
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '408':
+          description: Request Timeout - Operation timed out
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/408
+                title: Request Timeout
+                status: 408
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '409':
+          description: Conflict - Resource state conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/409
+                title: Conflict
+                status: 409
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '422':
+          description: Unprocessable Content - Business rule violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/422
+                title: Unprocessable Content
+                status: 422
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/500
+                title: Internal Server Error
+                status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   '/api/v1/instruments/{instrumentId}':
     get:
       tags:
@@ -1716,6 +1878,168 @@ paths:
                 traceId: 0HNABC123:00000001
       security:
         - Bearer: [ ]
+  /api/v1/notes/search:
+    get:
+      tags:
+        - Notes
+      operationId: GetSearchNotes
+      parameters:
+        - name: searchText
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            maximum: 21474837
+            minimum: 1
+            type: integer
+            format: int32
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NoteResponsePageResult'
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/400
+                title: Bad Request
+                status: 400
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '401':
+          description: Unauthorized - Authentication is required
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/401
+                title: Unauthorized
+                status: 401
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/403
+                title: Forbidden
+                status: 403
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/404
+                title: Not Found
+                status: 404
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '408':
+          description: Request Timeout - Operation timed out
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/408
+                title: Request Timeout
+                status: 408
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '409':
+          description: Conflict - Resource state conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/409
+                title: Conflict
+                status: 409
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '422':
+          description: Unprocessable Content - Business rule violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/422
+                title: Unprocessable Content
+                status: 422
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/500
+                title: Internal Server Error
+                status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
   '/api/v1/notes/{noteId}':
     get:
       tags:
@@ -2033,6 +2357,168 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/ReminderSortField'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReminderResponsePageResult'
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/400
+                title: Bad Request
+                status: 400
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '401':
+          description: Unauthorized - Authentication is required
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/401
+                title: Unauthorized
+                status: 401
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/403
+                title: Forbidden
+                status: 403
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/404
+                title: Not Found
+                status: 404
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '408':
+          description: Request Timeout - Operation timed out
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/408
+                title: Request Timeout
+                status: 408
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '409':
+          description: Conflict - Resource state conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/409
+                title: Conflict
+                status: 409
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '422':
+          description: Unprocessable Content - Business rule violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/422
+                title: Unprocessable Content
+                status: 422
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/500
+                title: Internal Server Error
+                status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
+  /api/v1/reminders/search:
+    get:
+      tags:
+        - Reminders
+      operationId: GetSearchPageAsync
+      parameters:
+        - name: page
+          in: query
+          schema:
+            maximum: 21474837
+            minimum: 1
+            type: integer
+            format: int32
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 20
+        - name: searchText
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -3981,6 +4467,168 @@ paths:
             type: array
             items:
               $ref: '#/components/schemas/StrategySortField'
+        - name: page
+          in: query
+          schema:
+            maximum: 21474837
+            minimum: 1
+            type: integer
+            format: int32
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StrategyResponsePageResult'
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/400
+                title: Bad Request
+                status: 400
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '401':
+          description: Unauthorized - Authentication is required
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/401
+                title: Unauthorized
+                status: 401
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/403
+                title: Forbidden
+                status: 403
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/404
+                title: Not Found
+                status: 404
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '408':
+          description: Request Timeout - Operation timed out
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/408
+                title: Request Timeout
+                status: 408
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '409':
+          description: Conflict - Resource state conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/409
+                title: Conflict
+                status: 409
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '422':
+          description: Unprocessable Content - Business rule violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/422
+                title: Unprocessable Content
+                status: 422
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/500
+                title: Internal Server Error
+                status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
+  /api/v1/strategies/search:
+    get:
+      tags:
+        - Strategies
+      operationId: GetSearchStrategies
+      parameters:
+        - name: searchText
+          in: query
+          required: true
+          schema:
+            type: string
         - name: page
           in: query
           schema:
@@ -6134,6 +6782,168 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/TradeResponse'
+        '400':
+          description: Bad Request - Invalid input data
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/400
+                title: Bad Request
+                status: 400
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '401':
+          description: Unauthorized - Authentication is required
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/401
+                title: Unauthorized
+                status: 401
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '403':
+          description: Forbidden - Access denied
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/403
+                title: Forbidden
+                status: 403
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '404':
+          description: Not Found - Resource does not exist
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/404
+                title: Not Found
+                status: 404
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '408':
+          description: Request Timeout - Operation timed out
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/408
+                title: Request Timeout
+                status: 408
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '409':
+          description: Conflict - Resource state conflict
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/409
+                title: Conflict
+                status: 409
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '422':
+          description: Unprocessable Content - Business rule violation
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/422
+                title: Unprocessable Content
+                status: 422
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '500':
+          description: Internal Server Error - Unexpected error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/500
+                title: Internal Server Error
+                status: 500
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+        '503':
+          description: Service Unavailable - Temporary infrastructure issue
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+              example:
+                type: https://httpstatuses.io/503
+                title: Service Unavailable
+                status: 503
+                detail: Safe error description.
+                instance: /api/resource
+                code: error_code
+                traceId: 0HNABC123:00000001
+      security:
+        - Bearer: [ ]
+  /api/v1/trades/search:
+    get:
+      tags:
+        - Trades
+      operationId: GetSearchTrades
+      parameters:
+        - name: searchText
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: query
+          schema:
+            maximum: 21474837
+            minimum: 1
+            type: integer
+            format: int32
+            default: 1
+        - name: pageSize
+          in: query
+          schema:
+            maximum: 100
+            minimum: 1
+            type: integer
+            format: int32
+            default: 20
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TradeResponsePageResult'
         '400':
           description: Bad Request - Invalid input data
           content:

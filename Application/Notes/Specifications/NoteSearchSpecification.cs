@@ -1,11 +1,11 @@
+using Application.Common.Models;
 using Application.Common.Specifications;
-using Application.Notes.Models;
 using Domain.Entities;
 
 namespace Application.Notes.Specifications;
 
-public sealed class NoteSearchSpecification(int userId, NoteSearchFilter filter)
-	: SearchSpecification<Note, NoteSearchFilter>(filter)
+public sealed class NoteSearchSpecification(int userId, SearchFilter filter)
+	: SearchSpecification<Note, SearchFilter>(filter)
 {
 	private readonly int _userId = userId;
 
@@ -13,20 +13,16 @@ public sealed class NoteSearchSpecification(int userId, NoteSearchFilter filter)
 	{
 		query = query.Where(x => x.UserId == _userId);
 
-		if (!string.IsNullOrWhiteSpace(Filter.Text))
-			query = query.Where(x => x.Text.Contains(Filter.Text));
-
-		if (!string.IsNullOrWhiteSpace(Filter.InstrumentSymbol))
-			query = query.Where(x => x.Instrument != null
-				&& x.Instrument.Symbol.Contains(Filter.InstrumentSymbol));
-
-		if (!string.IsNullOrWhiteSpace(Filter.InstrumentDescription))
-			query = query.Where(x => x.Instrument != null && x.Instrument.Description != null
-				&& x.Instrument.Description.Contains(Filter.InstrumentDescription));
-
-		if (!string.IsNullOrWhiteSpace(Filter.StrategyName))
-			query = query.Where(x => x.Strategy != null
-				&& x.Strategy.Name.Contains(Filter.StrategyName));
+		if (!string.IsNullOrWhiteSpace(Filter.SearchText))
+		{
+			var searchText = Filter.SearchText;
+			query = query.Where(x =>
+				(x.Text != null && x.Text.Contains(searchText)) ||
+				(x.Instrument != null &&
+					((x.Instrument.Symbol != null && x.Instrument.Symbol.Contains(searchText)) ||
+					 (x.Instrument.Description != null && x.Instrument.Description.Contains(searchText)))) ||
+				(x.Strategy != null && x.Strategy.Name != null && x.Strategy.Name.Contains(searchText)));
+		}
 
 		return query;
 	}

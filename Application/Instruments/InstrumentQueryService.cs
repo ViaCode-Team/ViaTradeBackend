@@ -2,6 +2,7 @@ using Application.Common.Exceptions;
 using Application.Common.Models;
 using Application.Instruments.Interfaces;
 using Application.Instruments.Models;
+using Application.Instruments.Specifications;
 using Application.Trades.Interfaces;
 using Application.Trades.Models;
 using Domain.Entities;
@@ -39,6 +40,15 @@ public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepo
 	)
 	{
 		return await instrumentRepository.GetPageAsync(instrumentFilter, pageOptions, instrumentSort, ct);
+	}
+
+	public async Task<PageResult<Instrument>> GetPageSearchAsync(
+		SearchFilter instrumentFilter,
+		PageOptions pageOptions,
+		CancellationToken ct)
+	{
+		var spec = new InstrumentSearchSpecification(instrumentFilter);
+		return await instrumentRepository.GetPageSearchAsync(spec, pageOptions, ct);
 	}
 
 	public async Task<IReadOnlyList<InstrumentFileDto>> ListFileMetadataAsync(
@@ -104,4 +114,6 @@ public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepo
 			EndDate = instrumentFile.EndDate,
 		};
 	}
+
+
 }

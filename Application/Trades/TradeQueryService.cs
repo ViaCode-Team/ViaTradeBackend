@@ -72,6 +72,19 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 		return trades.Map(ToDto);
 	}
 
+	public async Task<PageResult<TradeDto>> GetPageSearchAsync(
+		int userId,
+		SearchFilter tradeFilter,
+		PageOptions pageOptions,
+		CancellationToken ct
+	)
+	{
+		var spec = new TradeSearchSpecification(userId, tradeFilter);
+		var trades = await tradeRepository.GetPageSearchProjectionAsync(spec, pageOptions, ct);
+
+		return trades.Map(ToDto);
+	}
+
 	private static TradeDto ToDto(TradeProjectionDto source) =>
 		new(
 			source.Id,

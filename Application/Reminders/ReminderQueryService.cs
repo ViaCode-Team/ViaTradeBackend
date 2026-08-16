@@ -58,6 +58,19 @@ public class ReminderQueryService(IReminderRepository reminderRepository) : IRem
 		return reminders.Map(ToDto);
 	}
 
+	public async Task<PageResult<ReminderDto>> GetSearchPageAsync(
+		int userId,
+		PageOptions pageOptions,
+		SearchFilter filter,
+		CancellationToken ct
+	)
+	{
+		var spec = new RemindsSearchSpecification(userId, filter);
+		var reminders = await reminderRepository.GetPageSearchAsync(spec, pageOptions, ct);
+
+		return reminders.Map(ToDto);
+	}
+
 	private static ReminderDto ToDto(ReminderProjectionDto source)
 	{
 		var instrument = new InstrumentBriefDto(source.InstrumentId, source.InstrumentTicker, source.InstrumentName);

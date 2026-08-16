@@ -62,6 +62,19 @@ public class TradesController(
 		return TypedResults.Ok(userTrades.Map(ApiMapper.ToResponse));
 	}
 
+	[HttpGet("search")]
+	public async Task<Ok<PageResult<TradeResponse>>> GetSearchTrades(
+		[FromQuery] SearchFilter tradeFilter,
+		[FromQuery] PageOptions pageOptions,
+		CancellationToken ct
+	)
+	{
+		var userId = jwtHelper.GetUserIdFromClaims(User);
+		var userTrades = await tradeQueryService.GetPageSearchAsync(userId, tradeFilter, pageOptions, ct);
+
+		return TypedResults.Ok(userTrades.Map(ApiMapper.ToResponse));
+	}
+
 	[HttpGet("{tradeId:int}")]
 	public async Task<Ok<TradeResponse>> GetTradeById(
 		[FromRoute, Range(1, int.MaxValue)] int tradeId,

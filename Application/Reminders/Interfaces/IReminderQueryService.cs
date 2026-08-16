@@ -22,4 +22,10 @@ public interface IReminderQueryService
 		ReminderSort reminderSort,
 		CancellationToken ct
 	);
+	Task<PageResult<ReminderDto>> GetSearchPageAsync(
+		int userId,
+		PageOptions pageOptions,
+		SearchFilter filter,
+		CancellationToken ct
+	);
 }

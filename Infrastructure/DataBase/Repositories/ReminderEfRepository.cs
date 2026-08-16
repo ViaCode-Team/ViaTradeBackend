@@ -50,6 +50,28 @@ public class ReminderEfRepository(AppDbContext context) : BaseEfRepository<Remin
 			.ToPagedAsync(pageOptions, ct);
 	}
 
+	public async Task<PageResult<ReminderProjectionDto>> GetPageSearchAsync(
+		ISearchSpecification<Reminder> specification,
+		PageOptions pageOptions,
+		CancellationToken ct
+		)
+	{
+		var query = specification.Apply(_dbSet)
+			.OrderBy(reminder => reminder.Id);
+
+		return await query
+			.Select(reminder => new ReminderProjectionDto(
+				reminder.Id,
+				reminder.Text,
+				reminder.RemindAt,
+				reminder.InstrumentId,
+				reminder.Instrument!.Symbol,
+				reminder.Instrument!.Description,
+				reminder.UserId
+				))
+			.ToPagedAsync(pageOptions, ct);
+	}
+
 	public async Task<Reminder?> FindByUserAndIdAsync(int userId, int reminderId, CancellationToken ct)
 	{
 		return await _dbSet

@@ -21,6 +21,11 @@ public interface ITradeRepository : IRepository<Trade>
 		PageOptions pageOptions,
 		CancellationToken ct = default
 	);
+	Task<PageResult<TradeProjectionDto>> GetPageSearchProjectionAsync(
+		ISearchSpecification<Trade> specification,
+		PageOptions pageOptions,
+		CancellationToken ct = default
+	);
 	Task<int> ExecuteUpdateAsync(
 		int userId,
 		int id,

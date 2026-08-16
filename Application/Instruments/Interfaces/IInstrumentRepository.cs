@@ -1,6 +1,8 @@
+using Application.Common.Interfaces;
 using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Instruments.Models;
+using Application.Instruments.Specifications;
 using Domain.Entities;
 
 namespace Application.Instruments.Interfaces;
@@ -16,5 +18,10 @@ public interface IInstrumentRepository : IRepository<Instrument>
 		PageOptions pageOptions,
 		InstrumentSort instrumentSort,
 		CancellationToken ct = default
-	);
+		);
+	Task<PageResult<Instrument>> GetPageSearchAsync(
+		InstrumentSearchSpecification specification,
+		PageOptions pageOptions,
+		CancellationToken ct = default
+		);
 }
