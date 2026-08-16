@@ -1,8 +1,8 @@
-using Application.Common.Models;
-using Application.Common.Specifications;
-using Domain.Entities;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Common.Specifications;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Reminders.Specifications;
+namespace ViaTrade.Application.Reminders.Specifications;
 
 public sealed class RemindsSearchSpecification(int userId, SearchFilter filter) : SearchSpecification<Reminder, SearchFilter>(filter)
 {

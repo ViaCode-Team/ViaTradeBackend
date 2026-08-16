@@ -63,6 +63,7 @@ public class StrategiesController(
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
 		var pagedStrategies = await strategyQueryService.GetPageSearchAsync(
+			userId,
 			strategyFilter,
 			pageOptions,
 			ct

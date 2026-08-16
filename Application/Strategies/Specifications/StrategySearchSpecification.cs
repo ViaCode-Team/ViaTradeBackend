@@ -1,8 +1,8 @@
-using Application.Common.Models;
-using Application.Common.Specifications;
-using Domain.Entities;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Common.Specifications;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Strategies.Specifications;
+namespace ViaTrade.Application.Strategies.Specifications;
 
 public sealed class StrategySearchSpecification(SearchFilter filter)
 	: SearchSpecification<Strategy, SearchFilter>(filter)

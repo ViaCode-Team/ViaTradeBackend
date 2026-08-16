@@ -1,8 +1,8 @@
-using Application.Common.Models;
-using Application.Common.Specifications;
-using Domain.Entities;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Common.Specifications;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Trades.Specifications;
+namespace ViaTrade.Application.Trades.Specifications;
 
 public sealed class TradeSearchSpecification(int userId, SearchFilter filter)
 	: SearchSpecification<Trade, SearchFilter>(filter)

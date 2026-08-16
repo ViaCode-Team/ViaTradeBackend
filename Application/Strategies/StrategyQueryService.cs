@@ -6,6 +6,7 @@ using ViaTrade.Application.Notes.Models;
 using ViaTrade.Application.Strategies.Interfaces;
 using ViaTrade.Application.Strategies.Models;
 using ViaTrade.Application.Strategies.Specifications;
+using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Strategies;
 
@@ -51,17 +52,18 @@ public class StrategyQueryService(
 		return await strategyRepository.GetPageAsync(userId, spec, pageOptions, ct);
 	}
 
-	public async Task<PageResult<Strategy>> GetPageSearchAsync(
+	public async Task<PageResult<StrategySubscriptionDto>> GetPageSearchAsync(
+		int userId,
 		SearchFilter strategyFilter,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
 		var spec = new StrategySearchSpecification(strategyFilter);
-		return await strategyRepository.GetPageSearchAsync(spec, pageOptions, ct);
+		return await strategyRepository.GetPageSearchAsync(userId, spec, pageOptions, ct);
 	}
 
-	public async Task<Strategy> GetAsync(int userId, int strategyId, CancellationToken ct)
+	public async Task<StrategySubscriptionDto> GetAsync(int userId, int strategyId, CancellationToken ct)
 	{
 		var strategy = await strategyRepository.FindSubscriptionAsync(userId, strategyId, ct);
 		if (strategy == null)

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Instruments.Interfaces;
 using ViaTrade.Application.Instruments.Models;
+using ViaTrade.Application.Instruments.Specifications;
 using ViaTrade.Domain.Entities;
 using ViaTrade.Infrastructure.Extensions;
 

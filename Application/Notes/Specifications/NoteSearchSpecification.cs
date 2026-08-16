@@ -1,5 +1,5 @@
+using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Common.Specifications;
-using ViaTrade.Application.Notes.Models;
 using ViaTrade.Domain.Entities;
 
 

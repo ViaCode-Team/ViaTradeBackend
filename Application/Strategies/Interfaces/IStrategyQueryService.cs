@@ -2,6 +2,7 @@ using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Instruments.Models;
 using ViaTrade.Application.Notes.Models;
 using ViaTrade.Application.Strategies.Models;
+using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Strategies.Interfaces;
 
@@ -15,13 +16,14 @@ public interface IStrategyQueryService
 		PageOptions pageOptions,
 		CancellationToken ct
 	);
-	Task<PageResult<Strategy>> GetPageSearchAsync(
+	Task<PageResult<StrategySubscriptionDto>> GetPageSearchAsync(
+		int userId,
 		SearchFilter strategyFilter,
 		PageOptions pageOptions,
 		CancellationToken ct
 	);
-	Task<Strategy> GetAsync(int userId, int strategyId, CancellationToken ct);
-	Task<PageResult<Strategy>> GetPageByInstrumentAsync(
+	Task<StrategySubscriptionDto> GetAsync(int userId, int strategyId, CancellationToken ct);
+	Task<PageResult<StrategySubscriptionDto>> GetPageByInstrumentAsync(
 		int userId,
 		int instrumentId,
 		StrategyFilter strategyFilter,

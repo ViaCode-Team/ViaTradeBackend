@@ -1,4 +1,4 @@
-namespace Application.Common.Models;
+namespace ViaTrade.Application.Common.Models;
 
 public sealed class SearchFilter
 {

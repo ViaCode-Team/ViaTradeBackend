@@ -1,9 +1,8 @@
-using Application.Common.Models;
-using Application.Common.Specifications;
-using Application.Instruments.Models;
-using Domain.Entities;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Common.Specifications;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Instruments.Specifications;
+namespace ViaTrade.Application.Instruments.Specifications;
 
 public sealed class InstrumentSearchSpecification(SearchFilter filter)
 	: SearchSpecification<Instrument, SearchFilter>(filter)

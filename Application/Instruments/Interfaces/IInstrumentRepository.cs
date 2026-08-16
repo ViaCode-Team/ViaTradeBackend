@@ -3,7 +3,6 @@ using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Instruments.Models;
 using ViaTrade.Domain.Entities;
 using ViaTrade.Application.Instruments.Specifications;
-using ViaTrade.Application.Common.Interfaces;
 
 namespace ViaTrade.Application.Instruments.Interfaces;
 

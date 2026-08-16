@@ -74,7 +74,8 @@ public class ReminderEfRepository(AppDbContext context) : BaseEfRepository<Remin
 				reminder.InstrumentId,
 				reminder.Instrument!.Symbol,
 				reminder.Instrument!.Description,
-				reminder.UserId
+				reminder.UserId,
+				reminder.DeliveredAt
 				))
 			.ToPagedAsync(pageOptions, ct);
 	}
