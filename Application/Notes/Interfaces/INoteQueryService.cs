@@ -18,7 +18,7 @@ public interface INoteQueryService
 	);
 	Task<PageResult<NoteDto>> GetSearchAsync(
 		int userId,
-		NoteSearchFilter noteSearchFilter,
+		SearchFilter noteSearchFilter,
 		PageOptions pageOptions,
 		CancellationToken ct
 	);

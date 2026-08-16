@@ -56,7 +56,7 @@ public class NoteQueryService(
 
 	public async Task<PageResult<NoteDto>> GetSearchAsync(
 		int userId,
-		NoteSearchFilter noteSearchFilter,
+		SearchFilter noteSearchFilter,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)

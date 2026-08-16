@@ -39,7 +39,7 @@ public class NotesController(INoteQueryService noteQueryService, IJwtHelper jwtH
 
 	[HttpGet("search")]
 	public async Task<Ok<PageResult<NoteResponse>>> GetSearchNotes(
-		[FromQuery] NoteSearchFilter noteFilter,
+		[FromQuery] SearchFilter noteFilter,
 		[FromQuery] PageOptions pageOptions,
 		CancellationToken ct
 	)

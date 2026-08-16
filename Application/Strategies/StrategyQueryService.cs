@@ -51,7 +51,17 @@ public class StrategyQueryService(
 		return await strategyRepository.GetPageAsync(userId, spec, pageOptions, ct);
 	}
 
-	public async Task<StrategySubscriptionDto> GetAsync(int userId, int strategyId, CancellationToken ct)
+	public async Task<PageResult<Strategy>> GetPageSearchAsync(
+		SearchFilter strategyFilter,
+		PageOptions pageOptions,
+		CancellationToken ct
+	)
+	{
+		var spec = new StrategySearchSpecification(strategyFilter);
+		return await strategyRepository.GetPageSearchAsync(spec, pageOptions, ct);
+	}
+
+	public async Task<Strategy> GetAsync(int userId, int strategyId, CancellationToken ct)
 	{
 		var strategy = await strategyRepository.FindSubscriptionAsync(userId, strategyId, ct);
 		if (strategy == null)

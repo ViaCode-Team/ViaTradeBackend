@@ -17,6 +17,11 @@ public interface IInstrumentQueryService
 		InstrumentSort instrumentSort,
 		CancellationToken ct
 	);
+	Task<PageResult<Instrument>> GetPageSearchAsync(
+		SearchFilter instrumentFilter,
+		PageOptions pageOptions,
+		CancellationToken ct
+	);
 	Task<IReadOnlyList<InstrumentFileDto>> ListFileMetadataAsync(TradeDataType dataType, CancellationToken ct);
 	Task<InstrumentFileDto> GetFileMetadataAsync(
 		TradeDataType dataType,

@@ -2,6 +2,8 @@ using ViaTrade.Application.Common.Interfaces.Repositories;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Instruments.Models;
 using ViaTrade.Domain.Entities;
+using ViaTrade.Application.Instruments.Specifications;
+using ViaTrade.Application.Common.Interfaces;
 
 namespace ViaTrade.Application.Instruments.Interfaces;
 
@@ -16,5 +18,10 @@ public interface IInstrumentRepository : IRepository<Instrument>
 		PageOptions pageOptions,
 		InstrumentSort instrumentSort,
 		CancellationToken ct = default
-	);
+		);
+	Task<PageResult<Instrument>> GetPageSearchAsync(
+		InstrumentSearchSpecification specification,
+		PageOptions pageOptions,
+		CancellationToken ct = default
+		);
 }

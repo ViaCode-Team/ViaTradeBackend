@@ -15,8 +15,13 @@ public interface IStrategyQueryService
 		PageOptions pageOptions,
 		CancellationToken ct
 	);
-	Task<StrategySubscriptionDto> GetAsync(int userId, int strategyId, CancellationToken ct);
-	Task<PageResult<StrategySubscriptionDto>> GetPageByInstrumentAsync(
+	Task<PageResult<Strategy>> GetPageSearchAsync(
+		SearchFilter strategyFilter,
+		PageOptions pageOptions,
+		CancellationToken ct
+	);
+	Task<Strategy> GetAsync(int userId, int strategyId, CancellationToken ct);
+	Task<PageResult<Strategy>> GetPageByInstrumentAsync(
 		int userId,
 		int instrumentId,
 		StrategyFilter strategyFilter,

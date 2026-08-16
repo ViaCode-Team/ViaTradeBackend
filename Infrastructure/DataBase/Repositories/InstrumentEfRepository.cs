@@ -90,4 +90,18 @@ public class InstrumentEfRepository(AppDbContext context) : BaseEfRepository<Ins
 
 		return query;
 	}
+
+	public async Task<PageResult<Instrument>> GetPageSearchAsync(InstrumentSearchSpecification specification,
+		PageOptions pageOptions, CancellationToken ct = default)
+	{
+		var query = specification.Apply(_dbSet)
+		.OrderBy(x => x.Id);
+
+		return await query
+			.Select(x => new Instrument
+			{
+				Symbol = x.Symbol,
+				Description = x.Description
+			}).ToPagedAsync(pageOptions, ct);
+	}
 }

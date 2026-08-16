@@ -6,6 +6,7 @@ using ViaTrade.Application.Trades.Interfaces;
 using ViaTrade.Application.Trades.Models;
 using ViaTrade.Domain.Entities;
 using ViaTrade.Domain.Enums;
+using ViaTrade.Application.Instruments.Specifications;
 
 namespace ViaTrade.Application.Instruments;
 
@@ -39,6 +40,15 @@ public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepo
 	)
 	{
 		return await instrumentRepository.GetPageAsync(instrumentFilter, pageOptions, instrumentSort, ct);
+	}
+
+	public async Task<PageResult<Instrument>> GetPageSearchAsync(
+		SearchFilter instrumentFilter,
+		PageOptions pageOptions,
+		CancellationToken ct)
+	{
+		var spec = new InstrumentSearchSpecification(instrumentFilter);
+		return await instrumentRepository.GetPageSearchAsync(spec, pageOptions, ct);
 	}
 
 	public async Task<IReadOnlyList<InstrumentFileDto>> ListFileMetadataAsync(
@@ -104,4 +114,6 @@ public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepo
 			EndDate = instrumentFile.EndDate,
 		};
 	}
+
+
 }

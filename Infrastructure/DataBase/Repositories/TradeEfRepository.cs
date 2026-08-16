@@ -134,6 +134,32 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 		return await query.Select(ToProjection()).ToPagedAsync(pageOptions, ct);
 	}
 
+	public async Task<PageResult<TradeProjectionDto>> GetPageSearchProjectionAsync(
+		ISearchSpecification<Trade> specification,
+		PageOptions pageOptions,
+		CancellationToken ct
+	)
+	{
+		var query = specification.Apply(_dbSet)
+			.OrderBy(trade => trade.Id);
+
+		return await query
+			.Select(trade => new TradeProjectionDto(
+				trade.Id,
+				trade.OpenedAt,
+				trade.ClosedAt,
+				trade.OpenPrice,
+				trade.ClosePrice,
+				trade.NetIncome,
+				trade.Quantity,
+				trade.TotalPrice,
+				trade.Signal,
+				trade.TradeTypeId,
+				new InstrumentSummaryDto(trade.Instrument!.Id, trade.Instrument.Symbol, trade.Instrument.Description),
+				trade.UserId
+			)).ToPagedAsync(pageOptions, ct);
+	}
+
 	public async Task<TradeStatisticAggregateDto> GetGlobalStatisticsAsync(int userId, CancellationToken ct)
 	{
 		var result = await _context
@@ -216,7 +242,7 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 		if (startDate.HasValue)
 			query = query.Where(trade => trade.ClosedAt!.Value >= startDate.Value.ToDateTime(TimeOnly.MinValue));
 
-		if (endDate.HasValue)
+		if (endDate.HasValue) 
 			query = query.Where(trade =>
 				trade.ClosedAt!.Value < endDate.Value.AddDays(1).ToDateTime(TimeOnly.MinValue)
 			);

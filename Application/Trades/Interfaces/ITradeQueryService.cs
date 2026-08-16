@@ -15,4 +15,11 @@ public interface ITradeQueryService
 		PageOptions pageOptions,
 		CancellationToken ct
 	);
+
+	Task<PageResult<TradeDto>> GetPageSearchAsync(
+		int userId,
+		SearchFilter tradeFilter,
+		PageOptions pageOptions,
+		CancellationToken ct
+	);
 }

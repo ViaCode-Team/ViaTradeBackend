@@ -52,6 +52,18 @@ public class InstrumentsController(
 		return TypedResults.Ok(instruments.Map(ApiMapper.ToResponse));
 	}
 
+	[HttpGet("search")]
+	public async Task<Ok<PageResult<InstrumentResponse>>> GetSearchInstrument(
+		[FromQuery] SearchFilter instrumentFilter,
+		[FromQuery] PageOptions pageOptions,
+		CancellationToken ct
+	)
+	{
+		var instruments = await instrumentQueryService.GetPageSearchAsync(instrumentFilter, pageOptions, ct);
+
+		return TypedResults.Ok(instruments.Map(ApiMapper.ToResponse));
+	}
+
 	[HttpGet("{instrumentId:int}")]
 	public async Task<Ok<InstrumentResponse>> GetInstrumentById(
 		[FromRoute, Range(1, int.MaxValue)] int instrumentId,

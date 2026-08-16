@@ -76,4 +76,16 @@ public class StrategyEfRepository(AppDbContext context) : BaseEfRepository<Strat
 
 		return await query.WithSubscriptionState(userId).ToPagedAsync(pageOptions, ct);
 	}
+
+	public async Task<PageResult<Strategy>> GetPageSearchAsync(
+		ISearchSpecification<Strategy> specification,
+		PageOptions pageOptions,
+		CancellationToken ct
+	)
+	{
+		var query = specification.Apply(_dbSet)
+			.OrderBy(trade => trade.Id);
+
+		return await query.ToPagedAsync(pageOptions, ct);
+	}
 }
