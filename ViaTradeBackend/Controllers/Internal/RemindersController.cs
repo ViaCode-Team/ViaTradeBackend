@@ -18,18 +18,22 @@ public class RemindersController(
 {
 	[ServicePassword]
 	[HttpGet("due")]
-	public async Task<Ok<IEnumerable<ReminderResponse>>> GetDue(CancellationToken ct)
+	public async Task<Ok<IEnumerable<DueReminderResponse>>> GetDue(CancellationToken ct)
 	{
 		var reminders = await reminderQueryService.ListDueAsync(ct);
 
-		return TypedResults.Ok(reminders.Select(ApiMapper.ToResponse));
+		return TypedResults.Ok(reminders.Select(ApiMapper.ToDueResponse));
 	}
 
 	[ServicePassword]
-	[HttpDelete("{reminderId:int}")]
-	public async Task<NoContent> DeleteDue([FromRoute, Range(1, int.MaxValue)] int reminderId, CancellationToken ct)
+	[HttpPut("{reminderId:int}/delivery")]
+	public async Task<NoContent> ConfirmDelivery(
+		[FromRoute, Range(1, int.MaxValue)] int reminderId,
+		[FromBody, Required] ConfirmReminderDeliveryRequest request,
+		CancellationToken ct
+	)
 	{
-		await reminderCommandService.DeleteDueAsync(reminderId, ct);
+		await reminderCommandService.MarkDeliveredAsync(request.UserId, reminderId, ct);
 
 		return TypedResults.NoContent();
 	}

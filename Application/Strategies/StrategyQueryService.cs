@@ -1,15 +1,16 @@
 using Application.Common.Exceptions;
 using Application.Common.Models;
+using Application.Instruments.Interfaces;
 using Application.Instruments.Models;
 using Application.Notes.Models;
 using Application.Strategies.Interfaces;
 using Application.Strategies.Models;
 using Application.Strategies.Specifications;
-using Domain.Entities;
 
 namespace Application.Strategies;
 
 public class StrategyQueryService(
+	IInstrumentRepository instrumentRepository,
 	IStrategyRepository strategyRepository,
 	IUserStrategyInstrumentRepository userStrategyInstrumentRepository
 ) : IStrategyQueryService
@@ -20,25 +21,25 @@ public class StrategyQueryService(
 		if (counts == null)
 			throw new NotFoundException("User not found.", "user_not_found");
 
-		long notLinkedStratagiesCount = counts.TotalStrategiesCount - counts.ActiveStrategiesCount;
-		if (notLinkedStratagiesCount < 0)
+		long unsubscribedStrategiesCount = counts.TotalStrategiesCount - counts.SubscribedStrategiesCount;
+		if (unsubscribedStrategiesCount < 0)
 		{
 			throw new DataIntegrityException(
-				$"Active strategy count exceeds total strategy count. "
+				$"Subscribed strategy count exceeds total strategy count. "
 					+ $"UserId={userId}, "
 					+ $"Total={counts.TotalStrategiesCount}, "
-					+ $"Active={counts.ActiveStrategiesCount}."
+					+ $"Subscribed={counts.SubscribedStrategiesCount}."
 			);
 		}
 
 		return new StrategyStatisticDto(
 			counts.TotalStrategiesCount,
-			counts.ActiveStrategiesCount,
-			notLinkedStratagiesCount
+			counts.SubscribedStrategiesCount,
+			unsubscribedStrategiesCount
 		);
 	}
 
-	public async Task<PageResult<Strategy>> GetPageAsync(
+	public async Task<PageResult<StrategySubscriptionDto>> GetPageAsync(
 		int userId,
 		StrategyFilter strategyFilter,
 		StrategySort strategySort,
@@ -62,14 +63,14 @@ public class StrategyQueryService(
 
 	public async Task<Strategy> GetAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		var strategy = await strategyRepository.FindWithActivityAsync(userId, strategyId, ct);
+		var strategy = await strategyRepository.FindSubscriptionAsync(userId, strategyId, ct);
 		if (strategy == null)
 			throw new NotFoundException("Strategy not found.", "strategy_not_found");
 
 		return strategy;
 	}
 
-	public async Task<PageResult<Strategy>> GetPageByInstrumentAsync(
+	public async Task<PageResult<StrategySubscriptionDto>> GetPageByInstrumentAsync(
 		int userId,
 		int instrumentId,
 		StrategyFilter strategyFilter,
@@ -78,6 +79,14 @@ public class StrategyQueryService(
 		CancellationToken ct
 	)
 	{
+		var instrumentExists = await instrumentRepository.ExistsAsync(
+			instrument => instrument.Id == instrumentId,
+			ct
+		);
+
+		if (!instrumentExists)
+			throw new NotFoundException("Instrument not found.", "instrument_not_found");
+
 		return await userStrategyInstrumentRepository.GetStrategiesPageByInstrumentAsync(
 			userId,
 			instrumentId,
@@ -91,6 +100,7 @@ public class StrategyQueryService(
 	public async Task<PageResult<RelatedInstrumentDto>> GetInstrumentsByStrategyPageAsync(
 		int userId,
 		int strategyId,
+		StrategyInstrumentFilter instrumentFilter,
 		InstrumentSort instrumentSort,
 		PageOptions pageOptions,
 		CancellationToken ct
@@ -99,6 +109,7 @@ public class StrategyQueryService(
 		var result = await userStrategyInstrumentRepository.GetInstrumentsPageByStrategyAsync(
 			userId,
 			strategyId,
+			instrumentFilter,
 			instrumentSort,
 			pageOptions,
 			ct

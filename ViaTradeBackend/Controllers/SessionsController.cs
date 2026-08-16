@@ -38,9 +38,10 @@ public class SessionsController(
 		return TypedResults.NoContent();
 	}
 
-	[HttpPost("current/refresh")]
+	[HttpPost("current/tokens")]
 	[AllowAnonymous]
-	public async Task<NoContent> RefreshCurrentSession(CancellationToken ct)
+	[SetsAuthCookies]
+	public async Task<NoContent> CreateCurrentSessionTokens(CancellationToken ct)
 	{
 		var hasRefreshToken = Request.Cookies.TryGetValue(_authCookieOptions.RefreshTokenCookie, out var refreshToken);
 

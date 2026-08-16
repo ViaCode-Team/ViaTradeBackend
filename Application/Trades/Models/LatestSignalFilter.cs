@@ -1,16 +1,8 @@
-using System.Text.Json.Serialization;
+using Domain.Enums;
 
 namespace Application.Trades.Models;
 
 public sealed class LatestSignalFilter
 {
-	public SignalDirection? Direction { get; set; }
-}
-
-[JsonConverter(typeof(JsonStringEnumConverter))]
-public enum SignalDirection
-{
-	BUY,
-
-	SELL,
+	public List<TradeSignal>? Signals { get; set; }
 }

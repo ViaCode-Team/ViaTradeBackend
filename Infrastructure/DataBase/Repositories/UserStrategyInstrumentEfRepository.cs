@@ -12,7 +12,7 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 	: BaseEfRepository<UserStrategyInstrument>(context),
 		IUserStrategyInstrumentRepository
 {
-	public async Task<PageResult<Strategy>> GetStrategiesPageByInstrumentAsync(
+	public async Task<PageResult<StrategySubscriptionDto>> GetStrategiesPageByInstrumentAsync(
 		int userId,
 		int instrumentId,
 		StrategyFilter strategyFilter,
@@ -27,36 +27,29 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 			query = query.Where(link => link.Strategy!.Name == strategyFilter.Name);
 
 		var strategyQuery = ApplyStrategySort(query.Select(link => link.Strategy!), strategySort);
-		var pagedStrategies = await strategyQuery
-			.Select(strategy => new
-			{
-				Strategy = strategy,
-				IsActive = _context.UserStrategies.Any(userStrategy =>
-					userStrategy.UserId == userId && userStrategy.StrategyId == strategy.Id
-				),
-			})
-			.ToPagedAsync(pageOptions, ct);
-
-		return pagedStrategies.Map(result =>
-		{
-			result.Strategy.IsActive = result.IsActive;
-			return result.Strategy;
-		});
+		return await strategyQuery.WithSubscriptionState(userId).ToPagedAsync(pageOptions, ct);
 	}
 
 	public async Task<StrategyInstrumentsPageResult> GetInstrumentsPageByStrategyAsync(
 		int userId,
 		int strategyId,
+		StrategyInstrumentFilter instrumentFilter,
 		InstrumentSort instrumentSort,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
+		var linksQuery = _dbSet.Where(link => link.UserId == userId && link.StrategyId == strategyId);
+		if (instrumentFilter.InstrumentIds is { Count: > 0 })
+			linksQuery = linksQuery.Where(link =>
+				instrumentFilter.InstrumentIds.Contains(link.InstrumentId)
+			);
+
 		var strategyPageInfo = await _context
 			.Strategies.Where(strategy => strategy.Id == strategyId)
 			.Select(_ => new
 			{
-				TotalCount = _dbSet.Count(link => link.UserId == userId && link.StrategyId == strategyId),
+				TotalCount = linksQuery.Count(),
 			})
 			.SingleOrDefaultAsync(ct);
 
@@ -68,9 +61,7 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 			);
 		}
 
-		var query = _dbSet
-			.Where(link => link.UserId == userId && link.StrategyId == strategyId)
-			.Select(link => link.Instrument!);
+		var query = linksQuery.Select(link => link.Instrument!);
 
 		query = ApplyInstrumentSort(query, instrumentSort);
 

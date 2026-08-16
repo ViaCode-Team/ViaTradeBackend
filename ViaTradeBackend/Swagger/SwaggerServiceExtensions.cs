@@ -93,6 +93,7 @@ public static class SwaggerServiceExtensions
 
 			options.OperationFilter<ProblemDetailsOperationFilter>();
 			options.OperationFilter<CamelCaseParameterFilter>();
+			options.OperationFilter<StrategyInstrumentFilterOperationFilter>();
 			options.OperationFilter<SecurityRequirementsOperationFilter>();
 			options.OperationFilter<AuthCookiesOperationFilter>();
 

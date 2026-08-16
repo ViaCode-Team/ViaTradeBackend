@@ -3,7 +3,6 @@ using Application.Common.Models;
 using Application.Notes.Interfaces;
 using Application.Notes.Models;
 using Domain.Entities;
-using Domain.Enums;
 using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,7 +29,7 @@ public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(con
 		IQuerySpecification<Note> specification,
 		PageOptions pageOptions,
 		CancellationToken ct
-		)
+	)
 	{
 		var query = SpecificationEvaluator.GetQuery(_dbSet, specification);
 		if (specification.SortExpressions.Count == 0)
@@ -46,6 +45,7 @@ public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(con
 				note.Instrument!.Description,
 				note.StrategyId,
 				note.Strategy!.Name,
+				note.Strategy.DisplayName,
 				note.Strategy!.Description
 			))
 			.ToPagedAsync(pageOptions, ct);
@@ -55,10 +55,9 @@ public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(con
 		ISearchSpecification<Note> specification,
 		PageOptions pageOptions,
 		CancellationToken ct
-		)
+	)
 	{
-		var query = specification.Apply(_dbSet)
-			.OrderBy(note => note.Id);
+		var query = specification.Apply(_dbSet).OrderBy(note => note.Id);
 
 		return await query
 			.Select(note => new NoteProjectionDto(
@@ -70,22 +69,11 @@ public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(con
 				note.Instrument!.Description,
 				note.StrategyId,
 				note.Strategy!.Name,
+				note.Strategy.DisplayName,
 				note.Strategy!.Description
 			))
 			.ToPagedAsync(pageOptions, ct);
 	}
-
-	public async Task<Note?> FindByTargetAsync(int userId, int relatedId, NoteType noteType, CancellationToken ct) =>
-		noteType switch
-		{
-			NoteType.InstrumentNote => await _dbSet
-				.Include(note => note.Instrument)
-				.FirstOrDefaultAsync(note => note.InstrumentId == relatedId && note.UserId == userId, ct),
-			NoteType.StrategyNote => await _dbSet
-				.Include(note => note.Strategy)
-				.FirstOrDefaultAsync(note => note.StrategyId == relatedId && note.UserId == userId, ct),
-			_ => null,
-		};
 
 	public async Task<Note?> FindByIdForUserAsync(int userId, int noteId, CancellationToken ct)
 	{
@@ -95,59 +83,63 @@ public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(con
 			.FirstOrDefaultAsync(note => note.Id == noteId && note.UserId == userId, ct);
 	}
 
-	public async Task AddUserNoteAsync(
-		int relatedId,
-		NoteType noteType,
-		int userId,
-		string noteText,
-		CancellationToken ct
-	)
+	public async Task<Note?> FindByInstrumentAsync(int userId, int instrumentId, CancellationToken ct)
 	{
-		int? instrumentId = noteType == NoteType.InstrumentNote ? relatedId : null;
-		int? strategyId = noteType == NoteType.StrategyNote ? relatedId : null;
-
-		var note = new Note
-		{
-			UserId = userId,
-			Text = noteText,
-			InstrumentId = instrumentId,
-			StrategyId = strategyId,
-		};
-
-		_dbSet.Add(note);
+		return await _dbSet
+			.Include(note => note.Instrument)
+			.FirstOrDefaultAsync(note => note.InstrumentId == instrumentId && note.UserId == userId, ct);
 	}
 
-	public async Task<int> ExecuteUpdateUserNoteAsync(
-		int userId,
-		int id,
-		NoteType noteType,
-		string noteText,
-		CancellationToken ct
-	)
+	public async Task<Note?> FindByStrategyAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		var query = GetTargetQuery(id, userId, noteType);
+		return await _dbSet
+			.Include(note => note.Strategy)
+			.FirstOrDefaultAsync(note => note.StrategyId == strategyId && note.UserId == userId, ct);
+	}
 
-		return await EfDatabaseOperation.ExecuteAsync(() =>
-			query.ExecuteUpdateAsync(setters => setters.SetProperty(note => note.Text, noteText), ct)
+	public Task<int> ExecuteDeleteInstrumentAsync(int userId, int instrumentId, CancellationToken ct)
+	{
+		return EfDatabaseOperation.ExecuteAsync(() =>
+			_dbSet
+				.Where(note => note.UserId == userId && note.InstrumentId == instrumentId)
+				.ExecuteDeleteAsync(ct)
 		);
 	}
 
-	public async Task<int> ExecuteDeleteUserNoteAsync(int userId, int id, NoteType noteType, CancellationToken ct)
+	public Task<int> ExecuteDeleteStrategyAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		var query = GetTargetQuery(id, userId, noteType);
-
-		return await query.ExecuteDeleteAsync(ct);
+		return EfDatabaseOperation.ExecuteAsync(() =>
+			_dbSet
+				.Where(note => note.UserId == userId && note.StrategyId == strategyId)
+				.ExecuteDeleteAsync(ct)
+		);
 	}
 
-	private IQueryable<Note> GetTargetQuery(int id, int userId, NoteType noteType)
+	public Task<int> ExecuteUpdateInstrumentAsync(
+		int userId,
+		int instrumentId,
+		string text,
+		CancellationToken ct
+	)
 	{
-		return noteType switch
-		{
-			NoteType.InstrumentNote => _dbSet.Where(note => note.InstrumentId == id && note.UserId == userId),
+		return EfDatabaseOperation.ExecuteAsync(() =>
+			_dbSet
+				.Where(note => note.UserId == userId && note.InstrumentId == instrumentId)
+				.ExecuteUpdateAsync(setters => setters.SetProperty(note => note.Text, text), ct)
+		);
+	}
 
-			NoteType.StrategyNote => _dbSet.Where(note => note.StrategyId == id && note.UserId == userId),
-
-			_ => throw new ArgumentOutOfRangeException(nameof(noteType), noteType, "Unsupported note type."),
-		};
+	public Task<int> ExecuteUpdateStrategyAsync(
+		int userId,
+		int strategyId,
+		string text,
+		CancellationToken ct
+	)
+	{
+		return EfDatabaseOperation.ExecuteAsync(() =>
+			_dbSet
+				.Where(note => note.UserId == userId && note.StrategyId == strategyId)
+				.ExecuteUpdateAsync(setters => setters.SetProperty(note => note.Text, text), ct)
+		);
 	}
 }

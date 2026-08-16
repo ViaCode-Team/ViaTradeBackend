@@ -1,3 +1,3 @@
 namespace Application.Reminders.Models;
 
-public record ReminderStatisticsDto(int TotalReminders);
+public record ReminderStatisticsDto(int TotalReminders, int MaximumReminders, int RemainingReminders);

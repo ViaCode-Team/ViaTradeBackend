@@ -14,7 +14,11 @@ public class ReminderEfRepository(AppDbContext context) : BaseEfRepository<Remin
 	public async Task<IReadOnlyList<ReminderDto>> ListDueAsync(CancellationToken ct)
 	{
 		return await _dbSet
-			.Where(reminder => reminder.RemindAt <= DateTime.UtcNow)
+			.Where(reminder =>
+				reminder.RemindAt <= DateTime.UtcNow
+				&& reminder.PublishedAt == null
+				&& reminder.User!.TelegramId != null
+			)
 			.Select(reminder => new ReminderDto(
 				reminder.Id,
 				reminder.Text,
@@ -24,7 +28,9 @@ public class ReminderEfRepository(AppDbContext context) : BaseEfRepository<Remin
 					reminder.Instrument.Symbol,
 					reminder.Instrument.Description
 				),
-				reminder.UserId
+				reminder.UserId,
+				reminder.User!.TelegramId!,
+				reminder.DeliveredAt
 			))
 			.ToListAsync(ct);
 	}
@@ -45,7 +51,8 @@ public class ReminderEfRepository(AppDbContext context) : BaseEfRepository<Remin
 				reminder.InstrumentId,
 				reminder.Instrument!.Symbol,
 				reminder.Instrument!.Description,
-				reminder.UserId
+				reminder.UserId,
+				reminder.DeliveredAt
 			))
 			.ToPagedAsync(pageOptions, ct);
 	}
@@ -94,10 +101,58 @@ public class ReminderEfRepository(AppDbContext context) : BaseEfRepository<Remin
 	{
 		var affectedRows = await EfDatabaseOperation.ExecuteAsync(() =>
 			_dbSet
-				.Where(r => r.Id == reminderId && r.UserId == userId)
-				.ExecuteUpdateAsync(s => s.SetProperty(r => r.Text, text).SetProperty(r => r.RemindAt, remindAt), ct)
+				.Where(
+					r => r.Id == reminderId && r.UserId == userId && r.PublishedAt == null && r.DeliveredAt == null
+				)
+				.ExecuteUpdateAsync(
+					s => s
+						.SetProperty(r => r.Text, text)
+						.SetProperty(r => r.RemindAt, remindAt)
+						.SetProperty(r => r.PublishedAt, (DateTime?)null),
+					ct
+				)
 		);
 
 		return affectedRows;
+	}
+
+	public async Task<int> ExecuteMarkPublishedAsync(int reminderId, CancellationToken ct)
+	{
+		var publishedAt = DateTime.UtcNow;
+
+		return await EfDatabaseOperation.ExecuteAsync(() =>
+			_dbSet
+				.Where(r => r.Id == reminderId && r.RemindAt <= publishedAt && r.PublishedAt == null)
+				.ExecuteUpdateAsync(s => s.SetProperty(r => r.PublishedAt, publishedAt), ct)
+		);
+	}
+
+	public async Task<int> ExecuteMarkDeliveredForUserAsync(
+		int userId,
+		int reminderId,
+		CancellationToken ct
+	)
+	{
+		var deliveredAt = DateTime.UtcNow;
+
+		return await EfDatabaseOperation.ExecuteAsync(() =>
+			_dbSet
+				.Where(r => r.Id == reminderId && r.UserId == userId && r.RemindAt <= deliveredAt)
+				.ExecuteUpdateAsync(
+					s => s
+						.SetProperty(r => r.PublishedAt, r => r.PublishedAt ?? deliveredAt)
+						.SetProperty(r => r.DeliveredAt, r => r.DeliveredAt ?? deliveredAt),
+					ct
+				)
+		);
+	}
+
+	public Task<int> ExecuteDeleteDeliveredBeforeAsync(DateTime deliveredBefore, CancellationToken ct)
+	{
+		return EfDatabaseOperation.ExecuteAsync(() =>
+			_dbSet
+				.Where(r => r.DeliveredAt != null && r.DeliveredAt <= deliveredBefore)
+				.ExecuteDeleteAsync(ct)
+		);
 	}
 }

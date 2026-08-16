@@ -35,14 +35,17 @@ public class StrategyCommandService(
 		await uow.SaveChangesAsync(ct);
 	}
 
-	public async Task ActivateAsync(int userId, int strategyId, CancellationToken ct)
+	public async Task SetSubscriptionAsync(int userId, int strategyId, bool isSubscribed, CancellationToken ct)
 	{
-		var strategy = await strategyRepository.FindWithActivityAsync(userId, strategyId, ct);
-		if (strategy == null)
+		var strategyExists = await strategyRepository.ExistsAsync(strategy => strategy.Id == strategyId, ct);
+		if (!strategyExists)
 			throw new NotFoundException("Strategy not found.", "strategy_not_found");
 
-		if (strategy.IsActive)
+		if (!isSubscribed)
+		{
+			await userStrategyRepository.ExecuteUnsubscribeAsync(userId, strategyId, ct);
 			return;
+		}
 
 		var strategyLink = new UserStrategy { UserId = userId, StrategyId = strategyId };
 
@@ -59,16 +62,5 @@ public class StrategyCommandService(
 
 		if (affectedRows == 0)
 			throw new NotFoundException("User strategy code not found.", "strategy_code_not_found");
-	}
-
-	public async Task DeactivateAsync(int userId, int strategyId, CancellationToken ct)
-	{
-		var affectedRows = await userStrategyRepository.ExecuteDeleteAsync(
-			e => e.UserId == userId && e.StrategyId == strategyId,
-			ct
-		);
-
-		if (affectedRows == 0)
-			throw new NotFoundException("User strategy not found.", "user_strategy_not_found");
 	}
 }

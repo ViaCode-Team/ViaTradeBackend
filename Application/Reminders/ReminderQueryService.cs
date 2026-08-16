@@ -1,5 +1,6 @@
 using Application.Common.Exceptions;
 using Application.Common.Models;
+using Application.Instruments.Interfaces;
 using Application.Notes.Models;
 using Application.Reminders.Interfaces;
 using Application.Reminders.Models;
@@ -8,13 +9,18 @@ using Domain.Entities;
 
 namespace Application.Reminders;
 
-public class ReminderQueryService(IReminderRepository reminderRepository) : IReminderQueryService
+public class ReminderQueryService(
+	IInstrumentRepository instrumentRepository,
+	IReminderRepository reminderRepository,
+	ReminderLimitsOptions reminderLimitsOptions
+) : IReminderQueryService
 {
 	public async Task<ReminderStatisticsDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		int total = await reminderRepository.CountAsync(x => x.UserId == userId, ct);
+		int total = await reminderRepository.CountByUserAsync(userId, ct);
+		int remaining = Math.Max(0, reminderLimitsOptions.MaxRemindersPerUser - total);
 
-		return new ReminderStatisticsDto(total);
+		return new ReminderStatisticsDto(total, reminderLimitsOptions.MaxRemindersPerUser, remaining);
 	}
 
 	public async Task<IReadOnlyList<ReminderDto>> ListDueAsync(CancellationToken ct)
@@ -34,12 +40,21 @@ public class ReminderQueryService(IReminderRepository reminderRepository) : IRem
 	public async Task<PageResult<ReminderDto>> GetPageAsync(
 		int userId,
 		int instrumentId,
+		ReminderDeliveryStatus deliveryStatus,
 		PageOptions pageOptions,
 		ReminderSort reminderSort,
 		CancellationToken ct
 	)
 	{
-		var spec = new ReminderQuerySpecification(userId, instrumentId, reminderSort);
+		var instrumentExists = await instrumentRepository.ExistsAsync(
+			instrument => instrument.Id == instrumentId,
+			ct
+		);
+
+		if (!instrumentExists)
+			throw new NotFoundException("Instrument not found.", "instrument_not_found");
+
+		var spec = new ReminderQuerySpecification(userId, instrumentId, deliveryStatus, reminderSort);
 		var reminders = await reminderRepository.GetPageWithInstrumentAsync(spec, pageOptions, ct);
 
 		return reminders.Map(ToDto);
@@ -47,12 +62,13 @@ public class ReminderQueryService(IReminderRepository reminderRepository) : IRem
 
 	public async Task<PageResult<ReminderDto>> GetPageAsync(
 		int userId,
+		ReminderDeliveryStatus deliveryStatus,
 		PageOptions pageOptions,
 		ReminderSort reminderSort,
 		CancellationToken ct
 	)
 	{
-		var spec = new ReminderQuerySpecification(userId, null, reminderSort);
+		var spec = new ReminderQuerySpecification(userId, null, deliveryStatus, reminderSort);
 		var reminders = await reminderRepository.GetPageWithInstrumentAsync(spec, pageOptions, ct);
 
 		return reminders.Map(ToDto);
@@ -75,6 +91,14 @@ public class ReminderQueryService(IReminderRepository reminderRepository) : IRem
 	{
 		var instrument = new InstrumentBriefDto(source.InstrumentId, source.InstrumentTicker, source.InstrumentName);
 
-		return new ReminderDto(source.Id, source.Text, source.RemindAt, instrument, source.UserId);
+		return new ReminderDto(
+			source.Id,
+			source.Text,
+			source.RemindAt,
+			instrument,
+			source.UserId,
+			string.Empty,
+			source.DeliveredAt
+		);
 	}
 }

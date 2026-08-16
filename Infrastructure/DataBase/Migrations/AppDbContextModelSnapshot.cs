@@ -52,14 +52,14 @@ namespace Infrastructure.Migrations
                         {
                             Id = 1,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Gazprom",
+                            Description = "Газпром",
                             Symbol = "GAZP"
                         },
                         new
                         {
                             Id = 2,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Nornickel",
+                            Description = "Норникель",
                             Symbol = "GMKN"
                         });
                 });
@@ -119,8 +119,14 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<DateTime?>("DeliveredAt")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<int>("InstrumentId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("PublishedAt")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("RemindAt")
                         .HasColumnType("datetime(6)");
@@ -134,9 +140,15 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DeliveredAt");
+
                     b.HasIndex("InstrumentId");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("PublishedAt", "RemindAt");
+
+                    b.HasIndex("UserId", "DeliveredAt", "RemindAt");
 
                     b.ToTable("Reminders");
                 });
@@ -156,6 +168,10 @@ namespace Infrastructure.Migrations
                         .HasColumnType("datetime(6)");
 
                     b.Property<string>("Description")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("DisplayName")
+                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("InvestmentHorizon")
@@ -193,28 +209,30 @@ namespace Infrastructure.Migrations
                             Id = 1,
                             Accuracy = 81,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Basic trend-following strategy for an asset. Minimal risk, rare signals.",
-                            InvestmentHorizon = "1-3 weeks",
+                            Description = "Базовая стратегия следования тренду для актива. Минимальный риск, редкие сигналы.",
+                            DisplayName = "Следование тренду",
+                            InvestmentHorizon = "1–3 недели",
                             IsActive = true,
-                            LimitationsDescription = "Strategy exclusively for following the trend",
-                            LogicDescription = "Analysis of a long-term chart to confirm movement",
+                            LimitationsDescription = "Стратегия предназначена исключительно для следования тренду",
+                            LogicDescription = "Анализ долгосрочного графика для подтверждения движения",
                             Name = "TrendFollowingStrategy",
-                            SignalFrequency = "1-2 times a month",
-                            UsageDescription = "Follow the main trend, during low or medium volatility"
+                            SignalFrequency = "1–2 раза в месяц",
+                            UsageDescription = "Следуйте основному тренду при низкой или средней волатильности"
                         },
                         new
                         {
                             Id = 2,
                             Accuracy = 99,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Description = "Test strategy. 100000% profit per nanosecond",
-                            InvestmentHorizon = "up to 1 week",
+                            Description = "Тестовая стратегия. 100000% прибыли в наносекунду",
+                            DisplayName = "Тестовая стратегия",
+                            InvestmentHorizon = "до 1 недели",
                             IsActive = true,
-                            LimitationsDescription = "SuperStart",
-                            LogicDescription = "Very clear",
+                            LimitationsDescription = "Суперстарт",
+                            LogicDescription = "Очень понятная",
                             Name = "Test",
-                            SignalFrequency = "3 times a month",
-                            UsageDescription = "Use it however you like"
+                            SignalFrequency = "3 раза в месяц",
+                            UsageDescription = "Используйте как хотите"
                         });
                 });
 
@@ -307,13 +325,13 @@ namespace Infrastructure.Migrations
                         {
                             Id = 1,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "Stock"
+                            Name = "Акция"
                         },
                         new
                         {
                             Id = 2,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
-                            Name = "Futures"
+                            Name = "Фьючерс"
                         });
                 });
 

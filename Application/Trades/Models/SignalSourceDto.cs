@@ -1,3 +1,10 @@
 namespace Application.Trades.Models;
 
-public record SignalSourceDto(int StrategyId, string StrategyName, int InstrumentId, string Symbol, int? Accuracy);
+public record SignalSourceDto(
+	int StrategyId,
+	string StrategyName,
+	string DisplayName,
+	int InstrumentId,
+	string Symbol,
+	int? Accuracy
+);

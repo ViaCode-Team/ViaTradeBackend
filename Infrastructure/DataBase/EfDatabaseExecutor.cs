@@ -58,9 +58,7 @@ internal static class EfDatabaseOperation
 			currentException = currentException.InnerException
 		)
 		{
-			var mySqlException = currentException as MySqlException;
-
-			if (mySqlException != null)
+			if (currentException is MySqlException mySqlException)
 				return mySqlException;
 		}
 

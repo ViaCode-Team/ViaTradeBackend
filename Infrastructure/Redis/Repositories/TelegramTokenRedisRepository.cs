@@ -1,3 +1,4 @@
+using System.Text.Json;
 using Application.Users.Interfaces;
 using Infrastructure.Redis.Entities;
 using Infrastructure.Redis.Keys;
@@ -18,6 +19,16 @@ public class TelegramTokenRedisRepository(IConnectionMultiplexer connectionMulti
 	public async Task<int?> FindUserIdAsync(string token)
 	{
 		var entity = await FindByIdAsync(token);
+		return entity?.UserId;
+	}
+
+	public async Task<int?> ConsumeUserIdAsync(string token)
+	{
+		var value = await _database.StringGetDeleteAsync(GetKey(token));
+		if (value.IsNullOrEmpty)
+			return null;
+
+		var entity = JsonSerializer.Deserialize<TelegramTokenEntity>(value.ToString());
 		return entity?.UserId;
 	}
 }

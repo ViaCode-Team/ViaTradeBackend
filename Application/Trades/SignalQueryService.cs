@@ -40,6 +40,9 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 			throw new NotFoundException("Strategy instrument link was not found.", "strategy_instrument_not_found");
 
 		var signals = ListSignals(sources, signalHistoryFilter.StartDate, signalHistoryFilter.EndDate, signalSort);
+
+		signals = ApplySignalFilter(signals, signalHistoryFilter.Signals);
+
 		return CreatePageResult(signals, pageOptions);
 	}
 
@@ -54,12 +57,7 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 		var sources = await userStrategyRepository.ListSignalSourcesAsync(userId, ct);
 		var signals = ListLatestSignals(sources);
 
-		if (filter.Direction.HasValue)
-			signals = signals
-				.Where(signal =>
-					string.Equals(signal.Signal, filter.Direction.Value.ToString(), StringComparison.OrdinalIgnoreCase)
-				)
-				.ToList();
+		signals = ApplySignalFilter(signals, filter.Signals);
 
 		signals = ApplySorting(signals, signalSort.GetEffectiveSortBy()).ToList();
 
@@ -99,6 +97,7 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 			.Select(item => new SignalDto(
 				item.Source!.StrategyId,
 				item.Source.StrategyName,
+				item.Source.DisplayName,
 				item.Source.InstrumentId,
 				item.Source.Symbol,
 				item.Source.Accuracy,
@@ -133,6 +132,7 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 			var signal = new SignalDto(
 				source.StrategyId,
 				source.StrategyName,
+				source.DisplayName,
 				source.InstrumentId,
 				source.Symbol,
 				source.Accuracy,
@@ -169,6 +169,18 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 			return null;
 
 		return date.Value.Date;
+	}
+
+	private static List<SignalDto> ApplySignalFilter(List<SignalDto> signals, List<TradeSignal>? filterSignals)
+	{
+		if (filterSignals == null || filterSignals.Count == 0)
+			return signals;
+
+		var signalStrings = filterSignals.Select(s => s.ToString()).ToList();
+
+		return signals
+			.Where(signal => signalStrings.Contains(signal.Signal, StringComparer.OrdinalIgnoreCase))
+			.ToList();
 	}
 
 	private static IEnumerable<SignalDto> ApplySorting(IEnumerable<SignalDto> signals, List<SignalSortField> sortFields)

@@ -1,6 +1,8 @@
+using Domain.Interfaces;
+
 namespace Domain.Entities;
 
-public abstract class BaseEntity<TId>
+public abstract class BaseEntity<TId> : IEntity<TId>
 {
 	public TId Id { get; protected set; } = default!;
 

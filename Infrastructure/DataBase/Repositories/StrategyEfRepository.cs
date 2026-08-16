@@ -16,7 +16,7 @@ public class StrategyEfRepository(AppDbContext context) : BaseEfRepository<Strat
 			.Users.Where(user => user.Id == userId)
 			.Select(_ => new StrategyCountsDto(
 				_context.Strategies.LongCount(),
-				_context.UserStrategies.LongCount(link => link.UserId == userId)
+				_context.Strategies.LongCount(strategy => strategy.UserStrategies.Any(link => link.UserId == userId))
 			));
 
 		return await query.SingleOrDefaultAsync(ct);
@@ -29,21 +29,12 @@ public class StrategyEfRepository(AppDbContext context) : BaseEfRepository<Strat
 		return strategies.ToDictionary(strategy => strategy.Name, strategy => strategy.Accuracy);
 	}
 
-	public async Task<Strategy?> FindWithActivityAsync(int userId, int strategyId, CancellationToken ct)
+	public async Task<StrategySubscriptionDto?> FindSubscriptionAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		var result = await _dbSet
+		return await _dbSet
 			.Where(strategy => strategy.Id == strategyId)
-			.Select(strategy => new
-			{
-				Strategy = strategy,
-				IsActive = strategy.UserStrategies.Any(link => link.UserId == userId),
-			})
+			.WithSubscriptionState(userId)
 			.FirstOrDefaultAsync(ct);
-		if (result == null)
-			return null;
-
-		result.Strategy.IsActive = result.IsActive;
-		return result.Strategy;
 	}
 
 	public async Task<StrategyInstrumentLinkState?> FindInstrumentLinkStateAsync(
@@ -72,7 +63,7 @@ public class StrategyEfRepository(AppDbContext context) : BaseEfRepository<Strat
 			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<PageResult<Strategy>> GetPageAsync(
+	public async Task<PageResult<StrategySubscriptionDto>> GetPageAsync(
 		int userId,
 		IQuerySpecification<Strategy> spec,
 		PageOptions pageOptions,
@@ -83,19 +74,7 @@ public class StrategyEfRepository(AppDbContext context) : BaseEfRepository<Strat
 		if (spec.SortExpressions.Count == 0)
 			query = query.OrderBy(strategy => strategy.Id);
 
-		var pagedStrategies = await query
-			.Select(strategy => new
-			{
-				Strategy = strategy,
-				IsActive = strategy.UserStrategies.Any(link => link.UserId == userId),
-			})
-			.ToPagedAsync(pageOptions, ct);
-
-		return pagedStrategies.Map(strategy =>
-		{
-			strategy.Strategy.IsActive = strategy.IsActive;
-			return strategy.Strategy;
-		});
+		return await query.WithSubscriptionState(userId).ToPagedAsync(pageOptions, ct);
 	}
 
 	public async Task<PageResult<Strategy>> GetPageSearchAsync(

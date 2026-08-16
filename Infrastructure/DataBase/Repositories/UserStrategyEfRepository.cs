@@ -15,6 +15,13 @@ public class UserStrategyEfRepository(AppDbContext context)
 		return await _dbSet.CountAsync(e => e.UserId == userId, ct);
 	}
 
+	public Task ExecuteUnsubscribeAsync(int userId, int strategyId, CancellationToken ct)
+	{
+		return EfDatabaseOperation.ExecuteAsync(() =>
+			_dbSet.Where(link => link.UserId == userId && link.StrategyId == strategyId).ExecuteDeleteAsync(ct)
+		);
+	}
+
 	public async Task<List<SignalSourceDto>> ListSignalSourcesAsync(int userId, CancellationToken ct)
 	{
 		var userCodesQuery = _context.GetUserCodesQuery(userId);
@@ -28,6 +35,7 @@ public class UserStrategyEfRepository(AppDbContext context)
 			.Select(source => new SignalSourceDto(
 				source.StrategyId,
 				source.StrategyName,
+				source.DisplayName,
 				source.InstrumentId,
 				source.Symbol,
 				source.Accuracy

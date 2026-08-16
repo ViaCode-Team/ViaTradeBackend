@@ -7,11 +7,11 @@
 - **Length**: Must not exceed 100 lines. If this file exceeds 6000 characters (checked when editing), ask the user if they want to compress it without losing any meaning or details.
 
 ## Agent Behavior & Workflow
-1. **Strict Adherence**: Perceive user prompts exactly as written. DO NOT invent tasks, features, or behaviors that the user did not explicitly request. If a prompt is ambiguous or you are unsure how to proceed, you MUST ALWAYS ask the user for clarification before making any changes.
-2. **Verify & Thoroughness**: Never guess facts/outcomes. Read files to verify states. Double-check directly/indirectly affected code. Ensure features work before claiming success. NEVER leave tasks half-finished. ALWAYS run `grep_search` to find dangling references for removed code. Clean up unused variables immediately.
+1. **Strict Adherence**: Follow prompts exactly. Do not invent unrequested tasks or behavior. Ask for clarification before changing ambiguous work.
+2. **Verify & Thoroughness**: Verify facts in code, double-check affected code, and do not leave work incomplete. Run `grep_search` for dangling references and remove unused variables.
 3. **User Edits**: Respect manual user code changes. Ask before reverting user-authored code.
 4. **Proactive Rules**: Propose `AGENTS.md` updates if users repeatedly ask for specific behaviors.
-5. **Complete Refactoring & Dead Code Removal**: When replacing an existing feature, property, or logic with a new implementation, you MUST thoroughly search for and delete the old, superseded code across the entire codebase. Never leave the old implementation alongside the new one, as it creates confusion and technical debt.
+5. **Complete Refactoring & Dead Code Removal**: When replacing a feature, property, or logic, remove every superseded implementation; never leave old code alongside the replacement.
 6. **Explicit Change Scope**: Implement only items the user explicitly asks to change. When the user asks how to address a finding, explain the approach without modifying code unless they clearly request the implementation. Do not combine explanatory questions with implementation work by assumption.
 7. **Exception Ownership**: Repositories must not throw business exceptions. Keep data access errors technical in repositories; services must evaluate business conditions and throw domain-specific exceptions.
 8. **Generated Files**: Never create or edit migrations, model snapshots, or other generated files manually. Use the relevant official generator and include its output unchanged.
@@ -21,7 +21,7 @@
 2. **Error Resolution**: If the build fails, you MUST fix all compilation errors and rebuild until the build succeeds.
 3. **Warning Resolution**: Whenever possible, fix compiler warnings as well.
 4. **Code Replacement Accuracy**: NEVER guess or hallucinate the `TargetContent` for the `replace_file_content` tool. ALWAYS use `view_file` or `grep_search` to read the exact lines from the file first. Providing inaccurate target content causes the fuzzy matcher to make unintended, destructive changes to the code.
-5. **Temporary Files**: Remove every temporary file and directory you create before completing the task.
+5. **Temporary Files**: Remove every temporary or generated artifact you create, including diagrams, screenshots, and build output, before task completion; verify none remain untracked.
 
 ## Strict Security (CRITICAL)
 1. **Prevent IDOR**: NEVER query/update/delete by ID alone. ALL DB actions MUST verify ownership (`&& e.UserId == currentUserId`).
