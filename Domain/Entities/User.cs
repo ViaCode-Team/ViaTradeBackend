@@ -1,4 +1,4 @@
-namespace Domain.Entities;
+namespace ViaTrade.Domain.Entities;
 
 public sealed class User : BaseEntity<int>
 {

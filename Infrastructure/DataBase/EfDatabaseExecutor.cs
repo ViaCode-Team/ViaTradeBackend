@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 
-namespace Infrastructure.DataBase;
+namespace ViaTrade.Infrastructure.DataBase;
 
 internal static class EfDatabaseOperation
 {

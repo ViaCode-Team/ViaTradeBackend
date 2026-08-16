@@ -1,9 +1,9 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Application.Trades.Interfaces;
-using Domain.Models.Trade;
+using ViaTrade.Application.Trades.Interfaces;
+using ViaTrade.Domain.Models.Trade;
 
-namespace Infrastructure.Utils;
+namespace ViaTrade.Infrastructure.Utils;
 
 public class TradeDataBuilder : ITradeDataBuilder
 {

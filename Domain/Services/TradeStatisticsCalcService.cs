@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
-using Domain.Entities;
+using ViaTrade.Domain.Entities;
 
-namespace Domain.Services;
+namespace ViaTrade.Domain.Services;
 
 public static class TradeStatisticsCalcService
 {

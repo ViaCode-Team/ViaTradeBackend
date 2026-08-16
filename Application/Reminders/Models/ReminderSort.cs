@@ -1,6 +1,6 @@
-using Application.Common.Models;
+using ViaTrade.Application.Common.Models;
 
-namespace Application.Reminders.Models;
+namespace ViaTrade.Application.Reminders.Models;
 
 public record ReminderSort() : Sort<ReminderSortField>
 {

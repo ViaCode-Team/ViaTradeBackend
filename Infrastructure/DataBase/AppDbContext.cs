@@ -1,9 +1,9 @@
-using Domain.Entities;
-using Infrastructure.DataBase.Configuration;
-using Infrastructure.DataBase.Configuration.MySql;
 using Microsoft.EntityFrameworkCore;
+using ViaTrade.Domain.Entities;
+using ViaTrade.Infrastructure.DataBase.Configuration;
+using ViaTrade.Infrastructure.DataBase.Configuration.MySql;
 
-namespace Infrastructure.DataBase;
+namespace ViaTrade.Infrastructure.DataBase;
 
 public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(options)
 {

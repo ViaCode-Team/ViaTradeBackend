@@ -1,13 +1,13 @@
-using Application.Common.Exceptions;
-using Application.Common.Models;
-using Application.Instruments.Interfaces;
-using Application.Instruments.Models;
-using Application.Notes.Models;
-using Application.Strategies.Interfaces;
-using Application.Strategies.Models;
-using Application.Strategies.Specifications;
+using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Instruments.Interfaces;
+using ViaTrade.Application.Instruments.Models;
+using ViaTrade.Application.Notes.Models;
+using ViaTrade.Application.Strategies.Interfaces;
+using ViaTrade.Application.Strategies.Models;
+using ViaTrade.Application.Strategies.Specifications;
 
-namespace Application.Strategies;
+namespace ViaTrade.Application.Strategies;
 
 public class StrategyQueryService(
 	IInstrumentRepository instrumentRepository,
@@ -69,10 +69,7 @@ public class StrategyQueryService(
 		CancellationToken ct
 	)
 	{
-		var instrumentExists = await instrumentRepository.ExistsAsync(
-			instrument => instrument.Id == instrumentId,
-			ct
-		);
+		var instrumentExists = await instrumentRepository.ExistsAsync(instrument => instrument.Id == instrumentId, ct);
 
 		if (!instrumentExists)
 			throw new NotFoundException("Instrument not found.", "instrument_not_found");

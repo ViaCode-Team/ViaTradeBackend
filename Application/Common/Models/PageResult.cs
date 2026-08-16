@@ -1,4 +1,4 @@
-namespace Application.Common.Models;
+namespace ViaTrade.Application.Common.Models;
 
 public sealed class PageResult<T>(IReadOnlyList<T> items, int totalCount, int pageNumber, int pageSize)
 {

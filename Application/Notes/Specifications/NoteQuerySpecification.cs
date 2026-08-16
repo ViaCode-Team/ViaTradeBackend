@@ -1,9 +1,9 @@
-using Application.Common.Specifications;
-using Application.Notes.Models;
-using Domain.Entities;
-using Domain.Enums;
+using ViaTrade.Application.Common.Specifications;
+using ViaTrade.Application.Notes.Models;
+using ViaTrade.Domain.Entities;
+using ViaTrade.Domain.Enums;
 
-namespace Application.Notes.Specifications;
+namespace ViaTrade.Application.Notes.Specifications;
 
 public class NoteQuerySpecification : BaseQuerySpecification<Note>
 {

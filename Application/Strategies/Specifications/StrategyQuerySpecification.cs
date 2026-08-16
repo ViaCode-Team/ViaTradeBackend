@@ -1,8 +1,8 @@
-using Application.Common.Specifications;
-using Application.Strategies.Models;
-using Domain.Entities;
+using ViaTrade.Application.Common.Specifications;
+using ViaTrade.Application.Strategies.Models;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Strategies.Specifications;
+namespace ViaTrade.Application.Strategies.Specifications;
 
 public class StrategyQuerySpecification : BaseQuerySpecification<Strategy>
 {

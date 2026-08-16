@@ -1,9 +1,9 @@
-using Application.Common.Models;
-using Application.Instruments.Models;
-using Application.Notes.Models;
-using Application.Strategies.Models;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Instruments.Models;
+using ViaTrade.Application.Notes.Models;
+using ViaTrade.Application.Strategies.Models;
 
-namespace Application.Strategies.Interfaces;
+namespace ViaTrade.Application.Strategies.Interfaces;
 
 public interface IStrategyQueryService
 {

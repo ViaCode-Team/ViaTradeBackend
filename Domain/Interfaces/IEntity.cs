@@ -1,4 +1,4 @@
-namespace Domain.Interfaces;
+namespace ViaTrade.Domain.Interfaces;
 
 public interface IEntity<TId>
 {

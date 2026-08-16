@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Infrastructure.DataBase.Migrations
+namespace ViaTrade.Infrastructure.DataBase.Migrations
 {
 	/// <inheritdoc />
 	public partial class DropTradeNetIncomeForPriceRename : Migration

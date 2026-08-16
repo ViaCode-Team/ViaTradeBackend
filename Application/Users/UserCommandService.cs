@@ -1,16 +1,16 @@
 using System.Security.Cryptography;
-using Application.Common.Exceptions;
-using Application.Users.Interfaces;
-using Application.Users.Models;
+using Microsoft.Extensions.Options;
+using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Application.Users.Interfaces;
+using ViaTrade.Configuration.Options;
 
-namespace Application.Users;
+namespace ViaTrade.Application.Users;
 
 public class UserCommandService(
 	IUserRepository userRepository,
 	ITelegramTokenRepository telegramTokenRepository,
-	TelegramBotOptions telegramBotOptions
-)
-	: IUserCommandService
+	IOptions<TelegramBotSettings> telegramBotOptions
+) : IUserCommandService
 {
 	public async Task<string> GenerateTgLinkAsync(int userId, CancellationToken ct)
 	{
@@ -22,7 +22,7 @@ public class UserCommandService(
 
 		await telegramTokenRepository.SetAsync(token, userId, TimeSpan.FromMinutes(5));
 
-		return $"https://t.me/{telegramBotOptions.BotUsername}?start={token}";
+		return $"https://t.me/{telegramBotOptions.Value.BotUsername}?start={token}";
 	}
 
 	public async Task LinkTelegramAsync(string telegramToken, string telegramId, CancellationToken ct)

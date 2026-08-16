@@ -1,8 +1,8 @@
-using Application.Common.Specifications;
-using Application.Reminders.Models;
-using Domain.Entities;
+using ViaTrade.Application.Common.Specifications;
+using ViaTrade.Application.Reminders.Models;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Reminders.Specifications;
+namespace ViaTrade.Application.Reminders.Specifications;
 
 public class ReminderQuerySpecification : BaseQuerySpecification<Reminder>
 {

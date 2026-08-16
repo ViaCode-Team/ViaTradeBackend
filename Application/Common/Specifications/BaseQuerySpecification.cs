@@ -1,7 +1,7 @@
 using System.Linq.Expressions;
-using Application.Common.Interfaces;
+using ViaTrade.Application.Common.Interfaces;
 
-namespace Application.Common.Specifications;
+namespace ViaTrade.Application.Common.Specifications;
 
 public abstract class BaseQuerySpecification<T> : IQuerySpecification<T>
 {

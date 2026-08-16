@@ -1,6 +1,6 @@
-using Application.Common.Models;
+using ViaTrade.Application.Common.Models;
 
-namespace Application.Strategies.Models;
+namespace ViaTrade.Application.Strategies.Models;
 
 public record StrategySort() : Sort<StrategySortField>
 {

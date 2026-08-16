@@ -1,6 +1,6 @@
-using Application.Auth.Interfaces;
+using ViaTrade.Application.Auth.Interfaces;
 
-namespace Infrastructure.Utils;
+namespace ViaTrade.Infrastructure.Utils;
 
 public class BCryptPasswordHasher : IPasswordHasher
 {

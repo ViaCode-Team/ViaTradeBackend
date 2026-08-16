@@ -1,3 +1,3 @@
-namespace Application.Instruments.Models;
+namespace ViaTrade.Application.Instruments.Models;
 
 public record InstrumentStatisticsDto(int TotalInstruments);

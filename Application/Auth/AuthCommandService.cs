@@ -1,12 +1,14 @@
-using Application.Auth.Interfaces;
-using Application.Auth.Models;
-using Application.Common.Exceptions;
-using Application.Common.Interfaces;
-using Application.Users.Interfaces;
-using Application.Users.Models;
-using Domain.Entities;
+using Microsoft.Extensions.Options;
+using ViaTrade.Application.Auth.Interfaces;
+using ViaTrade.Application.Auth.Models;
+using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Application.Common.Interfaces;
+using ViaTrade.Application.Users.Interfaces;
+using ViaTrade.Application.Users.Models;
+using ViaTrade.Configuration.Options;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Auth;
+namespace ViaTrade.Application.Auth;
 
 public class AuthCommandService(
 	IUserRepository userRepository,
@@ -14,12 +16,15 @@ public class AuthCommandService(
 	IJwtHelper jwtHelper,
 	ISessionRepository sessionRepository,
 	IUnitOfWork uow,
-	SessionLifetimeOptions sessionLifetimeOptions
+	IOptions<JwtSettings> jwtOptions,
+	IOptions<AuthCookieSettings> authCookieOptions
 ) : IAuthCommandService
 {
-	private readonly TimeSpan _accessTokenLifetime = sessionLifetimeOptions.AccessTokenLifetime;
-	private readonly TimeSpan _idleSessionLifetime = sessionLifetimeOptions.IdleLifetime;
-	private readonly TimeSpan _absoluteSessionLifetime = sessionLifetimeOptions.AbsoluteLifetime;
+	private readonly TimeSpan _accessTokenLifetime = TimeSpan.FromMinutes(jwtOptions.Value.AccessTokenMinutes);
+	private readonly TimeSpan _idleSessionLifetime = TimeSpan.FromDays(authCookieOptions.Value.RefreshTokenExpiryDays);
+	private readonly TimeSpan _absoluteSessionLifetime = TimeSpan.FromDays(
+		authCookieOptions.Value.AbsoluteSessionLifetimeDays
+	);
 
 	public async Task<AuthTokens> LoginAsync(string login, string password, string userAgent, CancellationToken ct)
 	{

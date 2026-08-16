@@ -1,4 +1,4 @@
-namespace Application.Common.Exceptions;
+namespace ViaTrade.Application.Common.Exceptions;
 
 public class NotFoundException(
 	string message = "The requested resource was not found.",

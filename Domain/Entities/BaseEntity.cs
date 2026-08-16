@@ -1,6 +1,6 @@
-using Domain.Interfaces;
+using ViaTrade.Domain.Interfaces;
 
-namespace Domain.Entities;
+namespace ViaTrade.Domain.Entities;
 
 public abstract class BaseEntity<TId> : IEntity<TId>
 {

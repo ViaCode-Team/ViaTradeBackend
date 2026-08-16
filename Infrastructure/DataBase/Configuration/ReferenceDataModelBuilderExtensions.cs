@@ -1,7 +1,7 @@
-using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using ViaTrade.Domain.Entities;
 
-namespace Infrastructure.DataBase.Configuration;
+namespace ViaTrade.Infrastructure.DataBase.Configuration;
 
 internal static class ReferenceDataModelBuilderExtensions
 {

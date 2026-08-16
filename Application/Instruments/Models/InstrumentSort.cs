@@ -1,6 +1,6 @@
-using Application.Common.Models;
+using ViaTrade.Application.Common.Models;
 
-namespace Application.Instruments.Models;
+namespace ViaTrade.Application.Instruments.Models;
 
 public record InstrumentSort() : Sort<InstrumentSortField>
 {

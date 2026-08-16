@@ -1,26 +1,28 @@
-using Application.Common.Exceptions;
-using Application.Common.Models;
-using Application.Instruments.Interfaces;
-using Application.Notes.Models;
-using Application.Reminders.Interfaces;
-using Application.Reminders.Models;
-using Application.Reminders.Specifications;
-using Domain.Entities;
+using Microsoft.Extensions.Options;
+using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Instruments.Interfaces;
+using ViaTrade.Application.Notes.Models;
+using ViaTrade.Application.Reminders.Interfaces;
+using ViaTrade.Application.Reminders.Models;
+using ViaTrade.Application.Reminders.Specifications;
+using ViaTrade.Configuration.Options;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Reminders;
+namespace ViaTrade.Application.Reminders;
 
 public class ReminderQueryService(
 	IInstrumentRepository instrumentRepository,
 	IReminderRepository reminderRepository,
-	ReminderLimitsOptions reminderLimitsOptions
+	IOptions<ReminderLimitsSettings> reminderLimitsOptions
 ) : IReminderQueryService
 {
 	public async Task<ReminderStatisticsDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
 		int total = await reminderRepository.CountByUserAsync(userId, ct);
-		int remaining = Math.Max(0, reminderLimitsOptions.MaxRemindersPerUser - total);
+		int remaining = Math.Max(0, reminderLimitsOptions.Value.MaxRemindersPerUser - total);
 
-		return new ReminderStatisticsDto(total, reminderLimitsOptions.MaxRemindersPerUser, remaining);
+		return new ReminderStatisticsDto(total, reminderLimitsOptions.Value.MaxRemindersPerUser, remaining);
 	}
 
 	public async Task<IReadOnlyList<ReminderDto>> ListDueAsync(CancellationToken ct)
@@ -46,10 +48,7 @@ public class ReminderQueryService(
 		CancellationToken ct
 	)
 	{
-		var instrumentExists = await instrumentRepository.ExistsAsync(
-			instrument => instrument.Id == instrumentId,
-			ct
-		);
+		var instrumentExists = await instrumentRepository.ExistsAsync(instrument => instrument.Id == instrumentId, ct);
 
 		if (!instrumentExists)
 			throw new NotFoundException("Instrument not found.", "instrument_not_found");

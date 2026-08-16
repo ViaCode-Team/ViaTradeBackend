@@ -1,12 +1,12 @@
 using System.Text.Json;
-using Application.Auth.Interfaces;
-using Application.Common.Models;
-using Application.Users.Models;
-using Infrastructure.Redis.Utils;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
+using ViaTrade.Application.Auth.Interfaces;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Users.Models;
+using ViaTrade.Infrastructure.Redis.Utils;
 
-namespace Infrastructure.Redis.Repositories;
+namespace ViaTrade.Infrastructure.Redis.Repositories;
 
 public class SessionRedisRepository(
 	IConnectionMultiplexer connectionMultiplexer,

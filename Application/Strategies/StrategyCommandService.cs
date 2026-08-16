@@ -1,9 +1,9 @@
-using Application.Common.Exceptions;
-using Application.Common.Interfaces;
-using Application.Strategies.Interfaces;
-using Domain.Entities;
+using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Application.Common.Interfaces;
+using ViaTrade.Application.Strategies.Interfaces;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Strategies;
+namespace ViaTrade.Application.Strategies;
 
 public class StrategyCommandService(
 	IUserStrategyInstrumentRepository userStrategyInstrumentRepository,

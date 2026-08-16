@@ -1,12 +1,12 @@
-using Application.Common.Exceptions;
-using Application.Common.Models;
-using Application.Strategies.Interfaces;
-using Application.Trades.Interfaces;
-using Application.Trades.Models;
-using Domain.Enums;
-using Domain.Models.Trade;
+using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Strategies.Interfaces;
+using ViaTrade.Application.Trades.Interfaces;
+using ViaTrade.Application.Trades.Models;
+using ViaTrade.Domain.Enums;
+using ViaTrade.Domain.Models.Trade;
 
-namespace Application.Trades;
+namespace ViaTrade.Application.Trades;
 
 public class SignalQueryService(IFileReader tradefileReader, IUserStrategyRepository userStrategyRepository)
 	: ISignalQueryService

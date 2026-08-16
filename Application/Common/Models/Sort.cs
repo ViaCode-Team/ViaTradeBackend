@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Application.Common.Models;
+namespace ViaTrade.Application.Common.Models;
 
 public abstract record Sort<TField> : IValidatableObject
 	where TField : struct, Enum

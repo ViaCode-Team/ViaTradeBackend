@@ -1,7 +1,7 @@
-using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using ViaTrade.Domain.Entities;
 
-namespace Infrastructure.DataBase.Configuration.MySql;
+namespace ViaTrade.Infrastructure.DataBase.Configuration.MySql;
 
 internal static class MySqlModelBuilderExtensions
 {

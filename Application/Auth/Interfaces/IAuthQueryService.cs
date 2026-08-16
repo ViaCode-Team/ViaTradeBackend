@@ -1,7 +1,7 @@
-using Application.Common.Models;
-using Application.Users.Models;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Users.Models;
 
-namespace Application.Auth.Interfaces;
+namespace ViaTrade.Application.Auth.Interfaces;
 
 public interface IAuthQueryService
 {

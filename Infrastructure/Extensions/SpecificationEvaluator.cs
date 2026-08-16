@@ -1,8 +1,8 @@
-using Application.Common.Interfaces;
-using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using ViaTrade.Application.Common.Interfaces;
+using ViaTrade.Domain.Entities;
 
-namespace Infrastructure.Extensions;
+namespace ViaTrade.Infrastructure.Extensions;
 
 public static class SpecificationEvaluator
 {

@@ -1,10 +1,10 @@
-using Application.Common.Interfaces.Repositories;
-using Application.Common.Models;
-using Application.Instruments.Models;
-using Application.Strategies.Models;
-using Domain.Entities;
+using ViaTrade.Application.Common.Interfaces.Repositories;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Instruments.Models;
+using ViaTrade.Application.Strategies.Models;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Strategies.Interfaces;
+namespace ViaTrade.Application.Strategies.Interfaces;
 
 public interface IUserStrategyInstrumentRepository : IRepository<UserStrategyInstrument>
 {

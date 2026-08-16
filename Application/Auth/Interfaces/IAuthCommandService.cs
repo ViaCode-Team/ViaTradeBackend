@@ -1,6 +1,6 @@
-using Application.Auth.Models;
+using ViaTrade.Application.Auth.Models;
 
-namespace Application.Auth.Interfaces;
+namespace ViaTrade.Application.Auth.Interfaces;
 
 public interface IAuthCommandService
 {

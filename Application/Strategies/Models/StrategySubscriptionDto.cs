@@ -1,5 +1,5 @@
-using Domain.Entities;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Strategies.Models;
+namespace ViaTrade.Application.Strategies.Models;
 
 public sealed record StrategySubscriptionDto(Strategy Strategy, bool IsSubscribed);

@@ -1,4 +1,4 @@
-namespace Application.Common.Interfaces;
+namespace ViaTrade.Application.Common.Interfaces;
 
 public interface ISearchSpecification<TEntity>
 	where TEntity : class

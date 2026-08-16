@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Application.Strategies.Models;
+namespace ViaTrade.Application.Strategies.Models;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum StrategySortField

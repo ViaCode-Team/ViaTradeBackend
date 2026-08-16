@@ -1,8 +1,8 @@
-using Application.Auth.Interfaces;
-using Application.Common.Models;
-using Application.Users.Models;
+using ViaTrade.Application.Auth.Interfaces;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Users.Models;
 
-namespace Application.Auth;
+namespace ViaTrade.Application.Auth;
 
 public class AuthQueryService(ISessionRepository sessionRepository) : IAuthQueryService
 {

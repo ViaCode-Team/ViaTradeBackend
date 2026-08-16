@@ -1,6 +1,6 @@
-using Application.Common.Models;
+using ViaTrade.Application.Common.Models;
 
-namespace Infrastructure.Redis.Entities;
+namespace ViaTrade.Infrastructure.Redis.Entities;
 
 public class UserRedisEntity : CacheEntity
 {

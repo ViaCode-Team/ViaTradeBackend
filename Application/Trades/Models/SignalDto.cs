@@ -1,4 +1,4 @@
-namespace Application.Trades.Models;
+namespace ViaTrade.Application.Trades.Models;
 
 public record SignalDto(
 	int StrategyId,

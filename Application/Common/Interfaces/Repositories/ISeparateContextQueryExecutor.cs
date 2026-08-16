@@ -1,4 +1,4 @@
-namespace Application.Common.Interfaces.Repositories;
+namespace ViaTrade.Application.Common.Interfaces.Repositories;
 
 /// <summary>
 /// Executes queries using repositories resolved from separate DI scopes.

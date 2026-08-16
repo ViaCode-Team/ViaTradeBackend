@@ -1,9 +1,9 @@
-using Application.Users.Models;
-using Infrastructure.Redis.Keys;
-using Infrastructure.Redis.Scripts;
 using StackExchange.Redis;
+using ViaTrade.Application.Users.Models;
+using ViaTrade.Infrastructure.Redis.Keys;
+using ViaTrade.Infrastructure.Redis.Scripts;
 
-namespace Infrastructure.Redis.Utils;
+namespace ViaTrade.Infrastructure.Redis.Utils;
 
 internal sealed class SessionRedisStorageHelper(IDatabase database)
 {

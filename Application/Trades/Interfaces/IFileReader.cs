@@ -1,7 +1,7 @@
-using Domain.Enums;
-using Domain.Models.Trade;
+using ViaTrade.Domain.Enums;
+using ViaTrade.Domain.Models.Trade;
 
-namespace Application.Trades.Interfaces;
+namespace ViaTrade.Application.Trades.Interfaces;
 
 public interface IFileReader
 {

@@ -1,11 +1,11 @@
-using Application.Common.Exceptions;
-using Application.Common.Interfaces;
-using Application.Instruments.Interfaces;
-using Application.Notes.Interfaces;
-using Application.Strategies.Interfaces;
-using Domain.Entities;
+using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Application.Common.Interfaces;
+using ViaTrade.Application.Instruments.Interfaces;
+using ViaTrade.Application.Notes.Interfaces;
+using ViaTrade.Application.Strategies.Interfaces;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Notes;
+namespace ViaTrade.Application.Notes;
 
 public class NoteCommandService(
 	IInstrumentRepository instrumentRepository,
@@ -48,10 +48,7 @@ public class NoteCommandService(
 
 	public async Task DeleteInstrumentAsync(int userId, int instrumentId, CancellationToken ct)
 	{
-		var instrumentExists = await instrumentRepository.ExistsAsync(
-			instrument => instrument.Id == instrumentId,
-			ct
-		);
+		var instrumentExists = await instrumentRepository.ExistsAsync(instrument => instrument.Id == instrumentId, ct);
 
 		if (!instrumentExists)
 			throw new NotFoundException("Instrument not found.", "instrument_not_found");

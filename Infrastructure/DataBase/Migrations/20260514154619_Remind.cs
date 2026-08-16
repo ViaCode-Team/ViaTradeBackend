@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Infrastructure.Migrations;
+namespace ViaTrade.Infrastructure.Migrations;
 
 /// <inheritdoc />
 public partial class Remind : Migration

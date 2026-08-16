@@ -1,6 +1,6 @@
-using Application.Trades.Models;
+using ViaTrade.Application.Trades.Models;
 
-namespace Application.Trades.Interfaces;
+namespace ViaTrade.Application.Trades.Interfaces;
 
 public interface ITradeCommandService
 {

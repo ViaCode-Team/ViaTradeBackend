@@ -1,8 +1,8 @@
-using Application.Common.Models;
-using Application.Reminders.Models;
-using Domain.Entities;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Reminders.Models;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Reminders.Interfaces;
+namespace ViaTrade.Application.Reminders.Interfaces;
 
 public interface IReminderQueryService
 {

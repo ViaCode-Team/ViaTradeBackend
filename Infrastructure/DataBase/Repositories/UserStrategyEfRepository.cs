@@ -1,10 +1,10 @@
-using Application.Strategies.Interfaces;
-using Application.Trades.Models;
-using Domain.Entities;
-using Infrastructure.Utils;
 using Microsoft.EntityFrameworkCore;
+using ViaTrade.Application.Strategies.Interfaces;
+using ViaTrade.Application.Trades.Models;
+using ViaTrade.Domain.Entities;
+using ViaTrade.Infrastructure.Utils;
 
-namespace Infrastructure.DataBase.Repositories;
+namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
 public class UserStrategyEfRepository(AppDbContext context)
 	: BaseEfRepository<UserStrategy>(context),

@@ -1,12 +1,12 @@
-using Application.Common.Interfaces;
-using Application.Common.Models;
-using Application.Notes.Interfaces;
-using Application.Notes.Models;
-using Domain.Entities;
-using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using ViaTrade.Application.Common.Interfaces;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Notes.Interfaces;
+using ViaTrade.Application.Notes.Models;
+using ViaTrade.Domain.Entities;
+using ViaTrade.Infrastructure.Extensions;
 
-namespace Infrastructure.DataBase.Repositories;
+namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
 public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(context), INoteRepository
 {
@@ -100,27 +100,18 @@ public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(con
 	public Task<int> ExecuteDeleteInstrumentAsync(int userId, int instrumentId, CancellationToken ct)
 	{
 		return EfDatabaseOperation.ExecuteAsync(() =>
-			_dbSet
-				.Where(note => note.UserId == userId && note.InstrumentId == instrumentId)
-				.ExecuteDeleteAsync(ct)
+			_dbSet.Where(note => note.UserId == userId && note.InstrumentId == instrumentId).ExecuteDeleteAsync(ct)
 		);
 	}
 
 	public Task<int> ExecuteDeleteStrategyAsync(int userId, int strategyId, CancellationToken ct)
 	{
 		return EfDatabaseOperation.ExecuteAsync(() =>
-			_dbSet
-				.Where(note => note.UserId == userId && note.StrategyId == strategyId)
-				.ExecuteDeleteAsync(ct)
+			_dbSet.Where(note => note.UserId == userId && note.StrategyId == strategyId).ExecuteDeleteAsync(ct)
 		);
 	}
 
-	public Task<int> ExecuteUpdateInstrumentAsync(
-		int userId,
-		int instrumentId,
-		string text,
-		CancellationToken ct
-	)
+	public Task<int> ExecuteUpdateInstrumentAsync(int userId, int instrumentId, string text, CancellationToken ct)
 	{
 		return EfDatabaseOperation.ExecuteAsync(() =>
 			_dbSet
@@ -129,12 +120,7 @@ public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(con
 		);
 	}
 
-	public Task<int> ExecuteUpdateStrategyAsync(
-		int userId,
-		int strategyId,
-		string text,
-		CancellationToken ct
-	)
+	public Task<int> ExecuteUpdateStrategyAsync(int userId, int strategyId, string text, CancellationToken ct)
 	{
 		return EfDatabaseOperation.ExecuteAsync(() =>
 			_dbSet

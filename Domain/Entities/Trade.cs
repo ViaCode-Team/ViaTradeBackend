@@ -1,6 +1,6 @@
-using Domain.Enums;
+using ViaTrade.Domain.Enums;
 
-namespace Domain.Entities;
+namespace ViaTrade.Domain.Entities;
 
 public sealed class Trade : BaseEntity<int>
 {

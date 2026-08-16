@@ -1,10 +1,10 @@
 using System.Text.Json;
-using Application.Common.Interfaces.Repositories;
-using Application.Common.Models;
-using Infrastructure.Redis.Keys;
 using StackExchange.Redis;
+using ViaTrade.Application.Common.Interfaces.Repositories;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Infrastructure.Redis.Keys;
 
-namespace Infrastructure.Redis.Repositories;
+namespace ViaTrade.Infrastructure.Redis.Repositories;
 
 public class BaseRedisRepository<TEntity>(IDatabase database, RedisKeyBuilder keys) : ICacheRepository<TEntity>
 	where TEntity : CacheEntity

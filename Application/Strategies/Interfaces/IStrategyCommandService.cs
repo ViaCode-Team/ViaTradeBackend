@@ -1,4 +1,4 @@
-namespace Application.Strategies.Interfaces;
+namespace ViaTrade.Application.Strategies.Interfaces;
 
 public interface IStrategyCommandService
 {

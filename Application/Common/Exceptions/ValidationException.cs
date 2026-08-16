@@ -1,4 +1,4 @@
-namespace Application.Common.Exceptions;
+namespace ViaTrade.Application.Common.Exceptions;
 
 public class ValidationException(
 	string message,

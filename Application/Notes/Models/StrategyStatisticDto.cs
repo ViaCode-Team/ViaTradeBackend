@@ -1,4 +1,4 @@
-namespace Application.Notes.Models;
+namespace ViaTrade.Application.Notes.Models;
 
 public record StrategyStatisticDto(
 	long TotalStrategiesCount,

@@ -1,9 +1,9 @@
-using Application.Users.Interfaces;
-using Application.Users.Models;
-using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using ViaTrade.Application.Users.Interfaces;
+using ViaTrade.Application.Users.Models;
+using ViaTrade.Domain.Entities;
 
-namespace Infrastructure.DataBase.Repositories;
+namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
 public class UserEfRepository(AppDbContext context) : BaseEfRepository<User>(context), IUserRepository
 {

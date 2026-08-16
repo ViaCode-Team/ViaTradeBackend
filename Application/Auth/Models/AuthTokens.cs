@@ -1,4 +1,4 @@
-namespace Application.Auth.Models;
+namespace ViaTrade.Application.Auth.Models;
 
 public class AuthTokens
 {

@@ -1,6 +1,6 @@
-using Application.Common.Models;
+using ViaTrade.Application.Common.Models;
 
-namespace Application.Common.Interfaces.Repositories;
+namespace ViaTrade.Application.Common.Interfaces.Repositories;
 
 public interface ICacheRepository<T>
 	where T : CacheEntity

@@ -1,11 +1,11 @@
-using Application.Common.Exceptions;
-using Application.Common.Models;
-using Application.Trades.Interfaces;
-using Application.Trades.Models;
-using Application.Trades.Specifications;
-using Domain.Services;
+using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Trades.Interfaces;
+using ViaTrade.Application.Trades.Models;
+using ViaTrade.Application.Trades.Specifications;
+using ViaTrade.Domain.Services;
 
-namespace Application.Trades;
+namespace ViaTrade.Application.Trades;
 
 public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQueryService
 {

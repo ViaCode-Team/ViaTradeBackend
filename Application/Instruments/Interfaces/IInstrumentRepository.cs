@@ -1,9 +1,9 @@
-using Application.Common.Interfaces.Repositories;
-using Application.Common.Models;
-using Application.Instruments.Models;
-using Domain.Entities;
+using ViaTrade.Application.Common.Interfaces.Repositories;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Instruments.Models;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Instruments.Interfaces;
+namespace ViaTrade.Application.Instruments.Interfaces;
 
 public interface IInstrumentRepository : IRepository<Instrument>
 {

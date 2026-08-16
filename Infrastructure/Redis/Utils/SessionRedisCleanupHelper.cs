@@ -1,7 +1,7 @@
-using Infrastructure.Redis.Keys;
 using StackExchange.Redis;
+using ViaTrade.Infrastructure.Redis.Keys;
 
-namespace Infrastructure.Redis.Utils;
+namespace ViaTrade.Infrastructure.Redis.Utils;
 
 internal sealed class SessionRedisCleanupHelper(IDatabase database)
 {

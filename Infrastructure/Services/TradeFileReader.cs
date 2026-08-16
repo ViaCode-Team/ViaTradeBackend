@@ -1,28 +1,29 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
-using Application.Trades.Interfaces;
-using Domain.Enums;
-using Domain.Models.Trade;
-using Infrastructure.Configuration;
 using Microsoft.Extensions.Options;
+using ViaTrade.Application.Trades.Interfaces;
+using ViaTrade.Configuration.Options;
+using ViaTrade.Domain.Enums;
+using ViaTrade.Domain.Models.Trade;
 
-namespace Infrastructure.Services;
+namespace ViaTrade.Infrastructure.Services;
 
 public class TradeFileReader : IFileReader
 {
 	private readonly Dictionary<TradeDataType, string> _paths;
 	private readonly ITradeDataBuilder _tradeDataBuilder;
 
-	public TradeFileReader(IOptions<AnalyzerDataOption> options, ITradeDataBuilder tradeDataBuilder)
+	public TradeFileReader(IOptions<AnalyzerDataSettings> options, ITradeDataBuilder tradeDataBuilder)
 	{
-		var basePath = options.Value.SourcePath;
+		var settings = options.Value;
+		var basePath = settings.SourcePath;
 
 		_paths = new Dictionary<TradeDataType, string>
 		{
-			[TradeDataType.Futures] = Path.Combine(basePath, options.Value.FuturesDataDirectoryName),
-			[TradeDataType.Stocks] = Path.Combine(basePath, options.Value.StocksDataDirectoryName),
-			[TradeDataType.Strategy] = Path.Combine(basePath, options.Value.StrategyResultDirectoryName),
-			[TradeDataType.Screener] = Path.Combine(basePath, options.Value.ScrennerResultDirectoryName),
+			[TradeDataType.Futures] = Path.Combine(basePath, settings.FuturesDataDirectoryName),
+			[TradeDataType.Stocks] = Path.Combine(basePath, settings.StocksDataDirectoryName),
+			[TradeDataType.Strategy] = Path.Combine(basePath, settings.StrategyResultDirectoryName),
+			[TradeDataType.Screener] = Path.Combine(basePath, settings.ScrennerResultDirectoryName),
 		};
 
 		foreach (var key in _paths.Keys.ToList())

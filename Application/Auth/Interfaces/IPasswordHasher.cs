@@ -1,4 +1,4 @@
-namespace Application.Auth.Interfaces;
+namespace ViaTrade.Application.Auth.Interfaces;
 
 public interface IPasswordHasher
 {

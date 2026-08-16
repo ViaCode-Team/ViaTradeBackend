@@ -1,7 +1,7 @@
-using Application.Strategies.Models;
-using Domain.Entities;
+using ViaTrade.Application.Strategies.Models;
+using ViaTrade.Domain.Entities;
 
-namespace Infrastructure.Extensions;
+namespace ViaTrade.Infrastructure.Extensions;
 
 public static class StrategySubscriptionQueryableExtensions
 {

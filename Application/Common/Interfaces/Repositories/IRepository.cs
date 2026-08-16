@@ -1,8 +1,8 @@
 using System.Linq.Expressions;
-using Application.Common.Models;
-using Domain.Entities;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Common.Interfaces.Repositories;
+namespace ViaTrade.Application.Common.Interfaces.Repositories;
 
 public interface IRepository<TEntity>
 	where TEntity : BaseEntity<int>

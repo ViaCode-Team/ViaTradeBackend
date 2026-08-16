@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
 
-namespace Application.Trades.Models;
+namespace ViaTrade.Application.Trades.Models;
 
 public sealed class ProfitChartFilter : IValidatableObject
 {

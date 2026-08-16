@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Application.Instruments.Models;
+namespace ViaTrade.Application.Instruments.Models;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum InstrumentSortField

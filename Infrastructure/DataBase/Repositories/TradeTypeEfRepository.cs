@@ -1,7 +1,7 @@
-using Application.Trades.Interfaces;
-using Domain.Entities;
+using ViaTrade.Application.Trades.Interfaces;
+using ViaTrade.Domain.Entities;
 
-namespace Infrastructure.DataBase.Repositories;
+namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
 public class TradeTypeEfRepository(AppDbContext context)
 	: BaseEfRepository<TradeType>(context),

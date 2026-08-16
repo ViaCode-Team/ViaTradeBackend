@@ -1,10 +1,10 @@
-using Application.Common.Interfaces;
-using Application.Common.Interfaces.Repositories;
-using Application.Common.Models;
-using Application.Trades.Models;
-using Domain.Entities;
+using ViaTrade.Application.Common.Interfaces;
+using ViaTrade.Application.Common.Interfaces.Repositories;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Trades.Models;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Trades.Interfaces;
+namespace ViaTrade.Application.Trades.Interfaces;
 
 public interface ITradeRepository : IRepository<Trade>
 {

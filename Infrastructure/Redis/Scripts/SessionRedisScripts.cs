@@ -1,4 +1,4 @@
-namespace Infrastructure.Redis.Scripts;
+namespace ViaTrade.Infrastructure.Redis.Scripts;
 
 internal static class SessionRedisScripts
 {

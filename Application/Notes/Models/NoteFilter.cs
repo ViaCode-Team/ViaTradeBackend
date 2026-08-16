@@ -1,5 +1,5 @@
-using Domain.Enums;
+using ViaTrade.Domain.Enums;
 
-namespace Application.Notes.Models;
+namespace ViaTrade.Application.Notes.Models;
 
 public record NoteFilter(NoteType? Target);

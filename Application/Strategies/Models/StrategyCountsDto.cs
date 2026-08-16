@@ -1,3 +1,3 @@
-namespace Application.Strategies.Models;
+namespace ViaTrade.Application.Strategies.Models;
 
 public record StrategyCountsDto(long TotalStrategiesCount, long SubscribedStrategiesCount);

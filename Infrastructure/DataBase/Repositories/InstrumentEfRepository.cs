@@ -1,11 +1,11 @@
-using Application.Common.Models;
-using Application.Instruments.Interfaces;
-using Application.Instruments.Models;
-using Domain.Entities;
-using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Instruments.Interfaces;
+using ViaTrade.Application.Instruments.Models;
+using ViaTrade.Domain.Entities;
+using ViaTrade.Infrastructure.Extensions;
 
-namespace Infrastructure.DataBase.Repositories;
+namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
 public class InstrumentEfRepository(AppDbContext context) : BaseEfRepository<Instrument>(context), IInstrumentRepository
 {

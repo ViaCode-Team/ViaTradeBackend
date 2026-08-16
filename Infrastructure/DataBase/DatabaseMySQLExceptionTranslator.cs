@@ -1,7 +1,7 @@
-using Application.Common.Exceptions;
 using MySqlConnector;
+using ViaTrade.Application.Common.Exceptions;
 
-namespace Infrastructure.DataBase;
+namespace ViaTrade.Infrastructure.DataBase;
 
 internal static class DatabaseMySqlExceptionTranslator
 {

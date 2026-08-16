@@ -1,4 +1,4 @@
-namespace Application.Common.Exceptions;
+namespace ViaTrade.Application.Common.Exceptions;
 
 public abstract class AppException(string message, string code, Exception? innerException = null)
 	: Exception(message, innerException)

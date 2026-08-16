@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace Application.Common.Models;
+namespace ViaTrade.Application.Common.Models;
 
 public class PageOptions
 {

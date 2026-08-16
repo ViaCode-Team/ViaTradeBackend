@@ -1,12 +1,12 @@
-using Application.Common.Interfaces;
-using Application.Common.Models;
-using Application.Strategies.Interfaces;
-using Application.Strategies.Models;
-using Domain.Entities;
-using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using ViaTrade.Application.Common.Interfaces;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Strategies.Interfaces;
+using ViaTrade.Application.Strategies.Models;
+using ViaTrade.Domain.Entities;
+using ViaTrade.Infrastructure.Extensions;
 
-namespace Infrastructure.DataBase.Repositories;
+namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
 public class StrategyEfRepository(AppDbContext context) : BaseEfRepository<Strategy>(context), IStrategyRepository
 {

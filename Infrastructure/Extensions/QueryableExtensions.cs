@@ -1,7 +1,7 @@
-using Application.Common.Models;
 using Microsoft.EntityFrameworkCore;
+using ViaTrade.Application.Common.Models;
 
-namespace Infrastructure.Extensions;
+namespace ViaTrade.Infrastructure.Extensions;
 
 public static class QueryableExtensions
 {

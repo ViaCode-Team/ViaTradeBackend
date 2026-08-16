@@ -1,8 +1,8 @@
-using Application.Common.Models;
-using Application.Notes.Models;
-using Domain.Entities;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Notes.Models;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Notes.Interfaces;
+namespace ViaTrade.Application.Notes.Interfaces;
 
 public interface INoteQueryService
 {

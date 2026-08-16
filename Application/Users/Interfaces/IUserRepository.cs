@@ -1,8 +1,8 @@
-using Application.Common.Interfaces.Repositories;
-using Application.Users.Models;
-using Domain.Entities;
+using ViaTrade.Application.Common.Interfaces.Repositories;
+using ViaTrade.Application.Users.Models;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Users.Interfaces;
+namespace ViaTrade.Application.Users.Interfaces;
 
 public interface IUserRepository : IRepository<User>
 {

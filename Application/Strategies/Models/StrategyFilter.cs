@@ -1,4 +1,4 @@
-namespace Application.Strategies.Models;
+namespace ViaTrade.Application.Strategies.Models;
 
 public class StrategyFilter
 {

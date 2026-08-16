@@ -1,5 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
+		<RootNamespace>ViaTrade.Application</RootNamespace>
+		<AssemblyName>ViaTrade.Application</AssemblyName>
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -7,5 +9,6 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Domain\Domain.csproj" />
+		<ProjectReference Include="..\Configuration\Configuration.csproj" />
 	</ItemGroup>
 </Project>

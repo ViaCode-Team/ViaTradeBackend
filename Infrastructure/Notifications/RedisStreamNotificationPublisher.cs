@@ -1,15 +1,18 @@
-using Application.Notifications.Interfaces;
-using Application.Notifications.Models;
+using Microsoft.Extensions.Options;
 using StackExchange.Redis;
+using ViaTrade.Application.Notifications.Interfaces;
+using ViaTrade.Application.Notifications.Models;
+using ViaTrade.Configuration.Options;
 
-namespace Infrastructure.Notifications;
+namespace ViaTrade.Infrastructure.Notifications;
 
 public sealed class RedisStreamNotificationPublisher(
 	IConnectionMultiplexer connectionMultiplexer,
-	NotificationStreamOptions options
+	IOptions<NotificationStreamSettings> options
 ) : INotificationPublisher
 {
-	private readonly IDatabase _database = connectionMultiplexer.GetDatabase(options.RedisDatabase);
+	private readonly NotificationStreamSettings _options = options.Value;
+	private readonly IDatabase _database = connectionMultiplexer.GetDatabase(options.Value.RedisDatabase);
 
 	public Task PublishAsync(NotificationMessage notification, CancellationToken ct)
 	{
@@ -26,9 +29,9 @@ public sealed class RedisStreamNotificationPublisher(
 		];
 
 		return _database.StreamAddAsync(
-			options.StreamName,
+			_options.StreamName,
 			values,
-			maxLength: options.MaxLength,
+			maxLength: _options.MaxLength,
 			useApproximateMaxLength: true
 		);
 	}

@@ -1,6 +1,6 @@
-using Application.Common.Interfaces;
+using ViaTrade.Application.Common.Interfaces;
 
-namespace Application.Common.Specifications;
+namespace ViaTrade.Application.Common.Specifications;
 
 public abstract class SearchSpecification<TEntity, TFilter> : ISearchSpecification<TEntity>
 	where TEntity : class

@@ -1,7 +1,7 @@
-using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
+using ViaTrade.Domain.Entities;
 
-namespace Infrastructure.DataBase.Configuration;
+namespace ViaTrade.Infrastructure.DataBase.Configuration;
 
 internal static class DomainModelBuilderExtensions
 {
@@ -55,7 +55,12 @@ internal static class DomainModelBuilderExtensions
 		{
 			entity.HasIndex(x => x.UserId);
 			entity.HasIndex(x => x.DeliveredAt);
-			entity.HasIndex(x => new { x.UserId, x.DeliveredAt, x.RemindAt });
+			entity.HasIndex(x => new
+			{
+				x.UserId,
+				x.DeliveredAt,
+				x.RemindAt,
+			});
 			entity.HasIndex(x => new { x.PublishedAt, x.RemindAt });
 		});
 

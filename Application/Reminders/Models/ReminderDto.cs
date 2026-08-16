@@ -1,6 +1,6 @@
-using Application.Notes.Models;
+using ViaTrade.Application.Notes.Models;
 
-namespace Application.Reminders.Models;
+namespace ViaTrade.Application.Reminders.Models;
 
 public record ReminderDto(
 	int Id,

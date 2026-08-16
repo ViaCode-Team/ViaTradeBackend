@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Application.Users.Models;
+namespace ViaTrade.Application.Users.Models;
 
 public class UserInternalDto
 {

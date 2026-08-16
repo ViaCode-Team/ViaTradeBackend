@@ -1,6 +1,6 @@
-using Domain.Models.Trade;
+using ViaTrade.Domain.Models.Trade;
 
-namespace Application.Trades.Interfaces;
+namespace ViaTrade.Application.Trades.Interfaces;
 
 public interface ITradeDataBuilder
 {

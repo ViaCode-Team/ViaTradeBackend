@@ -1,6 +1,6 @@
-using Application.Users.Models;
+using ViaTrade.Application.Users.Models;
 
-namespace Application.Users.Interfaces;
+namespace ViaTrade.Application.Users.Interfaces;
 
 public interface IUserQueryService
 {

@@ -1,6 +1,6 @@
-using Application.Common.Interfaces;
+using ViaTrade.Application.Common.Interfaces;
 
-namespace Infrastructure.DataBase;
+namespace ViaTrade.Infrastructure.DataBase;
 
 public class EfUnitOfWork(AppDbContext context) : IUnitOfWork
 {

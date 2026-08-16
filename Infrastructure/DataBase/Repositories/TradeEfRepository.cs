@@ -1,13 +1,13 @@
-using Application.Common.Interfaces;
-using Application.Common.Models;
-using Application.Trades.Interfaces;
-using Application.Trades.Models;
-using Domain.Entities;
-using Domain.Enums;
-using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using ViaTrade.Application.Common.Interfaces;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Trades.Interfaces;
+using ViaTrade.Application.Trades.Models;
+using ViaTrade.Domain.Entities;
+using ViaTrade.Domain.Enums;
+using ViaTrade.Infrastructure.Extensions;
 
-namespace Infrastructure.DataBase.Repositories;
+namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
 public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(context), ITradeRepository
 {

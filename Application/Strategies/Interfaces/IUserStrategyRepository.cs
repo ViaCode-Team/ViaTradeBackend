@@ -1,8 +1,8 @@
-using Application.Common.Interfaces.Repositories;
-using Application.Trades.Models;
-using Domain.Entities;
+using ViaTrade.Application.Common.Interfaces.Repositories;
+using ViaTrade.Application.Trades.Models;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Strategies.Interfaces;
+namespace ViaTrade.Application.Strategies.Interfaces;
 
 public interface IUserStrategyRepository : IRepository<UserStrategy>
 {

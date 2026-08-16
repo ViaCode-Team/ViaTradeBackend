@@ -1,10 +1,10 @@
 using System.Text.Json;
-using Application.Users.Interfaces;
-using Infrastructure.Redis.Entities;
-using Infrastructure.Redis.Keys;
 using StackExchange.Redis;
+using ViaTrade.Application.Users.Interfaces;
+using ViaTrade.Infrastructure.Redis.Entities;
+using ViaTrade.Infrastructure.Redis.Keys;
 
-namespace Infrastructure.Redis.Repositories;
+namespace ViaTrade.Infrastructure.Redis.Repositories;
 
 public class TelegramTokenRedisRepository(IConnectionMultiplexer connectionMultiplexer)
 	: BaseRedisRepository<TelegramTokenEntity>(connectionMultiplexer.GetDatabase(), RedisKeys.Cache.TelegramTokens),

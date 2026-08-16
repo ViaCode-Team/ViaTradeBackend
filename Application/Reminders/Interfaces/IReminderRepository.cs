@@ -1,10 +1,10 @@
-using Application.Common.Interfaces;
-using Application.Common.Interfaces.Repositories;
-using Application.Common.Models;
-using Application.Reminders.Models;
-using Domain.Entities;
+using ViaTrade.Application.Common.Interfaces;
+using ViaTrade.Application.Common.Interfaces.Repositories;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Reminders.Models;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Reminders.Interfaces;
+namespace ViaTrade.Application.Reminders.Interfaces;
 
 public interface IReminderRepository : IRepository<Reminder>
 {
@@ -24,10 +24,6 @@ public interface IReminderRepository : IRepository<Reminder>
 		CancellationToken ct = default
 	);
 	Task<int> ExecuteMarkPublishedAsync(int reminderId, CancellationToken ct = default);
-	Task<int> ExecuteMarkDeliveredForUserAsync(
-		int userId,
-		int reminderId,
-		CancellationToken ct = default
-	);
+	Task<int> ExecuteMarkDeliveredForUserAsync(int userId, int reminderId, CancellationToken ct = default);
 	Task<int> ExecuteDeleteDeliveredBeforeAsync(DateTime deliveredBefore, CancellationToken ct = default);
 }

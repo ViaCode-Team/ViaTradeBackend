@@ -1,7 +1,7 @@
 using System.Security.Claims;
-using Application.Users.Models;
+using ViaTrade.Application.Users.Models;
 
-namespace Application.Auth.Interfaces;
+namespace ViaTrade.Application.Auth.Interfaces;
 
 public interface IJwtHelper
 {

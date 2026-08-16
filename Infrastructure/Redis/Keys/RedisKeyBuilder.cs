@@ -1,6 +1,6 @@
 using StackExchange.Redis;
 
-namespace Infrastructure.Redis.Keys;
+namespace ViaTrade.Infrastructure.Redis.Keys;
 
 public sealed class RedisKeyBuilder
 {

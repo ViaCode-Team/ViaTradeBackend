@@ -1,12 +1,12 @@
-using Application.Common.Models;
-using Application.Instruments.Models;
-using Application.Strategies.Interfaces;
-using Application.Strategies.Models;
-using Domain.Entities;
-using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Instruments.Models;
+using ViaTrade.Application.Strategies.Interfaces;
+using ViaTrade.Application.Strategies.Models;
+using ViaTrade.Domain.Entities;
+using ViaTrade.Infrastructure.Extensions;
 
-namespace Infrastructure.DataBase.Repositories;
+namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
 public class UserStrategyInstrumentEfRepository(AppDbContext context)
 	: BaseEfRepository<UserStrategyInstrument>(context),
@@ -41,16 +41,11 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 	{
 		var linksQuery = _dbSet.Where(link => link.UserId == userId && link.StrategyId == strategyId);
 		if (instrumentFilter.InstrumentIds is { Count: > 0 })
-			linksQuery = linksQuery.Where(link =>
-				instrumentFilter.InstrumentIds.Contains(link.InstrumentId)
-			);
+			linksQuery = linksQuery.Where(link => instrumentFilter.InstrumentIds.Contains(link.InstrumentId));
 
 		var strategyPageInfo = await _context
 			.Strategies.Where(strategy => strategy.Id == strategyId)
-			.Select(_ => new
-			{
-				TotalCount = linksQuery.Count(),
-			})
+			.Select(_ => new { TotalCount = linksQuery.Count() })
 			.SingleOrDefaultAsync(ct);
 
 		if (strategyPageInfo == null)

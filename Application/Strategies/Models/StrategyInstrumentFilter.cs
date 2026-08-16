@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Application.Strategies.Models;
+namespace ViaTrade.Application.Strategies.Models;
 
 public sealed class StrategyInstrumentFilter : IValidatableObject
 {

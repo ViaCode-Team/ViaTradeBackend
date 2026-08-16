@@ -1,4 +1,4 @@
-namespace Application.Users.Interfaces;
+namespace ViaTrade.Application.Users.Interfaces;
 
 public interface IUserCommandService
 {

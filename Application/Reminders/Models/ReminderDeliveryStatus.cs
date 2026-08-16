@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Application.Reminders.Models;
+namespace ViaTrade.Application.Reminders.Models;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ReminderDeliveryStatus

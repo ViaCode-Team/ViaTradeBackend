@@ -1,6 +1,6 @@
-using Application.Common.Models;
+using ViaTrade.Application.Common.Models;
 
-namespace Application.Trades.Models;
+namespace ViaTrade.Application.Trades.Models;
 
 public record SignalSort() : Sort<SignalSortField>
 {

@@ -1,8 +1,8 @@
-using Application.Common.Exceptions;
-using Application.Users.Interfaces;
-using Application.Users.Models;
+using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Application.Users.Interfaces;
+using ViaTrade.Application.Users.Models;
 
-namespace Application.Users;
+namespace ViaTrade.Application.Users;
 
 public class UserQueryService(IUserRepository userRepository, ITelegramTokenRepository telegramTokenRepository)
 	: IUserQueryService

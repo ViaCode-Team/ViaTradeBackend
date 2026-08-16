@@ -1,7 +1,7 @@
-using Application.Common.Models;
-using Application.Trades.Models;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Trades.Models;
 
-namespace Application.Trades.Interfaces;
+namespace ViaTrade.Application.Trades.Interfaces;
 
 public interface ITradeQueryService
 {

@@ -1,4 +1,4 @@
-namespace Application.Notes.Interfaces;
+namespace ViaTrade.Application.Notes.Interfaces;
 
 public interface INoteCommandService
 {

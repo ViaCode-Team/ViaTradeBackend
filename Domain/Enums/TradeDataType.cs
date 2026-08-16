@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Domain.Enums;
+namespace ViaTrade.Domain.Enums;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum TradeDataType

@@ -1,4 +1,4 @@
-namespace Application.Notifications.Models;
+namespace ViaTrade.Application.Notifications.Models;
 
 public sealed record NotificationMessage(
 	string NotificationId,

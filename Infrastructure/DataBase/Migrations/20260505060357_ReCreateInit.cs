@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace Infrastructure.Migrations;
+namespace ViaTrade.Infrastructure.Migrations;
 
 /// <inheritdoc />
 public partial class ReCreateInit : Migration

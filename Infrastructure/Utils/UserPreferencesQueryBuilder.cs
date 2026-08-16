@@ -1,7 +1,7 @@
-using Domain.Entities;
-using Infrastructure.DataBase;
+using ViaTrade.Domain.Entities;
+using ViaTrade.Infrastructure.DataBase;
 
-namespace Infrastructure.Utils;
+namespace ViaTrade.Infrastructure.Utils;
 
 public static class UserPreferencesQueryBuilder
 {

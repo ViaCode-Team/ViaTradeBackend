@@ -1,4 +1,4 @@
-namespace Domain.Models.Trade;
+namespace ViaTrade.Domain.Models.Trade;
 
 public class InstrumentFile
 {

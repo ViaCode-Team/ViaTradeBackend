@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace Infrastructure.DataBase.Configuration;
+namespace ViaTrade.Infrastructure.DataBase.Configuration;
 
 internal static class UtcDateTimeModelBuilderExtensions
 {

@@ -1,15 +1,16 @@
-using Application.Common.Exceptions;
-using Application.Common.Interfaces;
-using Application.Reminders.Interfaces;
-using Application.Reminders.Models;
-using Domain.Entities;
+using Microsoft.Extensions.Options;
+using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Application.Common.Interfaces;
+using ViaTrade.Application.Reminders.Interfaces;
+using ViaTrade.Configuration.Options;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Reminders;
+namespace ViaTrade.Application.Reminders;
 
 public class ReminderCommandService(
 	IReminderRepository reminderRepository,
 	IUnitOfWork uow,
-	ReminderLimitsOptions reminderLimitsOptions
+	IOptions<ReminderLimitsSettings> reminderLimitsOptions
 ) : IReminderCommandService
 {
 	public async Task<Reminder> CreateAsync(
@@ -21,7 +22,7 @@ public class ReminderCommandService(
 	)
 	{
 		int reminderCount = await reminderRepository.CountByUserAsync(userId, ct);
-		if (reminderCount >= reminderLimitsOptions.MaxRemindersPerUser)
+		if (reminderCount >= reminderLimitsOptions.Value.MaxRemindersPerUser)
 			throw new BusinessRuleException(
 				"The maximum number of reminders has been reached.",
 				"reminder_limit_exceeded"

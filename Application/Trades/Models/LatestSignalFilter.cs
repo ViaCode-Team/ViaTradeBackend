@@ -1,6 +1,6 @@
-using Domain.Enums;
+using ViaTrade.Domain.Enums;
 
-namespace Application.Trades.Models;
+namespace ViaTrade.Application.Trades.Models;
 
 public sealed class LatestSignalFilter
 {

@@ -1,9 +1,9 @@
-using Application.Common.Specifications;
-using Application.Trades.Models;
-using Domain.Entities;
-using Domain.Enums;
+using ViaTrade.Application.Common.Specifications;
+using ViaTrade.Application.Trades.Models;
+using ViaTrade.Domain.Entities;
+using ViaTrade.Domain.Enums;
 
-namespace Application.Trades.Specifications;
+namespace ViaTrade.Application.Trades.Specifications;
 
 public class TradeQuerySpecification : BaseQuerySpecification<Trade>
 {

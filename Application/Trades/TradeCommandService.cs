@@ -1,11 +1,11 @@
-using Application.Common.Exceptions;
-using Application.Common.Interfaces;
-using Application.Instruments.Interfaces;
-using Application.Trades.Interfaces;
-using Application.Trades.Models;
-using Domain.Entities;
+using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Application.Common.Interfaces;
+using ViaTrade.Application.Instruments.Interfaces;
+using ViaTrade.Application.Trades.Interfaces;
+using ViaTrade.Application.Trades.Models;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Trades;
+namespace ViaTrade.Application.Trades;
 
 public class TradeCommandService(
 	ITradeRepository tradeRepository,

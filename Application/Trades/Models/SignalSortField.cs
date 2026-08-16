@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Application.Trades.Models;
+namespace ViaTrade.Application.Trades.Models;
 
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum SignalSortField

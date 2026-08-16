@@ -1,8 +1,8 @@
-using Application.Common.Specifications;
-using Application.Notes.Models;
-using Domain.Entities;
+using ViaTrade.Application.Common.Specifications;
+using ViaTrade.Application.Notes.Models;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Notes.Specifications;
+namespace ViaTrade.Application.Notes.Specifications;
 
 public sealed class NoteSearchSpecification(int userId, NoteSearchFilter filter)
 	: SearchSpecification<Note, NoteSearchFilter>(filter)

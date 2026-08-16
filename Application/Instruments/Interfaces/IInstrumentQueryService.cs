@@ -1,10 +1,10 @@
-using Application.Common.Models;
-using Application.Instruments.Models;
-using Application.Trades.Models;
-using Domain.Entities;
-using Domain.Enums;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Instruments.Models;
+using ViaTrade.Application.Trades.Models;
+using ViaTrade.Domain.Entities;
+using ViaTrade.Domain.Enums;
 
-namespace Application.Instruments.Interfaces;
+namespace ViaTrade.Application.Instruments.Interfaces;
 
 public interface IInstrumentQueryService
 {

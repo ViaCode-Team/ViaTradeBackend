@@ -1,6 +1,6 @@
-using Domain.Entities;
+using ViaTrade.Domain.Entities;
 
-namespace Application.Reminders.Interfaces;
+namespace ViaTrade.Application.Reminders.Interfaces;
 
 public interface IReminderCommandService
 {

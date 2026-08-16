@@ -1,6 +1,6 @@
-using Application.Notifications.Models;
+using ViaTrade.Application.Notifications.Models;
 
-namespace Application.Notifications.Interfaces;
+namespace ViaTrade.Application.Notifications.Interfaces;
 
 public interface INotificationPublisher
 {

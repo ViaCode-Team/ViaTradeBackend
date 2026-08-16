@@ -1,13 +1,13 @@
-using Application.Common.Exceptions;
-using Application.Common.Models;
-using Application.Instruments.Interfaces;
-using Application.Instruments.Models;
-using Application.Trades.Interfaces;
-using Application.Trades.Models;
-using Domain.Entities;
-using Domain.Enums;
+using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Instruments.Interfaces;
+using ViaTrade.Application.Instruments.Models;
+using ViaTrade.Application.Trades.Interfaces;
+using ViaTrade.Application.Trades.Models;
+using ViaTrade.Domain.Entities;
+using ViaTrade.Domain.Enums;
 
-namespace Application.Instruments;
+namespace ViaTrade.Application.Instruments;
 
 public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepository instrumentRepository)
 	: IInstrumentQueryService

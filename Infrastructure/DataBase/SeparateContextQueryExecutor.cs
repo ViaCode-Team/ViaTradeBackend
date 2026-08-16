@@ -1,7 +1,7 @@
-using Application.Common.Interfaces.Repositories;
 using Microsoft.Extensions.DependencyInjection;
+using ViaTrade.Application.Common.Interfaces.Repositories;
 
-namespace Infrastructure.DataBase;
+namespace ViaTrade.Infrastructure.DataBase;
 
 public class SeparateContextQueryExecutor(IServiceScopeFactory scopeFactory) : ISeparateContextQueryExecutor
 {
