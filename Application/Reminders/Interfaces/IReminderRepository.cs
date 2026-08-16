@@ -23,4 +23,11 @@ public interface IReminderRepository : IRepository<Reminder>
 		DateTime remindAt,
 		CancellationToken ct = default
 	);
+	Task<int> ExecuteMarkPublishedAsync(int reminderId, CancellationToken ct = default);
+	Task<int> ExecuteMarkDeliveredForUserAsync(
+		int userId,
+		int reminderId,
+		CancellationToken ct = default
+	);
+	Task<int> ExecuteDeleteDeliveredBeforeAsync(DateTime deliveredBefore, CancellationToken ct = default);
 }

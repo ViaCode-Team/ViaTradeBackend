@@ -1098,6 +1098,10 @@ paths:
             minimum: 1
             type: integer
             format: int32
+        - name: deliveryStatus
+          in: query
+          schema:
+            $ref: '#/components/schemas/ReminderDeliveryStatus'
         - name: page
           in: query
           schema:
@@ -2184,6 +2188,10 @@ paths:
         - Reminders
       operationId: GetReminders
       parameters:
+        - name: deliveryStatus
+          in: query
+          schema:
+            $ref: '#/components/schemas/ReminderDeliveryStatus'
         - name: page
           in: query
           schema:
@@ -4637,6 +4645,15 @@ paths:
             minimum: 1
             type: integer
             format: int32
+        - name: instrumentIds
+          in: query
+          schema:
+            maxItems: 100
+            type: array
+            items:
+              minimum: 1
+              type: integer
+              format: int32
         - name: sortBy
           in: query
           schema:
@@ -7489,12 +7506,17 @@ components:
         password:
           type: string
       additionalProperties: false
+    ReminderDeliveryStatus:
+      enum:
+        - all
+        - undelivered
+        - delivered
+      type: string
     ReminderResponse:
       required:
         - id
         - remindAt
         - text
-        - userId
       type: object
       properties:
         id:
@@ -7507,9 +7529,9 @@ components:
           format: date-time
         instrument:
           $ref: '#/components/schemas/InstrumentBriefResponse'
-        userId:
-          type: integer
-          format: int32
+        deliveredAt:
+          type: string
+          format: date-time
       additionalProperties: false
     ReminderResponsePageResult:
       required:
@@ -7546,10 +7568,18 @@ components:
       type: string
     ReminderStatisticsResponse:
       required:
+        - maximumReminders
+        - remainingReminders
         - totalReminders
       type: object
       properties:
         totalReminders:
+          type: integer
+          format: int32
+        maximumReminders:
+          type: integer
+          format: int32
+        remainingReminders:
           type: integer
           format: int32
       additionalProperties: false

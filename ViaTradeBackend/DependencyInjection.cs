@@ -7,17 +7,22 @@ using Application.Instruments;
 using Application.Instruments.Interfaces;
 using Application.Notes;
 using Application.Notes.Interfaces;
+using Application.Notifications.Interfaces;
+using Application.Notifications.Models;
 using Application.Reminders;
 using Application.Reminders.Interfaces;
+using Application.Reminders.Models;
 using Application.Strategies;
 using Application.Strategies.Interfaces;
 using Application.Trades;
 using Application.Trades.Interfaces;
 using Application.Users;
 using Application.Users.Interfaces;
+using Application.Users.Models;
 using Infrastructure.Configuration;
 using Infrastructure.DataBase;
 using Infrastructure.DataBase.Repositories;
+using Infrastructure.Notifications;
 using Infrastructure.Redis.Repositories;
 using Infrastructure.Services;
 using Infrastructure.Utils;
@@ -37,6 +42,12 @@ public static class DependencyInjection
 {
 	public static IServiceCollection AddApplicationLayer(this IServiceCollection services, IConfiguration configuration)
 	{
+		var telegramBotOptions = configuration.GetSection("TelegramBot").Get<TelegramBotOptions>();
+		if (telegramBotOptions == null || string.IsNullOrWhiteSpace(telegramBotOptions.BotUsername))
+			throw new InvalidOperationException("Telegram bot options are not configured.");
+
+		services.AddSingleton(telegramBotOptions);
+
 		var authCookieOptions = configuration.GetSection("AuthCookies").Get<AuthCookieOptions>();
 		if (authCookieOptions == null)
 			throw new InvalidOperationException("Auth cookie options are not configured.");
@@ -95,12 +106,16 @@ public static class DependencyInjection
 	{
 		services.AddDatabase(configuration);
 		services.AddRedis(configuration);
+		services.AddTelegramNotifications(configuration);
+		services.AddReminderOptions(configuration);
 		services.AddRepositories();
 
 		services.AddScoped<IUnitOfWork, EfUnitOfWork>();
 		services.AddSingleton<ISeparateContextQueryExecutor, SeparateContextQueryExecutor>();
 
 		services.AddHostedService<SessionCleanupService>();
+		services.AddHostedService<TelegramReminderPublisherService>();
+		services.AddHostedService<ReminderCleanupService>();
 
 		return services;
 	}
@@ -114,6 +129,48 @@ public static class DependencyInjection
 
 		services.AddJwtAuthentication();
 		services.AddApplicationAuthorization();
+
+		return services;
+	}
+
+	private static IServiceCollection AddTelegramNotifications(
+		this IServiceCollection services,
+		IConfiguration configuration
+	)
+	{
+		var streamOptions = configuration.GetSection("TelegramNotifications").Get<NotificationStreamOptions>();
+		if (streamOptions == null || string.IsNullOrWhiteSpace(streamOptions.StreamName))
+			throw new InvalidOperationException("Telegram notification stream options are not configured.");
+
+		if (streamOptions.RedisDatabase < 0)
+			throw new InvalidOperationException("Telegram notification Redis database cannot be negative.");
+
+		if (streamOptions.MaxLength < 1 || streamOptions.ReminderPublishIntervalSeconds < 1)
+			throw new InvalidOperationException("Telegram notification settings must be positive.");
+
+		services.AddSingleton(streamOptions);
+
+		services.AddSingleton<INotificationPublisher, RedisStreamNotificationPublisher>();
+
+		return services;
+	}
+
+	private static IServiceCollection AddReminderOptions(this IServiceCollection services, IConfiguration configuration)
+	{
+		var reminderCleanupOptions = configuration.GetSection("ReminderCleanup").Get<ReminderCleanupOptions>();
+		if (
+			reminderCleanupOptions == null
+			|| reminderCleanupOptions.RetentionDays < 1
+			|| reminderCleanupOptions.CleanupIntervalHours < 1
+		)
+			throw new InvalidOperationException("Reminder cleanup settings must be positive.");
+
+		var reminderLimitsOptions = configuration.GetSection("ReminderLimits").Get<ReminderLimitsOptions>();
+		if (reminderLimitsOptions == null || reminderLimitsOptions.MaxRemindersPerUser < 1)
+			throw new InvalidOperationException("Reminder limit must be positive.");
+
+		services.AddSingleton(reminderCleanupOptions);
+		services.AddSingleton(reminderLimitsOptions);
 
 		return services;
 	}

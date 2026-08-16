@@ -119,8 +119,14 @@ namespace Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<DateTime?>("DeliveredAt")
+                        .HasColumnType("datetime(6)");
+
                     b.Property<int>("InstrumentId")
                         .HasColumnType("int");
+
+                    b.Property<DateTime?>("PublishedAt")
+                        .HasColumnType("datetime(6)");
 
                     b.Property<DateTime>("RemindAt")
                         .HasColumnType("datetime(6)");
@@ -134,9 +140,15 @@ namespace Infrastructure.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("DeliveredAt");
+
                     b.HasIndex("InstrumentId");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("PublishedAt", "RemindAt");
+
+                    b.HasIndex("UserId", "DeliveredAt", "RemindAt");
 
                     b.ToTable("Reminders");
                 });

@@ -3,7 +3,6 @@ using Application.Common.Interfaces.Repositories;
 using Application.Common.Models;
 using Application.Notes.Models;
 using Domain.Entities;
-using Domain.Enums;
 
 namespace Application.Notes.Interfaces;
 
@@ -21,9 +20,16 @@ public interface INoteRepository : IRepository<Note>
 		PageOptions pageOptions,
 		CancellationToken ct = default
 	);
-	Task<Note?> FindByTargetAsync(int userId, int relatedId, NoteType noteType, CancellationToken ct = default);
 	Task<Note?> FindByIdForUserAsync(int userId, int noteId, CancellationToken ct = default);
-	Task AddUserNoteAsync(int relatedId, NoteType noteType, int userId, string noteText, CancellationToken ct);
-	Task<int> ExecuteUpdateUserNoteAsync(int userId, int id, NoteType noteType, string noteText, CancellationToken ct);
-	Task<int> ExecuteDeleteUserNoteAsync(int userId, int id, NoteType noteType, CancellationToken ct);
+	Task<Note?> FindByInstrumentAsync(int userId, int instrumentId, CancellationToken ct = default);
+	Task<Note?> FindByStrategyAsync(int userId, int strategyId, CancellationToken ct = default);
+	Task<int> ExecuteDeleteInstrumentAsync(int userId, int instrumentId, CancellationToken ct = default);
+	Task<int> ExecuteDeleteStrategyAsync(int userId, int strategyId, CancellationToken ct = default);
+	Task<int> ExecuteUpdateInstrumentAsync(
+		int userId,
+		int instrumentId,
+		string text,
+		CancellationToken ct = default
+	);
+	Task<int> ExecuteUpdateStrategyAsync(int userId, int strategyId, string text, CancellationToken ct = default);
 }

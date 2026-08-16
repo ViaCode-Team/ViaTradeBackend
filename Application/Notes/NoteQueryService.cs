@@ -1,14 +1,19 @@
 using Application.Common.Exceptions;
 using Application.Common.Models;
+using Application.Instruments.Interfaces;
 using Application.Notes.Interfaces;
 using Application.Notes.Models;
 using Application.Notes.Specifications;
+using Application.Strategies.Interfaces;
 using Domain.Entities;
-using Domain.Enums;
 
 namespace Application.Notes;
 
-public class NoteQueryService(INoteRepository noteRepository) : INoteQueryService
+public class NoteQueryService(
+	IInstrumentRepository instrumentRepository,
+	IStrategyRepository strategyRepository,
+	INoteRepository noteRepository
+) : INoteQueryService
 {
 	public async Task<NoteStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
@@ -21,9 +26,31 @@ public class NoteQueryService(INoteRepository noteRepository) : INoteQueryServic
 			?? throw new NotFoundException("Note not found.", "note_not_found");
 	}
 
-	public async Task<Note> GetAsync(int userId, int relatedId, NoteType noteType, CancellationToken ct)
+	public async Task<Note> GetInstrumentAsync(int userId, int instrumentId, CancellationToken ct)
 	{
-		var existingNote = await noteRepository.FindByTargetAsync(userId, relatedId, noteType, ct);
+		var instrumentExists = await instrumentRepository.ExistsAsync(
+			instrument => instrument.Id == instrumentId,
+			ct
+		);
+
+		if (!instrumentExists)
+			throw new NotFoundException("Instrument not found.", "instrument_not_found");
+
+		var existingNote = await noteRepository.FindByInstrumentAsync(userId, instrumentId, ct);
+		if (existingNote == null)
+			throw new NotFoundException("Note not found.", "note_not_found");
+
+		return existingNote;
+	}
+
+	public async Task<Note> GetStrategyAsync(int userId, int strategyId, CancellationToken ct)
+	{
+		var strategyExists = await strategyRepository.ExistsAsync(strategy => strategy.Id == strategyId, ct);
+
+		if (!strategyExists)
+			throw new NotFoundException("Strategy not found.", "strategy_not_found");
+
+		var existingNote = await noteRepository.FindByStrategyAsync(userId, strategyId, ct);
 		if (existingNote == null)
 			throw new NotFoundException("Note not found.", "note_not_found");
 

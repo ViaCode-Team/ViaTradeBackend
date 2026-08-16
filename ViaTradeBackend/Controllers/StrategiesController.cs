@@ -5,7 +5,6 @@ using Application.Instruments.Models;
 using Application.Notes.Interfaces;
 using Application.Strategies.Interfaces;
 using Application.Strategies.Models;
-using Domain.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Contracts.Instruments;
@@ -70,6 +69,7 @@ public class StrategiesController(
 	[HttpGet("{strategyId:int}/instruments")]
 	public async Task<Ok<PageResult<InstrumentResponse>>> GetInstrumentsByStrategy(
 		[FromRoute, Range(1, int.MaxValue)] int strategyId,
+		[FromQuery] StrategyInstrumentFilter instrumentFilter,
 		[FromQuery] InstrumentSort instrumentSort,
 		[FromQuery] PageOptions pageOptions,
 		CancellationToken ct
@@ -79,6 +79,7 @@ public class StrategiesController(
 		var instruments = await strategyQueryService.GetInstrumentsByStrategyPageAsync(
 			userId,
 			strategyId,
+			instrumentFilter,
 			instrumentSort,
 			pageOptions,
 			ct
@@ -94,7 +95,7 @@ public class StrategiesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var note = await noteQueryService.GetAsync(userId, strategyId, NoteType.StrategyNote, ct);
+		var note = await noteQueryService.GetStrategyAsync(userId, strategyId, ct);
 
 		return TypedResults.Ok(ApiMapper.ToResponse(note));
 	}
@@ -107,7 +108,7 @@ public class StrategiesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await noteCommandService.UpsertAsync(userId, strategyId, NoteType.StrategyNote, request.Text, ct);
+		await noteCommandService.UpsertStrategyAsync(userId, strategyId, request.Text, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -119,7 +120,7 @@ public class StrategiesController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await noteCommandService.DeleteAsync(userId, strategyId, NoteType.StrategyNote, ct);
+		await noteCommandService.DeleteStrategyAsync(userId, strategyId, ct);
 
 		return TypedResults.NoContent();
 	}

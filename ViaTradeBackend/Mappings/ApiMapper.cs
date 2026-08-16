@@ -48,9 +48,18 @@ public static partial class ApiMapper
 	public static partial NoteResponse ToResponse(NoteDto source);
 
 	public static ReminderResponse ToResponse(Reminder source) =>
-		new(source.Id, source.Text, source.RemindAt, ToBriefResponse(source.Instrument), source.UserId);
+		new(
+			source.Id,
+			source.Text,
+			source.RemindAt,
+			ToBriefResponse(source.Instrument),
+			source.DeliveredAt
+		);
 
 	public static partial ReminderResponse ToResponse(ReminderDto source);
+
+	public static DueReminderResponse ToDueResponse(ReminderDto source) =>
+		new(source.Id, source.Text, source.RemindAt, ToResponse(source.Instrument), source.UserId);
 
 	public static partial InstrumentBriefResponse? ToResponse(InstrumentSummaryDto? source);
 

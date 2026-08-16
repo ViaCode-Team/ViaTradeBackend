@@ -8,5 +8,5 @@ public record ReminderResponse(
 	[StringLength(1024, MinimumLength = 1)] string Text,
 	DateTime RemindAt,
 	InstrumentBriefResponse? Instrument,
-	[Range(1, int.MaxValue)] int UserId
+	DateTime? DeliveredAt
 );

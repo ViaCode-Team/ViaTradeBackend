@@ -27,6 +27,7 @@ public interface IStrategyQueryService
 	Task<PageResult<RelatedInstrumentDto>> GetInstrumentsByStrategyPageAsync(
 		int userId,
 		int strategyId,
+		StrategyInstrumentFilter instrumentFilter,
 		InstrumentSort instrumentSort,
 		PageOptions pageOptions,
 		CancellationToken ct

@@ -12,12 +12,14 @@ public interface IReminderQueryService
 	Task<PageResult<ReminderDto>> GetPageAsync(
 		int userId,
 		int instrumentId,
+		ReminderDeliveryStatus deliveryStatus,
 		PageOptions pageOptions,
 		ReminderSort reminderSort,
 		CancellationToken ct
 	);
 	Task<PageResult<ReminderDto>> GetPageAsync(
 		int userId,
+		ReminderDeliveryStatus deliveryStatus,
 		PageOptions pageOptions,
 		ReminderSort reminderSort,
 		CancellationToken ct

@@ -10,5 +10,9 @@ public interface IReminderCommandService
 
 	Task DeleteAsync(int userId, int reminderId, CancellationToken ct);
 
-	Task DeleteDueAsync(int reminderId, CancellationToken ct);
+	Task<bool> MarkPublishedAsync(int reminderId, CancellationToken ct);
+
+	Task MarkDeliveredAsync(int userId, int reminderId, CancellationToken ct);
+
+	Task<int> DeleteDeliveredBeforeAsync(DateTime deliveredBefore, CancellationToken ct);
 }

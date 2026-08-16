@@ -33,16 +33,23 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 	public async Task<StrategyInstrumentsPageResult> GetInstrumentsPageByStrategyAsync(
 		int userId,
 		int strategyId,
+		StrategyInstrumentFilter instrumentFilter,
 		InstrumentSort instrumentSort,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
+		var linksQuery = _dbSet.Where(link => link.UserId == userId && link.StrategyId == strategyId);
+		if (instrumentFilter.InstrumentIds is { Count: > 0 })
+			linksQuery = linksQuery.Where(link =>
+				instrumentFilter.InstrumentIds.Contains(link.InstrumentId)
+			);
+
 		var strategyPageInfo = await _context
 			.Strategies.Where(strategy => strategy.Id == strategyId)
 			.Select(_ => new
 			{
-				TotalCount = _dbSet.Count(link => link.UserId == userId && link.StrategyId == strategyId),
+				TotalCount = linksQuery.Count(),
 			})
 			.SingleOrDefaultAsync(ct);
 
@@ -54,9 +61,7 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 			);
 		}
 
-		var query = _dbSet
-			.Where(link => link.UserId == userId && link.StrategyId == strategyId)
-			.Select(link => link.Instrument!);
+		var query = linksQuery.Select(link => link.Instrument!);
 
 		query = ApplyInstrumentSort(query, instrumentSort);
 

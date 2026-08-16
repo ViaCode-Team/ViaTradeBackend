@@ -8,7 +8,6 @@ using Application.Reminders.Interfaces;
 using Application.Reminders.Models;
 using Application.Strategies.Interfaces;
 using Application.Strategies.Models;
-using Domain.Enums;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTradeBackend.Contracts.Instruments;
@@ -93,7 +92,7 @@ public class InstrumentsController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var note = await noteQueryService.GetAsync(userId, instrumentId, NoteType.InstrumentNote, ct);
+		var note = await noteQueryService.GetInstrumentAsync(userId, instrumentId, ct);
 
 		return TypedResults.Ok(ApiMapper.ToResponse(note));
 	}
@@ -106,7 +105,7 @@ public class InstrumentsController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await noteCommandService.UpsertAsync(userId, instrumentId, NoteType.InstrumentNote, request.Text, ct);
+		await noteCommandService.UpsertInstrumentAsync(userId, instrumentId, request.Text, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -118,7 +117,7 @@ public class InstrumentsController(
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await noteCommandService.DeleteAsync(userId, instrumentId, NoteType.InstrumentNote, ct);
+		await noteCommandService.DeleteInstrumentAsync(userId, instrumentId, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -126,13 +125,21 @@ public class InstrumentsController(
 	[HttpGet("{instrumentId:int}/reminders")]
 	public async Task<Ok<PageResult<ReminderResponse>>> GetInstrumentReminders(
 		[FromRoute, Range(1, int.MaxValue)] int instrumentId,
+		[FromQuery] ReminderDeliveryStatus deliveryStatus,
 		[FromQuery] PageOptions pageOptions,
 		[FromQuery] ReminderSort reminderSort,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var reminders = await reminderQueryService.GetPageAsync(userId, instrumentId, pageOptions, reminderSort, ct);
+		var reminders = await reminderQueryService.GetPageAsync(
+			userId,
+			instrumentId,
+			deliveryStatus,
+			pageOptions,
+			reminderSort,
+			ct
+		);
 
 		return TypedResults.Ok(reminders.Map(ApiMapper.ToResponse));
 	}

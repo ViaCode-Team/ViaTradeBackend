@@ -1,11 +1,16 @@
 using Application.Common.Exceptions;
 using Application.Common.Interfaces;
 using Application.Reminders.Interfaces;
+using Application.Reminders.Models;
 using Domain.Entities;
 
 namespace Application.Reminders;
 
-public class ReminderCommandService(IReminderRepository reminderRepository, IUnitOfWork uow) : IReminderCommandService
+public class ReminderCommandService(
+	IReminderRepository reminderRepository,
+	IUnitOfWork uow,
+	ReminderLimitsOptions reminderLimitsOptions
+) : IReminderCommandService
 {
 	public async Task<Reminder> CreateAsync(
 		int userId,
@@ -15,6 +20,13 @@ public class ReminderCommandService(IReminderRepository reminderRepository, IUni
 		CancellationToken ct
 	)
 	{
+		int reminderCount = await reminderRepository.CountByUserAsync(userId, ct);
+		if (reminderCount >= reminderLimitsOptions.MaxRemindersPerUser)
+			throw new BusinessRuleException(
+				"The maximum number of reminders has been reached.",
+				"reminder_limit_exceeded"
+			);
+
 		var reminder = new Reminder
 		{
 			Text = text,
@@ -45,14 +57,23 @@ public class ReminderCommandService(IReminderRepository reminderRepository, IUni
 			throw new NotFoundException("Reminder not found.", "reminder_not_found");
 	}
 
-	public async Task DeleteDueAsync(int reminderId, CancellationToken ct)
+	public async Task<bool> MarkPublishedAsync(int reminderId, CancellationToken ct)
 	{
-		int rows = await reminderRepository.ExecuteDeleteAsync(
-			x => x.Id == reminderId && x.RemindAt <= DateTime.UtcNow,
-			ct
-		);
+		int rows = await reminderRepository.ExecuteMarkPublishedAsync(reminderId, ct);
+
+		return rows > 0;
+	}
+
+	public async Task MarkDeliveredAsync(int userId, int reminderId, CancellationToken ct)
+	{
+		int rows = await reminderRepository.ExecuteMarkDeliveredForUserAsync(userId, reminderId, ct);
 
 		if (rows == 0)
 			throw new NotFoundException("Reminder not found.", "reminder_not_found");
+	}
+
+	public Task<int> DeleteDeliveredBeforeAsync(DateTime deliveredBefore, CancellationToken ct)
+	{
+		return reminderRepository.ExecuteDeleteDeliveredBeforeAsync(deliveredBefore, ct);
 	}
 }

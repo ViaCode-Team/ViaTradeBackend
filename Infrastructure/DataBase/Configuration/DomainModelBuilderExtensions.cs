@@ -25,7 +25,11 @@ internal static class DomainModelBuilderExtensions
 
 		modelBuilder.Entity<UserInstrument>().HasIndex(x => new { x.UserId, x.InstrumentId }).IsUnique();
 
-		modelBuilder.Entity<UserStrategy>().HasIndex(x => new { x.UserId, x.StrategyId }).IsUnique();
+		modelBuilder.Entity<UserStrategy>(entity =>
+		{
+			entity.HasIndex(x => new { x.UserId, x.StrategyId }).IsUnique();
+			entity.HasQueryFilter(userStrategy => userStrategy.Strategy!.IsActive);
+		});
 
 		modelBuilder.Entity<UserStrategyInstrument>(entity =>
 		{
@@ -43,10 +47,17 @@ internal static class DomainModelBuilderExtensions
 				x.StrategyId,
 				x.InstrumentId,
 			});
+			entity.HasQueryFilter(userStrategyInstrument => userStrategyInstrument.Strategy!.IsActive);
 			entity.HasOne(x => x.Strategy).WithMany().HasForeignKey(x => x.StrategyId).IsRequired();
 		});
 
-		modelBuilder.Entity<Reminder>().HasIndex(x => x.UserId);
+		modelBuilder.Entity<Reminder>(entity =>
+		{
+			entity.HasIndex(x => x.UserId);
+			entity.HasIndex(x => x.DeliveredAt);
+			entity.HasIndex(x => new { x.UserId, x.DeliveredAt, x.RemindAt });
+			entity.HasIndex(x => new { x.PublishedAt, x.RemindAt });
+		});
 
 		modelBuilder.Entity<Note>(entity =>
 		{

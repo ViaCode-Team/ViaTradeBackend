@@ -19,6 +19,7 @@ public interface IUserStrategyInstrumentRepository : IRepository<UserStrategyIns
 	Task<StrategyInstrumentsPageResult> GetInstrumentsPageByStrategyAsync(
 		int userId,
 		int strategyId,
+		StrategyInstrumentFilter instrumentFilter,
 		InstrumentSort instrumentSort,
 		PageOptions pageOptions,
 		CancellationToken ct = default

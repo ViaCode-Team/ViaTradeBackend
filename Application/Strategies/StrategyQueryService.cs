@@ -1,5 +1,6 @@
 using Application.Common.Exceptions;
 using Application.Common.Models;
+using Application.Instruments.Interfaces;
 using Application.Instruments.Models;
 using Application.Notes.Models;
 using Application.Strategies.Interfaces;
@@ -9,6 +10,7 @@ using Application.Strategies.Specifications;
 namespace Application.Strategies;
 
 public class StrategyQueryService(
+	IInstrumentRepository instrumentRepository,
 	IStrategyRepository strategyRepository,
 	IUserStrategyInstrumentRepository userStrategyInstrumentRepository
 ) : IStrategyQueryService
@@ -67,6 +69,14 @@ public class StrategyQueryService(
 		CancellationToken ct
 	)
 	{
+		var instrumentExists = await instrumentRepository.ExistsAsync(
+			instrument => instrument.Id == instrumentId,
+			ct
+		);
+
+		if (!instrumentExists)
+			throw new NotFoundException("Instrument not found.", "instrument_not_found");
+
 		return await userStrategyInstrumentRepository.GetStrategiesPageByInstrumentAsync(
 			userId,
 			instrumentId,
@@ -80,6 +90,7 @@ public class StrategyQueryService(
 	public async Task<PageResult<RelatedInstrumentDto>> GetInstrumentsByStrategyPageAsync(
 		int userId,
 		int strategyId,
+		StrategyInstrumentFilter instrumentFilter,
 		InstrumentSort instrumentSort,
 		PageOptions pageOptions,
 		CancellationToken ct
@@ -88,6 +99,7 @@ public class StrategyQueryService(
 		var result = await userStrategyInstrumentRepository.GetInstrumentsPageByStrategyAsync(
 			userId,
 			strategyId,
+			instrumentFilter,
 			instrumentSort,
 			pageOptions,
 			ct

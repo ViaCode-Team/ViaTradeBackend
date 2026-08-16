@@ -1,9 +1,9 @@
-using Domain.Enums;
-
 namespace Application.Notes.Interfaces;
 
 public interface INoteCommandService
 {
-	Task DeleteAsync(int userId, int relatedId, NoteType noteType, CancellationToken ct);
-	Task UpsertAsync(int userId, int relatedId, NoteType noteType, string noteText, CancellationToken ct);
+	Task DeleteInstrumentAsync(int userId, int instrumentId, CancellationToken ct);
+	Task DeleteStrategyAsync(int userId, int strategyId, CancellationToken ct);
+	Task UpsertInstrumentAsync(int userId, int instrumentId, string text, CancellationToken ct);
+	Task UpsertStrategyAsync(int userId, int strategyId, string text, CancellationToken ct);
 }

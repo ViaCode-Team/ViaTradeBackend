@@ -1,10 +1,15 @@
 using System.Security.Cryptography;
 using Application.Common.Exceptions;
 using Application.Users.Interfaces;
+using Application.Users.Models;
 
 namespace Application.Users;
 
-public class UserCommandService(IUserRepository userRepository, ITelegramTokenRepository telegramTokenRepository)
+public class UserCommandService(
+	IUserRepository userRepository,
+	ITelegramTokenRepository telegramTokenRepository,
+	TelegramBotOptions telegramBotOptions
+)
 	: IUserCommandService
 {
 	public async Task<string> GenerateTgLinkAsync(int userId, CancellationToken ct)
@@ -17,16 +22,15 @@ public class UserCommandService(IUserRepository userRepository, ITelegramTokenRe
 
 		await telegramTokenRepository.SetAsync(token, userId, TimeSpan.FromMinutes(5));
 
-		return $"https://t.me/ViaTradeBot?start={token}";
+		return $"https://t.me/{telegramBotOptions.BotUsername}?start={token}";
 	}
 
 	public async Task LinkTelegramAsync(string telegramToken, string telegramId, CancellationToken ct)
 	{
-		var userIdNullable = await telegramTokenRepository.FindUserIdAsync(telegramToken);
+		var userIdNullable = await telegramTokenRepository.ConsumeUserIdAsync(telegramToken);
 		if (userIdNullable == null)
 			throw new InvalidTokenException("The Telegram link token is invalid or expired.");
 
-		await telegramTokenRepository.RemoveAsync(telegramToken);
 		var userId = userIdNullable.Value;
 
 		var affectedRows = await userRepository.UpdateTelegramIdAsync(userId, telegramId, ct);
