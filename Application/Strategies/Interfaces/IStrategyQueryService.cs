@@ -2,7 +2,6 @@ using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Instruments.Models;
 using ViaTrade.Application.Notes.Models;
 using ViaTrade.Application.Strategies.Models;
-using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Strategies.Interfaces;
 

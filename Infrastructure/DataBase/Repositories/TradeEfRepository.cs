@@ -140,8 +140,7 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 		CancellationToken ct
 	)
 	{
-		var query = specification.Apply(_dbSet)
-			.OrderBy(trade => trade.Id);
+		var query = specification.Apply(_dbSet).OrderBy(trade => trade.Id);
 
 		return await query
 			.Select(trade => new TradeProjectionDto(
@@ -157,7 +156,8 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 				trade.TradeTypeId,
 				new InstrumentSummaryDto(trade.Instrument!.Id, trade.Instrument.Symbol, trade.Instrument.Description),
 				trade.UserId
-			)).ToPagedAsync(pageOptions, ct);
+			))
+			.ToPagedAsync(pageOptions, ct);
 	}
 
 	public async Task<TradeStatisticAggregateDto> GetGlobalStatisticsAsync(int userId, CancellationToken ct)
@@ -242,7 +242,7 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 		if (startDate.HasValue)
 			query = query.Where(trade => trade.ClosedAt!.Value >= startDate.Value.ToDateTime(TimeOnly.MinValue));
 
-		if (endDate.HasValue) 
+		if (endDate.HasValue)
 			query = query.Where(trade =>
 				trade.ClosedAt!.Value < endDate.Value.AddDays(1).ToDateTime(TimeOnly.MinValue)
 			);

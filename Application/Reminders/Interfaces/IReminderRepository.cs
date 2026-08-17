@@ -18,7 +18,7 @@ public interface IReminderRepository : IRepository<Reminder>
 		ISearchSpecification<Reminder> specification,
 		PageOptions pageOptions,
 		CancellationToken ct
-		);
+	);
 	Task<Reminder?> FindByUserAndIdAsync(int userId, int reminderId, CancellationToken ct = default);
 	Task<int> CountByUserAsync(int userId, CancellationToken ct = default);
 	Task<int> ExecuteUpdateForUserAsync(

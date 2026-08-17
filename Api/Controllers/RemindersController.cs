@@ -45,7 +45,7 @@ public class RemindersController(
 	[HttpGet("search")]
 	public async Task<Ok<PageResult<ReminderResponse>>> GetSearchPageAsync(
 		[FromQuery] PageOptions pageOptions,
-	 	[FromQuery] SearchFilter filter,
+		[FromQuery] SearchFilter filter,
 		CancellationToken ct
 	)
 	{

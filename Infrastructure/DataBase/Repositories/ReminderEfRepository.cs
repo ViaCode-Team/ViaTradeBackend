@@ -61,10 +61,9 @@ public class ReminderEfRepository(AppDbContext context) : BaseEfRepository<Remin
 		ISearchSpecification<Reminder> specification,
 		PageOptions pageOptions,
 		CancellationToken ct
-		)
+	)
 	{
-		var query = specification.Apply(_dbSet)
-			.OrderBy(reminder => reminder.Id);
+		var query = specification.Apply(_dbSet).OrderBy(reminder => reminder.Id);
 
 		return await query
 			.Select(reminder => new ReminderProjectionDto(
@@ -76,7 +75,7 @@ public class ReminderEfRepository(AppDbContext context) : BaseEfRepository<Remin
 				reminder.Instrument!.Description,
 				reminder.UserId,
 				reminder.DeliveredAt
-				))
+			))
 			.ToPagedAsync(pageOptions, ct);
 	}
 

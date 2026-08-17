@@ -84,8 +84,7 @@ public class StrategyEfRepository(AppDbContext context) : BaseEfRepository<Strat
 		CancellationToken ct
 	)
 	{
-		var query = specification.Apply(_dbSet)
-			.OrderBy(trade => trade.Id);
+		var query = specification.Apply(_dbSet).OrderBy(trade => trade.Id);
 
 		return await query.WithSubscriptionState(userId).ToPagedAsync(pageOptions, ct);
 	}
