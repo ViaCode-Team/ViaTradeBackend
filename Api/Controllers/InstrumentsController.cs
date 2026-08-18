@@ -42,24 +42,19 @@ public class InstrumentsController(
 	[HttpGet]
 	public async Task<Ok<PageResult<InstrumentResponse>>> GetInstruments(
 		[FromQuery] InstrumentFilter instrumentFilter,
+		[FromQuery] InstrumentSearch instrumentSearch,
 		[FromQuery] PageOptions pageOptions,
 		[FromQuery] InstrumentSort instrumentSort,
 		CancellationToken ct
 	)
 	{
-		var instruments = await instrumentQueryService.GetPageAsync(instrumentFilter, pageOptions, instrumentSort, ct);
-
-		return TypedResults.Ok(instruments.Map(ApiMapper.ToResponse));
-	}
-
-	[HttpGet("search")]
-	public async Task<Ok<PageResult<InstrumentResponse>>> GetSearchInstrument(
-		[FromQuery] SearchFilter instrumentFilter,
-		[FromQuery] PageOptions pageOptions,
-		CancellationToken ct
-	)
-	{
-		var instruments = await instrumentQueryService.GetPageSearchAsync(instrumentFilter, pageOptions, ct);
+		var instruments = await instrumentQueryService.GetPageAsync(
+			instrumentFilter,
+			instrumentSearch,
+			pageOptions,
+			instrumentSort,
+			ct
+		);
 
 		return TypedResults.Ok(instruments.Map(ApiMapper.ToResponse));
 	}
@@ -137,7 +132,8 @@ public class InstrumentsController(
 	[HttpGet("{instrumentId:int}/reminders")]
 	public async Task<Ok<PageResult<ReminderResponse>>> GetInstrumentReminders(
 		[FromRoute, Range(1, int.MaxValue)] int instrumentId,
-		[FromQuery] ReminderDeliveryStatus deliveryStatus,
+		[FromQuery] ReminderFilter reminderFilter,
+		[FromQuery] ReminderSearch reminderSearch,
 		[FromQuery] PageOptions pageOptions,
 		[FromQuery] ReminderSort reminderSort,
 		CancellationToken ct
@@ -147,7 +143,8 @@ public class InstrumentsController(
 		var reminders = await reminderQueryService.GetPageAsync(
 			userId,
 			instrumentId,
-			deliveryStatus,
+			reminderFilter,
+			reminderSearch,
 			pageOptions,
 			reminderSort,
 			ct

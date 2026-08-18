@@ -27,25 +27,13 @@ public class NotesController(INoteQueryService noteQueryService, IJwtHelper jwtH
 	[HttpGet]
 	public async Task<Ok<PageResult<NoteResponse>>> GetNotes(
 		[FromQuery] NoteFilter noteFilter,
+		[FromQuery] NoteSearch noteSearch,
 		[FromQuery] PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userNotes = await noteQueryService.GetPageAsync(userId, noteFilter, pageOptions, ct);
-
-		return TypedResults.Ok(userNotes.Map(ApiMapper.ToResponse));
-	}
-
-	[HttpGet("search")]
-	public async Task<Ok<PageResult<NoteResponse>>> GetSearchNotes(
-		[FromQuery] SearchFilter noteFilter,
-		[FromQuery] PageOptions pageOptions,
-		CancellationToken ct
-	)
-	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userNotes = await noteQueryService.GetSearchAsync(userId, noteFilter, pageOptions, ct);
+		var userNotes = await noteQueryService.GetPageAsync(userId, noteFilter, noteSearch, pageOptions, ct);
 
 		return TypedResults.Ok(userNotes.Map(ApiMapper.ToResponse));
 	}

@@ -24,10 +24,4 @@ public interface IStrategyRepository : IRepository<Strategy>
 		PageOptions pageOptions,
 		CancellationToken ct = default
 	);
-	Task<PageResult<StrategySubscriptionDto>> GetPageSearchAsync(
-		int userId,
-		ISearchSpecification<Strategy> specification,
-		PageOptions pageOptions,
-		CancellationToken ct = default
-	);
 }

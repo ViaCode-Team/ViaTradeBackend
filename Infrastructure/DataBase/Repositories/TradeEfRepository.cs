@@ -15,13 +15,13 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 
 	public async Task<List<ProfitChartAggregateRow>> GetProfitChartAsync(
 		int userId,
-		ProfitChartFilter filter,
+		ProfitChartFilter profitChartFilter,
 		CancellationToken ct
 	)
 	{
-		var tradesQuery = GetClosedTradesQuery(userId, filter.StartDate, filter.EndDate);
+		var tradesQuery = GetClosedTradesQuery(userId, profitChartFilter.StartDate, profitChartFilter.EndDate);
 
-		return filter.Granularity switch
+		return profitChartFilter.Granularity switch
 		{
 			ProfitChartGranularity.Day => await tradesQuery
 				.GroupBy(trade => new
@@ -89,8 +89,8 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 				))
 				.ToListAsync(ct),
 			_ => throw new ArgumentOutOfRangeException(
-				nameof(filter.Granularity),
-				filter.Granularity,
+				nameof(profitChartFilter.Granularity),
+				profitChartFilter.Granularity,
 				"Unsupported chart granularity."
 			),
 		};
@@ -127,37 +127,9 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 		CancellationToken ct
 	)
 	{
-		var query = SpecificationEvaluator.GetQuery(_dbSet, specification);
-		if (specification.SortExpressions.Count == 0)
-			query = query.OrderBy(trade => trade.Id);
+		var query = SpecificationEvaluator.GetQueryForPagination(_dbSet, specification);
 
 		return await query.Select(ToProjection()).ToPagedAsync(pageOptions, ct);
-	}
-
-	public async Task<PageResult<TradeProjectionDto>> GetPageSearchProjectionAsync(
-		ISearchSpecification<Trade> specification,
-		PageOptions pageOptions,
-		CancellationToken ct
-	)
-	{
-		var query = specification.Apply(_dbSet).OrderBy(trade => trade.Id);
-
-		return await query
-			.Select(trade => new TradeProjectionDto(
-				trade.Id,
-				trade.OpenedAt,
-				trade.ClosedAt,
-				trade.OpenPrice,
-				trade.ClosePrice,
-				trade.NetIncome,
-				trade.Quantity,
-				trade.TotalPrice,
-				trade.Signal,
-				trade.TradeTypeId,
-				new InstrumentSummaryDto(trade.Instrument!.Id, trade.Instrument.Symbol, trade.Instrument.Description),
-				trade.UserId
-			))
-			.ToPagedAsync(pageOptions, ct);
 	}
 
 	public async Task<TradeStatisticAggregateDto> GetGlobalStatisticsAsync(int userId, CancellationToken ct)

@@ -42,24 +42,14 @@ public class StrategyQueryService(
 	public async Task<PageResult<StrategySubscriptionDto>> GetPageAsync(
 		int userId,
 		StrategyFilter strategyFilter,
+		StrategySearch strategySearch,
 		StrategySort strategySort,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		var spec = new StrategyQuerySpecification(strategyFilter, strategySort);
+		var spec = new StrategyQuerySpecification(strategyFilter, strategySearch, strategySort);
 		return await strategyRepository.GetPageAsync(userId, spec, pageOptions, ct);
-	}
-
-	public async Task<PageResult<StrategySubscriptionDto>> GetPageSearchAsync(
-		int userId,
-		SearchFilter strategyFilter,
-		PageOptions pageOptions,
-		CancellationToken ct
-	)
-	{
-		var spec = new StrategySearchSpecification(strategyFilter);
-		return await strategyRepository.GetPageSearchAsync(userId, spec, pageOptions, ct);
 	}
 
 	public async Task<StrategySubscriptionDto> GetAsync(int userId, int strategyId, CancellationToken ct)
@@ -87,9 +77,7 @@ public class StrategyQueryService(
 
 		return await userStrategyInstrumentRepository.GetStrategiesPageByInstrumentAsync(
 			userId,
-			instrumentId,
-			strategyFilter,
-			strategySort,
+			new UserStrategyInstrumentByInstrumentSpecification(userId, instrumentId, strategyFilter, strategySort),
 			pageOptions,
 			ct
 		);
@@ -105,10 +93,8 @@ public class StrategyQueryService(
 	)
 	{
 		var result = await userStrategyInstrumentRepository.GetInstrumentsPageByStrategyAsync(
-			userId,
 			strategyId,
-			instrumentFilter,
-			instrumentSort,
+			new UserStrategyInstrumentByStrategySpecification(userId, strategyId, instrumentFilter, instrumentSort),
 			pageOptions,
 			ct
 		);

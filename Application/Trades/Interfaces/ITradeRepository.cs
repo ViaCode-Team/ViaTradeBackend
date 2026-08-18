@@ -11,7 +11,7 @@ public interface ITradeRepository : IRepository<Trade>
 	Task<TradeStatisticAggregateDto> GetGlobalStatisticsAsync(int userId, CancellationToken ct = default);
 	Task<List<ProfitChartAggregateRow>> GetProfitChartAsync(
 		int userId,
-		ProfitChartFilter filter,
+		ProfitChartFilter profitChartFilter,
 		CancellationToken ct = default
 	);
 	Task<TradeDateRangeDto> GetTradeDateRangeAsync(int userId, CancellationToken ct = default);
@@ -21,11 +21,7 @@ public interface ITradeRepository : IRepository<Trade>
 		PageOptions pageOptions,
 		CancellationToken ct = default
 	);
-	Task<PageResult<TradeProjectionDto>> GetPageSearchProjectionAsync(
-		ISearchSpecification<Trade> specification,
-		PageOptions pageOptions,
-		CancellationToken ct = default
-	);
+
 	Task<int> ExecuteUpdateAsync(
 		int userId,
 		int id,

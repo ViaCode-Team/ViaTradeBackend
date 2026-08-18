@@ -13,15 +13,12 @@ public interface IInstrumentQueryService
 	Task<Instrument> GetBySymbolAsync(string symbol, CancellationToken ct);
 	Task<PageResult<Instrument>> GetPageAsync(
 		InstrumentFilter instrumentFilter,
+		InstrumentSearch instrumentSearch,
 		PageOptions pageOptions,
 		InstrumentSort instrumentSort,
 		CancellationToken ct
 	);
-	Task<PageResult<Instrument>> GetPageSearchAsync(
-		SearchFilter instrumentFilter,
-		PageOptions pageOptions,
-		CancellationToken ct
-	);
+
 	Task<IReadOnlyList<InstrumentFileDto>> ListFileMetadataAsync(TradeDataType dataType, CancellationToken ct);
 	Task<InstrumentFileDto> GetFileMetadataAsync(
 		TradeDataType dataType,

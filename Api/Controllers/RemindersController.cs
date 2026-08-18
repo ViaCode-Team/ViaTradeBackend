@@ -30,27 +30,22 @@ public class RemindersController(
 
 	[HttpGet]
 	public async Task<Ok<PageResult<ReminderResponse>>> GetReminders(
-		[FromQuery] ReminderDeliveryStatus deliveryStatus,
+		[FromQuery] ReminderFilter reminderFilter,
+		[FromQuery] ReminderSearch reminderSearch,
 		[FromQuery] PageOptions pageOptions,
 		[FromQuery] ReminderSort reminderSort,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var reminders = await reminderQueryService.GetPageAsync(userId, deliveryStatus, pageOptions, reminderSort, ct);
-
-		return TypedResults.Ok(reminders.Map(ApiMapper.ToResponse));
-	}
-
-	[HttpGet("search")]
-	public async Task<Ok<PageResult<ReminderResponse>>> GetSearchPageAsync(
-		[FromQuery] PageOptions pageOptions,
-		[FromQuery] SearchFilter filter,
-		CancellationToken ct
-	)
-	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var reminders = await reminderQueryService.GetSearchPageAsync(userId, pageOptions, filter, ct);
+		var reminders = await reminderQueryService.GetPageAsync(
+			userId,
+			reminderFilter,
+			reminderSearch,
+			pageOptions,
+			reminderSort,
+			ct
+		);
 
 		return TypedResults.Ok(reminders.Map(ApiMapper.ToResponse));
 	}

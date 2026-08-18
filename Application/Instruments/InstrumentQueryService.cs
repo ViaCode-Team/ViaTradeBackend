@@ -34,22 +34,14 @@ public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepo
 
 	public async Task<PageResult<Instrument>> GetPageAsync(
 		InstrumentFilter instrumentFilter,
+		InstrumentSearch instrumentSearch,
 		PageOptions pageOptions,
 		InstrumentSort instrumentSort,
 		CancellationToken ct
 	)
 	{
-		return await instrumentRepository.GetPageAsync(instrumentFilter, pageOptions, instrumentSort, ct);
-	}
-
-	public async Task<PageResult<Instrument>> GetPageSearchAsync(
-		SearchFilter instrumentFilter,
-		PageOptions pageOptions,
-		CancellationToken ct
-	)
-	{
-		var spec = new InstrumentSearchSpecification(instrumentFilter);
-		return await instrumentRepository.GetPageSearchAsync(spec, pageOptions, ct);
+		var spec = new InstrumentQuerySpecification(instrumentFilter, instrumentSearch, instrumentSort);
+		return await instrumentRepository.GetPageAsync(spec, pageOptions, ct);
 	}
 
 	public async Task<IReadOnlyList<InstrumentFileDto>> ListFileMetadataAsync(

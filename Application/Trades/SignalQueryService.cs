@@ -48,7 +48,7 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 
 	public async Task<PageResult<SignalDto>> GetLatestPageAsync(
 		int userId,
-		LatestSignalFilter filter,
+		LatestSignalFilter latestSignalFilter,
 		SignalSort signalSort,
 		PageOptions pageOptions,
 		CancellationToken ct
@@ -57,7 +57,7 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 		var sources = await userStrategyRepository.ListSignalSourcesAsync(userId, ct);
 		var signals = ListLatestSignals(sources);
 
-		signals = ApplySignalFilter(signals, filter.Signals);
+		signals = ApplySignalFilter(signals, latestSignalFilter.Signals);
 
 		signals = ApplySorting(signals, signalSort.GetEffectiveSortBy()).ToList();
 

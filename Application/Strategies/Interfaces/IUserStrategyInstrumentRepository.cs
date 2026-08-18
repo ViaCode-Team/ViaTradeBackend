@@ -1,6 +1,6 @@
+using ViaTrade.Application.Common.Interfaces;
 using ViaTrade.Application.Common.Interfaces.Repositories;
 using ViaTrade.Application.Common.Models;
-using ViaTrade.Application.Instruments.Models;
 using ViaTrade.Application.Strategies.Models;
 using ViaTrade.Domain.Entities;
 
@@ -10,17 +10,13 @@ public interface IUserStrategyInstrumentRepository : IRepository<UserStrategyIns
 {
 	Task<PageResult<StrategySubscriptionDto>> GetStrategiesPageByInstrumentAsync(
 		int userId,
-		int instrumentId,
-		StrategyFilter strategyFilter,
-		StrategySort strategySort,
+		IQuerySpecification<UserStrategyInstrument> spec,
 		PageOptions pageOptions,
 		CancellationToken ct = default
 	);
 	Task<StrategyInstrumentsPageResult> GetInstrumentsPageByStrategyAsync(
-		int userId,
 		int strategyId,
-		StrategyInstrumentFilter instrumentFilter,
-		InstrumentSort instrumentSort,
+		IQuerySpecification<UserStrategyInstrument> spec,
 		PageOptions pageOptions,
 		CancellationToken ct = default
 	);

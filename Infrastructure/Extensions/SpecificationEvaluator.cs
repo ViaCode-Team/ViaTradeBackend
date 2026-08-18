@@ -22,6 +22,20 @@ public static class SpecificationEvaluator
 		return query;
 	}
 
+	public static IQueryable<TEntity> GetQueryForPagination<TEntity>(
+		IQueryable<TEntity> query,
+		IQuerySpecification<TEntity> specification
+	)
+		where TEntity : BaseEntity<int>
+	{
+		var result = GetQuery(query, specification);
+
+		if (specification.SortExpressions.Count == 0)
+			result = result.OrderBy(entity => entity.Id);
+
+		return result;
+	}
+
 	private static IQueryable<TEntity> ApplyCriteria<TEntity>(
 		IQueryable<TEntity> query,
 		IQuerySpecification<TEntity> specification
@@ -52,7 +66,7 @@ public static class SpecificationEvaluator
 	)
 		where TEntity : BaseEntity<int>
 	{
-		if (specification.SortExpressions.Count == 0)
+		if (specification.SortExpressions.Count <= 0)
 			return query;
 
 		IOrderedQueryable<TEntity> orderedQuery;

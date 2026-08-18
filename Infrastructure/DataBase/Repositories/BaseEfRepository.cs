@@ -41,9 +41,7 @@ public class BaseEfRepository<TEntity> : IRepository<TEntity>
 		CancellationToken ct
 	)
 	{
-		var query = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
-		if (spec.SortExpressions.Count == 0)
-			query = query.OrderBy(e => e.Id);
+		var query = SpecificationEvaluator.GetQueryForPagination(_dbSet.AsQueryable(), spec);
 
 		return await query.ToPagedAsync(pageOptions, ct);
 	}

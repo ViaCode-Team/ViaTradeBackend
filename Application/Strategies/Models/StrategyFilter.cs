@@ -1,6 +1,3 @@
 namespace ViaTrade.Application.Strategies.Models;
 
-public class StrategyFilter
-{
-	public string? Name { get; set; }
-}
+public record StrategyFilter(string? Name);

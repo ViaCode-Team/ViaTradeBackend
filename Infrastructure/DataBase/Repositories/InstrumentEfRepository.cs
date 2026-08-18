@@ -1,10 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Instruments.Interfaces;
 using ViaTrade.Application.Instruments.Models;
-using ViaTrade.Application.Instruments.Specifications;
 using ViaTrade.Domain.Entities;
-using ViaTrade.Infrastructure.Extensions;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
@@ -35,71 +32,5 @@ public class InstrumentEfRepository(AppDbContext context) : BaseEfRepository<Ins
 				StringComparer.OrdinalIgnoreCase,
 				ct
 			);
-	}
-
-	public async Task<PageResult<Instrument>> GetPageAsync(
-		InstrumentFilter instrumentFilter,
-		PageOptions pageOptions,
-		InstrumentSort instrumentSort,
-		CancellationToken ct
-	)
-	{
-		var query = _dbSet.AsQueryable();
-		if (!string.IsNullOrWhiteSpace(instrumentFilter.Symbol))
-		{
-			var pattern = $"%{instrumentFilter.Symbol}%";
-			query = query.Where(instrument => EF.Functions.Like(instrument.Symbol, pattern));
-		}
-
-		query = ApplySort(query, instrumentSort);
-
-		return await query.ToPagedAsync(pageOptions, ct);
-	}
-
-	private static IQueryable<Instrument> ApplySort(IQueryable<Instrument> query, InstrumentSort instrumentSort)
-	{
-		var sortFields = instrumentSort.GetEffectiveSortBy();
-
-		if (sortFields.Count > 0)
-		{
-			IOrderedQueryable<Instrument>? orderedQuery = null;
-			foreach (var field in sortFields)
-			{
-				if (orderedQuery == null)
-				{
-					orderedQuery = field switch
-					{
-						InstrumentSortField.SymbolDesc => query.OrderByDescending(e => e.Symbol),
-						_ => query.OrderBy(e => e.Symbol),
-					};
-				}
-				else
-				{
-					orderedQuery = field switch
-					{
-						InstrumentSortField.SymbolDesc => orderedQuery.ThenByDescending(e => e.Symbol),
-						_ => orderedQuery.ThenBy(e => e.Symbol),
-					};
-				}
-			}
-			query = orderedQuery ?? query;
-		}
-		else
-		{
-			query = query.OrderBy(e => e.Id);
-		}
-
-		return query;
-	}
-
-	public async Task<PageResult<Instrument>> GetPageSearchAsync(
-		InstrumentSearchSpecification specification,
-		PageOptions pageOptions,
-		CancellationToken ct = default
-	)
-	{
-		var query = specification.Apply(_dbSet).OrderBy(x => x.Id);
-
-		return await query.ToPagedAsync(pageOptions, ct);
 	}
 }

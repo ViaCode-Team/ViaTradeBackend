@@ -37,6 +37,7 @@ public class StrategiesController(
 	[HttpGet]
 	public async Task<Ok<PageResult<StrategyResponse>>> GetStrategies(
 		[FromQuery] StrategyFilter strategyFilter,
+		[FromQuery] StrategySearch strategySearch,
 		[FromQuery] StrategySort strategySort,
 		[FromQuery] PageOptions pageOptions,
 		CancellationToken ct
@@ -46,23 +47,11 @@ public class StrategiesController(
 		var pagedStrategies = await strategyQueryService.GetPageAsync(
 			userId,
 			strategyFilter,
+			strategySearch,
 			strategySort,
 			pageOptions,
 			ct
 		);
-
-		return TypedResults.Ok(pagedStrategies.Map(ApiMapper.ToResponse));
-	}
-
-	[HttpGet("search")]
-	public async Task<Ok<PageResult<StrategyResponse>>> GetSearchStrategies(
-		[FromQuery] SearchFilter strategyFilter,
-		[FromQuery] PageOptions pageOptions,
-		CancellationToken ct
-	)
-	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var pagedStrategies = await strategyQueryService.GetPageSearchAsync(userId, strategyFilter, pageOptions, ct);
 
 		return TypedResults.Ok(pagedStrategies.Map(ApiMapper.ToResponse));
 	}

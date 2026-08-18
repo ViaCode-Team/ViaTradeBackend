@@ -17,7 +17,7 @@ public interface ISignalQueryService
 
 	Task<PageResult<SignalDto>> GetLatestPageAsync(
 		int userId,
-		LatestSignalFilter filter,
+		LatestSignalFilter latestSignalFilter,
 		SignalSort signalSort,
 		PageOptions pageOptions,
 		CancellationToken ct

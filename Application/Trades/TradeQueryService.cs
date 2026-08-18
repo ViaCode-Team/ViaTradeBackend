@@ -11,14 +11,14 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 {
 	public async Task<List<ProfitChartBucketDto>> GetProfitChartAsync(
 		int userId,
-		ProfitChartFilter filter,
+		ProfitChartFilter profitChartFilter,
 		CancellationToken ct
 	)
 	{
-		var rows = await tradeRepository.GetProfitChartAsync(userId, filter, ct);
+		var rows = await tradeRepository.GetProfitChartAsync(userId, profitChartFilter, ct);
 
 		return rows.Select(row => new ProfitChartBucketDto(
-				GetBucketDate(row, filter.Granularity),
+				GetBucketDate(row, profitChartFilter.Granularity),
 				row.NetIncome,
 				row.BuyNetIncome,
 				row.SellNetIncome
@@ -62,25 +62,13 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 	public async Task<PageResult<TradeDto>> GetPageAsync(
 		int userId,
 		TradeFilter tradeFilter,
+		TradeSearch tradeSearch,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		var spec = new TradeQuerySpecification(userId, tradeFilter);
+		var spec = new TradeQuerySpecification(userId, tradeFilter, tradeSearch);
 		var trades = await tradeRepository.GetPageProjectionAsync(spec, pageOptions, ct);
-
-		return trades.Map(ToDto);
-	}
-
-	public async Task<PageResult<TradeDto>> GetPageSearchAsync(
-		int userId,
-		SearchFilter tradeFilter,
-		PageOptions pageOptions,
-		CancellationToken ct
-	)
-	{
-		var spec = new TradeSearchSpecification(userId, tradeFilter);
-		var trades = await tradeRepository.GetPageSearchProjectionAsync(spec, pageOptions, ct);
 
 		return trades.Map(ToDto);
 	}

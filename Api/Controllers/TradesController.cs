@@ -30,12 +30,12 @@ public class TradesController(
 
 	[HttpGet("profitChart")]
 	public async Task<Ok<List<ProfitChartBucketResponse>>> GetProfitChart(
-		[FromQuery] ProfitChartFilter filter,
+		[FromQuery] ProfitChartFilter profitChartFilter,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var buckets = await tradeQueryService.GetProfitChartAsync(userId, filter, ct);
+		var buckets = await tradeQueryService.GetProfitChartAsync(userId, profitChartFilter, ct);
 
 		return TypedResults.Ok(buckets.Select(ApiMapper.ToResponse).ToList());
 	}
@@ -52,25 +52,13 @@ public class TradesController(
 	[HttpGet]
 	public async Task<Ok<PageResult<TradeResponse>>> GetTrades(
 		[FromQuery] TradeFilter tradeFilter,
+		[FromQuery] TradeSearch tradeSearch,
 		[FromQuery] PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userTrades = await tradeQueryService.GetPageAsync(userId, tradeFilter, pageOptions, ct);
-
-		return TypedResults.Ok(userTrades.Map(ApiMapper.ToResponse));
-	}
-
-	[HttpGet("search")]
-	public async Task<Ok<PageResult<TradeResponse>>> GetSearchTrades(
-		[FromQuery] SearchFilter tradeFilter,
-		[FromQuery] PageOptions pageOptions,
-		CancellationToken ct
-	)
-	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userTrades = await tradeQueryService.GetPageSearchAsync(userId, tradeFilter, pageOptions, ct);
+		var userTrades = await tradeQueryService.GetPageAsync(userId, tradeFilter, tradeSearch, pageOptions, ct);
 
 		return TypedResults.Ok(userTrades.Map(ApiMapper.ToResponse));
 	}

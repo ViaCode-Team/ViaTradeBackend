@@ -54,27 +54,15 @@ public class NoteQueryService(
 		return existingNote;
 	}
 
-	public async Task<PageResult<NoteDto>> GetSearchAsync(
-		int userId,
-		SearchFilter noteSearchFilter,
-		PageOptions pageOptions,
-		CancellationToken ct
-	)
-	{
-		var spec = new NoteSearchSpecification(userId, noteSearchFilter);
-		var notes = await noteRepository.GetPageSearchAsync(spec, pageOptions, ct);
-
-		return notes.Map(ToDto);
-	}
-
 	public async Task<PageResult<NoteDto>> GetPageAsync(
 		int userId,
 		NoteFilter noteFilter,
+		NoteSearch noteSearch,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		var spec = new NoteQuerySpecification(userId, noteFilter);
+		var spec = new NoteQuerySpecification(userId, noteFilter, noteSearch);
 		var notes = await noteRepository.GetPageWithTargetsAsync(spec, pageOptions, ct);
 
 		return notes.Map(ToDto);

@@ -6,13 +6,44 @@ namespace ViaTrade.Application.Strategies.Specifications;
 
 public class StrategyQuerySpecification : BaseQuerySpecification<Strategy>
 {
-	public StrategyQuerySpecification(StrategyFilter strategyFilter, StrategySort strategySort)
+	public StrategyQuerySpecification(
+		StrategyFilter strategyFilter,
+		StrategySearch strategySearch,
+		StrategySort strategySort
+	)
 	{
-		if (!string.IsNullOrWhiteSpace(strategyFilter.Name))
-			AddCriteria(x => x.Name == strategyFilter.Name);
+		var isNameFiltered = !string.IsNullOrWhiteSpace(strategyFilter.Name);
 
-		var sortFields = strategySort.GetEffectiveSortBy();
-		foreach (var field in sortFields)
+		ApplyFilter(strategyFilter, isNameFiltered);
+
+		ApplySearch(strategySearch, isNameFiltered);
+
+		ApplySorting(strategySort);
+	}
+
+	private void ApplyFilter(StrategyFilter strategyFilter, bool isNameFiltered)
+	{
+		if (isNameFiltered)
+			AddCriteria(x => x.Name == strategyFilter.Name);
+	}
+
+	private void ApplySearch(StrategySearch strategySearch, bool isNameFiltered)
+	{
+		var searchText = strategySearch.GetNormalizedSearchText();
+		if (searchText == null)
+			return;
+
+		AddCriteria(x =>
+			(!isNameFiltered && x.Name.Contains(searchText))
+			|| x.DisplayName.Contains(searchText)
+			|| (x.SignalFrequency != null && x.SignalFrequency.Contains(searchText))
+			|| (x.InvestmentHorizon != null && x.InvestmentHorizon.Contains(searchText))
+		);
+	}
+
+	private void ApplySorting(StrategySort strategySort)
+	{
+		foreach (var field in strategySort.GetEffectiveSortBy())
 		{
 			switch (field)
 			{

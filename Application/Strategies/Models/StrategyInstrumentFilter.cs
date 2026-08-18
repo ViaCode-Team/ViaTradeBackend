@@ -2,12 +2,10 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ViaTrade.Application.Strategies.Models;
 
-public sealed class StrategyInstrumentFilter : IValidatableObject
+public record StrategyInstrumentFilter([MaxLength(StrategyInstrumentFilter.MaxInstrumentIds)] List<int>? InstrumentIds)
+	: IValidatableObject
 {
 	public const int MaxInstrumentIds = 100;
-
-	[MaxLength(MaxInstrumentIds)]
-	public List<int>? InstrumentIds { get; set; }
 
 	public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
 	{

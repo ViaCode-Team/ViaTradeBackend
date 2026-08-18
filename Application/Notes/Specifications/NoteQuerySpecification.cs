@@ -7,17 +7,48 @@ namespace ViaTrade.Application.Notes.Specifications;
 
 public class NoteQuerySpecification : BaseQuerySpecification<Note>
 {
-	public NoteQuerySpecification(int userId, NoteFilter request)
+	public NoteQuerySpecification(int userId, NoteFilter noteFilter, NoteSearch noteSearch)
 	{
 		AddCriteria(x => x.UserId == userId);
 
-		if (request.Target.HasValue)
+		ApplyFilter(noteFilter);
+
+		ApplySearch(noteSearch);
+	}
+
+	private void ApplyFilter(NoteFilter noteFilter)
+	{
+		if (noteFilter.Target is not { } target)
+			return;
+
+		switch (target)
 		{
-			var target = request.Target.Value;
-			if (target == NoteType.InstrumentNote)
+			case NoteType.InstrumentNote:
 				AddCriteria(x => x.InstrumentId != null);
-			else if (target == NoteType.StrategyNote)
+				break;
+
+			case NoteType.StrategyNote:
 				AddCriteria(x => x.StrategyId != null);
+				break;
 		}
+	}
+
+	private void ApplySearch(NoteSearch noteSearch)
+	{
+		var searchText = noteSearch.GetNormalizedSearchText();
+		if (searchText == null)
+			return;
+
+		AddCriteria(x =>
+			(x.Text.Contains(searchText))
+			|| (
+				x.Instrument != null
+				&& (
+					(x.Instrument.Symbol != null && x.Instrument.Symbol.Contains(searchText))
+					|| (x.Instrument.Description != null && x.Instrument.Description.Contains(searchText))
+				)
+			)
+			|| (x.Strategy != null && x.Strategy.Name != null && x.Strategy.Name.Contains(searchText))
+		);
 	}
 }

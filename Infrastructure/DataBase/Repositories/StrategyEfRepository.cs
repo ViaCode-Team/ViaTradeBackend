@@ -70,21 +70,7 @@ public class StrategyEfRepository(AppDbContext context) : BaseEfRepository<Strat
 		CancellationToken ct
 	)
 	{
-		var query = SpecificationEvaluator.GetQuery(_dbSet, spec);
-		if (spec.SortExpressions.Count == 0)
-			query = query.OrderBy(strategy => strategy.Id);
-
-		return await query.WithSubscriptionState(userId).ToPagedAsync(pageOptions, ct);
-	}
-
-	public async Task<PageResult<StrategySubscriptionDto>> GetPageSearchAsync(
-		int userId,
-		ISearchSpecification<Strategy> specification,
-		PageOptions pageOptions,
-		CancellationToken ct
-	)
-	{
-		var query = specification.Apply(_dbSet).OrderBy(trade => trade.Id);
+		var query = SpecificationEvaluator.GetQueryForPagination(_dbSet, spec);
 
 		return await query.WithSubscriptionState(userId).ToPagedAsync(pageOptions, ct);
 	}

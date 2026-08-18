@@ -42,7 +42,8 @@ public class ReminderQueryService(
 	public async Task<PageResult<ReminderDto>> GetPageAsync(
 		int userId,
 		int instrumentId,
-		ReminderDeliveryStatus deliveryStatus,
+		ReminderFilter reminderFilter,
+		ReminderSearch reminderSearch,
 		PageOptions pageOptions,
 		ReminderSort reminderSort,
 		CancellationToken ct
@@ -53,7 +54,7 @@ public class ReminderQueryService(
 		if (!instrumentExists)
 			throw new NotFoundException("Instrument not found.", "instrument_not_found");
 
-		var spec = new ReminderQuerySpecification(userId, instrumentId, deliveryStatus, reminderSort);
+		var spec = new ReminderQuerySpecification(reminderFilter, reminderSearch, reminderSort, userId, instrumentId);
 		var reminders = await reminderRepository.GetPageWithInstrumentAsync(spec, pageOptions, ct);
 
 		return reminders.Map(ToDto);
@@ -61,27 +62,15 @@ public class ReminderQueryService(
 
 	public async Task<PageResult<ReminderDto>> GetPageAsync(
 		int userId,
-		ReminderDeliveryStatus deliveryStatus,
+		ReminderFilter reminderFilter,
+		ReminderSearch reminderSearch,
 		PageOptions pageOptions,
 		ReminderSort reminderSort,
 		CancellationToken ct
 	)
 	{
-		var spec = new ReminderQuerySpecification(userId, null, deliveryStatus, reminderSort);
+		var spec = new ReminderQuerySpecification(reminderFilter, reminderSearch, reminderSort, userId);
 		var reminders = await reminderRepository.GetPageWithInstrumentAsync(spec, pageOptions, ct);
-
-		return reminders.Map(ToDto);
-	}
-
-	public async Task<PageResult<ReminderDto>> GetSearchPageAsync(
-		int userId,
-		PageOptions pageOptions,
-		SearchFilter filter,
-		CancellationToken ct
-	)
-	{
-		var spec = new RemindsSearchSpecification(userId, filter);
-		var reminders = await reminderRepository.GetPageSearchAsync(spec, pageOptions, ct);
 
 		return reminders.Map(ToDto);
 	}
