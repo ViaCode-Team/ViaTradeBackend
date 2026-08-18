@@ -1,3 +1,5 @@
+using Swashbuckle.AspNetCore.SwaggerUI;
+
 namespace ViaTrade.Api.Swagger;
 
 public static class SwaggerMiddlewareExtensions
@@ -9,21 +11,33 @@ public static class SwaggerMiddlewareExtensions
 		if (env.IsDevelopment())
 		{
 			app.UseSwagger();
+
 			app.UseSwaggerUI(options =>
 			{
-				options.SwaggerEndpoint("/swagger/v1/swagger.yaml", "ViaTrade Web API v1");
-				options.SwaggerEndpoint("/swagger/internal/swagger.yaml", "ViaTrade Internal API v1");
-
-				options.RoutePrefix = string.Empty;
-				options.ConfigObject.AdditionalItems.Add("withCredentials", true);
-
-				options.EnableTryItOutByDefault();
-				options.EnablePersistAuthorization();
-				options.DisplayRequestDuration();
-				options.DisplayOperationId();
+				ConfigureCommonUI(options);
+				ConfigureEndpointsUI(options);
 			});
 		}
 
 		return app;
+	}
+
+	private static void ConfigureCommonUI(SwaggerUIOptions options)
+	{
+		options.RoutePrefix = string.Empty;
+		options.ConfigObject.AdditionalItems.Add("withCredentials", true);
+
+		options.EnableTryItOutByDefault();
+		options.EnablePersistAuthorization();
+		options.DisplayRequestDuration();
+		options.DisplayOperationId();
+	}
+
+	private static void ConfigureEndpointsUI(SwaggerUIOptions options)
+	{
+		foreach (var (name, info) in SwaggerDocuments.AllDocuments)
+		{
+			options.SwaggerEndpoint($"/swagger/{name}/swagger.yaml", $"{info.Title} {info.Version}");
+		}
 	}
 }

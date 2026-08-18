@@ -7,6 +7,7 @@ using ViaTrade.Api.Contracts.Auth;
 using ViaTrade.Api.Contracts.Users;
 using ViaTrade.Api.Cookies;
 using ViaTrade.Api.Mappings;
+using ViaTrade.Api.Routing;
 using ViaTrade.Api.Swagger.Attributes;
 using ViaTrade.Application.Auth.Interfaces;
 using ViaTrade.Application.Common.Models;
@@ -14,7 +15,7 @@ using ViaTrade.Configuration.Options;
 
 namespace ViaTrade.Api.Controllers;
 
-[Route("api/v1/[controller]")]
+[Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
 public class SessionsController(
 	IAuthCommandService authCommandService,

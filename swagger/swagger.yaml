@@ -7916,11 +7916,6 @@ components:
       description: Write JWT token without the Bearer prefix.
       scheme: bearer
       bearerFormat: JWT
-    ServicePassword:
-      type: apiKey
-      description: Write service password.
-      name: TgBot-Service-Password
-      in: header
 tags:
   - name: Instruments
   - name: Notes

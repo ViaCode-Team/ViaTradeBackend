@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using ViaTrade.Api.Contracts.Signals;
 using ViaTrade.Api.Contracts.Statistics;
 using ViaTrade.Api.Mappings;
+using ViaTrade.Api.Routing;
 using ViaTrade.Application.Auth.Interfaces;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Trades.Interfaces;
@@ -10,7 +11,7 @@ using ViaTrade.Application.Trades.Models;
 
 namespace ViaTrade.Api.Controllers;
 
-[Route("api/v1/[controller]")]
+[Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
 public class SignalsController(ISignalQueryService signalQueryService, IJwtHelper jwtHelper) : ControllerBase
 {

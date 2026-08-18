@@ -4,12 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using ViaTrade.Api.Attribute;
 using ViaTrade.Api.Contracts.Reminders;
 using ViaTrade.Api.Mappings;
+using ViaTrade.Api.Routing;
 using ViaTrade.Application.Reminders.Interfaces;
 
-namespace ViaTrade.Api.Controllers.Internal;
+namespace ViaTrade.Api.Controllers.Internal.TgBot;
 
-[Route("api/v1/internal/[controller]")]
-[ApiExplorerSettings(GroupName = "internal")]
+[Route($"{ApiRoutes.V1.TgBot}/[controller]")]
+[ApiExplorerSettings(GroupName = InternalServices.TgBot)]
 [ApiController]
 public class RemindersController(
 	IReminderCommandService reminderCommandService,

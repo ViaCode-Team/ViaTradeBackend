@@ -4,13 +4,14 @@ using Microsoft.AspNetCore.Mvc;
 using ViaTrade.Api.Attribute;
 using ViaTrade.Api.Contracts.Instruments;
 using ViaTrade.Api.Mappings;
+using ViaTrade.Api.Routing;
 using ViaTrade.Application.Instruments.Interfaces;
 using ViaTrade.Domain.Enums;
 
-namespace ViaTrade.Api.Controllers.Internal;
+namespace ViaTrade.Api.Controllers.Internal.Analyzer;
 
-[Route("api/v1/internal/[controller]")]
-[ApiExplorerSettings(GroupName = "internal")]
+[Route($"{ApiRoutes.V1.Analyzer}/[controller]")]
+[ApiExplorerSettings(GroupName = InternalServices.Analyzer)]
 [ApiController]
 public class InstrumentsController(IInstrumentQueryService instrumentQueryService) : ControllerBase
 {

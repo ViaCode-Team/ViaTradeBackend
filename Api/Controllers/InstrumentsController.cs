@@ -7,6 +7,7 @@ using ViaTrade.Api.Contracts.Reminders;
 using ViaTrade.Api.Contracts.Statistics;
 using ViaTrade.Api.Contracts.Strategies;
 using ViaTrade.Api.Mappings;
+using ViaTrade.Api.Routing;
 using ViaTrade.Application.Auth.Interfaces;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Instruments.Interfaces;
@@ -19,7 +20,7 @@ using ViaTrade.Application.Strategies.Models;
 
 namespace ViaTrade.Api.Controllers;
 
-[Route("api/v1/[controller]")]
+[Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
 public class InstrumentsController(
 	IInstrumentQueryService instrumentQueryService,

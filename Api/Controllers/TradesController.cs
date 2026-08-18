@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using ViaTrade.Api.Contracts.Statistics;
 using ViaTrade.Api.Contracts.Trades;
 using ViaTrade.Api.Mappings;
+using ViaTrade.Api.Routing;
 using ViaTrade.Application.Auth.Interfaces;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Trades.Interfaces;
@@ -11,7 +12,7 @@ using ViaTrade.Application.Trades.Models;
 
 namespace ViaTrade.Api.Controllers;
 
-[Route("api/v1/[controller]")]
+[Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
 public class TradesController(
 	ITradeCommandService tradeCommandService,
