@@ -1,3 +1,5 @@
+using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
@@ -15,14 +17,26 @@ public class ServicePasswordAttribute() : ActionFilterAttribute, IAllowAnonymous
 			.Value;
 
 		var expectedPassword = settings.Password;
-		var providedPassword = context.HttpContext.Request.Headers["TgBot-Service-Password"].ToString();
+		var providedPassword = context.HttpContext.Request.Headers["Service-Password"].ToString();
 
 		if (
 			string.IsNullOrWhiteSpace(providedPassword)
-			|| !string.Equals(providedPassword, expectedPassword, StringComparison.Ordinal)
+			|| !IsPasswordValidConstantTime(providedPassword, expectedPassword)
 		)
-		{
 			context.Result = new UnauthorizedResult();
-		}
+	}
+
+	private static bool IsPasswordValidConstantTime(string providedPassword, string expectedPassword)
+	{
+		var expectedBytes = MemoryMarshal.AsBytes(expectedPassword.AsSpan());
+		var providedBytes = MemoryMarshal.AsBytes(providedPassword.AsSpan());
+
+		bool isLengthEqual = expectedBytes.Length == providedBytes.Length;
+		bool isContentEqual = CryptographicOperations.FixedTimeEquals(
+			expectedBytes,
+			isLengthEqual ? providedBytes : expectedBytes
+		);
+
+		return isLengthEqual && isContentEqual;
 	}
 }

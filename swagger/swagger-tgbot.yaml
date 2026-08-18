@@ -708,7 +708,7 @@ components:
     ServicePassword:
       type: apiKey
       description: Write service password.
-      name: TgBot-Service-Password
+      name: Service-Password
       in: header
 tags:
   - name: Reminders

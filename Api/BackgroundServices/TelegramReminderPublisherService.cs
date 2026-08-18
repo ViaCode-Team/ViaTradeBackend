@@ -61,19 +61,35 @@ public sealed class TelegramReminderPublisherService(
 
 		foreach (var reminder in reminders)
 		{
-			await PublishReminderAsync(reminder, ct);
-			bool isMarked = await reminderCommandService.MarkPublishedAsync(reminder.Id, ct);
-			if (isMarked)
-				logger.LogInformation(
-					"Marked reminder {ReminderId} as published for user {UserId}",
+			try
+			{
+				await PublishReminderAsync(reminder, ct);
+				bool isMarked = await reminderCommandService.MarkPublishedAsync(reminder.Id, ct);
+				if (isMarked)
+					logger.LogInformation(
+						"Marked reminder {ReminderId} as published for user {UserId}",
+						reminder.Id,
+						reminder.UserId
+					);
+				else
+					logger.LogInformation(
+						"Reminder {ReminderId} was already delivered or removed before publishing was recorded",
+						reminder.Id
+					);
+			}
+			catch (OperationCanceledException)
+			{
+				throw;
+			}
+			catch (Exception exception)
+			{
+				logger.LogError(
+					exception,
+					"Failed to publish or mark reminder {ReminderId} for user {UserId}. Skipping to next.",
 					reminder.Id,
 					reminder.UserId
 				);
-			else
-				logger.LogInformation(
-					"Reminder {ReminderId} was already delivered or removed before publishing was recorded",
-					reminder.Id
-				);
+			}
 		}
 	}
 

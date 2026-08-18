@@ -57,7 +57,6 @@ public class TradeCommandService(
 	public async Task DeleteAsync(int userId, int id, CancellationToken ct)
 	{
 		var affectedRows = await tradeRepository.ExecuteDeleteAsync(t => t.Id == id && t.UserId == userId, ct);
-
 		if (affectedRows == 0)
 			throw new NotFoundException("Trade not found.", "trade_not_found");
 	}

@@ -71,19 +71,17 @@ public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepo
 		CancellationToken ct
 	)
 	{
-		string symbol;
-		int? instrumentId;
-		var hasInstrumentId = int.TryParse(instrumentIdOrSymbol, out var parsedInstrumentId);
+		string? symbol = null;
+		int? instrumentId = null;
 
-		if (hasInstrumentId)
+		if (int.TryParse(instrumentIdOrSymbol, out var parsedInstrumentId))
 		{
-			symbol =
-				await instrumentRepository.FindTickerByIdAsync(parsedInstrumentId, ct)
-				?? throw new NotFoundException("Instrument not found.", "instrument_not_found");
-
-			instrumentId = parsedInstrumentId;
+			symbol = await instrumentRepository.FindTickerByIdAsync(parsedInstrumentId, ct);
+			if (symbol != null)
+				instrumentId = parsedInstrumentId;
 		}
-		else
+
+		if (symbol == null)
 		{
 			symbol = instrumentIdOrSymbol;
 			instrumentId = await instrumentRepository.FindIdByTickerAsync(symbol, ct);

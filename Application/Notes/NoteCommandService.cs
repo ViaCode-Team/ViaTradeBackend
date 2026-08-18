@@ -48,11 +48,6 @@ public class NoteCommandService(
 
 	public async Task DeleteInstrumentAsync(int userId, int instrumentId, CancellationToken ct)
 	{
-		var instrumentExists = await instrumentRepository.ExistsAsync(instrument => instrument.Id == instrumentId, ct);
-
-		if (!instrumentExists)
-			throw new NotFoundException("Instrument not found.", "instrument_not_found");
-
 		int affectedRows = await noteRepository.ExecuteDeleteInstrumentAsync(userId, instrumentId, ct);
 		if (affectedRows == 0)
 			throw new NotFoundException("Note not found.", "note_not_found");
@@ -60,11 +55,6 @@ public class NoteCommandService(
 
 	public async Task DeleteStrategyAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		var strategyExists = await strategyRepository.ExistsAsync(strategy => strategy.Id == strategyId, ct);
-
-		if (!strategyExists)
-			throw new NotFoundException("Strategy not found.", "strategy_not_found");
-
 		int affectedRows = await noteRepository.ExecuteDeleteStrategyAsync(userId, strategyId, ct);
 		if (affectedRows == 0)
 			throw new NotFoundException("Note not found.", "note_not_found");
