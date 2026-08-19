@@ -1,18 +1,11 @@
 using ViaTrade.Application.Common.Exceptions;
 using ViaTrade.Application.Common.Interfaces;
-using ViaTrade.Application.Instruments.Interfaces;
 using ViaTrade.Application.Notes.Interfaces;
-using ViaTrade.Application.Strategies.Interfaces;
 using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Notes;
 
-public class NoteCommandService(
-	IInstrumentRepository instrumentRepository,
-	IStrategyRepository strategyRepository,
-	INoteRepository noteRepository,
-	IUnitOfWork uow
-) : INoteCommandService
+public class NoteCommandService(INoteRepository noteRepository, IUnitOfWork uow) : INoteCommandService
 {
 	public async Task UpsertInstrumentAsync(int userId, int instrumentId, string text, CancellationToken ct)
 	{
