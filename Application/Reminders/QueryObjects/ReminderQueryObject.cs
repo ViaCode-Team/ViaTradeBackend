@@ -1,12 +1,12 @@
-using ViaTrade.Application.Common.Specifications;
+using ViaTrade.Application.Common.QueryObjects;
 using ViaTrade.Application.Reminders.Models;
 using ViaTrade.Domain.Entities;
 
-namespace ViaTrade.Application.Reminders.Specifications;
+namespace ViaTrade.Application.Reminders.QueryObjects;
 
-public class ReminderQuerySpecification : BaseQuerySpecification<Reminder>
+public class ReminderQueryObject : BaseQueryObject<Reminder>
 {
-	public ReminderQuerySpecification(
+	public ReminderQueryObject(
 		ReminderFilter reminderFilter,
 		ReminderSearch reminderSearch,
 		ReminderSort reminderSort,
@@ -51,9 +51,10 @@ public class ReminderQuerySpecification : BaseQuerySpecification<Reminder>
 			return;
 
 		var isDate = DateTime.TryParse(searchText, out var date);
+		var nextDay = isDate ? date.Date.AddDays(1) : default;
 
 		AddCriteria(x =>
-			(isDate && x.RemindAt.Date == date.Date)
+			(isDate && x.RemindAt >= date.Date && x.RemindAt < nextDay)
 			|| (x.Text.Contains(searchText))
 			|| (
 				x.Instrument != null
@@ -72,11 +73,11 @@ public class ReminderQuerySpecification : BaseQuerySpecification<Reminder>
 			switch (field)
 			{
 				case ReminderSortField.RemindAtAsc:
-					AddOrderBy(r => r.RemindAt, false);
+					AddOrderByAscending(r => r.RemindAt);
 					break;
 				case ReminderSortField.RemindAtDesc:
 				default:
-					AddOrderBy(r => r.RemindAt, true);
+					AddOrderByDescending(r => r.RemindAt);
 					break;
 			}
 		}

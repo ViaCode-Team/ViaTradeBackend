@@ -1,10 +1,11 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using ViaTrade.Application.Common.Interfaces;
 using ViaTrade.Application.Common.Interfaces.Repositories;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Domain.Entities;
-using ViaTrade.Infrastructure.Extensions;
+using ViaTrade.Infrastructure.DataBase.Extensions;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
@@ -36,12 +37,12 @@ public class BaseEfRepository<TEntity> : IRepository<TEntity>
 	}
 
 	public async Task<PageResult<TEntity>> GetPageAsync(
-		IQuerySpecification<TEntity> spec,
+		IQueryObject<TEntity> queryObject,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		var query = SpecificationEvaluator.GetQueryForPagination(_dbSet.AsQueryable(), spec);
+		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet.AsQueryable(), queryObject);
 
 		return await query.ToPagedAsync(pageOptions, ct);
 	}

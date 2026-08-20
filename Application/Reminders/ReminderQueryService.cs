@@ -5,7 +5,7 @@ using ViaTrade.Application.Instruments.Interfaces;
 using ViaTrade.Application.Notes.Models;
 using ViaTrade.Application.Reminders.Interfaces;
 using ViaTrade.Application.Reminders.Models;
-using ViaTrade.Application.Reminders.Specifications;
+using ViaTrade.Application.Reminders.QueryObjects;
 using ViaTrade.Configuration.Options;
 using ViaTrade.Domain.Entities;
 
@@ -54,8 +54,8 @@ public class ReminderQueryService(
 		if (!instrumentExists)
 			throw new NotFoundException("Instrument not found.", "instrument_not_found");
 
-		var spec = new ReminderQuerySpecification(reminderFilter, reminderSearch, reminderSort, userId, instrumentId);
-		var reminders = await reminderRepository.GetPageWithInstrumentAsync(spec, pageOptions, ct);
+		var queryObject = new ReminderQueryObject(reminderFilter, reminderSearch, reminderSort, userId, instrumentId);
+		var reminders = await reminderRepository.GetPageWithInstrumentAsync(queryObject, pageOptions, ct);
 
 		return reminders.Map(ToDto);
 	}
@@ -69,8 +69,8 @@ public class ReminderQueryService(
 		CancellationToken ct
 	)
 	{
-		var spec = new ReminderQuerySpecification(reminderFilter, reminderSearch, reminderSort, userId);
-		var reminders = await reminderRepository.GetPageWithInstrumentAsync(spec, pageOptions, ct);
+		var queryObject = new ReminderQueryObject(reminderFilter, reminderSearch, reminderSort, userId);
+		var reminders = await reminderRepository.GetPageWithInstrumentAsync(queryObject, pageOptions, ct);
 
 		return reminders.Map(ToDto);
 	}

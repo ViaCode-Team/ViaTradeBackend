@@ -1,21 +1,21 @@
 using System.Linq.Expressions;
 using ViaTrade.Application.Common.Interfaces;
 
-namespace ViaTrade.Application.Common.Specifications;
+namespace ViaTrade.Application.Common.QueryObjects;
 
-public abstract class BaseQuerySpecification<T> : IQuerySpecification<T>
+public abstract class BaseQueryObject<T> : IQueryObject<T>
 {
 	public List<Expression<Func<T, bool>>> Criteria { get; } = [];
 	public List<Expression<Func<T, object>>> Includes { get; } = [];
 	public List<(Expression<Func<T, object>> KeySelector, bool IsDescending)> SortExpressions { get; } = [];
 	public bool IsSplitQuery { get; private set; }
 
-	protected BaseQuerySpecification(Expression<Func<T, bool>> criteria)
+	protected BaseQueryObject(Expression<Func<T, bool>> criteria)
 	{
 		Criteria.Add(criteria);
 	}
 
-	protected BaseQuerySpecification() { }
+	protected BaseQueryObject() { }
 
 	protected void AddCriteria(Expression<Func<T, bool>> criteria)
 	{
@@ -27,9 +27,14 @@ public abstract class BaseQuerySpecification<T> : IQuerySpecification<T>
 		Includes.Add(includeExpression);
 	}
 
-	protected void AddOrderBy(Expression<Func<T, object>> keySelector, bool descending = false)
+	protected void AddOrderByAscending(Expression<Func<T, object>> keySelector)
 	{
-		SortExpressions.Add((keySelector, descending));
+		SortExpressions.Add((keySelector, false));
+	}
+
+	protected void AddOrderByDescending(Expression<Func<T, object>> keySelector)
+	{
+		SortExpressions.Add((keySelector, true));
 	}
 
 	protected void ApplySplitQuery()

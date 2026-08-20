@@ -1,16 +1,12 @@
-using ViaTrade.Application.Common.Specifications;
+using ViaTrade.Application.Common.QueryObjects;
 using ViaTrade.Application.Strategies.Models;
 using ViaTrade.Domain.Entities;
 
-namespace ViaTrade.Application.Strategies.Specifications;
+namespace ViaTrade.Application.Strategies.QueryObjects;
 
-public class StrategyQuerySpecification : BaseQuerySpecification<Strategy>
+public class StrategyQueryObject : BaseQueryObject<Strategy>
 {
-	public StrategyQuerySpecification(
-		StrategyFilter strategyFilter,
-		StrategySearch strategySearch,
-		StrategySort strategySort
-	)
+	public StrategyQueryObject(StrategyFilter strategyFilter, StrategySearch strategySearch, StrategySort strategySort)
 	{
 		var isNameFiltered = !string.IsNullOrWhiteSpace(strategyFilter.Name);
 
@@ -48,16 +44,16 @@ public class StrategyQuerySpecification : BaseQuerySpecification<Strategy>
 			switch (field)
 			{
 				case StrategySortField.NameAsc:
-					AddOrderBy(x => x.Name, false);
+					AddOrderByAscending(x => x.Name);
 					break;
 				case StrategySortField.NameDesc:
-					AddOrderBy(x => x.Name, true);
+					AddOrderByDescending(x => x.Name);
 					break;
 				case StrategySortField.AccuracyAsc:
-					AddOrderBy(x => x.Accuracy ?? 0, false);
+					AddOrderByAscending(x => x.Accuracy ?? 0);
 					break;
 				case StrategySortField.AccuracyDesc:
-					AddOrderBy(x => x.Accuracy ?? 0, true);
+					AddOrderByDescending(x => x.Accuracy ?? 0);
 					break;
 			}
 		}

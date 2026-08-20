@@ -15,6 +15,7 @@
 6. **Explicit Change Scope (CRITICAL)**: VERY IMPORTANT: NEVER change anything unless the user explicitly requests it. If you have an idea or want to propose a change, ask the user first. Implement only what is explicitly requested. When the user asks a question, just answer it without modifying code. Do not combine explanatory questions with implementation work by assumption.
 7. **Exception Ownership**: Repositories must not throw business exceptions. Keep data access errors technical in repositories; services must evaluate business conditions and throw domain-specific exceptions.
 8. **Generated Files**: Never create or edit migrations, model snapshots, or other generated files manually. Use the relevant official generator and include its output unchanged.
+9. **Avoid Premature Abstraction**: Keep one-off code local unless extraction is justified by reuse, correctness, maintainability, or an explicit user requirement.
 
 ## Mandatory Agent Workflow
 1. **Build Verification**: After making ANY code changes, you MUST run `dotnet build` to verify the project compiles without errors.

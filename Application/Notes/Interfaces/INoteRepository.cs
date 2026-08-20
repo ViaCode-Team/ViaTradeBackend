@@ -10,7 +10,7 @@ public interface INoteRepository : IRepository<Note>
 {
 	Task<NoteStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct = default);
 	Task<PageResult<NoteProjectionDto>> GetPageWithTargetsAsync(
-		IQuerySpecification<Note> specification,
+		IQueryObject<Note> queryObject,
 		PageOptions pageOptions,
 		CancellationToken ct = default
 	);

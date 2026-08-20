@@ -5,6 +5,7 @@ using ViaTrade.Application.Instruments.Models;
 using ViaTrade.Application.Strategies.Interfaces;
 using ViaTrade.Application.Strategies.Models;
 using ViaTrade.Domain.Entities;
+using ViaTrade.Infrastructure.DataBase.Extensions;
 using ViaTrade.Infrastructure.Extensions;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
@@ -15,12 +16,12 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 {
 	public async Task<PageResult<StrategySubscriptionDto>> GetStrategiesPageByInstrumentAsync(
 		int userId,
-		IQuerySpecification<UserStrategyInstrument> spec,
+		IQueryObject<UserStrategyInstrument> queryObject,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		var query = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
+		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet.AsQueryable(), queryObject);
 		var strategyQuery = query.Select(link => link.Strategy!);
 
 		return await strategyQuery.WithSubscriptionState(userId).ToPagedAsync(pageOptions, ct);
@@ -28,12 +29,12 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 
 	public async Task<StrategyInstrumentsPageResult> GetInstrumentsPageByStrategyAsync(
 		int strategyId,
-		IQuerySpecification<UserStrategyInstrument> spec,
+		IQueryObject<UserStrategyInstrument> queryObject,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		var linksQuery = SpecificationEvaluator.GetQuery(_dbSet.AsQueryable(), spec);
+		var linksQuery = QueryObjectEvaluator.GetQueryForPagination(_dbSet.AsQueryable(), queryObject);
 
 		var strategyPageInfo = await _context
 			.Strategies.Where(strategy => strategy.Id == strategyId)

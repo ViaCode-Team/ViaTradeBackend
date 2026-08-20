@@ -5,7 +5,7 @@ using ViaTrade.Application.Instruments.Models;
 using ViaTrade.Application.Notes.Models;
 using ViaTrade.Application.Strategies.Interfaces;
 using ViaTrade.Application.Strategies.Models;
-using ViaTrade.Application.Strategies.Specifications;
+using ViaTrade.Application.Strategies.QueryObjects;
 
 namespace ViaTrade.Application.Strategies;
 
@@ -48,8 +48,8 @@ public class StrategyQueryService(
 		CancellationToken ct
 	)
 	{
-		var spec = new StrategyQuerySpecification(strategyFilter, strategySearch, strategySort);
-		return await strategyRepository.GetPageAsync(userId, spec, pageOptions, ct);
+		var queryObject = new StrategyQueryObject(strategyFilter, strategySearch, strategySort);
+		return await strategyRepository.GetPageAsync(userId, queryObject, pageOptions, ct);
 	}
 
 	public async Task<StrategySubscriptionDto> GetAsync(int userId, int strategyId, CancellationToken ct)
@@ -77,7 +77,7 @@ public class StrategyQueryService(
 
 		return await userStrategyInstrumentRepository.GetStrategiesPageByInstrumentAsync(
 			userId,
-			new UserStrategyInstrumentByInstrumentSpecification(userId, instrumentId, strategyFilter, strategySort),
+			new UserStrategyInstrumentByInstrumentQueryObject(userId, instrumentId, strategyFilter, strategySort),
 			pageOptions,
 			ct
 		);
@@ -94,7 +94,7 @@ public class StrategyQueryService(
 	{
 		var result = await userStrategyInstrumentRepository.GetInstrumentsPageByStrategyAsync(
 			strategyId,
-			new UserStrategyInstrumentByStrategySpecification(userId, strategyId, instrumentFilter, instrumentSort),
+			new UserStrategyInstrumentByStrategyQueryObject(userId, strategyId, instrumentFilter, instrumentSort),
 			pageOptions,
 			ct
 		);

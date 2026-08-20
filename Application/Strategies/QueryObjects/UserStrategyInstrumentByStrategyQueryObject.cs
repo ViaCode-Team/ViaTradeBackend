@@ -1,13 +1,13 @@
-using ViaTrade.Application.Common.Specifications;
+using ViaTrade.Application.Common.QueryObjects;
 using ViaTrade.Application.Instruments.Models;
 using ViaTrade.Application.Strategies.Models;
 using ViaTrade.Domain.Entities;
 
-namespace ViaTrade.Application.Strategies.Specifications;
+namespace ViaTrade.Application.Strategies.QueryObjects;
 
-public class UserStrategyInstrumentByStrategySpecification : BaseQuerySpecification<UserStrategyInstrument>
+public class UserStrategyInstrumentByStrategyQueryObject : BaseQueryObject<UserStrategyInstrument>
 {
-	public UserStrategyInstrumentByStrategySpecification(
+	public UserStrategyInstrumentByStrategyQueryObject(
 		int userId,
 		int strategyId,
 		StrategyInstrumentFilter instrumentFilter,
@@ -16,18 +16,28 @@ public class UserStrategyInstrumentByStrategySpecification : BaseQuerySpecificat
 	{
 		AddCriteria(link => link.UserId == userId && link.StrategyId == strategyId);
 
+		ApplyFilter(instrumentFilter);
+
+		ApplySorting(instrumentSort);
+	}
+
+	private void ApplyFilter(StrategyInstrumentFilter instrumentFilter)
+	{
 		if (instrumentFilter.InstrumentIds is { Count: > 0 })
 			AddCriteria(link => instrumentFilter.InstrumentIds.Contains(link.InstrumentId));
+	}
 
+	private void ApplySorting(InstrumentSort instrumentSort)
+	{
 		foreach (var field in instrumentSort.GetEffectiveSortBy())
 		{
 			switch (field)
 			{
 				case InstrumentSortField.SymbolDesc:
-					AddOrderBy(link => link.Instrument!.Symbol, true);
+					AddOrderByDescending(link => link.Instrument!.Symbol);
 					break;
-				default:
-					AddOrderBy(link => link.Instrument!.Symbol);
+				case InstrumentSortField.SymbolAsc:
+					AddOrderByAscending(link => link.Instrument!.Symbol);
 					break;
 			}
 		}

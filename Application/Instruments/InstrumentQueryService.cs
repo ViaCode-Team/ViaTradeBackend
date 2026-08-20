@@ -2,7 +2,7 @@ using ViaTrade.Application.Common.Exceptions;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Instruments.Interfaces;
 using ViaTrade.Application.Instruments.Models;
-using ViaTrade.Application.Instruments.Specifications;
+using ViaTrade.Application.Instruments.QueryObjects;
 using ViaTrade.Application.Trades.Interfaces;
 using ViaTrade.Application.Trades.Models;
 using ViaTrade.Domain.Entities;
@@ -40,8 +40,8 @@ public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepo
 		CancellationToken ct
 	)
 	{
-		var spec = new InstrumentQuerySpecification(instrumentFilter, instrumentSearch, instrumentSort);
-		return await instrumentRepository.GetPageAsync(spec, pageOptions, ct);
+		var queryObject = new InstrumentQueryObject(instrumentFilter, instrumentSearch, instrumentSort);
+		return await instrumentRepository.GetPageAsync(queryObject, pageOptions, ct);
 	}
 
 	public async Task<IReadOnlyList<InstrumentFileDto>> ListFileMetadataAsync(

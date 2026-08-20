@@ -10,7 +10,7 @@ public interface IReminderRepository : IRepository<Reminder>
 {
 	Task<IReadOnlyList<ReminderDto>> ListDueAsync(CancellationToken ct = default);
 	Task<PageResult<ReminderProjectionDto>> GetPageWithInstrumentAsync(
-		IQuerySpecification<Reminder> specification,
+		IQueryObject<Reminder> queryObject,
 		PageOptions pageOptions,
 		CancellationToken ct = default
 	);

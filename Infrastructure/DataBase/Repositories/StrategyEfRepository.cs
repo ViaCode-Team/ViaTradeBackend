@@ -4,6 +4,7 @@ using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Strategies.Interfaces;
 using ViaTrade.Application.Strategies.Models;
 using ViaTrade.Domain.Entities;
+using ViaTrade.Infrastructure.DataBase.Extensions;
 using ViaTrade.Infrastructure.Extensions;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
@@ -65,12 +66,12 @@ public class StrategyEfRepository(AppDbContext context) : BaseEfRepository<Strat
 
 	public async Task<PageResult<StrategySubscriptionDto>> GetPageAsync(
 		int userId,
-		IQuerySpecification<Strategy> spec,
+		IQueryObject<Strategy> queryObject,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		var query = SpecificationEvaluator.GetQueryForPagination(_dbSet, spec);
+		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet, queryObject);
 
 		return await query.WithSubscriptionState(userId).ToPagedAsync(pageOptions, ct);
 	}

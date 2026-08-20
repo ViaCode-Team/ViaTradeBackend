@@ -1,12 +1,12 @@
-using ViaTrade.Application.Common.Specifications;
+using ViaTrade.Application.Common.QueryObjects;
 using ViaTrade.Application.Instruments.Models;
 using ViaTrade.Domain.Entities;
 
-namespace ViaTrade.Application.Instruments.Specifications;
+namespace ViaTrade.Application.Instruments.QueryObjects;
 
-public class InstrumentQuerySpecification : BaseQuerySpecification<Instrument>
+public class InstrumentQueryObject : BaseQueryObject<Instrument>
 {
-	public InstrumentQuerySpecification(
+	public InstrumentQueryObject(
 		InstrumentFilter instrumentFilter,
 		InstrumentSearch instrumentSearch,
 		InstrumentSort instrumentSort
@@ -46,10 +46,10 @@ public class InstrumentQuerySpecification : BaseQuerySpecification<Instrument>
 			switch (field)
 			{
 				case InstrumentSortField.SymbolDesc:
-					AddOrderBy(x => x.Symbol, descending: true);
+					AddOrderByDescending(x => x.Symbol);
 					break;
-				default:
-					AddOrderBy(x => x.Symbol);
+				case InstrumentSortField.SymbolAsc:
+					AddOrderByAscending(x => x.Symbol);
 					break;
 			}
 		}

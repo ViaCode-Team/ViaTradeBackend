@@ -1,7 +1,10 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using ViaTrade.Application.Common.Interfaces;
 using ViaTrade.Application.Common.Models;
+using ViaTrade.Domain.Entities;
 
-namespace ViaTrade.Infrastructure.Extensions;
+namespace ViaTrade.Infrastructure.DataBase.Extensions;
 
 public static class QueryableExtensions
 {
@@ -12,6 +15,7 @@ public static class QueryableExtensions
 	)
 	{
 		var totalCount = await source.CountAsync(ct);
+
 		return await source.ToPagedAsync(pageOptions, totalCount, ct);
 	}
 
@@ -30,6 +34,12 @@ public static class QueryableExtensions
 			.Take(pageOptions.PageSize)
 			.ToListAsync(ct);
 
-		return new PageResult<T>(items, totalCount, pageOptions.Page, pageOptions.PageSize);
+		return new PageResult<T>(
+			items,
+			totalCount,
+			pageOptions.Page,
+			pageOptions.PageSize
+		);
 	}
+
 }

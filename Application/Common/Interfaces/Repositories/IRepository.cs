@@ -11,7 +11,7 @@ public interface IRepository<TEntity>
 	Task<IReadOnlyList<TEntity>> ListAsync(CancellationToken ct = default);
 	Task<PageResult<TEntity>> GetPageAsync(PageOptions pageOptions, CancellationToken ct = default);
 	Task<PageResult<TEntity>> GetPageAsync(
-		IQuerySpecification<TEntity> spec,
+		IQueryObject<TEntity> queryObject,
 		PageOptions pageOptions,
 		CancellationToken ct = default
 	);

@@ -20,7 +20,7 @@ public interface IStrategyRepository : IRepository<Strategy>
 	Task<int?> FindAccuracyByNameAsync(string name, CancellationToken ct = default);
 	Task<PageResult<StrategySubscriptionDto>> GetPageAsync(
 		int userId,
-		IQuerySpecification<Strategy> spec,
+		IQueryObject<Strategy> queryObject,
 		PageOptions pageOptions,
 		CancellationToken ct = default
 	);

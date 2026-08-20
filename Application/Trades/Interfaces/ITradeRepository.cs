@@ -17,7 +17,7 @@ public interface ITradeRepository : IRepository<Trade>
 	Task<TradeDateRangeDto> GetTradeDateRangeAsync(int userId, CancellationToken ct = default);
 	Task<TradeProjectionDto?> FindProjectionByUserAndIdAsync(int userId, int id, CancellationToken ct = default);
 	Task<PageResult<TradeProjectionDto>> GetPageProjectionAsync(
-		IQuerySpecification<Trade> specification,
+		IQueryObject<Trade> queryObject,
 		PageOptions pageOptions,
 		CancellationToken ct = default
 	);

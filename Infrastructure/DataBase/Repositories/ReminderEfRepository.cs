@@ -5,7 +5,7 @@ using ViaTrade.Application.Notes.Models;
 using ViaTrade.Application.Reminders.Interfaces;
 using ViaTrade.Application.Reminders.Models;
 using ViaTrade.Domain.Entities;
-using ViaTrade.Infrastructure.Extensions;
+using ViaTrade.Infrastructure.DataBase.Extensions;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
@@ -36,12 +36,12 @@ public class ReminderEfRepository(AppDbContext context) : BaseEfRepository<Remin
 	}
 
 	public async Task<PageResult<ReminderProjectionDto>> GetPageWithInstrumentAsync(
-		IQuerySpecification<Reminder> specification,
+		IQueryObject<Reminder> queryObject,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		var query = SpecificationEvaluator.GetQueryForPagination(_dbSet, specification);
+		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet, queryObject);
 
 		return await query
 			.Select(reminder => new ReminderProjectionDto(

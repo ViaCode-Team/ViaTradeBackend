@@ -1,13 +1,13 @@
-using ViaTrade.Application.Common.Specifications;
+using ViaTrade.Application.Common.QueryObjects;
 using ViaTrade.Application.Trades.Models;
 using ViaTrade.Domain.Entities;
 using ViaTrade.Domain.Enums;
 
-namespace ViaTrade.Application.Trades.Specifications;
+namespace ViaTrade.Application.Trades.QueryObjects;
 
-public class TradeQuerySpecification : BaseQuerySpecification<Trade>
+public class TradeQueryObject : BaseQueryObject<Trade>
 {
-	public TradeQuerySpecification(int userId, TradeFilter tradeFilter, TradeSearch tradeSearch)
+	public TradeQueryObject(int userId, TradeFilter tradeFilter, TradeSearch tradeSearch)
 	{
 		AddCriteria(x => x.UserId == userId);
 
@@ -49,23 +49,24 @@ public class TradeQuerySpecification : BaseQuerySpecification<Trade>
 		var isDecimal = decimal.TryParse(searchText, out var textPriceDecimal);
 		var isDate = DateTime.TryParse(searchText, out var date);
 
+		var nextDay = isDate ? date.Date.AddDays(1) : default;
+
 		AddCriteria(x =>
 			(isDouble && ((x.ClosePrice != null && x.ClosePrice == textPriceDouble) || x.OpenPrice == textPriceDouble))
 			|| isDecimal && x.TotalPrice == textPriceDecimal
 			|| (
 				isDate
 				&& (
-					x.OpenedAt.Date == date.Date
-					|| (!excludeClosedAt && x.ClosedAt != null && x.ClosedAt.Value.Date == date.Date)
+					(x.OpenedAt >= date.Date && x.OpenedAt < nextDay)
+					|| (
+						!excludeClosedAt
+						&& x.ClosedAt != null
+						&& x.ClosedAt.Value >= date.Date
+						&& x.ClosedAt.Value < nextDay
+					)
 				)
 			)
-			|| (
-				x.Instrument != null
-				&& (
-					(x.Instrument.Symbol.Contains(searchText))
-					|| (x.Instrument.Description != null && x.Instrument.Description.Contains(searchText))
-				)
-			)
+			|| (x.Instrument != null && (x.Instrument.Symbol.Contains(searchText)))
 		);
 	}
 }

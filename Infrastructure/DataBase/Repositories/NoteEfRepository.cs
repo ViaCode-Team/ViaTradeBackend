@@ -4,7 +4,7 @@ using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Notes.Interfaces;
 using ViaTrade.Application.Notes.Models;
 using ViaTrade.Domain.Entities;
-using ViaTrade.Infrastructure.Extensions;
+using ViaTrade.Infrastructure.DataBase.Extensions;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
@@ -26,12 +26,12 @@ public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(con
 	}
 
 	public async Task<PageResult<NoteProjectionDto>> GetPageWithTargetsAsync(
-		IQuerySpecification<Note> specification,
+		IQueryObject<Note> queryObject,
 		PageOptions pageOptions,
 		CancellationToken ct
 	)
 	{
-		var query = SpecificationEvaluator.GetQueryForPagination(_dbSet, specification);
+		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet, queryObject);
 
 		return await query
 			.Select(note => new NoteProjectionDto(

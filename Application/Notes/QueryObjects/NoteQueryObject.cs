@@ -1,13 +1,13 @@
-using ViaTrade.Application.Common.Specifications;
+using ViaTrade.Application.Common.QueryObjects;
 using ViaTrade.Application.Notes.Models;
 using ViaTrade.Domain.Entities;
 using ViaTrade.Domain.Enums;
 
-namespace ViaTrade.Application.Notes.Specifications;
+namespace ViaTrade.Application.Notes.QueryObjects;
 
-public class NoteQuerySpecification : BaseQuerySpecification<Note>
+public class NoteQueryObject : BaseQueryObject<Note>
 {
-	public NoteQuerySpecification(int userId, NoteFilter noteFilter, NoteSearch noteSearch)
+	public NoteQueryObject(int userId, NoteFilter noteFilter, NoteSearch noteSearch)
 	{
 		AddCriteria(x => x.UserId == userId);
 

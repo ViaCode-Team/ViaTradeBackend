@@ -114,6 +114,7 @@ public static class DependencyInjection
 						ServerVersion.AutoDetect(connectionString),
 						mySqlOptions => mySqlOptions.EnableStringComparisonTranslations()
 					)
+					.UseProjectables()
 					.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 			}
 		);

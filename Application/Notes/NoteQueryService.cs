@@ -3,7 +3,7 @@ using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Instruments.Interfaces;
 using ViaTrade.Application.Notes.Interfaces;
 using ViaTrade.Application.Notes.Models;
-using ViaTrade.Application.Notes.Specifications;
+using ViaTrade.Application.Notes.QueryObjects;
 using ViaTrade.Application.Strategies.Interfaces;
 using ViaTrade.Domain.Entities;
 
@@ -62,8 +62,8 @@ public class NoteQueryService(
 		CancellationToken ct
 	)
 	{
-		var spec = new NoteQuerySpecification(userId, noteFilter, noteSearch);
-		var notes = await noteRepository.GetPageWithTargetsAsync(spec, pageOptions, ct);
+		var queryObject = new NoteQueryObject(userId, noteFilter, noteSearch);
+		var notes = await noteRepository.GetPageWithTargetsAsync(queryObject, pageOptions, ct);
 
 		return notes.Map(ToDto);
 	}

@@ -10,13 +10,13 @@ public interface IUserStrategyInstrumentRepository : IRepository<UserStrategyIns
 {
 	Task<PageResult<StrategySubscriptionDto>> GetStrategiesPageByInstrumentAsync(
 		int userId,
-		IQuerySpecification<UserStrategyInstrument> spec,
+		IQueryObject<UserStrategyInstrument> queryObject,
 		PageOptions pageOptions,
 		CancellationToken ct = default
 	);
 	Task<StrategyInstrumentsPageResult> GetInstrumentsPageByStrategyAsync(
 		int strategyId,
-		IQuerySpecification<UserStrategyInstrument> spec,
+		IQueryObject<UserStrategyInstrument> queryObject,
 		PageOptions pageOptions,
 		CancellationToken ct = default
 	);

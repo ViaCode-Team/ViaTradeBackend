@@ -2,7 +2,7 @@ using ViaTrade.Application.Common.Exceptions;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Trades.Interfaces;
 using ViaTrade.Application.Trades.Models;
-using ViaTrade.Application.Trades.Specifications;
+using ViaTrade.Application.Trades.QueryObjects;
 using ViaTrade.Domain.Services;
 
 namespace ViaTrade.Application.Trades;
@@ -67,8 +67,8 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 		CancellationToken ct
 	)
 	{
-		var spec = new TradeQuerySpecification(userId, tradeFilter, tradeSearch);
-		var trades = await tradeRepository.GetPageProjectionAsync(spec, pageOptions, ct);
+		var queryObject = new TradeQueryObject(userId, tradeFilter, tradeSearch);
+		var trades = await tradeRepository.GetPageProjectionAsync(queryObject, pageOptions, ct);
 
 		return trades.Map(ToDto);
 	}
