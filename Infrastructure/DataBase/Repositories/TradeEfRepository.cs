@@ -83,7 +83,7 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 		CancellationToken ct
 	)
 	{
-		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet, queryObject);
+		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet, queryObject, _entityType);
 
 		return await query.Select(trade => trade.ToTradeProjectionDto()).ToPagedAsync(pageOptions, ct);
 	}

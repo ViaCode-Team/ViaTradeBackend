@@ -14,11 +14,13 @@ public class BaseEfRepository<TEntity> : IRepository<TEntity>
 {
 	protected readonly AppDbContext _context;
 	protected readonly DbSet<TEntity> _dbSet;
+	protected readonly IEntityType _entityType;
 
 	public BaseEfRepository(AppDbContext context)
 	{
 		_context = context;
 		_dbSet = _context.Set<TEntity>();
+		_entityType = _context.Model.FindEntityType(typeof(TEntity))!;
 	}
 
 	public async Task<TEntity?> FindByIdAsync(int id, CancellationToken ct)
@@ -42,7 +44,7 @@ public class BaseEfRepository<TEntity> : IRepository<TEntity>
 		CancellationToken ct
 	)
 	{
-		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet.AsQueryable(), queryObject);
+		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet.AsQueryable(), queryObject, _entityType);
 
 		return await query.ToPagedAsync(pageOptions, ct);
 	}

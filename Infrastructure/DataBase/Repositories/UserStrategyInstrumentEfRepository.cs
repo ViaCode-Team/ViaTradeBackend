@@ -21,7 +21,7 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 		CancellationToken ct
 	)
 	{
-		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet.AsQueryable(), queryObject);
+		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet.AsQueryable(), queryObject, _entityType);
 		var strategyQuery = query.Select(link => link.Strategy!);
 
 		return await strategyQuery.WithSubscriptionState(userId).ToPagedAsync(pageOptions, ct);
@@ -34,7 +34,7 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 		CancellationToken ct
 	)
 	{
-		var linksQuery = QueryObjectEvaluator.GetQueryForPagination(_dbSet.AsQueryable(), queryObject);
+		var linksQuery = QueryObjectEvaluator.GetQueryForPagination(_dbSet.AsQueryable(), queryObject, _entityType);
 
 		var strategyPageInfo = await _context
 			.Strategies.Where(strategy => strategy.Id == strategyId)

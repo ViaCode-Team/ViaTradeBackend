@@ -41,7 +41,7 @@ public class ReminderEfRepository(AppDbContext context) : BaseEfRepository<Remin
 		CancellationToken ct
 	)
 	{
-		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet, queryObject);
+		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet, queryObject, _entityType);
 
 		return await query
 			.Select(reminder => new ReminderProjectionDto(

@@ -71,7 +71,7 @@ public class StrategyEfRepository(AppDbContext context) : BaseEfRepository<Strat
 		CancellationToken ct
 	)
 	{
-		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet, queryObject);
+		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet, queryObject, _entityType);
 
 		return await query.WithSubscriptionState(userId).ToPagedAsync(pageOptions, ct);
 	}

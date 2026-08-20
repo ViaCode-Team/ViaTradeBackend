@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata;
 using ViaTrade.Application.Common.Interfaces;
 using ViaTrade.Domain.Entities;
 
@@ -24,7 +25,8 @@ public static class QueryObjectEvaluator
 
 	public static IOrderedQueryable<TEntity> GetQueryForPagination<TEntity>(
 		IQueryable<TEntity> query,
-		IQueryObject<TEntity> queryObject
+		IQueryObject<TEntity> queryObject,
+		IEntityType entityType
 	)
 		where TEntity : BaseEntity<int>
 	{
@@ -34,7 +36,7 @@ public static class QueryObjectEvaluator
 		query = ApplyCriteria(query, queryObject);
 		query = ApplyIncludes(query, queryObject);
 
-		return ApplyPaginationSorting(query, queryObject);
+		return ApplyPaginationSorting(query, queryObject, entityType);
 	}
 
 	private static IQueryable<TEntity> ApplyCriteria<TEntity>(
@@ -89,7 +91,8 @@ public static class QueryObjectEvaluator
 
 	private static IOrderedQueryable<TEntity> ApplyPaginationSorting<TEntity>(
 		IQueryable<TEntity> query,
-		IQueryObject<TEntity> queryObject
+		IQueryObject<TEntity> queryObject,
+		IEntityType entityType
 	)
 		where TEntity : BaseEntity<int>
 	{
@@ -97,15 +100,41 @@ public static class QueryObjectEvaluator
 			return query.OrderBy(entity => entity.Id);
 
 		var orderedQuery = ApplySorting(query, queryObject);
-		if (!HasIdSorting(queryObject))
+		if (!HasUniqueKeySorting(queryObject, entityType))
 			orderedQuery = orderedQuery.ThenBy(entity => entity.Id);
 
 		return orderedQuery;
 	}
 
-	private static bool HasIdSorting<TEntity>(IQueryObject<TEntity> queryObject)
+	private static bool HasUniqueKeySorting<TEntity>(
+		IQueryObject<TEntity> queryObject,
+		IEntityType entityType
+	)
 		where TEntity : BaseEntity<int>
 	{
+		var sortedMembers = GetSortedMemberNames(queryObject);
+		if (sortedMembers.Count == 0)
+			return false;
+
+		foreach (var key in entityType.GetKeys())
+		{
+			if (IsSubsetOf(key.Properties, sortedMembers))
+				return true;
+		}
+
+		foreach (var index in entityType.GetIndexes())
+		{
+			if (index.IsUnique && IsSubsetOf(index.Properties, sortedMembers))
+				return true;
+		}
+
+		return false;
+	}
+
+	private static HashSet<string> GetSortedMemberNames<TEntity>(IQueryObject<TEntity> queryObject)
+	{
+		var members = new HashSet<string>();
+
 		foreach (var (keySelector, _) in queryObject.SortExpressions)
 		{
 			Expression body = keySelector.Body;
@@ -113,10 +142,21 @@ public static class QueryObjectEvaluator
 			if (body is UnaryExpression { NodeType: ExpressionType.Convert } unaryExpression)
 				body = unaryExpression.Operand;
 
-			if (body is MemberExpression memberExpression && memberExpression.Member.Name == nameof(BaseEntity<>.Id))
-				return true;
+			if (body is MemberExpression { Expression: ParameterExpression } memberExpression)
+				members.Add(memberExpression.Member.Name);
 		}
 
-		return false;
+		return members;
+	}
+
+	private static bool IsSubsetOf(IReadOnlyList<IProperty> properties, HashSet<string> sortedMembers)
+	{
+		foreach (var property in properties)
+		{
+			if (!sortedMembers.Contains(property.Name))
+				return false;
+		}
+
+		return true;
 	}
 }

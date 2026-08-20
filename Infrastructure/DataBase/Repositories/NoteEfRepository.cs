@@ -31,7 +31,7 @@ public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(con
 		CancellationToken ct
 	)
 	{
-		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet, queryObject);
+		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet, queryObject, _entityType);
 
 		return await query
 			.Select(note => new NoteProjectionDto(
