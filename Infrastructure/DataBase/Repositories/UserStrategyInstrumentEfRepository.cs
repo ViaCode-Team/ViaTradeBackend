@@ -10,8 +10,8 @@ using ViaTrade.Infrastructure.Extensions;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
-public class UserStrategyInstrumentEfRepository(AppDbContext context)
-	: BaseEfRepository<UserStrategyInstrument>(context),
+public class UserStrategyInstrumentEfRepository(AppDbContext context, EfQueryObjectBuilder queryObjectBuilder)
+	: BaseEfRepository<UserStrategyInstrument>(context, queryObjectBuilder),
 		IUserStrategyInstrumentRepository
 {
 	public async Task<PageResult<StrategySubscriptionDto>> GetStrategiesPageByInstrumentAsync(
@@ -21,10 +21,12 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 		CancellationToken ct
 	)
 	{
-		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet.AsQueryable(), queryObject, _entityType);
+		var (query, isUnique) = _queryObjectBuilder.BuildForPagination(_dbSet.AsQueryable(), queryObject);
 		var strategyQuery = query.Select(link => link.Strategy!);
 
-		return await strategyQuery.WithSubscriptionState(userId).ToPagedAsync(pageOptions, ct);
+		var projectedQuery = strategyQuery.WithSubscriptionState(userId);
+
+		return await projectedQuery.ToPagedAsync(pageOptions, isUnique, ct);
 	}
 
 	public async Task<StrategyInstrumentsPageResult> GetInstrumentsPageByStrategyAsync(
@@ -34,14 +36,10 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 		CancellationToken ct
 	)
 	{
-		var linksQuery = QueryObjectEvaluator.GetQueryForPagination(_dbSet.AsQueryable(), queryObject, _entityType);
+		var (linksQuery, isUnique) = _queryObjectBuilder.BuildForPagination(_dbSet.AsQueryable(), queryObject);
 
-		var strategyPageInfo = await _context
-			.Strategies.Where(strategy => strategy.Id == strategyId)
-			.Select(_ => new { TotalCount = linksQuery.Count() })
-			.SingleOrDefaultAsync(ct);
-
-		if (strategyPageInfo == null)
+		var strategyExists = await _context.Strategies.AnyAsync(strategy => strategy.Id == strategyId, ct);
+		if (!strategyExists)
 		{
 			return new StrategyInstrumentsPageResult(
 				false,
@@ -51,9 +49,13 @@ public class UserStrategyInstrumentEfRepository(AppDbContext context)
 
 		var query = linksQuery.Select(link => link.Instrument!);
 
-		var instruments = await query
-			.Select(instrument => new RelatedInstrumentDto(instrument.Id, instrument.Symbol, instrument.Description))
-			.ToPagedAsync(pageOptions, strategyPageInfo.TotalCount, ct);
+		var projectedQuery = query.Select(instrument => new RelatedInstrumentDto(
+			instrument.Id,
+			instrument.Symbol,
+			instrument.Description
+		));
+
+		var instruments = await projectedQuery.ToPagedAsync(pageOptions, isUnique, ct);
 
 		return new StrategyInstrumentsPageResult(true, instruments);
 	}

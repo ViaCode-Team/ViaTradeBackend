@@ -5,7 +5,9 @@ using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
-public class UserEfRepository(AppDbContext context) : BaseEfRepository<User>(context), IUserRepository
+public class UserEfRepository(AppDbContext context, EfQueryObjectBuilder queryObjectBuilder)
+	: BaseEfRepository<User>(context, queryObjectBuilder),
+		IUserRepository
 {
 	public async Task<UserLoginDto?> FindLoginUserAsync(string login, CancellationToken ct)
 	{

@@ -4,6 +4,7 @@ using StackExchange.Redis;
 using ViaTrade.Application.Auth.Interfaces;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Users.Models;
+using ViaTrade.Infrastructure.Redis.Serialization;
 using ViaTrade.Infrastructure.Redis.Utils;
 
 namespace ViaTrade.Infrastructure.Redis.Repositories;
@@ -20,7 +21,7 @@ public class SessionRedisRepository(
 	public async Task CreateSessionAsync(UserSessionDto session, string refreshToken, TimeSpan ttl)
 	{
 		var refreshTokenFingerprint = RefreshTokenRedisHelper.GetFingerprint(refreshToken);
-		var sessionJson = JsonSerializer.Serialize(session);
+		var sessionJson = JsonSerializer.Serialize(session, RedisJsonSerializerContext.Default.UserSessionDto);
 		var wasCreated = await _sessionStorageHelper.TryCreateAsync(session, sessionJson, refreshTokenFingerprint, ttl);
 		if (wasCreated)
 			return;
@@ -172,7 +173,10 @@ public class SessionRedisRepository(
 	{
 		try
 		{
-			var session = JsonSerializer.Deserialize<UserSessionDto>(value.ToString());
+			var session = JsonSerializer.Deserialize(
+				value.ToString(),
+				RedisJsonSerializerContext.Default.UserSessionDto
+			);
 			if (session == null || session.Id != expectedSessionId)
 				throw new InvalidOperationException("Redis session data is invalid.");
 

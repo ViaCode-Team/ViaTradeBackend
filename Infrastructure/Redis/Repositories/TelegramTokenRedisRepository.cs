@@ -3,6 +3,7 @@ using StackExchange.Redis;
 using ViaTrade.Application.Users.Interfaces;
 using ViaTrade.Infrastructure.Redis.Entities;
 using ViaTrade.Infrastructure.Redis.Keys;
+using ViaTrade.Infrastructure.Redis.Serialization;
 
 namespace ViaTrade.Infrastructure.Redis.Repositories;
 
@@ -28,7 +29,10 @@ public class TelegramTokenRedisRepository(IConnectionMultiplexer connectionMulti
 		if (value.IsNullOrEmpty)
 			return null;
 
-		var entity = JsonSerializer.Deserialize<TelegramTokenEntity>(value.ToString());
+		var entity = JsonSerializer.Deserialize(
+			value.ToString(),
+			RedisJsonSerializerContext.Default.TelegramTokenEntity
+		);
 		return entity?.UserId;
 	}
 }

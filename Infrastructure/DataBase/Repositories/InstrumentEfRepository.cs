@@ -5,7 +5,9 @@ using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
-public class InstrumentEfRepository(AppDbContext context) : BaseEfRepository<Instrument>(context), IInstrumentRepository
+public class InstrumentEfRepository(AppDbContext context, EfQueryObjectBuilder queryObjectBuilder)
+	: BaseEfRepository<Instrument>(context, queryObjectBuilder),
+		IInstrumentRepository
 {
 	public async Task<Instrument?> FindByTickerAsync(string ticker, CancellationToken ct)
 	{

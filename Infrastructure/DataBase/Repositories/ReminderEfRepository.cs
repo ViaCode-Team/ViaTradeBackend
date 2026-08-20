@@ -9,7 +9,9 @@ using ViaTrade.Infrastructure.DataBase.Extensions;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
-public class ReminderEfRepository(AppDbContext context) : BaseEfRepository<Reminder>(context), IReminderRepository
+public class ReminderEfRepository(AppDbContext context, EfQueryObjectBuilder queryObjectBuilder)
+	: BaseEfRepository<Reminder>(context, queryObjectBuilder),
+		IReminderRepository
 {
 	public async Task<IReadOnlyList<ReminderDto>> ListDueAsync(CancellationToken ct)
 	{
@@ -41,20 +43,20 @@ public class ReminderEfRepository(AppDbContext context) : BaseEfRepository<Remin
 		CancellationToken ct
 	)
 	{
-		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet, queryObject, _entityType);
+		var (query, isUnique) = _queryObjectBuilder.BuildForPagination(_dbSet.AsQueryable(), queryObject);
 
-		return await query
-			.Select(reminder => new ReminderProjectionDto(
-				reminder.Id,
-				reminder.Text,
-				reminder.RemindAt,
-				reminder.InstrumentId,
-				reminder.Instrument!.Symbol,
-				reminder.Instrument!.Description,
-				reminder.UserId,
-				reminder.DeliveredAt
-			))
-			.ToPagedAsync(pageOptions, ct);
+		var projectedQuery = query.Select(reminder => new ReminderProjectionDto(
+			reminder.Id,
+			reminder.Text,
+			reminder.RemindAt,
+			reminder.InstrumentId,
+			reminder.Instrument!.Symbol,
+			reminder.Instrument!.Description,
+			reminder.UserId,
+			reminder.DeliveredAt
+		));
+
+		return await projectedQuery.ToPagedAsync(pageOptions, isUnique, ct);
 	}
 
 	public async Task<Reminder?> FindByUserAndIdAsync(int userId, int reminderId, CancellationToken ct)

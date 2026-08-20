@@ -39,6 +39,7 @@ public static class ApplicationSettingsServiceCollectionExtensions
 		services
 			.AddOptions<ConnectionStringsSettings>()
 			.BindConfiguration(nameof(ApplicationSettings.ConnectionStrings));
+		services.AddOptions<DatabaseSettings>().BindConfiguration(nameof(ApplicationSettings.Database));
 		services.AddOptions<JwtSettings>().BindConfiguration(nameof(ApplicationSettings.Jwt));
 		services.AddOptions<AuthCookieSettings>().BindConfiguration(nameof(ApplicationSettings.AuthCookies));
 		services.AddOptions<TelegramBotSettings>().BindConfiguration(nameof(ApplicationSettings.TelegramBot));

@@ -9,7 +9,9 @@ using ViaTrade.Infrastructure.Extensions;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
-public class StrategyEfRepository(AppDbContext context) : BaseEfRepository<Strategy>(context), IStrategyRepository
+public class StrategyEfRepository(AppDbContext context, EfQueryObjectBuilder queryObjectBuilder)
+	: BaseEfRepository<Strategy>(context, queryObjectBuilder),
+		IStrategyRepository
 {
 	public async Task<StrategyCountsDto?> FindStatisticsAsync(int userId, CancellationToken ct)
 	{
@@ -71,8 +73,8 @@ public class StrategyEfRepository(AppDbContext context) : BaseEfRepository<Strat
 		CancellationToken ct
 	)
 	{
-		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet, queryObject, _entityType);
+		var (query, isUnique) = _queryObjectBuilder.BuildForPagination(_dbSet.AsQueryable(), queryObject);
 
-		return await query.WithSubscriptionState(userId).ToPagedAsync(pageOptions, ct);
+		return await query.WithSubscriptionState(userId).ToPagedAsync(pageOptions, isUnique, ct);
 	}
 }

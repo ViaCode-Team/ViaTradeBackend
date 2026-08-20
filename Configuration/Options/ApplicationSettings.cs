@@ -8,6 +8,9 @@ public sealed class ApplicationSettings
 	public ConnectionStringsSettings ConnectionStrings { get; set; } = new();
 
 	[ValidateObjectMembers]
+	public DatabaseSettings Database { get; set; } = new();
+
+	[ValidateObjectMembers]
 	public JwtSettings Jwt { get; set; } = new();
 
 	[ValidateObjectMembers]

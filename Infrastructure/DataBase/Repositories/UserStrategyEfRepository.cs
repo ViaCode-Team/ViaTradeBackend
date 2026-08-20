@@ -6,8 +6,8 @@ using ViaTrade.Infrastructure.Utils;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
-public class UserStrategyEfRepository(AppDbContext context)
-	: BaseEfRepository<UserStrategy>(context),
+public class UserStrategyEfRepository(AppDbContext context, EfQueryObjectBuilder queryObjectBuilder)
+	: BaseEfRepository<UserStrategy>(context, queryObjectBuilder),
 		IUserStrategyRepository
 {
 	public async Task<int> CountByUserAsync(int userId, CancellationToken ct)

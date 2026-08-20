@@ -24,6 +24,7 @@ using ViaTrade.Application.Trades;
 using ViaTrade.Application.Trades.Interfaces;
 using ViaTrade.Application.Users;
 using ViaTrade.Application.Users.Interfaces;
+using ViaTrade.Configuration;
 using ViaTrade.Configuration.Options;
 using ViaTrade.Infrastructure.DataBase;
 using ViaTrade.Infrastructure.DataBase.Repositories;
@@ -38,8 +39,8 @@ public static class DependencyInjection
 {
 	public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
 	{
-		services.AddScoped<IJwtHelper, JwtHelper>();
-		services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+		services.AddSingleton<IJwtHelper, JwtHelper>();
+		services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 
 		services.AddScoped<IAuthCommandService, AuthCommandService>();
 		services.AddScoped<IAuthQueryService, AuthQueryService>();
@@ -66,9 +67,12 @@ public static class DependencyInjection
 		return services;
 	}
 
-	public static IServiceCollection AddInfrastructureLayer(this IServiceCollection services)
+	public static IServiceCollection AddInfrastructureLayer(
+		this IServiceCollection services,
+		IConfiguration configuration
+	)
 	{
-		services.AddDatabase();
+		services.AddDatabase(configuration);
 		services.AddRedis();
 		services.AddTelegramNotifications();
 		services.AddRepositories();
@@ -100,24 +104,29 @@ public static class DependencyInjection
 		return services;
 	}
 
-	private static IServiceCollection AddDatabase(this IServiceCollection services)
+	private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
 	{
-		services.AddDbContext<AppDbContext>(
-			(serviceProvider, options) =>
-			{
-				var connectionStrings = serviceProvider.GetRequiredService<IOptions<ConnectionStringsSettings>>().Value;
-				var connectionString = connectionStrings.MySql;
+		var connectionSettings = configuration.GetConnectionStrings();
+		var dbSettings = configuration.GetDatabaseSettings();
 
-				options
-					.UseMySql(
-						connectionString,
-						ServerVersion.AutoDetect(connectionString),
-						mySqlOptions => mySqlOptions.EnableStringComparisonTranslations()
-					)
-					.UseProjectables()
-					.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-			}
-		);
+		services.AddDbContextPool<AppDbContext>(options =>
+		{
+			options
+				.UseMySql(
+					connectionSettings.MySql,
+					ServerVersion.AutoDetect(connectionSettings.MySql),
+					mySqlOptions =>
+					{
+						mySqlOptions.EnableStringComparisonTranslations();
+						mySqlOptions.EnableRetryOnFailure(
+							maxRetryCount: dbSettings.MaxRetryCount,
+							maxRetryDelay: TimeSpan.FromSeconds(dbSettings.MaxRetryDelaySeconds),
+							errorNumbersToAdd: null
+						);
+					}
+				)
+				.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+		});
 
 		return services;
 	}
@@ -137,10 +146,11 @@ public static class DependencyInjection
 
 	private static IServiceCollection AddRepositories(this IServiceCollection services)
 	{
-		services.AddScoped<UserRedisRepository>();
+		services.AddScoped<EfQueryObjectBuilder>();
+		services.AddSingleton<UserRedisRepository>();
 
-		services.AddScoped<ITelegramTokenRepository, TelegramTokenRedisRepository>();
-		services.AddScoped<ISessionRepository, SessionRedisRepository>();
+		services.AddSingleton<ITelegramTokenRepository, TelegramTokenRedisRepository>();
+		services.AddSingleton<ISessionRepository, SessionRedisRepository>();
 
 		services.AddScoped<ITradeRepository, TradeEfRepository>();
 		services.AddScoped<ITradeTypeRepository, TradeTypeEfRepository>();
@@ -176,7 +186,7 @@ public static class DependencyInjection
 
 		services.AddAuthorizationBuilder().SetDefaultPolicy(defaultPolicy).SetFallbackPolicy(defaultPolicy);
 
-		services.AddScoped<IAuthorizationHandler, ActiveSessionHandler>();
+		services.AddSingleton<IAuthorizationHandler, ActiveSessionHandler>();
 
 		return services;
 	}

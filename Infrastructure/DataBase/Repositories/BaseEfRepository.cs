@@ -1,6 +1,5 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
 using ViaTrade.Application.Common.Interfaces;
 using ViaTrade.Application.Common.Interfaces.Repositories;
 using ViaTrade.Application.Common.Models;
@@ -14,13 +13,13 @@ public class BaseEfRepository<TEntity> : IRepository<TEntity>
 {
 	protected readonly AppDbContext _context;
 	protected readonly DbSet<TEntity> _dbSet;
-	protected readonly IEntityType _entityType;
+	protected readonly EfQueryObjectBuilder _queryObjectBuilder;
 
-	public BaseEfRepository(AppDbContext context)
+	public BaseEfRepository(AppDbContext context, EfQueryObjectBuilder queryObjectBuilder)
 	{
 		_context = context;
 		_dbSet = _context.Set<TEntity>();
-		_entityType = _context.Model.FindEntityType(typeof(TEntity))!;
+		_queryObjectBuilder = queryObjectBuilder;
 	}
 
 	public async Task<TEntity?> FindByIdAsync(int id, CancellationToken ct)
@@ -44,9 +43,9 @@ public class BaseEfRepository<TEntity> : IRepository<TEntity>
 		CancellationToken ct
 	)
 	{
-		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet.AsQueryable(), queryObject, _entityType);
+		var (query, isUnique) = _queryObjectBuilder.BuildForPagination(_dbSet.AsQueryable(), queryObject);
 
-		return await query.ToPagedAsync(pageOptions, ct);
+		return await query.ToPagedAsync(pageOptions, isUnique, ct);
 	}
 
 	public async Task<IReadOnlyList<TEntity>> ListByAsync(

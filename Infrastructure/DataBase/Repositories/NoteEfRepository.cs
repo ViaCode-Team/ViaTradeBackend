@@ -8,7 +8,9 @@ using ViaTrade.Infrastructure.DataBase.Extensions;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
-public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(context), INoteRepository
+public class NoteEfRepository(AppDbContext context, EfQueryObjectBuilder queryObjectBuilder)
+	: BaseEfRepository<Note>(context, queryObjectBuilder),
+		INoteRepository
 {
 	public async Task<NoteStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
@@ -31,22 +33,22 @@ public class NoteEfRepository(AppDbContext context) : BaseEfRepository<Note>(con
 		CancellationToken ct
 	)
 	{
-		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet, queryObject, _entityType);
+		var (query, isUnique) = _queryObjectBuilder.BuildForPagination(_dbSet.AsQueryable(), queryObject);
 
-		return await query
-			.Select(note => new NoteProjectionDto(
-				note.Id,
-				note.Text,
-				note.UserId,
-				note.InstrumentId,
-				note.Instrument!.Symbol,
-				note.Instrument!.Description,
-				note.StrategyId,
-				note.Strategy!.Name,
-				note.Strategy.DisplayName,
-				note.Strategy!.Description
-			))
-			.ToPagedAsync(pageOptions, ct);
+		var projectedQuery = query.Select(note => new NoteProjectionDto(
+			note.Id,
+			note.Text,
+			note.UserId,
+			note.InstrumentId,
+			note.Instrument!.Symbol,
+			note.Instrument!.Description,
+			note.StrategyId,
+			note.Strategy!.Name,
+			note.Strategy.DisplayName,
+			note.Strategy!.Description
+		));
+
+		return await projectedQuery.ToPagedAsync(pageOptions, isUnique, ct);
 	}
 
 	public async Task<Note?> FindByIdForUserAsync(int userId, int noteId, CancellationToken ct)

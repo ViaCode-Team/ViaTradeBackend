@@ -5,6 +5,7 @@ using StackExchange.Redis;
 using ViaTrade.Application.Users.Models;
 using ViaTrade.Infrastructure.Redis.Keys;
 using ViaTrade.Infrastructure.Redis.Scripts;
+using ViaTrade.Infrastructure.Redis.Serialization;
 
 namespace ViaTrade.Infrastructure.Redis.Utils;
 
@@ -44,7 +45,7 @@ internal sealed class RefreshTokenRedisHelper(IDatabase database)
 			[
 				refreshTokenFingerprint,
 				session.Id,
-				JsonSerializer.Serialize(session),
+				JsonSerializer.Serialize(session, RedisJsonSerializerContext.Default.UserSessionDto),
 				ToMilliseconds(sessionTtl),
 				newRefreshTokenFingerprint,
 				ToMilliseconds(usedRefreshTokenTtl),

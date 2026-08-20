@@ -4,11 +4,14 @@ using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Trades.Interfaces;
 using ViaTrade.Application.Trades.Models;
 using ViaTrade.Domain.Entities;
+using ViaTrade.Domain.Enums;
 using ViaTrade.Infrastructure.DataBase.Extensions;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
-public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(context), ITradeRepository
+public class TradeEfRepository(AppDbContext context, EfQueryObjectBuilder queryObjectBuilder)
+	: BaseEfRepository<Trade>(context, queryObjectBuilder),
+		ITradeRepository
 {
 	private static readonly DateTime WeekEpoch = new(1900, 1, 1);
 
@@ -18,34 +21,68 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 		CancellationToken ct
 	)
 	{
-		var tradesQuery = GetClosedTradesQuery(userId, profitChartFilter.StartDate, profitChartFilter.EndDate);
+		var projectedQuery = GetClosedTradesQuery(userId, profitChartFilter.StartDate, profitChartFilter.EndDate)
+			.Select(trade => new
+			{
+				trade.ClosedAt!.Value.Year,
+				trade.ClosedAt.Value.Month,
+				trade.ClosedAt.Value.Day,
+				Week = EF.Functions.DateDiffWeek(WeekEpoch, trade.ClosedAt.Value),
+				Income = trade.NetIncome!.Value,
+				BuyIncome = trade.Signal == TradeSignal.BUY ? trade.NetIncome!.Value : 0,
+				SellIncome = trade.Signal == TradeSignal.SELL ? trade.NetIncome!.Value : 0,
+			});
 
 		return profitChartFilter.Granularity switch
 		{
-			ProfitChartGranularity.Day => await tradesQuery
-				.GroupBy(trade => new
+			ProfitChartGranularity.Day => await projectedQuery
+				.GroupBy(t => new
 				{
-					trade.ClosedAt!.Value.Year,
-					trade.ClosedAt.Value.Month,
-					trade.ClosedAt.Value.Day,
+					t.Year,
+					t.Month,
+					t.Day,
 				})
-				.OrderBy(group => group.Key.Year)
-				.ThenBy(group => group.Key.Month)
-				.ThenBy(group => group.Key.Day)
-				.Select(group => group.ToProfitChartAggregateRow(group.Key.Year, group.Key.Month, group.Key.Day, null))
+				.OrderBy(g => g.Key.Year)
+				.ThenBy(g => g.Key.Month)
+				.ThenBy(g => g.Key.Day)
+				.Select(g => new ProfitChartAggregateRow(
+					g.Key.Year,
+					g.Key.Month,
+					g.Key.Day,
+					null,
+					Math.Round(g.Sum(x => x.Income), 2),
+					Math.Round(g.Sum(x => x.BuyIncome), 2),
+					Math.Round(g.Sum(x => x.SellIncome), 2)
+				))
 				.ToListAsync(ct),
 
-			ProfitChartGranularity.Week => await tradesQuery
-				.GroupBy(trade => EF.Functions.DateDiffWeek(WeekEpoch, trade.ClosedAt!.Value))
-				.OrderBy(group => group.Key)
-				.Select(group => group.ToProfitChartAggregateRow(null, null, null, group.Key))
+			ProfitChartGranularity.Week => await projectedQuery
+				.GroupBy(t => t.Week)
+				.OrderBy(g => g.Key)
+				.Select(g => new ProfitChartAggregateRow(
+					null,
+					null,
+					null,
+					g.Key,
+					Math.Round(g.Sum(x => x.Income), 2),
+					Math.Round(g.Sum(x => x.BuyIncome), 2),
+					Math.Round(g.Sum(x => x.SellIncome), 2)
+				))
 				.ToListAsync(ct),
 
-			ProfitChartGranularity.Month => await tradesQuery
-				.GroupBy(trade => new { trade.ClosedAt!.Value.Year, trade.ClosedAt.Value.Month })
-				.OrderBy(group => group.Key.Year)
-				.ThenBy(group => group.Key.Month)
-				.Select(group => group.ToProfitChartAggregateRow(group.Key.Year, group.Key.Month, null, null))
+			ProfitChartGranularity.Month => await projectedQuery
+				.GroupBy(t => new { t.Year, t.Month })
+				.OrderBy(g => g.Key.Year)
+				.ThenBy(g => g.Key.Month)
+				.Select(g => new ProfitChartAggregateRow(
+					g.Key.Year,
+					g.Key.Month,
+					null,
+					null,
+					Math.Round(g.Sum(x => x.Income), 2),
+					Math.Round(g.Sum(x => x.BuyIncome), 2),
+					Math.Round(g.Sum(x => x.SellIncome), 2)
+				))
 				.ToListAsync(ct),
 
 			_ => throw new ArgumentOutOfRangeException(nameof(profitChartFilter.Granularity)),
@@ -73,7 +110,20 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 	{
 		return await _dbSet
 			.Where(trade => trade.Id == id && trade.UserId == userId)
-			.Select(trade => trade.ToTradeProjectionDto())
+			.Select(trade => new TradeProjectionDto(
+				trade.Id,
+				trade.OpenedAt,
+				trade.ClosedAt,
+				trade.OpenPrice,
+				trade.ClosePrice,
+				trade.NetIncome,
+				trade.Quantity,
+				trade.TotalPrice,
+				trade.Signal,
+				trade.TradeTypeId,
+				new InstrumentSummaryDto(trade.Instrument!.Id, trade.Instrument.Symbol, trade.Instrument.Description),
+				trade.UserId
+			))
 			.FirstOrDefaultAsync(ct);
 	}
 
@@ -83,15 +133,36 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 		CancellationToken ct
 	)
 	{
-		var query = QueryObjectEvaluator.GetQueryForPagination(_dbSet, queryObject, _entityType);
+		var (query, isUnique) = _queryObjectBuilder.BuildForPagination(_dbSet.AsQueryable(), queryObject);
 
-		return await query.Select(trade => trade.ToTradeProjectionDto()).ToPagedAsync(pageOptions, ct);
+		var projectedQuery = query.Select(trade => new TradeProjectionDto(
+			trade.Id,
+			trade.OpenedAt,
+			trade.ClosedAt,
+			trade.OpenPrice,
+			trade.ClosePrice,
+			trade.NetIncome,
+			trade.Quantity,
+			trade.TotalPrice,
+			trade.Signal,
+			trade.TradeTypeId,
+			new InstrumentSummaryDto(trade.Instrument!.Id, trade.Instrument.Symbol, trade.Instrument.Description),
+			trade.UserId
+		));
+
+		return await projectedQuery.ToPagedAsync(pageOptions, isUnique, ct);
 	}
 
 	public async Task<TradeStatisticAggregateDto> GetGlobalStatisticsAsync(int userId, CancellationToken ct)
 	{
 		var result = await _context
-			.Trades.Where(trade => trade.UserId == userId && trade.IsClosedTrade() && trade.IsProfitCalculable())
+			.Trades.Where(trade =>
+				trade.UserId == userId
+				&& trade.ClosedAt.HasValue
+				&& trade.ClosePrice.HasValue
+				&& trade.OpenPrice != 0
+				&& trade.Signal != TradeSignal.HOLD
+			)
 			.Select(trade => new { Income = trade.NetIncome!.Value })
 			.GroupBy(_ => 1)
 			.Select(group => new TradeStatisticAggregateDto(
@@ -137,7 +208,11 @@ public class TradeEfRepository(AppDbContext context) : BaseEfRepository<Trade>(c
 	private IQueryable<Trade> GetClosedTradesQuery(int userId, DateOnly? startDate, DateOnly? endDate)
 	{
 		var query = _context.Trades.Where(trade =>
-			trade.UserId == userId && trade.IsClosedTrade() && trade.IsProfitCalculable()
+			trade.UserId == userId
+			&& trade.ClosedAt.HasValue
+			&& trade.ClosePrice.HasValue
+			&& trade.OpenPrice != 0
+			&& trade.Signal != TradeSignal.HOLD
 		);
 
 		if (startDate.HasValue)

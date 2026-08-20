@@ -4,10 +4,8 @@ namespace ViaTrade.Api.Swagger;
 
 public static class SwaggerMiddlewareExtensions
 {
-	public static IApplicationBuilder UseViaTradeSwagger(this IApplicationBuilder app)
+	public static IApplicationBuilder UseViaTradeSwagger(this IApplicationBuilder app, IWebHostEnvironment env)
 	{
-		var env = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
-
 		if (env.IsDevelopment())
 		{
 			app.UseSwagger();
