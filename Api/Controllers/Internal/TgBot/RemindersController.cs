@@ -1,11 +1,13 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using ViaTrade.Api.Attribute;
 using ViaTrade.Api.Contracts.Reminders;
 using ViaTrade.Api.Mappings;
 using ViaTrade.Api.Routing;
 using ViaTrade.Application.Reminders.Interfaces;
+using ViaTrade.Configuration.Options;
 
 namespace ViaTrade.Api.Controllers.Internal.TgBot;
 
@@ -14,14 +16,15 @@ namespace ViaTrade.Api.Controllers.Internal.TgBot;
 [ApiController]
 public class RemindersController(
 	IReminderCommandService reminderCommandService,
-	IReminderQueryService reminderQueryService
+	IReminderQueryService reminderQueryService,
+	IOptions<NotificationStreamSettings> options
 ) : ControllerBase
 {
 	[ServicePassword]
 	[HttpGet("due")]
 	public async Task<Ok<IEnumerable<DueReminderResponse>>> GetDue(CancellationToken ct)
 	{
-		var reminders = await reminderQueryService.ListDueAsync(ct);
+		var reminders = await reminderQueryService.ListDueBatchAsync(options.Value.ReminderPublishBatchSize, ct);
 
 		return TypedResults.Ok(reminders.Select(ApiMapper.ToDueResponse));
 	}

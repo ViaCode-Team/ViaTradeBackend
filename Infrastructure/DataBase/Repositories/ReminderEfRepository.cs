@@ -13,7 +13,7 @@ public class ReminderEfRepository(AppDbContext context, EfQueryObjectBuilder que
 	: BaseEfRepository<Reminder>(context, queryObjectBuilder),
 		IReminderRepository
 {
-	public async Task<IReadOnlyList<ReminderDto>> ListDueAsync(CancellationToken ct)
+	public async Task<IReadOnlyList<ReminderDto>> ListDueBatchAsync(int limit, CancellationToken ct)
 	{
 		return await _dbSet
 			.Where(reminder =>
@@ -21,6 +21,9 @@ public class ReminderEfRepository(AppDbContext context, EfQueryObjectBuilder que
 				&& reminder.PublishedAt == null
 				&& reminder.User!.TelegramId != null
 			)
+			.OrderBy(reminder => reminder.RemindAt)
+			.ThenBy(reminder => reminder.Id)
+			.Take(limit)
 			.Select(reminder => new ReminderDto(
 				reminder.Id,
 				reminder.Text,

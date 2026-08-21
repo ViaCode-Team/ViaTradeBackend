@@ -55,7 +55,7 @@ public sealed class TelegramReminderPublisherService(
 		using var scope = services.CreateScope();
 		var reminderQueryService = scope.ServiceProvider.GetRequiredService<IReminderQueryService>();
 		var reminderCommandService = scope.ServiceProvider.GetRequiredService<IReminderCommandService>();
-		var reminders = await reminderQueryService.ListDueAsync(ct);
+		var reminders = await reminderQueryService.ListDueBatchAsync(options.Value.ReminderPublishBatchSize, ct);
 
 		logger.LogDebug("Found {ReminderCount} due reminders for Telegram publishing", reminders.Count);
 

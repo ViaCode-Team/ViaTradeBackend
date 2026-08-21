@@ -8,7 +8,7 @@ namespace ViaTrade.Application.Reminders.Interfaces;
 
 public interface IReminderRepository : IRepository<Reminder>
 {
-	Task<IReadOnlyList<ReminderDto>> ListDueAsync(CancellationToken ct = default);
+	Task<IReadOnlyList<ReminderDto>> ListDueBatchAsync(int limit, CancellationToken ct = default);
 	Task<PageResult<ReminderProjectionDto>> GetPageWithInstrumentAsync(
 		IQueryObject<Reminder> queryObject,
 		PageOptions pageOptions,

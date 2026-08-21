@@ -15,4 +15,7 @@ public sealed class NotificationStreamSettings
 
 	[Range(1, int.MaxValue)]
 	public int ReminderPublishIntervalSeconds { get; set; }
+
+	[Range(1, 1000)]
+	public int ReminderPublishBatchSize { get; set; }
 }

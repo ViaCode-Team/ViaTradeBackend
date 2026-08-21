@@ -25,9 +25,11 @@ public class ReminderQueryService(
 		return new ReminderStatisticsDto(total, reminderLimitsOptions.Value.MaxRemindersPerUser, remaining);
 	}
 
-	public async Task<IReadOnlyList<ReminderDto>> ListDueAsync(CancellationToken ct)
+	public async Task<IReadOnlyList<ReminderDto>> ListDueBatchAsync(int limit, CancellationToken ct)
 	{
-		return await reminderRepository.ListDueAsync(ct);
+		ArgumentOutOfRangeException.ThrowIfLessThan(limit, 1);
+
+		return await reminderRepository.ListDueBatchAsync(limit, ct);
 	}
 
 	public async Task<Reminder> GetAsync(int userId, int reminderId, CancellationToken ct)
