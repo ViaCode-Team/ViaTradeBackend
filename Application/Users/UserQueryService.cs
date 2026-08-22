@@ -7,11 +7,6 @@ namespace ViaTrade.Application.Users;
 public class UserQueryService(IUserRepository userRepository, ITelegramTokenRepository telegramTokenRepository)
 	: IUserQueryService
 {
-	public async Task<IReadOnlyList<UserTelegramDto>> ListTelegramRecipientsAsync(CancellationToken ct)
-	{
-		return await userRepository.ListTelegramRecipientsAsync(ct);
-	}
-
 	public async Task<UserMeDto> GetCurrentUserAsync(int userId, CancellationToken ct)
 	{
 		var user = await userRepository.FindMeAsync(userId, ct);

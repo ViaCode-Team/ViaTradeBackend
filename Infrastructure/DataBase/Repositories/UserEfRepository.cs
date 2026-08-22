@@ -40,14 +40,6 @@ public class UserEfRepository(AppDbContext context, EfQueryObjectBuilder queryOb
 			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<IReadOnlyList<UserTelegramDto>> ListTelegramRecipientsAsync(CancellationToken ct)
-	{
-		return await _dbSet
-			.Where(user => user.TelegramId != null)
-			.Select(user => new UserTelegramDto { Id = user.Id, TelegramId = user.TelegramId! })
-			.ToListAsync(ct);
-	}
-
 	public async Task<int> UpdateTelegramIdAsync(int userId, string telegramId, CancellationToken ct)
 	{
 		return await _dbSet

@@ -22,8 +22,6 @@ public static partial class ApiMapper
 {
 	public static partial UserMeResponse ToResponse(UserMeDto source);
 
-	public static partial UserTelegramResponse ToResponse(UserTelegramDto source);
-
 	public static UserSessionResponse ToResponse(UserSessionDto source, string currentSessionId)
 	{
 		return new UserSessionResponse(
