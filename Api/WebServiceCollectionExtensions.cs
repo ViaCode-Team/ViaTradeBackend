@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using ViaTrade.Api.Middleware;
 using ViaTrade.Api.Routing;
 using ViaTrade.Api.Swagger;
@@ -27,8 +28,20 @@ public static class WebServiceCollectionExtensions
 
 		services
 			.AddControllers(options =>
-				options.Conventions.Add(new RouteTokenTransformerConvention(new CamelCaseRouteTokenTransformer()))
-			)
+			{
+				options.Conventions.Add(
+					new RouteTokenTransformerConvention(
+						new CamelCaseRouteTokenTransformer()
+					)
+				);
+
+				var jsonInputFormatter = options.InputFormatters
+					.OfType<SystemTextJsonInputFormatter>()
+					.Single();
+
+				jsonInputFormatter.SupportedMediaTypes.Clear();
+				jsonInputFormatter.SupportedMediaTypes.Add("application/json");
+			})
 			.AddJsonOptions(options =>
 			{
 				options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;

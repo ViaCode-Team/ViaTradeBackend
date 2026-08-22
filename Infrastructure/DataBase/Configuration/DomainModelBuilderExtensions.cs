@@ -33,6 +33,8 @@ internal static class DomainModelBuilderExtensions
 
 		modelBuilder.Entity<UserStrategyInstrument>(entity =>
 		{
+			entity.HasIndex(x => new { x.StrategyId, x.InstrumentId });
+
 			entity
 				.HasIndex(x => new
 				{

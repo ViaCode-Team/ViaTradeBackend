@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 	<PropertyGroup>
 		<RootNamespace>ViaTrade.Api</RootNamespace>
 		<AssemblyName>ViaTrade.Api</AssemblyName>
@@ -23,15 +23,6 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.11" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.12">
-			<PrivateAssets>all</PrivateAssets>
-		</PackageReference>
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.12">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-		<PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="9.0.0" />
-		<PackageReference Include="StackExchange.Redis" Version="3.1.13" />
 		<PackageReference Include="Riok.Mapperly" Version="4.3.1" PrivateAssets="all" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
 	</ItemGroup>
@@ -52,11 +43,6 @@
 	<Target Name="GenerateSwagger" AfterTargets="Build">
 		<MakeDir Directories="$(ProjectDir)..\swagger\" />
 
-		<Exec
-			EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development"
-			IgnoreExitCode="true"
-			Command="dotnet tool run swagger tofile --yaml --output &quot;%(SwaggerDocument.OutputPath)&quot; --openapiversion 3.0 &quot;$(TargetPath)&quot; %(SwaggerDocument.Identity)"
-			WorkingDirectory="$(ProjectDir)"
-		/>
+		<Exec EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" IgnoreExitCode="true" Command="dotnet tool run swagger tofile --yaml --output &quot;%(SwaggerDocument.OutputPath)&quot; --openapiversion 3.0 &quot;$(TargetPath)&quot; %(SwaggerDocument.Identity)" WorkingDirectory="$(ProjectDir)" />
 	</Target>
 </Project>

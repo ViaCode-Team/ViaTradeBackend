@@ -808,12 +808,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateNoteRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/UpdateNoteRequest'
-          application/*+json:
-            schema:
-              $ref: '#/components/schemas/UpdateNoteRequest'
         required: true
       responses:
         '204':
@@ -1287,12 +1281,6 @@ paths:
       requestBody:
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/CreateReminderRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/CreateReminderRequest'
-          application/*+json:
             schema:
               $ref: '#/components/schemas/CreateReminderRequest'
         required: true
@@ -2367,12 +2355,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateReminderRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/UpdateReminderRequest'
-          application/*+json:
-            schema:
-              $ref: '#/components/schemas/UpdateReminderRequest'
         required: true
       responses:
         '204':
@@ -2657,12 +2639,6 @@ paths:
       requestBody:
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/LoginRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/LoginRequest'
-          application/*+json:
             schema:
               $ref: '#/components/schemas/LoginRequest'
         required: true
@@ -4350,12 +4326,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateStrategyRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/UpdateStrategyRequest'
-          application/*+json:
-            schema:
-              $ref: '#/components/schemas/UpdateStrategyRequest'
         required: true
       responses:
         '204':
@@ -4833,12 +4803,6 @@ paths:
       requestBody:
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/UpdateNoteRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/UpdateNoteRequest'
-          application/*+json:
             schema:
               $ref: '#/components/schemas/UpdateNoteRequest'
         required: true
@@ -6054,12 +6018,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CreateTradeRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/CreateTradeRequest'
-          application/*+json:
-            schema:
-              $ref: '#/components/schemas/CreateTradeRequest'
         required: true
       responses:
         '201':
@@ -6363,12 +6321,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/UpdateTradeRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/UpdateTradeRequest'
-          application/*+json:
-            schema:
-              $ref: '#/components/schemas/UpdateTradeRequest'
         required: true
       responses:
         '204':
@@ -6653,12 +6605,6 @@ paths:
       requestBody:
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/RegisterRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/RegisterRequest'
-          application/*+json:
             schema:
               $ref: '#/components/schemas/RegisterRequest'
         required: true

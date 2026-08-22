@@ -165,12 +165,6 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ConfirmReminderDeliveryRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/ConfirmReminderDeliveryRequest'
-          application/*+json:
-            schema:
-              $ref: '#/components/schemas/ConfirmReminderDeliveryRequest'
         required: true
       responses:
         '204':
@@ -311,12 +305,6 @@ paths:
       requestBody:
         content:
           application/json:
-            schema:
-              $ref: '#/components/schemas/LinkTelegramRequest'
-          text/json:
-            schema:
-              $ref: '#/components/schemas/LinkTelegramRequest'
-          application/*+json:
             schema:
               $ref: '#/components/schemas/LinkTelegramRequest'
         required: true
