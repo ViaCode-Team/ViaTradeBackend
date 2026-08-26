@@ -49,7 +49,11 @@ public class TradeQueryObject : BaseQueryObject<Trade>
 		var isDecimal = decimal.TryParse(searchText, out var textPriceDecimal);
 		var isDate = DateTime.TryParse(searchText, out var date);
 
-		var nextDay = isDate ? date.Date.AddDays(1) : default;
+		DateTime nextDay = default;
+		if (isDate)
+		{
+			nextDay = date.Date.AddDays(1);
+		}
 
 		AddCriteria(x =>
 			(isDouble && ((x.ClosePrice != null && x.ClosePrice == textPriceDouble) || x.OpenPrice == textPriceDouble))

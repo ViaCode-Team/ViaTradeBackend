@@ -40,19 +40,17 @@ public class UserEfRepository(AppDbContext context, EfQueryObjectBuilder queryOb
 			.FirstOrDefaultAsync(ct);
 	}
 
-	public async Task<int> UpdateTelegramIdAsync(int userId, string telegramId, CancellationToken ct)
+	public Task<int> UpdateTelegramIdAsync(int userId, string telegramId, CancellationToken ct)
 	{
-		return await _dbSet
+		return _dbSet
 			.Where(u => u.Id == userId)
 			.ExecuteUpdateAsync(s => s.SetProperty(u => u.TelegramId, telegramId), ct);
 	}
 
 	public async Task<int> UpdateLastLoginAtAsync(int userId, DateTime lastLoginDate, CancellationToken ct)
 	{
-		return await EfDatabaseOperation.ExecuteAsync(() =>
-			_dbSet
-				.Where(u => u.Id == userId)
-				.ExecuteUpdateAsync(s => s.SetProperty(u => u.LastLoginAt, lastLoginDate), ct)
-		);
+		return await _dbSet
+			.Where(u => u.Id == userId)
+			.ExecuteUpdateAsync(s => s.SetProperty(u => u.LastLoginAt, lastLoginDate), ct);
 	}
 }

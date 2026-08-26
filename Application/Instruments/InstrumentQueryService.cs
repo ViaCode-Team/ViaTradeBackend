@@ -74,7 +74,8 @@ public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepo
 		string? symbol = null;
 		int? instrumentId = null;
 
-		if (int.TryParse(instrumentIdOrSymbol, out var parsedInstrumentId))
+		bool isId = int.TryParse(instrumentIdOrSymbol, out var parsedInstrumentId);
+		if (isId)
 		{
 			symbol = await instrumentRepository.FindTickerByIdAsync(parsedInstrumentId, ct);
 			if (symbol != null)

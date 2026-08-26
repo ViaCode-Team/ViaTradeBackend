@@ -66,11 +66,7 @@ public class TradeCommandService(
 		var price = (decimal)request.OpenPrice * request.Quantity;
 
 		var affectedRows = await tradeRepository.ExecuteUpdateAsync(userId, id, request, price, ct);
-		if (affectedRows != 0)
-			return;
-
-		var tradeIsExist = await tradeRepository.ExistsAsync(t => t.Id == id && t.UserId == userId, ct);
-		if (!tradeIsExist)
+		if (affectedRows == 0)
 			throw new NotFoundException("Trade not found.", "trade_not_found");
 	}
 }

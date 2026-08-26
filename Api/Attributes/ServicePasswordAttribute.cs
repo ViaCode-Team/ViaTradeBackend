@@ -32,10 +32,14 @@ public class ServicePasswordAttribute() : ActionFilterAttribute, IAllowAnonymous
 		var providedBytes = MemoryMarshal.AsBytes(providedPassword.AsSpan());
 
 		bool isLengthEqual = expectedBytes.Length == providedBytes.Length;
-		bool isContentEqual = CryptographicOperations.FixedTimeEquals(
-			expectedBytes,
-			isLengthEqual ? providedBytes : expectedBytes
-		);
+
+		var bytesToCompare = expectedBytes;
+		if (isLengthEqual)
+		{
+			bytesToCompare = providedBytes;
+		}
+
+		bool isContentEqual = CryptographicOperations.FixedTimeEquals(expectedBytes, bytesToCompare);
 
 		return isLengthEqual && isContentEqual;
 	}

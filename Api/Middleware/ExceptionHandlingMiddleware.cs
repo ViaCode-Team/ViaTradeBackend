@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using ViaTrade.Application.Common.Exceptions;
 
 namespace ViaTrade.Api.Middleware;
@@ -11,6 +12,9 @@ public class ExceptionHandlingMiddleware(
 {
 	public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken ct)
 	{
+		if (exception is DbUpdateException dbUpdateEx && dbUpdateEx.InnerException is AppException appEx)
+			exception = appEx;
+
 		if (context.RequestAborted.IsCancellationRequested)
 		{
 			logger.LogDebug("Request was aborted by the client: Path={Path}", context.Request.Path);

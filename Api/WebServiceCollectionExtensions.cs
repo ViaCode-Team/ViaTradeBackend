@@ -29,15 +29,9 @@ public static class WebServiceCollectionExtensions
 		services
 			.AddControllers(options =>
 			{
-				options.Conventions.Add(
-					new RouteTokenTransformerConvention(
-						new CamelCaseRouteTokenTransformer()
-					)
-				);
+				options.Conventions.Add(new RouteTokenTransformerConvention(new CamelCaseRouteTokenTransformer()));
 
-				var jsonInputFormatter = options.InputFormatters
-					.OfType<SystemTextJsonInputFormatter>()
-					.Single();
+				var jsonInputFormatter = options.InputFormatters.OfType<SystemTextJsonInputFormatter>().Single();
 
 				jsonInputFormatter.SupportedMediaTypes.Clear();
 				jsonInputFormatter.SupportedMediaTypes.Add("application/json");

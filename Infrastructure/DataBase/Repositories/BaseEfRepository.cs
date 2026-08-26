@@ -105,5 +105,5 @@ public class BaseEfRepository<TEntity> : IRepository<TEntity>
 	public void Remove(TEntity entity) => _dbSet.Remove(entity);
 
 	public Task<int> ExecuteDeleteAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken ct) =>
-		EfDatabaseOperation.ExecuteAsync(() => _dbSet.Where(predicate).ExecuteDeleteAsync(ct));
+		_dbSet.Where(predicate).ExecuteDeleteAsync(ct);
 }

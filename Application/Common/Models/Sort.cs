@@ -9,7 +9,15 @@ public abstract record Sort<TField> : IValidatableObject
 
 	protected virtual List<TField> DefaultSortBy => [];
 
-	public List<TField> GetEffectiveSortBy() => SortBy.Count > 0 ? SortBy : DefaultSortBy;
+	public List<TField> GetEffectiveSortBy()
+	{
+		if (SortBy.Count > 0)
+		{
+			return SortBy;
+		}
+
+		return DefaultSortBy;
+	}
 
 	public virtual IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
 	{

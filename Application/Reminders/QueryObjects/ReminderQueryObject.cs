@@ -51,7 +51,12 @@ public class ReminderQueryObject : BaseQueryObject<Reminder>
 			return;
 
 		var isDate = DateTime.TryParse(searchText, out var date);
-		var nextDay = isDate ? date.Date.AddDays(1) : default;
+
+		DateTime nextDay = default;
+		if (isDate)
+		{
+			nextDay = date.Date.AddDays(1);
+		}
 
 		AddCriteria(x =>
 			(isDate && x.RemindAt >= date.Date && x.RemindAt < nextDay)

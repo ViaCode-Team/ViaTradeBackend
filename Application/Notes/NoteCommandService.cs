@@ -20,7 +20,8 @@ public class NoteCommandService(INoteRepository noteRepository, IUnitOfWork uow)
 			InstrumentId = instrumentId,
 		};
 
-		await SaveAsync(note, ct);
+		await noteRepository.AddAsync(note, ct);
+		await uow.SaveChangesAsync(ct);
 	}
 
 	public async Task UpsertStrategyAsync(int userId, int strategyId, string text, CancellationToken ct)
@@ -36,7 +37,8 @@ public class NoteCommandService(INoteRepository noteRepository, IUnitOfWork uow)
 			StrategyId = strategyId,
 		};
 
-		await SaveAsync(note, ct);
+		await noteRepository.AddAsync(note, ct);
+		await uow.SaveChangesAsync(ct);
 	}
 
 	public async Task DeleteInstrumentAsync(int userId, int instrumentId, CancellationToken ct)
@@ -51,11 +53,5 @@ public class NoteCommandService(INoteRepository noteRepository, IUnitOfWork uow)
 		int affectedRows = await noteRepository.ExecuteDeleteStrategyAsync(userId, strategyId, ct);
 		if (affectedRows == 0)
 			throw new NotFoundException("Note not found.", "note_not_found");
-	}
-
-	private async Task SaveAsync(Note note, CancellationToken ct)
-	{
-		await noteRepository.AddAsync(note, ct);
-		await uow.SaveChangesAsync(ct);
 	}
 }

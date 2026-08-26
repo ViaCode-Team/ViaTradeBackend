@@ -49,7 +49,11 @@ public static class SwaggerServiceExtensions
 		options.CustomOperationIds(apiDesc =>
 		{
 			var hasMethodInfo = apiDesc.TryGetMethodInfo(out var methodInfo);
-			return hasMethodInfo ? methodInfo.Name : null;
+			if (hasMethodInfo)
+			{
+				return methodInfo.Name;
+			}
+			return null;
 		});
 	}
 

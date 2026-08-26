@@ -33,9 +33,9 @@
 6. **Configuration**: Keep only shared, non-sensitive defaults in `appsettings.json`; local-only values belong in `appsettings.Development.json`; production secrets and connections must use environment variables or a secret store.
 
 ## C# Coding Guidelines (C# 12+)
-1. **General**: File-scoped namespaces. **`using` directives MUST be placed BEFORE the `namespace` declaration**. Exactly 1 empty line after `using` directives, after `namespace`, between methods, between fields/methods, and at EOF.
+1. **General**: File-scoped namespaces. **`using` directives MUST be placed BEFORE the `namespace` declaration**. Always use `using` statements at the top of the file instead of fully qualified type names in the code (e.g. avoid `System.Collections.Generic.List`). Exactly 1 empty line after `using` directives, after `namespace`, between methods, between fields/methods, and at EOF.
 2. **Fields/Blocks**: Group related fields (NO empty lines between them). Use empty lines between execution stages (e.g. validation -> save -> return).
-3. **Syntax Constraints**: Use modern syntax (switch expressions). NO ternary operators (`? :`); use `if/else` or `switch`. Do not declare `out var` or pattern variables inside `if` conditions; assign them before the condition. NO spread collections `[..]` for fluent methods (prefer `.ToList()`). Regular collections `[]` allowed.
+3. **Syntax Constraints**: Use modern syntax (switch expressions). NO ternary operators (`? :`); use `if/else` or `switch`. Do not declare `out var` inside `if` conditions; assign them before the condition. Pattern matching variables (e.g., `is Type type`) ARE allowed. NO spread collections `[..]` for fluent methods (prefer `.ToList()`). Regular collections `[]` allowed.
 4. **Clean Code**: Avoid unnecessary braces for single-line statements. Comments must be minimal, in English, and only for highly complex code.
 5. **Entity Framework**: The DbContext is globally configured with `QueryTrackingBehavior.NoTracking`. All read operations are untracked by default. DO NOT add `.AsNoTracking()` explicitly. When updating entities using `SaveChangesAsync()`, you MUST explicitly call `_dbSet.Update(entity)` beforehand. Prefer `ExecuteUpdateAsync/ExecuteDeleteAsync` where possible.
 

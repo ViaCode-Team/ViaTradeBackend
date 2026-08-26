@@ -75,33 +75,25 @@ public class NoteEfRepository(AppDbContext context, EfQueryObjectBuilder queryOb
 
 	public Task<int> ExecuteDeleteInstrumentAsync(int userId, int instrumentId, CancellationToken ct)
 	{
-		return EfDatabaseOperation.ExecuteAsync(() =>
-			_dbSet.Where(note => note.UserId == userId && note.InstrumentId == instrumentId).ExecuteDeleteAsync(ct)
-		);
+		return _dbSet.Where(note => note.UserId == userId && note.InstrumentId == instrumentId).ExecuteDeleteAsync(ct);
 	}
 
 	public Task<int> ExecuteDeleteStrategyAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		return EfDatabaseOperation.ExecuteAsync(() =>
-			_dbSet.Where(note => note.UserId == userId && note.StrategyId == strategyId).ExecuteDeleteAsync(ct)
-		);
+		return _dbSet.Where(note => note.UserId == userId && note.StrategyId == strategyId).ExecuteDeleteAsync(ct);
 	}
 
 	public Task<int> ExecuteUpdateInstrumentAsync(int userId, int instrumentId, string text, CancellationToken ct)
 	{
-		return EfDatabaseOperation.ExecuteAsync(() =>
-			_dbSet
-				.Where(note => note.UserId == userId && note.InstrumentId == instrumentId)
-				.ExecuteUpdateAsync(setters => setters.SetProperty(note => note.Text, text), ct)
-		);
+		return _dbSet
+			.Where(note => note.UserId == userId && note.InstrumentId == instrumentId)
+			.ExecuteUpdateAsync(setters => setters.SetProperty(note => note.Text, text), ct);
 	}
 
 	public Task<int> ExecuteUpdateStrategyAsync(int userId, int strategyId, string text, CancellationToken ct)
 	{
-		return EfDatabaseOperation.ExecuteAsync(() =>
-			_dbSet
-				.Where(note => note.UserId == userId && note.StrategyId == strategyId)
-				.ExecuteUpdateAsync(setters => setters.SetProperty(note => note.Text, text), ct)
-		);
+		return _dbSet
+			.Where(note => note.UserId == userId && note.StrategyId == strategyId)
+			.ExecuteUpdateAsync(setters => setters.SetProperty(note => note.Text, text), ct);
 	}
 }

@@ -77,7 +77,10 @@ public static class QueryableExtensions
 			return new PageResult<T>([], 0, pageOptions.Page, pageOptions.PageSize);
 
 		var item = await source.FirstOrDefaultAsync(ct);
-		var items = item != null ? [item] : Array.Empty<T>();
+
+		T[] items = [];
+		if (item != null)
+			items = [item];
 
 		return new PageResult<T>(items, items.Length, pageOptions.Page, pageOptions.PageSize);
 	}

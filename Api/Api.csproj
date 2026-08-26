@@ -43,6 +43,11 @@
 	<Target Name="GenerateSwagger" AfterTargets="Build">
 		<MakeDir Directories="$(ProjectDir)..\swagger\" />
 
-		<Exec EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development" IgnoreExitCode="true" Command="dotnet tool run swagger tofile --yaml --output &quot;%(SwaggerDocument.OutputPath)&quot; --openapiversion 3.0 &quot;$(TargetPath)&quot; %(SwaggerDocument.Identity)" WorkingDirectory="$(ProjectDir)" />
+		<Exec
+			EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development"
+			IgnoreExitCode="true"
+			Command="dotnet tool run swagger tofile --yaml --output &quot;%(SwaggerDocument.OutputPath)&quot; --openapiversion 3.0 &quot;$(TargetPath)&quot; %(SwaggerDocument.Identity)"
+			WorkingDirectory="$(ProjectDir)"
+		/>
 	</Target>
 </Project>

@@ -27,6 +27,7 @@ using ViaTrade.Application.Users.Interfaces;
 using ViaTrade.Configuration;
 using ViaTrade.Configuration.Options;
 using ViaTrade.Infrastructure.DataBase;
+using ViaTrade.Infrastructure.DataBase.Interceptors;
 using ViaTrade.Infrastructure.DataBase.Repositories;
 using ViaTrade.Infrastructure.Notifications;
 using ViaTrade.Infrastructure.Redis.Repositories;
@@ -109,24 +110,30 @@ public static class DependencyInjection
 		var connectionSettings = configuration.GetConnectionStrings();
 		var dbSettings = configuration.GetDatabaseSettings();
 
-		services.AddDbContextPool<AppDbContext>(options =>
-		{
-			options
-				.UseMySql(
-					connectionSettings.MySql,
-					ServerVersion.AutoDetect(connectionSettings.MySql),
-					mySqlOptions =>
-					{
-						mySqlOptions.EnableStringComparisonTranslations();
-						mySqlOptions.EnableRetryOnFailure(
-							maxRetryCount: dbSettings.MaxRetryCount,
-							maxRetryDelay: TimeSpan.FromSeconds(dbSettings.MaxRetryDelaySeconds),
-							errorNumbersToAdd: null
-						);
-					}
-				)
-				.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-		});
+		services.AddSingleton<MySqlExceptionTranslationInterceptor>();
+
+		services.AddDbContextPool<AppDbContext>(
+			(serviceProvider, options) =>
+			{
+				var interceptor = serviceProvider.GetRequiredService<MySqlExceptionTranslationInterceptor>();
+				options
+					.UseMySql(
+						connectionSettings.MySql,
+						ServerVersion.AutoDetect(connectionSettings.MySql),
+						mySqlOptions =>
+						{
+							mySqlOptions.EnableStringComparisonTranslations();
+							mySqlOptions.EnableRetryOnFailure(
+								maxRetryCount: dbSettings.MaxRetryCount,
+								maxRetryDelay: TimeSpan.FromSeconds(dbSettings.MaxRetryDelaySeconds),
+								errorNumbersToAdd: null
+							);
+						}
+					)
+					.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
+					.AddInterceptors(interceptor);
+			}
+		);
 
 		return services;
 	}

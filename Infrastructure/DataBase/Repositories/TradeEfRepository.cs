@@ -186,23 +186,21 @@ public class TradeEfRepository(AppDbContext context, EfQueryObjectBuilder queryO
 		CancellationToken ct
 	)
 	{
-		return await EfDatabaseOperation.ExecuteAsync(() =>
-			_dbSet
-				.Where(t => t.Id == id && t.UserId == userId)
-				.ExecuteUpdateAsync(
-					s =>
-						s.SetProperty(t => t.OpenedAt, request.OpenedAt)
-							.SetProperty(t => t.ClosedAt, request.ClosedAt)
-							.SetProperty(t => t.OpenPrice, request.OpenPrice)
-							.SetProperty(t => t.ClosePrice, request.ClosePrice)
-							.SetProperty(t => t.Quantity, request.Quantity)
-							.SetProperty(t => t.Signal, request.Signal)
-							.SetProperty(t => t.TotalPrice, price)
-							.SetProperty(t => t.TradeTypeId, request.TradeTypeId)
-							.SetProperty(t => t.InstrumentId, request.InstrumentId),
-					ct
-				)
-		);
+		return await _dbSet
+			.Where(t => t.Id == id && t.UserId == userId)
+			.ExecuteUpdateAsync(
+				s =>
+					s.SetProperty(t => t.OpenedAt, request.OpenedAt)
+						.SetProperty(t => t.ClosedAt, request.ClosedAt)
+						.SetProperty(t => t.OpenPrice, request.OpenPrice)
+						.SetProperty(t => t.ClosePrice, request.ClosePrice)
+						.SetProperty(t => t.Quantity, request.Quantity)
+						.SetProperty(t => t.Signal, request.Signal)
+						.SetProperty(t => t.TotalPrice, price)
+						.SetProperty(t => t.TradeTypeId, request.TradeTypeId)
+						.SetProperty(t => t.InstrumentId, request.InstrumentId),
+				ct
+			);
 	}
 
 	private IQueryable<Trade> GetClosedTradesQuery(int userId, DateOnly? startDate, DateOnly? endDate)

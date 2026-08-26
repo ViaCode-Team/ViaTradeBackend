@@ -17,9 +17,7 @@ public class UserStrategyEfRepository(AppDbContext context, EfQueryObjectBuilder
 
 	public Task ExecuteUnsubscribeAsync(int userId, int strategyId, CancellationToken ct)
 	{
-		return EfDatabaseOperation.ExecuteAsync(() =>
-			_dbSet.Where(link => link.UserId == userId && link.StrategyId == strategyId).ExecuteDeleteAsync(ct)
-		);
+		return _dbSet.Where(link => link.UserId == userId && link.StrategyId == strategyId).ExecuteDeleteAsync(ct);
 	}
 
 	public async Task<List<SignalSourceDto>> ListSignalSourcesAsync(int userId, CancellationToken ct)
