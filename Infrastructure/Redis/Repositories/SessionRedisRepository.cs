@@ -2,7 +2,6 @@ using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
 using ViaTrade.Application.Auth.Interfaces;
-using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Users.Models;
 using ViaTrade.Infrastructure.Redis.Serialization;
 using ViaTrade.Infrastructure.Redis.Utils;
@@ -94,15 +93,6 @@ public class SessionRedisRepository(
 		var sessionIds = await _sessionStorageHelper.ListIdsByUserAsync(userId);
 
 		return await LoadExistingSessionsAsync(userId, sessionIds);
-	}
-
-	public async Task<PageResult<UserSessionDto>> GetPageByUserAsync(int userId, PageOptions pageOptions)
-	{
-		var sessions = await ListByUserAsync(userId);
-		var start = (pageOptions.Page - 1) * pageOptions.PageSize;
-		var pageItems = sessions.Skip(start).Take(pageOptions.PageSize).ToList();
-
-		return new PageResult<UserSessionDto>(pageItems, sessions.Count, pageOptions.Page, pageOptions.PageSize);
 	}
 
 	public Task<int> CleanupExpiredSessionsAsync(DateTime utcNow) =>

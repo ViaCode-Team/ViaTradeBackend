@@ -1,13 +1,17 @@
 using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Application.Common.Interfaces.Repositories;
 using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Common.Queries;
 using ViaTrade.Application.Trades.Interfaces;
 using ViaTrade.Application.Trades.Models;
-using ViaTrade.Application.Trades.QueryObjects;
+using ViaTrade.Application.Trades.Specifications;
+using ViaTrade.Domain.Entities;
 using ViaTrade.Domain.Services;
 
 namespace ViaTrade.Application.Trades;
 
-public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQueryService
+public class TradeQueryService(IReadRepository<Trade> tradeRepository, ITradeRepository tradeStatistics)
+	: ITradeQueryService
 {
 	public async Task<List<ProfitChartBucketDto>> GetProfitChartAsync(
 		int userId,
@@ -15,7 +19,7 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 		CancellationToken ct
 	)
 	{
-		var rows = await tradeRepository.GetProfitChartAsync(userId, profitChartFilter, ct);
+		var rows = await tradeStatistics.GetProfitChartAsync(userId, profitChartFilter, ct);
 
 		return rows.Select(row => new ProfitChartBucketDto(
 				GetBucketDate(row, profitChartFilter.Granularity),
@@ -28,12 +32,12 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 
 	public Task<TradeDateRangeDto> GetTradeDateRangeAsync(int userId, CancellationToken ct)
 	{
-		return tradeRepository.GetTradeDateRangeAsync(userId, ct);
+		return tradeStatistics.GetTradeDateRangeAsync(userId, ct);
 	}
 
 	public async Task<GlobalTradeStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		var result = await tradeRepository.GetGlobalStatisticsAsync(userId, ct);
+		var result = await tradeStatistics.GetGlobalStatisticsAsync(userId, ct);
 
 		var tradeStatistic = new TradeStatisticDto(result.TotalTrades, result.WinTrades, result.LoseTrades);
 
@@ -52,11 +56,28 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 
 	public async Task<TradeDto> GetAsync(int userId, int id, CancellationToken ct)
 	{
-		var trade = await tradeRepository.FindProjectionByUserAndIdAsync(userId, id, ct);
+		var trade = await tradeRepository.FirstOrDefaultAsync(
+			trade => trade.UserId == userId && trade.Id == id,
+			trade => new TradeDto(
+				trade.Id,
+				trade.OpenedAt,
+				trade.ClosedAt,
+				trade.OpenPrice,
+				trade.ClosePrice,
+				trade.NetIncome,
+				trade.Quantity,
+				trade.TotalPrice,
+				trade.Signal,
+				trade.TradeTypeId,
+				new InstrumentSummaryDto(trade.Instrument!.Id, trade.Instrument.Symbol, trade.Instrument.Description),
+				trade.UserId
+			),
+			ct
+		);
 		if (trade == null)
 			throw new NotFoundException("Trade not found.", "trade_not_found");
 
-		return ToDto(trade);
+		return trade;
 	}
 
 	public async Task<PageResult<TradeDto>> GetPageAsync(
@@ -67,27 +88,27 @@ public class TradeQueryService(ITradeRepository tradeRepository) : ITradeQuerySe
 		CancellationToken ct
 	)
 	{
-		var queryObject = new TradeQueryObject(userId, tradeFilter, tradeSearch);
-		var trades = await tradeRepository.GetPageProjectionAsync(queryObject, pageOptions, ct);
-
-		return trades.Map(ToDto);
-	}
-
-	private static TradeDto ToDto(TradeProjectionDto source) =>
-		new(
-			source.Id,
-			source.OpenedAt,
-			source.ClosedAt,
-			source.OpenPrice,
-			source.ClosePrice,
-			source.NetIncome,
-			source.Quantity,
-			source.TotalPrice,
-			source.Signal,
-			source.TradeTypeId,
-			source.Instrument,
-			source.UserId
+		var specification = new TradesPageSpecification(userId, tradeFilter, tradeSearch, pageOptions);
+		return await PageQuery.ExecuteAsync(
+			tradeRepository,
+			specification,
+			trade => new TradeDto(
+				trade.Id,
+				trade.OpenedAt,
+				trade.ClosedAt,
+				trade.OpenPrice,
+				trade.ClosePrice,
+				trade.NetIncome,
+				trade.Quantity,
+				trade.TotalPrice,
+				trade.Signal,
+				trade.TradeTypeId,
+				new InstrumentSummaryDto(trade.Instrument!.Id, trade.Instrument.Symbol, trade.Instrument.Description),
+				trade.UserId
+			),
+			ct
 		);
+	}
 
 	private static DateOnly GetBucketDate(ProfitChartAggregateRow row, ProfitChartGranularity granularity)
 	{

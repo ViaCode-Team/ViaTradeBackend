@@ -1,20 +1,22 @@
 using ViaTrade.Application.Common.Exceptions;
 using ViaTrade.Application.Common.Interfaces;
+using ViaTrade.Application.Common.Interfaces.Repositories;
 using ViaTrade.Application.Strategies.Interfaces;
 using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Strategies;
 
 public class StrategyCommandService(
-	IUserStrategyInstrumentRepository userStrategyInstrumentRepository,
-	IUserStrategyRepository userStrategyRepository,
-	IStrategyRepository strategyRepository,
+	IRepository<UserStrategyInstrument> userStrategyInstrumentRepository,
+	IRepository<UserStrategy> userStrategyRepository,
+	IReadRepository<Strategy> strategyRepository,
+	IStrategyRepository strategyOperations,
 	IUnitOfWork uow
 ) : IStrategyCommandService
 {
 	public async Task LinkInstrumentAsync(int userId, int strategyId, int instrumentId, CancellationToken ct)
 	{
-		var linkState = await strategyRepository.FindInstrumentLinkStateAsync(userId, strategyId, instrumentId, ct);
+		var linkState = await strategyOperations.FindInstrumentLinkStateAsync(userId, strategyId, instrumentId, ct);
 		if (linkState == null)
 			throw new NotFoundException("Strategy not found.", "strategy_not_found");
 
@@ -31,25 +33,28 @@ public class StrategyCommandService(
 			InstrumentId = instrumentId,
 		};
 
-		await userStrategyInstrumentRepository.AddAsync(strategyCode, ct);
+		userStrategyInstrumentRepository.Add(strategyCode);
 		await uow.SaveChangesAsync(ct);
 	}
 
 	public async Task SetSubscriptionAsync(int userId, int strategyId, bool isSubscribed, CancellationToken ct)
 	{
-		var strategyExists = await strategyRepository.ExistsAsync(strategy => strategy.Id == strategyId, ct);
+		var strategyExists = await strategyRepository.AnyAsync(strategy => strategy.Id == strategyId, ct);
 		if (!strategyExists)
 			throw new NotFoundException("Strategy not found.", "strategy_not_found");
 
 		if (!isSubscribed)
 		{
-			await userStrategyRepository.ExecuteUnsubscribeAsync(userId, strategyId, ct);
+			await userStrategyRepository.ExecuteDeleteAsync(
+				link => link.UserId == userId && link.StrategyId == strategyId,
+				ct
+			);
 			return;
 		}
 
 		var strategyLink = new UserStrategy { UserId = userId, StrategyId = strategyId };
 
-		await userStrategyRepository.AddAsync(strategyLink, ct);
+		userStrategyRepository.Add(strategyLink);
 		await uow.SaveChangesAsync(ct);
 	}
 

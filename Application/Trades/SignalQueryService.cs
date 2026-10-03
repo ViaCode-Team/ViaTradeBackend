@@ -1,19 +1,26 @@
 using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Application.Common.Interfaces.Repositories;
 using ViaTrade.Application.Common.Models;
-using ViaTrade.Application.Strategies.Interfaces;
+using ViaTrade.Application.Common.Queries;
+using ViaTrade.Application.Common.Specifications;
 using ViaTrade.Application.Trades.Interfaces;
 using ViaTrade.Application.Trades.Models;
+using ViaTrade.Application.Trades.Specifications;
+using ViaTrade.Domain.Entities;
 using ViaTrade.Domain.Enums;
 using ViaTrade.Domain.Models.Trade;
 
 namespace ViaTrade.Application.Trades;
 
-public class SignalQueryService(IFileReader tradefileReader, IUserStrategyRepository userStrategyRepository)
-	: ISignalQueryService
+public class SignalQueryService(
+	IFileReader tradefileReader,
+	IReadRepository<UserStrategyInstrument> userStrategyInstrumentRepository
+) : ISignalQueryService
 {
 	public async Task<SignalStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
-		var sources = await userStrategyRepository.ListSignalSourcesAsync(userId, ct);
+		var specification = new SignalSourcesSpecification(userId);
+		var sources = await userStrategyInstrumentRepository.ListAsync(specification, ct);
 		var signals = ListSignals(sources, null, null, new SignalSort());
 
 		return new SignalStatisticDto(
@@ -31,7 +38,9 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 		CancellationToken ct
 	)
 	{
-		var sources = await userStrategyRepository.ListSignalSourcesAsync(userId, ct);
+		var sourcesSpecification = new SignalSourcesSpecification(userId);
+		var pageSpecification = new PageSpecification<SignalDto>(pageOptions);
+		var sources = await userStrategyInstrumentRepository.ListAsync(sourcesSpecification, ct);
 		sources = sources
 			.Where(source => source.StrategyId == signalHistoryFilter.StrategyId)
 			.Where(source => source.InstrumentId == signalHistoryFilter.InstrumentId)
@@ -43,7 +52,7 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 
 		signals = ApplySignalFilter(signals, signalHistoryFilter.Signals);
 
-		return CreatePageResult(signals, pageOptions);
+		return PageQuery.FromList(signals, pageSpecification);
 	}
 
 	public async Task<PageResult<SignalDto>> GetLatestPageAsync(
@@ -54,14 +63,16 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 		CancellationToken ct
 	)
 	{
-		var sources = await userStrategyRepository.ListSignalSourcesAsync(userId, ct);
+		var sourcesSpecification = new SignalSourcesSpecification(userId);
+		var pageSpecification = new PageSpecification<SignalDto>(pageOptions);
+		var sources = await userStrategyInstrumentRepository.ListAsync(sourcesSpecification, ct);
 		var signals = ListLatestSignals(sources);
 
 		signals = ApplySignalFilter(signals, latestSignalFilter.Signals);
 
 		signals = ApplySorting(signals, signalSort.GetEffectiveSortBy()).ToList();
 
-		return CreatePageResult(signals, pageOptions);
+		return PageQuery.FromList(signals, pageSpecification);
 	}
 
 	private List<SignalDto> ListSignals(
@@ -154,13 +165,6 @@ public class SignalQueryService(IFileReader tradefileReader, IUserStrategyReposi
 		}
 
 		return latestBySource.Values.ToList();
-	}
-
-	private static PageResult<SignalDto> CreatePageResult(List<SignalDto> signals, PageOptions pageOptions)
-	{
-		var items = signals.Skip((pageOptions.Page - 1) * pageOptions.PageSize).Take(pageOptions.PageSize).ToList();
-
-		return new PageResult<SignalDto>(items, signals.Count, pageOptions.Page, pageOptions.PageSize);
 	}
 
 	private static DateTime? GetDateOnly(DateTime? date)

@@ -3,7 +3,7 @@ using ViaTrade.Application.Auth.Interfaces;
 using ViaTrade.Application.Auth.Models;
 using ViaTrade.Application.Common.Exceptions;
 using ViaTrade.Application.Common.Interfaces;
-using ViaTrade.Application.Users.Interfaces;
+using ViaTrade.Application.Common.Interfaces.Repositories;
 using ViaTrade.Application.Users.Models;
 using ViaTrade.Configuration.Options;
 using ViaTrade.Domain.Entities;
@@ -11,7 +11,7 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Auth;
 
 public class AuthCommandService(
-	IUserRepository userRepository,
+	IRepository<User> userRepository,
 	IPasswordHasher passwordHasher,
 	IJwtHelper jwtHelper,
 	ISessionRepository sessionRepository,
@@ -28,7 +28,11 @@ public class AuthCommandService(
 
 	public async Task<AuthTokens> LoginAsync(string login, string password, string userAgent, CancellationToken ct)
 	{
-		var user = await userRepository.FindLoginUserAsync(login, ct);
+		var user = await userRepository.FirstOrDefaultAsync(
+			user => user.Login == login,
+			user => new UserLoginDto(user.Id, user.Login, user.PasswordHash),
+			ct
+		);
 
 		if (user == null || !passwordHasher.Verify(password, user.PasswordHash))
 			throw new InvalidCredentialsException();
@@ -74,7 +78,11 @@ public class AuthCommandService(
 			throw new InvalidTokenException();
 		}
 
-		var user = await userRepository.FindTokenUserAsync(session.UserId, ct);
+		var user = await userRepository.FirstOrDefaultAsync(
+			user => user.Id == session.UserId,
+			user => new UserTokenDto(user.Id, user.Login),
+			ct
+		);
 		if (user == null)
 		{
 			await sessionRepository.TerminateSessionAsync(session.Id);
@@ -113,7 +121,7 @@ public class AuthCommandService(
 
 	public async Task<AuthTokens> RegisterAsync(string login, string password, string userAgent, CancellationToken ct)
 	{
-		if (await userRepository.ExistsAsync(u => u.Login == login, ct))
+		if (await userRepository.AnyAsync(u => u.Login == login, ct))
 			throw new ConflictException("User already exists.", "user_already_exists");
 
 		var user = new User
@@ -123,7 +131,7 @@ public class AuthCommandService(
 			RegisteredAt = DateTime.UtcNow,
 		};
 
-		await userRepository.AddAsync(user, ct);
+		userRepository.Add(user);
 		await uow.SaveChangesAsync(ct);
 
 		return await LoginAsync(login, password, userAgent, ct);

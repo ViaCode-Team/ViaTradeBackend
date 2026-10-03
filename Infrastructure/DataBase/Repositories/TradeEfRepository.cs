@@ -1,17 +1,12 @@
 using Microsoft.EntityFrameworkCore;
-using ViaTrade.Application.Common.Interfaces;
-using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Trades.Interfaces;
 using ViaTrade.Application.Trades.Models;
 using ViaTrade.Domain.Entities;
 using ViaTrade.Domain.Enums;
-using ViaTrade.Infrastructure.DataBase.Extensions;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
-public class TradeEfRepository(AppDbContext context, EfQueryObjectBuilder queryObjectBuilder)
-	: BaseEfRepository<Trade>(context, queryObjectBuilder),
-		ITradeRepository
+public class TradeEfRepository(AppDbContext context) : ITradeRepository
 {
 	private static readonly DateTime WeekEpoch = new(1900, 1, 1);
 
@@ -106,56 +101,9 @@ public class TradeEfRepository(AppDbContext context, EfQueryObjectBuilder queryO
 		return new TradeDateRangeDto(DateOnly.FromDateTime(range.MinDate), DateOnly.FromDateTime(range.MaxDate));
 	}
 
-	public async Task<TradeProjectionDto?> FindProjectionByUserAndIdAsync(int userId, int id, CancellationToken ct)
-	{
-		return await _dbSet
-			.Where(trade => trade.Id == id && trade.UserId == userId)
-			.Select(trade => new TradeProjectionDto(
-				trade.Id,
-				trade.OpenedAt,
-				trade.ClosedAt,
-				trade.OpenPrice,
-				trade.ClosePrice,
-				trade.NetIncome,
-				trade.Quantity,
-				trade.TotalPrice,
-				trade.Signal,
-				trade.TradeTypeId,
-				new InstrumentSummaryDto(trade.Instrument!.Id, trade.Instrument.Symbol, trade.Instrument.Description),
-				trade.UserId
-			))
-			.FirstOrDefaultAsync(ct);
-	}
-
-	public async Task<PageResult<TradeProjectionDto>> GetPageProjectionAsync(
-		IQueryObject<Trade> queryObject,
-		PageOptions pageOptions,
-		CancellationToken ct
-	)
-	{
-		var (query, isUnique) = _queryObjectBuilder.BuildForPagination(_dbSet.AsQueryable(), queryObject);
-
-		var projectedQuery = query.Select(trade => new TradeProjectionDto(
-			trade.Id,
-			trade.OpenedAt,
-			trade.ClosedAt,
-			trade.OpenPrice,
-			trade.ClosePrice,
-			trade.NetIncome,
-			trade.Quantity,
-			trade.TotalPrice,
-			trade.Signal,
-			trade.TradeTypeId,
-			new InstrumentSummaryDto(trade.Instrument!.Id, trade.Instrument.Symbol, trade.Instrument.Description),
-			trade.UserId
-		));
-
-		return await projectedQuery.ToPagedAsync(pageOptions, isUnique, ct);
-	}
-
 	public async Task<TradeStatisticAggregateDto> GetGlobalStatisticsAsync(int userId, CancellationToken ct)
 	{
-		var result = await _context
+		var result = await context
 			.Trades.Where(trade =>
 				trade.UserId == userId
 				&& trade.ClosedAt.HasValue
@@ -186,8 +134,8 @@ public class TradeEfRepository(AppDbContext context, EfQueryObjectBuilder queryO
 		CancellationToken ct
 	)
 	{
-		return await _dbSet
-			.Where(t => t.Id == id && t.UserId == userId)
+		return await context
+			.Trades.Where(t => t.Id == id && t.UserId == userId)
 			.ExecuteUpdateAsync(
 				s =>
 					s.SetProperty(t => t.OpenedAt, request.OpenedAt)
@@ -205,7 +153,7 @@ public class TradeEfRepository(AppDbContext context, EfQueryObjectBuilder queryO
 
 	private IQueryable<Trade> GetClosedTradesQuery(int userId, DateOnly? startDate, DateOnly? endDate)
 	{
-		var query = _context.Trades.Where(trade =>
+		var query = context.Trades.Where(trade =>
 			trade.UserId == userId
 			&& trade.ClosedAt.HasValue
 			&& trade.ClosePrice.HasValue

@@ -1,14 +1,7 @@
-using ViaTrade.Application.Common.Interfaces.Repositories;
-using ViaTrade.Application.Users.Models;
-using ViaTrade.Domain.Entities;
-
 namespace ViaTrade.Application.Users.Interfaces;
 
-public interface IUserRepository : IRepository<User>
+public interface IUserRepository
 {
-	Task<UserLoginDto?> FindLoginUserAsync(string login, CancellationToken ct = default);
-	Task<UserTokenDto?> FindTokenUserAsync(int userId, CancellationToken ct = default);
-	Task<UserMeDto?> FindMeAsync(int userId, CancellationToken ct = default);
-	Task<int> UpdateTelegramIdAsync(int userId, string telegramId, CancellationToken ct = default);
-	Task<int> UpdateLastLoginAtAsync(int userId, DateTime lastLoginDate, CancellationToken ct = default);
+	Task<int> ExecuteUpdateTelegramIdAsync(int userId, string telegramId, CancellationToken ct = default);
+	Task<int> ExecuteUpdateLastLoginAtAsync(int userId, DateTime lastLoginDate, CancellationToken ct = default);
 }

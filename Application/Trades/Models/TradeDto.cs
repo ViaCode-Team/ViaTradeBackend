@@ -18,18 +18,3 @@ public record TradeDto(
 );
 
 public record InstrumentSummaryDto(int Id, string Symbol, string? Name);
-
-public record TradeProjectionDto(
-	int Id,
-	DateTime OpenedAt,
-	DateTime? ClosedAt,
-	double OpenPrice,
-	double? ClosePrice,
-	double? NetIncome,
-	int Quantity,
-	decimal TotalPrice,
-	TradeSignal Signal,
-	int TradeTypeId,
-	InstrumentSummaryDto? Instrument,
-	int UserId
-);

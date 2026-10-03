@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Options;
 using ViaTrade.Application.Common.Exceptions;
 using ViaTrade.Application.Common.Interfaces;
+using ViaTrade.Application.Common.Interfaces.Repositories;
 using ViaTrade.Application.Reminders.Interfaces;
 using ViaTrade.Configuration.Options;
 using ViaTrade.Domain.Entities;
@@ -8,7 +9,8 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Reminders;
 
 public class ReminderCommandService(
-	IReminderRepository reminderRepository,
+	IRepository<Reminder> reminderRepository,
+	IReminderRepository reminderOperations,
 	IUnitOfWork uow,
 	IOptions<ReminderLimitsSettings> reminderLimitsOptions
 ) : IReminderCommandService
@@ -21,7 +23,7 @@ public class ReminderCommandService(
 		CancellationToken ct
 	)
 	{
-		int reminderCount = await reminderRepository.CountByUserAsync(userId, ct);
+		int reminderCount = await reminderRepository.CountAsync(reminder => reminder.UserId == userId, ct);
 		if (reminderCount >= reminderLimitsOptions.Value.MaxRemindersPerUser)
 			throw new BusinessRuleException(
 				"The maximum number of reminders has been reached.",
@@ -36,7 +38,7 @@ public class ReminderCommandService(
 			UserId = userId,
 		};
 
-		await reminderRepository.AddAsync(reminder, ct);
+		reminderRepository.Add(reminder);
 		await uow.SaveChangesAsync(ct);
 
 		return reminder;
@@ -44,7 +46,7 @@ public class ReminderCommandService(
 
 	public async Task UpdateAsync(int userId, int reminderId, string text, DateTime remindAt, CancellationToken ct)
 	{
-		int rows = await reminderRepository.ExecuteUpdateForUserAsync(userId, reminderId, text, remindAt, ct);
+		int rows = await reminderOperations.ExecuteUpdateForUserAsync(userId, reminderId, text, remindAt, ct);
 
 		if (rows == 0)
 			throw new NotFoundException("Reminder not found.", "reminder_not_found");
@@ -58,16 +60,16 @@ public class ReminderCommandService(
 			throw new NotFoundException("Reminder not found.", "reminder_not_found");
 	}
 
-	public async Task<bool> MarkPublishedAsync(int reminderId, CancellationToken ct)
+	public async Task<bool> MarkPublishedAsync(int userId, int reminderId, CancellationToken ct)
 	{
-		int rows = await reminderRepository.ExecuteMarkPublishedAsync(reminderId, ct);
+		int rows = await reminderOperations.ExecuteMarkPublishedAsync(userId, reminderId, ct);
 
 		return rows > 0;
 	}
 
 	public async Task MarkDeliveredAsync(int userId, int reminderId, CancellationToken ct)
 	{
-		int rows = await reminderRepository.ExecuteMarkDeliveredForUserAsync(userId, reminderId, ct);
+		int rows = await reminderOperations.ExecuteMarkDeliveredForUserAsync(userId, reminderId, ct);
 
 		if (rows == 0)
 			throw new NotFoundException("Reminder not found.", "reminder_not_found");
@@ -75,6 +77,9 @@ public class ReminderCommandService(
 
 	public Task<int> DeleteDeliveredBeforeAsync(DateTime deliveredBefore, CancellationToken ct)
 	{
-		return reminderRepository.ExecuteDeleteDeliveredBeforeAsync(deliveredBefore, ct);
+		return reminderRepository.ExecuteDeleteAsync(
+			reminder => reminder.DeliveredAt != null && reminder.DeliveredAt <= deliveredBefore,
+			ct
+		);
 	}
 }

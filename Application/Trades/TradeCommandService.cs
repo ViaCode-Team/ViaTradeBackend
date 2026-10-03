@@ -1,6 +1,6 @@
 using ViaTrade.Application.Common.Exceptions;
 using ViaTrade.Application.Common.Interfaces;
-using ViaTrade.Application.Instruments.Interfaces;
+using ViaTrade.Application.Common.Interfaces.Repositories;
 using ViaTrade.Application.Trades.Interfaces;
 using ViaTrade.Application.Trades.Models;
 using ViaTrade.Domain.Entities;
@@ -8,8 +8,9 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Trades;
 
 public class TradeCommandService(
-	ITradeRepository tradeRepository,
-	IInstrumentRepository instrumentRepository,
+	IRepository<Trade> tradeRepository,
+	IReadRepository<Instrument> instrumentRepository,
+	ITradeRepository tradeOperations,
 	IUnitOfWork uow
 ) : ITradeCommandService
 {
@@ -29,10 +30,10 @@ public class TradeCommandService(
 			TotalPrice = (decimal)request.OpenPrice * request.Quantity,
 		};
 
-		await tradeRepository.AddAsync(trade, ct);
+		tradeRepository.Add(trade);
 		await uow.SaveChangesAsync(ct);
 
-		var instrument = await instrumentRepository.FindByIdAsync(trade.InstrumentId, ct);
+		var instrument = await instrumentRepository.GetByIdAsync(trade.InstrumentId, ct);
 		if (instrument == null)
 			throw new DataIntegrityException(
 				$"Trade code was not found after trade creation. InstrumentId={trade.InstrumentId}."
@@ -65,7 +66,7 @@ public class TradeCommandService(
 	{
 		var price = (decimal)request.OpenPrice * request.Quantity;
 
-		var affectedRows = await tradeRepository.ExecuteUpdateAsync(userId, id, request, price, ct);
+		var affectedRows = await tradeOperations.ExecuteUpdateAsync(userId, id, request, price, ct);
 		if (affectedRows == 0)
 			throw new NotFoundException("Trade not found.", "trade_not_found");
 	}

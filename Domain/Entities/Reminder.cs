@@ -1,3 +1,5 @@
+using ViaTrade.Domain.Entities.Abstractions;
+
 namespace ViaTrade.Domain.Entities;
 
 public sealed class Reminder : BaseEntity<int>

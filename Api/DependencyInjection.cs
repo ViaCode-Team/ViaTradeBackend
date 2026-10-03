@@ -1,3 +1,5 @@
+using Ardalis.Specification;
+using Ardalis.Specification.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -24,12 +26,16 @@ using ViaTrade.Application.Trades;
 using ViaTrade.Application.Trades.Interfaces;
 using ViaTrade.Application.Users;
 using ViaTrade.Application.Users.Interfaces;
+using ViaTrade.Application.Users.Models;
 using ViaTrade.Configuration;
 using ViaTrade.Configuration.Options;
 using ViaTrade.Infrastructure.DataBase;
 using ViaTrade.Infrastructure.DataBase.Interceptors;
 using ViaTrade.Infrastructure.DataBase.Repositories;
+using ViaTrade.Infrastructure.DataBase.Repositories.Generic;
 using ViaTrade.Infrastructure.Notifications;
+using ViaTrade.Infrastructure.Redis.Entities;
+using ViaTrade.Infrastructure.Redis.Keys;
 using ViaTrade.Infrastructure.Redis.Repositories;
 using ViaTrade.Infrastructure.Services;
 using ViaTrade.Infrastructure.Utils;
@@ -153,20 +159,28 @@ public static class DependencyInjection
 
 	private static IServiceCollection AddRepositories(this IServiceCollection services)
 	{
-		services.AddScoped<EfQueryObjectBuilder>();
-		services.AddSingleton<UserRedisRepository>();
+		services.AddScoped(typeof(IReadRepository<>), typeof(ReadEfRepository<>));
+		services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
+		services.AddSingleton<ISpecificationEvaluator>(SpecificationEvaluator.Default);
 
-		services.AddSingleton<ITelegramTokenRepository, TelegramTokenRedisRepository>();
+		services.AddSingleton<ICacheRepository<UserRedisEntity>>(
+			serviceProvider => new BaseRedisRepository<UserRedisEntity>(
+				serviceProvider.GetRequiredService<IConnectionMultiplexer>().GetDatabase(),
+				RedisKeys.Cache.Users
+			)
+		);
+		services.AddSingleton<ICacheRepository<TelegramTokenEntity>>(
+			serviceProvider => new BaseRedisRepository<TelegramTokenEntity>(
+				serviceProvider.GetRequiredService<IConnectionMultiplexer>().GetDatabase(),
+				RedisKeys.Cache.TelegramTokens
+			)
+		);
+
 		services.AddSingleton<ISessionRepository, SessionRedisRepository>();
 
 		services.AddScoped<ITradeRepository, TradeEfRepository>();
-		services.AddScoped<ITradeTypeRepository, TradeTypeEfRepository>();
 
 		services.AddScoped<IStrategyRepository, StrategyEfRepository>();
-		services.AddScoped<IUserStrategyRepository, UserStrategyEfRepository>();
-		services.AddScoped<IUserStrategyInstrumentRepository, UserStrategyInstrumentEfRepository>();
-
-		services.AddScoped<IInstrumentRepository, InstrumentEfRepository>();
 
 		services.AddScoped<IReminderRepository, ReminderEfRepository>();
 		services.AddScoped<INoteRepository, NoteEfRepository>();

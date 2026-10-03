@@ -1,3 +1,4 @@
+using ViaTrade.Domain.Entities.Abstractions;
 using ViaTrade.Domain.Enums;
 
 namespace ViaTrade.Domain.Entities;

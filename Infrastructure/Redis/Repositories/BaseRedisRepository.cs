@@ -22,6 +22,15 @@ public class BaseRedisRepository<TEntity>(IDatabase database, RedisKeyBuilder ke
 		return JsonSerializer.Deserialize<TEntity>(value.ToString());
 	}
 
+	public async Task<TEntity?> ConsumeAsync(string id)
+	{
+		var value = await _database.StringGetDeleteAsync(GetKey(id));
+		if (value.IsNullOrEmpty)
+			return default;
+
+		return JsonSerializer.Deserialize<TEntity>(value.ToString());
+	}
+
 	public async Task SetAsync(TEntity entity, TimeSpan? expiry = null)
 	{
 		var json = JsonSerializer.Serialize(entity);

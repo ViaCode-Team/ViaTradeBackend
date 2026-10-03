@@ -64,7 +64,7 @@ public sealed class TelegramReminderPublisherService(
 			try
 			{
 				await PublishReminderAsync(reminder, ct);
-				bool isMarked = await reminderCommandService.MarkPublishedAsync(reminder.Id, ct);
+				bool isMarked = await reminderCommandService.MarkPublishedAsync(reminder.UserId, reminder.Id, ct);
 				if (isMarked)
 					logger.LogInformation(
 						"Marked reminder {ReminderId} as published for user {UserId}",

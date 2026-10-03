@@ -1,8 +1,10 @@
 using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Application.Common.Interfaces.Repositories;
 using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Common.Queries;
 using ViaTrade.Application.Instruments.Interfaces;
 using ViaTrade.Application.Instruments.Models;
-using ViaTrade.Application.Instruments.QueryObjects;
+using ViaTrade.Application.Instruments.Specifications;
 using ViaTrade.Application.Trades.Interfaces;
 using ViaTrade.Application.Trades.Models;
 using ViaTrade.Domain.Entities;
@@ -10,7 +12,7 @@ using ViaTrade.Domain.Enums;
 
 namespace ViaTrade.Application.Instruments;
 
-public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepository instrumentRepository)
+public class InstrumentQueryService(IFileReader tradefileReader, IReadRepository<Instrument> instrumentRepository)
 	: IInstrumentQueryService
 {
 	public async Task<InstrumentStatisticsDto> GetStatisticsAsync(CancellationToken ct)
@@ -22,13 +24,13 @@ public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepo
 
 	public async Task<Instrument> GetAsync(int instrumentId, CancellationToken ct)
 	{
-		return await instrumentRepository.FindByIdAsync(instrumentId, ct)
+		return await instrumentRepository.GetByIdAsync(instrumentId, ct)
 			?? throw new NotFoundException("Instrument not found.", "instrument_not_found");
 	}
 
 	public async Task<Instrument> GetBySymbolAsync(string symbol, CancellationToken ct)
 	{
-		return await instrumentRepository.FindByTickerAsync(symbol, ct)
+		return await instrumentRepository.FirstOrDefaultAsync(e => e.Symbol == symbol, ct)
 			?? throw new NotFoundException("Instrument not found.", "instrument_not_found");
 	}
 
@@ -40,8 +42,13 @@ public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepo
 		CancellationToken ct
 	)
 	{
-		var queryObject = new InstrumentQueryObject(instrumentFilter, instrumentSearch, instrumentSort);
-		return await instrumentRepository.GetPageAsync(queryObject, pageOptions, ct);
+		var specification = new InstrumentsPageSpecification(
+			instrumentFilter,
+			instrumentSearch,
+			pageOptions,
+			instrumentSort
+		);
+		return await PageQuery.ExecuteAsync(instrumentRepository, specification, ct);
 	}
 
 	public async Task<IReadOnlyList<InstrumentFileDto>> ListFileMetadataAsync(
@@ -50,7 +57,16 @@ public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepo
 	)
 	{
 		var instrumentFiles = tradefileReader.GetInstruments(dataType);
-		var instrumentIdBySymbol = await instrumentRepository.GetInstrumentIdByTickerAsync(ct);
+		var instruments = await instrumentRepository.ListAsync(
+			instrument => true,
+			instrument => new InstrumentReferenceDto(instrument.Id, instrument.Symbol),
+			ct
+		);
+		var instrumentIdBySymbol = instruments.ToDictionary(
+			instrument => instrument.Symbol,
+			instrument => instrument.Id,
+			StringComparer.OrdinalIgnoreCase
+		);
 
 		return instrumentFiles
 			.Where(file => instrumentIdBySymbol.ContainsKey(file.Symbol))
@@ -77,7 +93,11 @@ public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepo
 		bool isId = int.TryParse(instrumentIdOrSymbol, out var parsedInstrumentId);
 		if (isId)
 		{
-			symbol = await instrumentRepository.FindTickerByIdAsync(parsedInstrumentId, ct);
+			symbol = await instrumentRepository.FirstOrDefaultAsync(
+				instrument => instrument.Id == parsedInstrumentId,
+				instrument => instrument.Symbol,
+				ct
+			);
 			if (symbol != null)
 				instrumentId = parsedInstrumentId;
 		}
@@ -85,7 +105,11 @@ public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepo
 		if (symbol == null)
 		{
 			symbol = instrumentIdOrSymbol;
-			instrumentId = await instrumentRepository.FindIdByTickerAsync(symbol, ct);
+			instrumentId = await instrumentRepository.FirstOrDefaultAsync(
+				instrument => instrument.Symbol == symbol,
+				instrument => (int?)instrument.Id,
+				ct
+			);
 		}
 
 		var instrumentFiles = tradefileReader.GetInstruments(dataType, [symbol]);
@@ -93,7 +117,11 @@ public class InstrumentQueryService(IFileReader tradefileReader, IInstrumentRepo
 		if (instrumentFile == null)
 			throw new NotFoundException("Instrument file not found.", "instrument_file_not_found");
 
-		instrumentId ??= await instrumentRepository.FindIdByTickerAsync(instrumentFile.Symbol, ct);
+		instrumentId ??= await instrumentRepository.FirstOrDefaultAsync(
+			instrument => instrument.Symbol == instrumentFile.Symbol,
+			instrument => (int?)instrument.Id,
+			ct
+		);
 		if (instrumentId == null)
 			throw new NotFoundException("Instrument not found.", "instrument_not_found");
 

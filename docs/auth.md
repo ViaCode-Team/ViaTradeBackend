@@ -52,7 +52,7 @@ flowchart LR
 - `SessionRedisStorageHelper` выполняет низкоуровневые операции с записями сессий и их индексами.
 - `RefreshTokenRedisHelper` выполняет низкоуровневые операции с fingerprint и индексами refresh token.
 - `SessionRedisCleanupHelper` очищает просроченные вторичные индексы Redis batch-операциями.
-- `IConnectionMultiplexer` зарегистрирован в DI как singleton; конкретный Redis-репозиторий выбирает logical Redis DB через `GetDatabase()` и передаёт её в generic `RedisRepository`.
+- `IConnectionMultiplexer` зарегистрирован в DI как singleton. Для кешей и Telegram-токенов DI создаёт `ICacheRepository<TEntity>` на основе `BaseRedisRepository<TEntity>`; одноразовые токены потребляются через атомарный Redis `GETDEL`. Хранилище сессий отдельно выполняет Lua-операции и поддерживает индексы.
 - `JwtBearerOptionsSetup` получает access JWT из cookie и проверяет его подпись, issuer, audience и срок действия.
 - `ActiveSessionHandler` проверяет, что сессия из JWT ещё существует в Redis.
 - `SessionCleanupService` раз в пять минут запускает C# batch-очистку устаревших вторичных индексов Redis.

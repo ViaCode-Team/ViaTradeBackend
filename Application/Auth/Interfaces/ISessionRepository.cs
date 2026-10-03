@@ -1,4 +1,3 @@
-using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Users.Models;
 
 namespace ViaTrade.Application.Auth.Interfaces;
@@ -18,6 +17,5 @@ public interface ISessionRepository
 	);
 	Task TerminateSessionAsync(string sessionId);
 	Task<IReadOnlyList<UserSessionDto>> ListByUserAsync(int userId);
-	Task<PageResult<UserSessionDto>> GetPageByUserAsync(int userId, PageOptions pageOptions);
 	Task<int> CleanupExpiredSessionsAsync(DateTime utcNow);
 }

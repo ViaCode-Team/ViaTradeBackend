@@ -11,14 +11,3 @@ public record ReminderDto(
 	string TelegramId,
 	DateTime? DeliveredAt
 );
-
-public record ReminderProjectionDto(
-	int Id,
-	string Text,
-	DateTime RemindAt,
-	int InstrumentId,
-	string InstrumentTicker,
-	string? InstrumentName,
-	int UserId,
-	DateTime? DeliveredAt
-);
