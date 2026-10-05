@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using ViaTrade.Application.Users.Interfaces;
+using ViaTrade.Application.Users.Common.Abstractions;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 

@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Options;
-using ViaTrade.Application.Trades.Interfaces;
+using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Configuration.Options;
 using ViaTrade.Domain.Enums;
 using ViaTrade.Domain.Models.Trade;

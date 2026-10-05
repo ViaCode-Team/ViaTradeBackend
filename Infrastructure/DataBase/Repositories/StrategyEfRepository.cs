@@ -1,16 +1,17 @@
 using Microsoft.EntityFrameworkCore;
-using ViaTrade.Application.Strategies.Interfaces;
-using ViaTrade.Application.Strategies.Models;
+using ViaTrade.Application.Strategies.Common.Abstractions;
+using ViaTrade.Application.Strategies.GetStatistics;
+using ViaTrade.Application.Strategies.LinkInstrument;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
 public class StrategyEfRepository(AppDbContext context) : IStrategyRepository
 {
-	public async Task<StrategyCountsDto?> FindStatisticsAsync(int userId, CancellationToken ct)
+	public async Task<StrategyCounts?> FindStatisticsAsync(int userId, CancellationToken ct)
 	{
 		var query = context
 			.Users.Where(user => user.Id == userId)
-			.Select(_ => new StrategyCountsDto(
+			.Select(_ => new StrategyCounts(
 				context.Strategies.LongCount(),
 				context.Strategies.LongCount(strategy => strategy.UserStrategies.Any(link => link.UserId == userId))
 			));

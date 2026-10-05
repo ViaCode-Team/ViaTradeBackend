@@ -47,7 +47,7 @@ flowchart LR
 ```
 
 - `JwtHelper` создаёт access JWT и криптографически случайные refresh token.
-- `AuthCommandService` содержит правила входа, регистрации, обновления и выхода.
+- `LoginHandler`, `RegisterHandler`, `RefreshTokensHandler`, `LogoutSessionHandler` и `LogoutAllHandler` содержат правила отдельных операций; `AuthTokenFactory` объединяет расчёт сроков действия и создание токенов.
 - `SessionRedisRepository` содержит сценарии создания, чтения, ротации и завершения сессий, а также поддерживает их Redis-индексы.
 - `SessionRedisStorageHelper` выполняет низкоуровневые операции с записями сессий и их индексами.
 - `RefreshTokenRedisHelper` выполняет низкоуровневые операции с fingerprint и индексами refresh token.
@@ -89,7 +89,7 @@ Refresh token не содержит claims и не расшифровывает�
 
 | Ключ Redis | Тип | Значение | Время жизни / очистка |
 | --- | --- | --- | --- |
-| `session:<sessionId>` | String | JSON `UserSessionDto`: ID, ID пользователя, User-Agent, даты создания, последнего refresh и окончания | TTL совпадает с текущим окончанием сессии. |
+| `session:<sessionId>` | String | JSON `SessionData`: ID, ID пользователя, User-Agent, даты создания, последнего refresh и окончания | TTL совпадает с текущим окончанием сессии. |
 | `refresh:<sessionId>` | String | SHA-256 fingerprint текущего refresh token | Тот же TTL, что у сессии. Исходный токен здесь не хранится. |
 | `refresh:idx:<SHA-256(refreshToken)>` | String | ID сессии | Тот же TTL. Позволяет найти сессию по fingerprint refresh token. |
 | `refresh:used:<SHA-256(refreshToken)>` | String | ID сессии | Существует до абсолютного окончания сессии; нужен для обнаружения повторного использования старого токена. |
@@ -245,7 +245,7 @@ sequenceDiagram
 
 ## Куда смотреть в коде
 
-- `Application/Auth/AuthCommandService.cs` — жизненный цикл сессии и правила refresh.
+- `Application/Auth/Login/`, `Register/`, `RefreshTokens/`, `LogoutSession/` и `LogoutAll/` — обработчики жизненного цикла сессии; `Application/Auth/Common/AuthTokenFactory.cs` — расчёт сроков действия токенов.
 - `Infrastructure/Redis/Repositories/SessionRedisRepository.cs` — структура Redis и атомарные операции.
 - `Infrastructure/Redis/Utils/SessionRedisCleanupHelper.cs` — C# batch-очистка просроченных индексов.
 - `Infrastructure/Redis/Keys/RedisKeys.cs` — единый каталог всех Redis-ключей и префиксов.
@@ -257,3 +257,4 @@ sequenceDiagram
 - `ViaTradeBackend/OptionsSetup/JwtBearerOptionsSetup.cs` — извлечение access JWT из cookie и его проверка.
 - `ViaTradeBackend/Handler/ActiveSessionHandler.cs` — проверка отзыва сессии на сервере.
 - `ViaTradeBackend/Controllers/SessionsController.cs` — HTTP-endpoint для сессий.
+

@@ -1,6 +1,7 @@
 using System.Reflection;
 using StackExchange.Redis;
-using ViaTrade.Application.Users.Models;
+using ViaTrade.Application.Users.Common;
+using ViaTrade.Application.Users.ConsumeTelegramToken;
 using ViaTrade.Infrastructure.Redis.Keys;
 using ViaTrade.Infrastructure.Redis.Repositories;
 using Xunit;
@@ -9,6 +10,23 @@ namespace ViaTrade.Tests;
 
 public sealed class RedisCacheRepositoryTests
 {
+	[Fact]
+	public async Task ConsumeTelegramTokenCommandReturnsTheOwnerOnlyOnce()
+	{
+		var database = DispatchProxy.Create<IDatabase, RedisDatabaseStub>();
+		var stub = (RedisDatabaseStub)database;
+		stub.Values["TgToken:test"] = """{"UserId":7,"Id":"test"}""";
+		var repository = new BaseRedisRepository<TelegramTokenEntity>(database, RedisKeys.Cache.TelegramTokens);
+		var handler = new ConsumeTelegramTokenHandler(repository);
+		var command = new ConsumeTelegramTokenCommand("test");
+
+		var result = await handler.HandleAsync(command);
+		Assert.NotNull(result);
+		Assert.Equal(7, result.UserId);
+		Assert.Null(await handler.HandleAsync(command));
+		Assert.Equal(new[] { "TgToken:test", "TgToken:test" }, stub.ConsumedKeys);
+	}
+
 	[Fact]
 	public async Task ConsumeUsesGetDeleteAndPreservesExistingTokenJson()
 	{

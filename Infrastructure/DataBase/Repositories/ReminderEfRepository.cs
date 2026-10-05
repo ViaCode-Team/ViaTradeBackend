@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using ViaTrade.Application.Reminders.Interfaces;
+using ViaTrade.Application.Reminders.Common.Abstractions;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 

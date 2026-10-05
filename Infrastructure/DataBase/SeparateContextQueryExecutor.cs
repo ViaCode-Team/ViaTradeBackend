@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using ViaTrade.Application.Common.Interfaces.Repositories;
+using ViaTrade.Application.Common.Abstractions.Repositories;
 
 namespace ViaTrade.Infrastructure.DataBase;
 

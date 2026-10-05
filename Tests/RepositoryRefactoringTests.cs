@@ -6,24 +6,31 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using ViaTrade.Application.Common.Exceptions;
 using ViaTrade.Application.Common.Models;
-using ViaTrade.Application.Common.Queries;
-using ViaTrade.Application.Common.Specifications;
-using ViaTrade.Application.Instruments;
-using ViaTrade.Application.Instruments.Models;
-using ViaTrade.Application.Instruments.Specifications;
-using ViaTrade.Application.Notes;
-using ViaTrade.Application.Notes.Models;
-using ViaTrade.Application.Notes.Specifications;
-using ViaTrade.Application.Reminders;
-using ViaTrade.Application.Reminders.Models;
-using ViaTrade.Application.Reminders.Specifications;
-using ViaTrade.Application.Strategies;
-using ViaTrade.Application.Strategies.Models;
-using ViaTrade.Application.Strategies.Specifications;
-using ViaTrade.Application.Trades;
-using ViaTrade.Application.Trades.Models;
-using ViaTrade.Application.Trades.Specifications;
-using ViaTrade.Application.Users;
+using ViaTrade.Application.Instruments.Common;
+using ViaTrade.Application.Instruments.GetBySymbol;
+using ViaTrade.Application.Instruments.GetPage;
+using ViaTrade.Application.Notes.Common;
+using ViaTrade.Application.Notes.DeleteInstrument;
+using ViaTrade.Application.Notes.Get;
+using ViaTrade.Application.Notes.GetInstrument;
+using ViaTrade.Application.Notes.GetPage;
+using ViaTrade.Application.Notes.GetStrategy;
+using ViaTrade.Application.Notes.UpsertInstrument;
+using ViaTrade.Application.Reminders.Common;
+using ViaTrade.Application.Reminders.Get;
+using ViaTrade.Application.Reminders.GetPage;
+using ViaTrade.Application.Reminders.ListDue;
+using ViaTrade.Application.Signals.Common;
+using ViaTrade.Application.Strategies.Common;
+using ViaTrade.Application.Strategies.Get;
+using ViaTrade.Application.Strategies.GetByInstrumentPage;
+using ViaTrade.Application.Strategies.GetInstrumentsPage;
+using ViaTrade.Application.Strategies.GetPage;
+using ViaTrade.Application.Strategies.SetSubscription;
+using ViaTrade.Application.Trades.Common;
+using ViaTrade.Application.Trades.Get;
+using ViaTrade.Application.Trades.GetPage;
+using ViaTrade.Application.Users.GetCurrent;
 using ViaTrade.Domain.Entities;
 using ViaTrade.Domain.Entities.Abstractions;
 using ViaTrade.Domain.Enums;
@@ -37,32 +44,157 @@ namespace ViaTrade.Tests;
 public sealed class RepositoryRefactoringTests
 {
 	[Fact]
+	public async Task SingleNoteQueriesProjectNullableTargetsAndPreserveOwnership()
+	{
+		await using var database = await TestDatabase.CreateAsync();
+		var context = database.Context;
+		context.Notes.AddRange(
+			WithId(
+				context,
+				new Note
+				{
+					UserId = 1,
+					InstrumentId = 1,
+					Text = "Instrument",
+				},
+				1
+			),
+			WithId(
+				context,
+				new Note
+				{
+					UserId = 1,
+					StrategyId = 1,
+					Text = "Strategy",
+				},
+				2
+			),
+			WithId(
+				context,
+				new Note
+				{
+					UserId = 2,
+					InstrumentId = 1,
+					Text = "Other user",
+				},
+				3
+			)
+		);
+		await database.SaveAsync();
+		var repository = new ReadEfRepository<Note>(context);
+		var handler = new GetNoteHandler(repository);
+		var instrumentNote = await handler.HandleAsync(new GetNoteQuery(1, 1));
+		Assert.Equal("GAZP", instrumentNote.Instrument!.Symbol);
+		Assert.Null(instrumentNote.Strategy);
+		Assert.DoesNotContain("CreatedAt", Assert.Single(database.Commands.Reads));
+		var selectedColumns = database.Commands.Reads[0].Split("FROM", 2)[0];
+		Assert.DoesNotContain("IsActive", selectedColumns);
+		Assert.DoesNotContain("Accuracy", database.Commands.Reads[0]);
+		var strategyNote = await handler.HandleAsync(new GetNoteQuery(1, 2));
+		Assert.Null(strategyNote.Instrument);
+		Assert.Equal("TrendFollowingStrategy", strategyNote.Strategy!.Name);
+		await Assert.ThrowsAsync<NotFoundException>(() => handler.HandleAsync(new GetNoteQuery(2, 1)));
+		var instrumentHandler = new GetInstrumentNoteHandler(new ReadEfRepository<Instrument>(context), repository);
+		Assert.Equal(1, (await instrumentHandler.HandleAsync(new GetInstrumentNoteQuery(1, 1))).Id);
+		var strategyHandler = new GetStrategyNoteHandler(new ReadEfRepository<Strategy>(context), repository);
+		Assert.Equal(2, (await strategyHandler.HandleAsync(new GetStrategyNoteQuery(1, 1))).Id);
+		await Assert.ThrowsAsync<NotFoundException>(() =>
+			instrumentHandler.HandleAsync(new GetInstrumentNoteQuery(1, 100))
+		);
+		await Assert.ThrowsAsync<NotFoundException>(() =>
+			strategyHandler.HandleAsync(new GetStrategyNoteQuery(1, 100))
+		);
+		await Assert.ThrowsAsync<NotFoundException>(() => strategyHandler.HandleAsync(new GetStrategyNoteQuery(2, 1)));
+	}
+
+	[Fact]
+	public async Task NoteProjectionPreservesTheNoteWhenItsStrategyIsFilteredOut()
+	{
+		await using var database = await TestDatabase.CreateAsync();
+		var context = database.Context;
+		context.Strategies.Add(WithId(
+			context,
+			new Strategy { Name = "Inactive", DisplayName = "Inactive", IsActive = false },
+			100
+		));
+		context.Notes.Add(WithId(context, new Note { UserId = 1, StrategyId = 100, Text = "Hidden strategy" }, 1));
+		await database.SaveAsync();
+		var repository = new ReadEfRepository<Note>(context);
+
+		var note = await new GetNoteHandler(repository).HandleAsync(new GetNoteQuery(1, 1));
+		Assert.Equal("Hidden strategy", note.Text);
+		Assert.Null(note.Instrument);
+		Assert.Null(note.Strategy);
+
+		var page = await new GetNotesPageHandler(repository).HandleAsync(
+			new GetNotesPageQuery(1, new NoteFilter(null), new NoteSearch(), new PageOptions())
+		);
+		Assert.Equal(1, page.TotalCount);
+		Assert.Equal(note, Assert.Single(page.Items));
+		Assert.Empty(context.ChangeTracker.Entries());
+	}
+
+	[Fact]
+	public async Task SingleReminderQueryProjectsOnlyResponseFieldsAndPreservesOwnership()
+	{
+		await using var database = await TestDatabase.CreateAsync();
+		var context = database.Context;
+		context.Reminders.AddRange(CreateReminder(context, 1, 1), CreateReminder(context, 2, 2));
+		await database.SaveAsync();
+		var handler = new GetReminderHandler(new ReadEfRepository<Reminder>(context));
+		var reminder = await handler.HandleAsync(new GetReminderQuery(1, 1));
+		Assert.Equal("GAZP", reminder.Instrument!.Symbol);
+		Assert.Null(reminder.DeliveredAt);
+		Assert.Empty(reminder.TelegramId);
+		var sql = Assert.Single(database.Commands.Reads);
+		Assert.DoesNotContain("PublishedAt", sql);
+		Assert.DoesNotContain("CreatedAt", sql);
+		Assert.DoesNotContain("TelegramId", sql);
+		await Assert.ThrowsAsync<NotFoundException>(() => handler.HandleAsync(new GetReminderQuery(2, 1)));
+		await Assert.ThrowsAsync<NotFoundException>(() => handler.HandleAsync(new GetReminderQuery(1, 100)));
+	}
+
+	[Fact]
 	public async Task InstrumentLookupUsesRequestedSymbolAndGenericPaging()
 	{
 		await using var database = await TestDatabase.CreateAsync();
 		await database
 			.Context.Instruments.Where(instrument => instrument.Symbol == "GMKN")
 			.ExecuteUpdateAsync(setters => setters.SetProperty(instrument => instrument.Description, (string?)null));
-		var service = new InstrumentQueryService(null!, new ReadEfRepository<Instrument>(database.Context));
-		Assert.Equal("GMKN", (await service.GetBySymbolAsync("GMKN", default)).Symbol);
-		await Assert.ThrowsAsync<NotFoundException>(() => service.GetBySymbolAsync("Missing", default));
+		var getInstrumentBySymbolHandler = new GetInstrumentBySymbolHandler(
+			new ReadEfRepository<Instrument>(database.Context)
+		);
+		var getInstrumentsPageHandler = new GetInstrumentsPageHandler(
+			new ReadEfRepository<Instrument>(database.Context)
+		);
+		Assert.Equal(
+			"GMKN",
+			(await getInstrumentBySymbolHandler.HandleAsync(new GetInstrumentBySymbolQuery("GMKN"), default)).Symbol
+		);
+		await Assert.ThrowsAsync<NotFoundException>(() =>
+			getInstrumentBySymbolHandler.HandleAsync(new GetInstrumentBySymbolQuery("Missing"), default)
+		);
 		database.Commands.Reads.Clear();
-		var page = await service.GetPageAsync(
-			new InstrumentFilter("GMKN"),
-			new InstrumentSearch { SearchText = "GMKN" },
-			new PageOptions(),
-			new InstrumentSort(),
+		var page = await getInstrumentsPageHandler.HandleAsync(
+			new GetInstrumentsPageQuery(
+				new InstrumentFilter("GMKN"),
+				new InstrumentSearch { SearchText = "GMKN" },
+				new PageOptions(),
+				new InstrumentSort()
+			),
 			default
 		);
 		Assert.Equal("GMKN", Assert.Single(page.Items).Symbol);
 		Assert.Equal(1, page.TotalCount);
 		Assert.DoesNotContain("COUNT", Assert.Single(database.Commands.Reads), StringComparison.OrdinalIgnoreCase);
 		database.Commands.Reads.Clear();
-		var second = await service.GetPageAsync(
-			new InstrumentFilter("GMKN"),
-			new InstrumentSearch(),
-			new PageOptions { Page = 2 },
-			new InstrumentSort(),
+		var second = await getInstrumentsPageHandler.HandleAsync(
+			new GetInstrumentsPageQuery(
+				new InstrumentFilter("GMKN"),
+				new InstrumentSearch(),
+				new PageOptions { Page = 2 },
+				new InstrumentSort()
+			),
 			default
 		);
 		Assert.Equal(1, second.TotalCount);
@@ -74,11 +206,13 @@ public sealed class RepositoryRefactoringTests
 	public async Task UserProjectionDoesNotSelectPasswordHash()
 	{
 		await using var database = await TestDatabase.CreateAsync();
-		var service = new UserQueryService(new ReadEfRepository<User>(database.Context), null!);
-		var user = await service.GetCurrentUserAsync(1, default);
+		var getCurrentUserHandler = new GetCurrentUserHandler(new ReadEfRepository<User>(database.Context));
+		var user = await getCurrentUserHandler.HandleAsync(new GetCurrentUserQuery(1), default);
 		Assert.Equal("one", user.Login);
 		Assert.DoesNotContain("PasswordHash", Assert.Single(database.Commands.Reads));
-		await Assert.ThrowsAsync<NotFoundException>(() => service.GetCurrentUserAsync(100, default));
+		await Assert.ThrowsAsync<NotFoundException>(() =>
+			getCurrentUserHandler.HandleAsync(new GetCurrentUserQuery(100), default)
+		);
 	}
 
 	[Fact]
@@ -102,52 +236,60 @@ public sealed class RepositoryRefactoringTests
 			}
 		);
 		await database.SaveAsync();
-		var service = new StrategyQueryService(
-			new ReadEfRepository<Instrument>(context),
+		var getStrategiesPageHandler = new GetStrategiesPageHandler(new ReadEfRepository<Strategy>(context));
+		var getStrategyHandler = new GetStrategyHandler(new ReadEfRepository<Strategy>(context));
+		var getStrategyInstrumentsPageHandler = new GetStrategyInstrumentsPageHandler(
 			new ReadEfRepository<Strategy>(context),
-			new ReadEfRepository<UserStrategyInstrument>(context),
-			new StrategyEfRepository(context)
+			new ReadEfRepository<UserStrategyInstrument>(context)
 		);
-		Assert.True((await service.GetAsync(1, 1, default)).IsSubscribed);
-		Assert.False((await service.GetAsync(2, 1, default)).IsSubscribed);
-		var page = await service.GetPageAsync(
-			1,
-			new StrategyFilter(null),
-			new StrategySearch(),
-			new StrategySort(),
-			new PageOptions(),
+		Assert.True((await getStrategyHandler.HandleAsync(new GetStrategyQuery(1, 1), default)).IsSubscribed);
+		Assert.False((await getStrategyHandler.HandleAsync(new GetStrategyQuery(2, 1), default)).IsSubscribed);
+		var page = await getStrategiesPageHandler.HandleAsync(
+			new GetStrategiesPageQuery(
+				1,
+				new StrategyFilter(null),
+				new StrategySearch(),
+				new StrategySort(),
+				new PageOptions()
+			),
 			default
 		);
 		Assert.Equal(2, page.TotalCount);
 		Assert.Single(page.Items, item => item.IsSubscribed);
 		database.Commands.Reads.Clear();
-		var second = await service.GetPageAsync(
-			1,
-			new StrategyFilter("Test"),
-			new StrategySearch(),
-			new StrategySort(),
-			new PageOptions { Page = 2 },
+		var second = await getStrategiesPageHandler.HandleAsync(
+			new GetStrategiesPageQuery(
+				1,
+				new StrategyFilter("Test"),
+				new StrategySearch(),
+				new StrategySort(),
+				new PageOptions { Page = 2 }
+			),
 			default
 		);
 		Assert.Empty(second.Items);
 		Assert.Equal(1, second.TotalCount);
 		Assert.Contains("COUNT", Assert.Single(database.Commands.Reads), StringComparison.OrdinalIgnoreCase);
-		var instruments = await service.GetInstrumentsByStrategyPageAsync(
-			1,
-			1,
-			new StrategyInstrumentFilter(null),
-			new InstrumentSort(),
-			new PageOptions(),
+		var instruments = await getStrategyInstrumentsPageHandler.HandleAsync(
+			new GetStrategyInstrumentsPageQuery(
+				1,
+				1,
+				new StrategyInstrumentFilter(null),
+				new InstrumentSort(),
+				new PageOptions()
+			),
 			default
 		);
 		Assert.Equal("GAZP", Assert.Single(instruments.Items).Symbol);
 		await Assert.ThrowsAsync<NotFoundException>(() =>
-			service.GetInstrumentsByStrategyPageAsync(
-				1,
-				100,
-				new StrategyInstrumentFilter(null),
-				new InstrumentSort(),
-				new PageOptions(),
+			getStrategyInstrumentsPageHandler.HandleAsync(
+				new GetStrategyInstrumentsPageQuery(
+					1,
+					100,
+					new StrategyInstrumentFilter(null),
+					new InstrumentSort(),
+					new PageOptions()
+				),
 				default
 			)
 		);
@@ -195,14 +337,16 @@ public sealed class RepositoryRefactoringTests
 			)
 		);
 		await database.SaveAsync();
-		var service = new StrategyQueryService(null!, new ReadEfRepository<Strategy>(context), null!, null!);
+		var getStrategiesPageHandler = new GetStrategiesPageHandler(new ReadEfRepository<Strategy>(context));
 
-		var page = await service.GetPageAsync(
-			1,
-			new StrategyFilter(name),
-			new StrategySearch { SearchText = searchText },
-			new StrategySort(),
-			new PageOptions(),
+		var page = await getStrategiesPageHandler.HandleAsync(
+			new GetStrategiesPageQuery(
+				1,
+				new StrategyFilter(name),
+				new StrategySearch { SearchText = searchText },
+				new StrategySort(),
+				new PageOptions()
+			),
 			default
 		);
 
@@ -213,7 +357,7 @@ public sealed class RepositoryRefactoringTests
 		}
 		else
 		{
-			Assert.Equal(expectedId, Assert.Single(page.Items).Strategy.Id);
+			Assert.Equal(expectedId, Assert.Single(page.Items).Id);
 			Assert.Equal(1, page.TotalCount);
 		}
 	}
@@ -231,13 +375,15 @@ public sealed class RepositoryRefactoringTests
 		);
 		await database.SaveAsync();
 		var repository = new ReadEfRepository<Reminder>(context);
-		var service = new ReminderQueryService(new ReadEfRepository<Instrument>(context), repository, null!);
-		var complete = await service.GetPageAsync(
-			1,
-			new ReminderFilter(null),
-			new ReminderSearch(),
-			new PageOptions { PageSize = 3 },
-			new ReminderSort(),
+		var getRemindersPageHandler = new GetRemindersPageHandler(repository);
+		var complete = await getRemindersPageHandler.HandleAsync(
+			new GetRemindersPageQuery(
+				1,
+				new ReminderFilter(null),
+				new ReminderSearch(),
+				new PageOptions { PageSize = 3 },
+				new ReminderSort()
+			),
 			default
 		);
 		Assert.Equal(3, complete.TotalCount);
@@ -262,8 +408,7 @@ public sealed class RepositoryRefactoringTests
 			new PageOptions { PageSize = 2 },
 			new ReminderSort()
 		);
-		var first = await PageQuery.ExecuteAsync(
-			repository,
+		var first = await repository.GetPageAsync(
 			firstSpecification,
 			reminder => new { reminder.Id, InstrumentTicker = reminder.Instrument!.Symbol },
 			default
@@ -279,8 +424,7 @@ public sealed class RepositoryRefactoringTests
 			new PageOptions { Page = 2, PageSize = 2 },
 			new ReminderSort()
 		);
-		var second = await PageQuery.ExecuteAsync(
-			repository,
+		var second = await repository.GetPageAsync(
 			secondSpecification,
 			reminder => new { reminder.Id, InstrumentTicker = reminder.Instrument!.Symbol },
 			default
@@ -295,8 +439,7 @@ public sealed class RepositoryRefactoringTests
 			new PageOptions { Page = 3, PageSize = 2 },
 			new ReminderSort()
 		);
-		var beyond = await PageQuery.ExecuteAsync(
-			repository,
+		var beyond = await repository.GetPageAsync(
 			beyondSpecification,
 			reminder => new { reminder.Id, InstrumentTicker = reminder.Instrument!.Symbol },
 			default
@@ -342,8 +485,7 @@ public sealed class RepositoryRefactoringTests
 			new ReminderSort()
 		);
 
-		var result = await PageQuery.ExecuteAsync(
-			repository,
+		var result = await repository.GetPageAsync(
 			specification,
 			reminder => new { reminder.Id, InstrumentTicker = reminder.Instrument!.Symbol },
 			default
@@ -375,7 +517,7 @@ public sealed class RepositoryRefactoringTests
 			new InstrumentSort()
 		);
 
-		var result = await PageQuery.ExecuteAsync(repository, specification, default);
+		var result = await repository.GetPageAsync(specification, default);
 
 		Assert.Empty(result.Items);
 		Assert.Equal(0, result.TotalCount);
@@ -384,9 +526,11 @@ public sealed class RepositoryRefactoringTests
 	}
 
 	[Theory]
-	[InlineData(1)]
-	[InlineData(2)]
-	public async Task CancelledPageDoesNotSendDatabaseQueries(int page)
+	[InlineData(1, false)]
+	[InlineData(1, true)]
+	[InlineData(2, false)]
+	[InlineData(2, true)]
+	public async Task CancelledPageDoesNotSendDatabaseQueries(int page, bool project)
 	{
 		await using var database = await TestDatabase.CreateAsync();
 		var repository = new ReadEfRepository<Instrument>(database.Context);
@@ -399,9 +543,14 @@ public sealed class RepositoryRefactoringTests
 		using var cancellation = new CancellationTokenSource();
 		cancellation.Cancel();
 
-		await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
-			PageQuery.ExecuteAsync(repository, specification, cancellation.Token)
-		);
+		if (project)
+			await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+				repository.GetPageAsync(specification, instrument => instrument.Symbol, cancellation.Token)
+			);
+		else
+			await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
+				repository.GetPageAsync(specification, cancellation.Token)
+			);
 		Assert.Empty(database.Commands.Reads);
 	}
 
@@ -422,19 +571,26 @@ public sealed class RepositoryRefactoringTests
 	[Fact]
 	public void InMemoryPaginationAndPageTotalsHandleBoundaryValues()
 	{
-		var specification = new PageSpecification<int>(new PageOptions { Page = 2, PageSize = 2 });
-		var page = PageQuery.FromList(new[] { 1, 2, 3 }, specification);
+		var page = PageResult<int>.FromList(new[] { 1, 2, 3 }, 2, 2);
 		Assert.Equal(3, Assert.Single(page.Items));
 		Assert.Equal(3, page.TotalCount);
 		Assert.Equal(2, page.TotalPages);
-		var beyond = new PageSpecification<int>(
-			new PageOptions { Page = PageOptions.MaxPage, PageSize = PageOptions.MaxPageSize }
-		);
-		Assert.Empty(PageQuery.FromList(new[] { 1, 2, 3 }, beyond).Items);
-		Assert.Equal(3, PageQuery.FromList(new[] { 1, 2, 3 }, beyond).TotalCount);
-		Assert.Equal(0, PageQuery.FromList(Array.Empty<int>(), specification).TotalPages);
+		var beyond = PageResult<int>.FromList(new[] { 1, 2, 3 }, PageOptions.MaxPage, PageOptions.MaxPageSize);
+		Assert.Empty(beyond.Items);
+		Assert.Equal(3, beyond.TotalCount);
+		Assert.Equal(0, PageResult<int>.FromList(Array.Empty<int>(), 2, 2).TotalPages);
 		Assert.Equal(int.MaxValue, new PageResult<int>([], int.MaxValue, 1, 1).TotalPages);
 		Assert.Equal(21_474_837, new PageResult<int>([], int.MaxValue, 1, 100).TotalPages);
+	}
+
+	[Theory]
+	[InlineData(0, 2)]
+	[InlineData(-1, 2)]
+	[InlineData(1, 0)]
+	[InlineData(1, -1)]
+	public void InMemoryPaginationRejectsNonPositiveBounds(int page, int pageSize)
+	{
+		Assert.Throws<ArgumentOutOfRangeException>(() => PageResult<int>.FromList([1, 2, 3], page, pageSize));
 	}
 
 	[Fact]
@@ -526,17 +682,9 @@ public sealed class RepositoryRefactoringTests
 		await database.SaveAsync();
 		var repository = new EfRepository<Note>(context);
 		var operations = new NoteEfRepository(context);
-		var queryService = new NoteQueryService(
-			new ReadEfRepository<Instrument>(context),
-			new ReadEfRepository<Strategy>(context),
-			repository,
-			operations
-		);
-		var page = await queryService.GetPageAsync(
-			1,
-			new NoteFilter(null),
-			new NoteSearch(),
-			new PageOptions(),
+		var getNotesPageHandler = new GetNotesPageHandler(repository);
+		var page = await getNotesPageHandler.HandleAsync(
+			new GetNotesPageQuery(1, new NoteFilter(null), new NoteSearch(), new PageOptions()),
 			default
 		);
 		Assert.Equal(2, page.TotalCount);
@@ -544,32 +692,57 @@ public sealed class RepositoryRefactoringTests
 		Assert.Null(page.Items[0].Strategy);
 		Assert.Equal("TrendFollowingStrategy", page.Items[1].Strategy!.Name);
 		Assert.Null(page.Items[1].Instrument);
-		var instrumentSearch = await queryService.GetPageAsync(
-			1,
-			new NoteFilter(null),
-			new NoteSearch { SearchText = "GAZP" },
-			new PageOptions(),
+		var pageSql = Assert.Single(database.Commands.Reads);
+		Assert.DoesNotContain("CreatedAt", pageSql);
+		Assert.DoesNotContain("IsActive", pageSql.Split("FROM", 2)[0]);
+		Assert.DoesNotContain("Accuracy", pageSql);
+		Assert.Empty(context.ChangeTracker.Entries());
+
+		var secondPage = await getNotesPageHandler.HandleAsync(
+			new GetNotesPageQuery(
+				1,
+				new NoteFilter(null),
+				new NoteSearch(),
+				new PageOptions { Page = 2, PageSize = 1 }
+			),
+			default
+		);
+		Assert.Equal(2, secondPage.TotalCount);
+		var secondPageNote = Assert.Single(secondPage.Items);
+		Assert.Equal(2, secondPageNote.Id);
+		Assert.Null(secondPageNote.Instrument);
+		Assert.Equal("TrendFollowingStrategy", secondPageNote.Strategy!.Name);
+
+		var instrumentSearch = await getNotesPageHandler.HandleAsync(
+			new GetNotesPageQuery(1, new NoteFilter(null), new NoteSearch { SearchText = "GAZP" }, new PageOptions()),
 			default
 		);
 		Assert.Equal(1, Assert.Single(instrumentSearch.Items).Id);
-		var strategySearch = await queryService.GetPageAsync(
-			1,
-			new NoteFilter(null),
-			new NoteSearch { SearchText = "TrendFollowing" },
-			new PageOptions(),
+		var strategySearch = await getNotesPageHandler.HandleAsync(
+			new GetNotesPageQuery(
+				1,
+				new NoteFilter(null),
+				new NoteSearch { SearchText = "TrendFollowing" },
+				new PageOptions()
+			),
 			default
 		);
 		Assert.Equal(2, Assert.Single(strategySearch.Items).Id);
-		var otherUserSpecification = new NoteWithTargetsSpecification(2, note => note.Id == 1);
-		Assert.Null(await repository.FirstOrDefaultAsync(otherUserSpecification, default));
+		var otherUserHandler = new GetNoteHandler(repository);
+		await Assert.ThrowsAsync<NotFoundException>(() => otherUserHandler.HandleAsync(new GetNoteQuery(2, 1)));
 
-		var commands = new NoteCommandService(repository, operations, new EfUnitOfWork(context));
-		await commands.UpsertInstrumentAsync(1, 1, "Updated", default);
+		var deleteInstrumentNoteHandler = new DeleteInstrumentNoteHandler(repository);
+		var upsertInstrumentNoteHandler = new UpsertInstrumentNoteHandler(
+			repository,
+			operations,
+			new EfUnitOfWork(context)
+		);
+		await upsertInstrumentNoteHandler.HandleAsync(new UpsertInstrumentNoteCommand(1, 1, "Updated"), default);
 		Assert.Equal(
 			"Other user",
 			await repository.FirstOrDefaultAsync(note => note.UserId == 2, note => note.Text, default)
 		);
-		await commands.DeleteInstrumentAsync(1, 1, default);
+		await deleteInstrumentNoteHandler.HandleAsync(new DeleteInstrumentNoteCommand(1, 1), default);
 		Assert.True(await repository.AnyAsync(note => note.Id == 3 && note.UserId == 2, default));
 		Assert.Equal(1, await repository.CountAsync(note => note.UserId == 1, default));
 	}
@@ -618,27 +791,21 @@ public sealed class RepositoryRefactoringTests
 			new PageOptions(),
 			new StrategySort { SortBy = [StrategySortField.AccuracyDesc, StrategySortField.NameAsc] }
 		);
-		var page = await PageQuery.ExecuteAsync(
-			links,
+		var page = await links.GetPageAsync(
 			specification,
-			link => new StrategySubscriptionDto(
-				link.Strategy!,
-				link.Strategy!.UserStrategies.Any(subscription => subscription.UserId == 1)
-			),
+			StrategySubscriptionResult.LinkProjection(1),
 			default
 		);
-		Assert.Equal(new[] { 2, 1 }, page.Items.Select(item => item.Strategy.Id));
+		Assert.Equal(new[] { 2, 1 }, page.Items.Select(item => item.Id));
 		Assert.False(page.Items[0].IsSubscribed);
 		Assert.True(page.Items[1].IsSubscribed);
 
-		var service = new StrategyCommandService(
-			links,
+		var setStrategySubscriptionHandler = new SetStrategySubscriptionHandler(
 			subscriptions,
 			new ReadEfRepository<Strategy>(context),
-			new StrategyEfRepository(context),
 			new EfUnitOfWork(context)
 		);
-		await service.SetSubscriptionAsync(1, 1, false, default);
+		await setStrategySubscriptionHandler.HandleAsync(new SetStrategySubscriptionCommand(1, 1, false), default);
 		Assert.Equal(2, await links.CountAsync(link => link.UserId == 1, default));
 		Assert.Empty(await links.ListAsync(sourcesSpecification, default));
 		Assert.True(await subscriptions.AnyAsync(link => link.UserId == 2 && link.StrategyId == 2, default));
@@ -695,8 +862,10 @@ public sealed class RepositoryRefactoringTests
 		var batch = await repository.ListAsync(specification, default);
 		Assert.Equal(1, Assert.Single(batch).Id);
 		Assert.Equal("telegram-1", batch[0].TelegramId);
-		var service = new ReminderQueryService(new ReadEfRepository<Instrument>(context), repository, null!);
-		await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() => service.ListDueBatchAsync(0, default));
+		var listDueRemindersHandler = new ListDueRemindersHandler(repository);
+		await Assert.ThrowsAsync<ArgumentOutOfRangeException>(() =>
+			listDueRemindersHandler.HandleAsync(new ListDueRemindersQuery(0), default)
+		);
 	}
 
 	[Fact]
@@ -707,12 +876,15 @@ public sealed class RepositoryRefactoringTests
 		context.Trades.AddRange(CreateTrade(context, 1, 1), CreateTrade(context, 2, 2));
 		await database.SaveAsync();
 		var repository = new EfRepository<Trade>(context);
-		var service = new TradeQueryService(repository, new TradeEfRepository(context));
-		await Assert.ThrowsAsync<NotFoundException>(() => service.GetAsync(2, 1, default));
-		var projection = await service.GetAsync(1, 1, default);
+		var getTradeHandler = new GetTradeHandler(repository);
+		var getTradesPageHandler = new GetTradesPageHandler(repository);
+		await Assert.ThrowsAsync<NotFoundException>(() =>
+			getTradeHandler.HandleAsync(new GetTradeQuery(2, 1), default)
+		);
+		var projection = await getTradeHandler.HandleAsync(new GetTradeQuery(1, 1), default);
 		Assert.Equal("GAZP", projection.Instrument!.Symbol);
 		Assert.Equal(10, projection.NetIncome);
-		var request = new TradeInputDto
+		var request = new TradeInput
 		{
 			OpenedAt = projection.OpenedAt,
 			ClosedAt = projection.ClosedAt,
@@ -726,12 +898,14 @@ public sealed class RepositoryRefactoringTests
 		var operations = new TradeEfRepository(context);
 		Assert.Equal(0, await operations.ExecuteUpdateAsync(2, 1, request, 200, default));
 		Assert.Equal(1, await operations.ExecuteUpdateAsync(1, 1, request, 200, default));
-		Assert.Equal(20, (await service.GetAsync(1, 1, default)).NetIncome);
-		var page = await service.GetPageAsync(
-			1,
-			new TradeFilter(null, null, null, null, null),
-			new TradeSearch(),
-			new PageOptions(),
+		Assert.Equal(20, (await getTradeHandler.HandleAsync(new GetTradeQuery(1, 1), default)).NetIncome);
+		var page = await getTradesPageHandler.HandleAsync(
+			new GetTradesPageQuery(
+				1,
+				new TradeFilter(null, null, null, null, null),
+				new TradeSearch(),
+				new PageOptions()
+			),
 			default
 		);
 		Assert.Equal(1, page.TotalCount);
@@ -742,11 +916,13 @@ public sealed class RepositoryRefactoringTests
 		openTrade.ClosePrice = null;
 		context.Trades.Add(openTrade);
 		await database.SaveAsync();
-		var openPage = await service.GetPageAsync(
-			1,
-			new TradeFilter(null, TradeStatus.Open, null, null, null),
-			new TradeSearch { SearchText = "100" },
-			new PageOptions(),
+		var openPage = await getTradesPageHandler.HandleAsync(
+			new GetTradesPageQuery(
+				1,
+				new TradeFilter(null, TradeStatus.Open, null, null, null),
+				new TradeSearch { SearchText = "100" },
+				new PageOptions()
+			),
 			default
 		);
 		Assert.Equal(3, Assert.Single(openPage.Items).Id);
@@ -777,17 +953,25 @@ public sealed class RepositoryRefactoringTests
 			new PageOptions { Page = 2, PageSize = 1 },
 			new InstrumentSort()
 		);
-		var first = specification.ForPage(instrument => instrument.Symbol);
-		var second = secondSpecification.ForPage(instrument => instrument.Symbol);
-		Assert.Equal(new[] { "GAZP" }, await repository.ListAsync(first, default));
-		Assert.Equal(new[] { "GMKN" }, await repository.ListAsync(second, default));
-		Assert.Equal(2, await repository.CountAsync(first, default));
+		var first = await repository.GetPageAsync(specification, instrument => instrument.Symbol, default);
+		var second = await repository.GetPageAsync(secondSpecification, instrument => instrument.Symbol, default);
+		Assert.Equal(new[] { "GAZP" }, first.Items);
+		Assert.Equal(new[] { "GMKN" }, second.Items);
+		Assert.Equal(2, first.TotalCount);
+		Assert.Equal(2, second.TotalCount);
+		Assert.Equal(2, await repository.CountAsync(specification, default));
 		Assert.Equal(-1, specification.Skip);
 		Assert.Equal(-1, specification.Take);
 		Assert.Equal(1, specification.Page);
 		Assert.Equal(1, specification.PageSize);
-		var projection = specification.Project(instrument => instrument.Symbol);
-		Assert.Equal(new[] { "GAZP", "GMKN" }, await repository.ListAsync(projection, default));
+		var instruments = await repository.ListAsync(specification, default);
+		Assert.Equal(new[] { "GAZP", "GMKN" }, instruments.Select(instrument => instrument.Symbol));
+
+		var page = await repository.GetPageAsync(specification, instrument => instrument.Symbol, default);
+		Assert.Equal(new[] { "GAZP" }, page.Items);
+		Assert.Equal(2, page.TotalCount);
+		Assert.Equal(-1, specification.Skip);
+		Assert.Equal(-1, specification.Take);
 	}
 
 	[Fact]
@@ -808,14 +992,11 @@ public sealed class RepositoryRefactoringTests
 			new TradeSearch { SearchText = "GAZP" },
 			new PageOptions { Page = 2 }
 		);
-		var tradePage = trade.ForPage(trade => new
-		{
-			trade.Id,
-			trade.UserId,
-			trade.NetIncome,
-			trade.Instrument!.Symbol,
-		});
-		var tradeSql = evaluator.GetQuery(context.Trades, tradePage).ToQueryString();
+		var tradeSql = evaluator.GetQuery(context.Trades, trade)
+			.Skip(trade.Offset)
+			.Take(trade.PageSize)
+			.Select(TradeResult.Projection)
+			.ToQueryString();
 		Assert.Contains("UserId", tradeSql);
 		Assert.Contains("IS NULL", tradeSql);
 		Assert.Contains("ORDER BY", tradeSql);
@@ -823,14 +1004,11 @@ public sealed class RepositoryRefactoringTests
 		Assert.Contains("LIMIT", tradeSql);
 		Assert.Contains("OFFSET", tradeSql);
 		var note = new NotesPageSpecification(1, new NoteFilter(null), new NoteSearch(), new PageOptions());
-		var noteProjection = note.Project(note => new
-		{
-			note.Id,
-			InstrumentTicker = note.Instrument!.Symbol,
-			StrategyName = note.Strategy!.Name,
-		});
-		var noteSql = evaluator.GetQuery(context.Notes, noteProjection).ToQueryString();
+		var noteSql = evaluator.GetQuery(context.Notes, note).Select(NoteResult.Projection).ToQueryString();
 		Assert.Contains("LEFT JOIN", noteSql);
+		Assert.DoesNotContain("CreatedAt", noteSql);
+		Assert.DoesNotContain("IsActive", noteSql.Split("FROM", 2)[0]);
+		Assert.DoesNotContain("Accuracy", noteSql);
 		var signal = new SignalSourcesSpecification(1);
 		var signalSql = evaluator.GetQuery(context.UserStrategyInstruments, signal).ToQueryString();
 		Assert.Contains("EXISTS", signalSql);
@@ -844,12 +1022,9 @@ public sealed class RepositoryRefactoringTests
 			new PageOptions(),
 			new InstrumentSort()
 		);
-		var linkedProjection = linkedInstruments.Project(link => new RelatedInstrumentDto(
-			link.Instrument!.Id,
-			link.Instrument.Symbol,
-			link.Instrument.Description
-		));
-		var linkedSql = evaluator.GetQuery(context.UserStrategyInstruments, linkedProjection).ToQueryString();
+		var linkedSql = evaluator.GetQuery(context.UserStrategyInstruments, linkedInstruments)
+			.Select(InstrumentResult.LinkProjection)
+			.ToQueryString();
 		Assert.Contains("UserId", linkedSql);
 		Assert.Contains("StrategyId", linkedSql);
 		var strategies = new StrategiesPageSpecification(
@@ -858,10 +1033,14 @@ public sealed class RepositoryRefactoringTests
 			new PageOptions(),
 			new StrategySort()
 		);
-		var strategiesPage = strategies.ForPage(strategy => strategy.Name);
-		var strategiesSql = evaluator.GetQuery(context.Strategies, strategiesPage).ToQueryString();
+		var strategiesSql = evaluator.GetQuery(context.Strategies, strategies)
+			.Skip(strategies.Offset)
+			.Take(strategies.PageSize)
+			.Select(StrategySubscriptionResult.Projection(1))
+			.ToQueryString();
 		Assert.Contains("SignalFrequency", strategiesSql);
 		Assert.Contains("InvestmentHorizon", strategiesSql);
+		Assert.Contains("EXISTS", strategiesSql);
 	}
 
 	private static T WithId<T>(AppDbContext context, T entity, int id)

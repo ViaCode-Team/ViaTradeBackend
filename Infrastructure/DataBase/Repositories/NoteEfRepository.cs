@@ -1,24 +1,24 @@
 using Microsoft.EntityFrameworkCore;
-using ViaTrade.Application.Notes.Interfaces;
-using ViaTrade.Application.Notes.Models;
+using ViaTrade.Application.Notes.Common.Abstractions;
+using ViaTrade.Application.Notes.GetStatistics;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
 public class NoteEfRepository(AppDbContext context) : INoteRepository
 {
-	public async Task<NoteStatisticDto> GetStatisticsAsync(int userId, CancellationToken ct)
+	public async Task<NoteStatisticsResult> GetStatisticsAsync(int userId, CancellationToken ct)
 	{
 		var statistics = await context
 			.Notes.Where(note => note.UserId == userId)
 			.GroupBy(_ => 1)
-			.Select(group => new NoteStatisticDto(
+			.Select(group => new NoteStatisticsResult(
 				group.Count(),
 				group.Count(note => note.InstrumentId != null),
 				group.Count(note => note.StrategyId != null)
 			))
 			.SingleOrDefaultAsync(ct);
 
-		return statistics ?? new NoteStatisticDto(0, 0, 0);
+		return statistics ?? new NoteStatisticsResult(0, 0, 0);
 	}
 
 	public Task<int> ExecuteUpdateInstrumentAsync(int userId, int instrumentId, string text, CancellationToken ct)

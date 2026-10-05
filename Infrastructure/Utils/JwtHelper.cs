@@ -4,9 +4,9 @@ using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
-using ViaTrade.Application.Auth.Interfaces;
+using ViaTrade.Application.Auth.Common;
+using ViaTrade.Application.Auth.Common.Abstractions;
 using ViaTrade.Application.Common.Exceptions;
-using ViaTrade.Application.Users.Models;
 using ViaTrade.Configuration.Options;
 
 namespace ViaTrade.Infrastructure.Utils;
@@ -15,7 +15,7 @@ public class JwtHelper(IOptions<JwtSettings> options) : IJwtHelper
 {
 	private readonly JwtSettings _options = options.Value;
 
-	public string GenerateAccessToken(UserTokenDto user, string sessionId, DateTime expiresAt)
+	public string GenerateAccessToken(TokenUser user, string sessionId, DateTime expiresAt)
 	{
 		var claims = new[]
 		{

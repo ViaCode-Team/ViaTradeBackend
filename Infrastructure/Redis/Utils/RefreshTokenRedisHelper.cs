@@ -2,7 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using StackExchange.Redis;
-using ViaTrade.Application.Users.Models;
+using ViaTrade.Application.Auth.Common;
 using ViaTrade.Infrastructure.Redis.Keys;
 using ViaTrade.Infrastructure.Redis.Scripts;
 using ViaTrade.Infrastructure.Redis.Serialization;
@@ -24,7 +24,7 @@ internal sealed class RefreshTokenRedisHelper(IDatabase database)
 	}
 
 	public async Task<bool> TryRotateAsync(
-		UserSessionDto session,
+		SessionData session,
 		string refreshTokenFingerprint,
 		string newRefreshTokenFingerprint,
 		TimeSpan sessionTtl,
@@ -45,7 +45,7 @@ internal sealed class RefreshTokenRedisHelper(IDatabase database)
 			[
 				refreshTokenFingerprint,
 				session.Id,
-				JsonSerializer.Serialize(session, RedisJsonSerializerContext.Default.UserSessionDto),
+				JsonSerializer.Serialize(session, RedisJsonSerializerContext.Default.SessionData),
 				ToMilliseconds(sessionTtl),
 				newRefreshTokenFingerprint,
 				ToMilliseconds(usedRefreshTokenTtl),
@@ -59,7 +59,7 @@ internal sealed class RefreshTokenRedisHelper(IDatabase database)
 	}
 
 	public async Task<bool> TryMigrateLegacyAsync(
-		UserSessionDto session,
+		SessionData session,
 		string refreshToken,
 		string refreshTokenFingerprint,
 		TimeSpan sessionTtl

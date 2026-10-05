@@ -1,6 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authorization;
-using ViaTrade.Application.Auth.Interfaces;
+using ViaTrade.Application.Auth.Common.Abstractions;
 
 namespace ViaTrade.Api.Handler;
 

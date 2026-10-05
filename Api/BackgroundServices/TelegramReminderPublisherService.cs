@@ -1,9 +1,11 @@
 using System.Text.Json;
 using Microsoft.Extensions.Options;
-using ViaTrade.Application.Notifications.Interfaces;
-using ViaTrade.Application.Notifications.Models;
-using ViaTrade.Application.Reminders.Interfaces;
-using ViaTrade.Application.Reminders.Models;
+using ViaTrade.Application.Common.Abstractions;
+using ViaTrade.Application.Notifications.Common;
+using ViaTrade.Application.Notifications.Common.Abstractions;
+using ViaTrade.Application.Reminders.Common;
+using ViaTrade.Application.Reminders.ListDue;
+using ViaTrade.Application.Reminders.MarkPublished;
 using ViaTrade.Configuration.Options;
 
 namespace ViaTrade.Api.BackgroundServices;
@@ -53,9 +55,14 @@ public sealed class TelegramReminderPublisherService(
 	private async Task PublishDueRemindersAsync(CancellationToken ct)
 	{
 		using var scope = services.CreateScope();
-		var reminderQueryService = scope.ServiceProvider.GetRequiredService<IReminderQueryService>();
-		var reminderCommandService = scope.ServiceProvider.GetRequiredService<IReminderCommandService>();
-		var reminders = await reminderQueryService.ListDueBatchAsync(options.Value.ReminderPublishBatchSize, ct);
+		var dueHandler = scope.ServiceProvider.GetRequiredService<
+			IQueryHandler<ListDueRemindersQuery, IReadOnlyList<ReminderResult>>
+		>();
+		var publishHandler = scope.ServiceProvider.GetRequiredService<
+			ICommandHandler<MarkReminderPublishedCommand, PublishReminderResult>
+		>();
+		var query = new ListDueRemindersQuery(options.Value.ReminderPublishBatchSize);
+		var reminders = await dueHandler.HandleAsync(query, ct);
 
 		logger.LogDebug("Found {ReminderCount} due reminders for Telegram publishing", reminders.Count);
 
@@ -64,8 +71,9 @@ public sealed class TelegramReminderPublisherService(
 			try
 			{
 				await PublishReminderAsync(reminder, ct);
-				bool isMarked = await reminderCommandService.MarkPublishedAsync(reminder.UserId, reminder.Id, ct);
-				if (isMarked)
+				var command = new MarkReminderPublishedCommand(reminder.UserId, reminder.Id);
+				var result = await publishHandler.HandleAsync(command, ct);
+				if (result.IsPublished)
 					logger.LogInformation(
 						"Marked reminder {ReminderId} as published for user {UserId}",
 						reminder.Id,
@@ -93,7 +101,7 @@ public sealed class TelegramReminderPublisherService(
 		}
 	}
 
-	private async Task PublishReminderAsync(ReminderDto reminder, CancellationToken ct)
+	private async Task PublishReminderAsync(ReminderResult reminder, CancellationToken ct)
 	{
 		var payload = new ReminderNotificationPayload(
 			reminder.Id,

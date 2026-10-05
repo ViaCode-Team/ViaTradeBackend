@@ -1,6 +1,6 @@
 using System.Globalization;
 using System.Text.RegularExpressions;
-using ViaTrade.Application.Trades.Interfaces;
+using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Domain.Models.Trade;
 
 namespace ViaTrade.Infrastructure.Utils;

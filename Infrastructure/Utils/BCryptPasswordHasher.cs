@@ -1,4 +1,4 @@
-using ViaTrade.Application.Auth.Interfaces;
+using ViaTrade.Application.Auth.Common.Abstractions;
 
 namespace ViaTrade.Infrastructure.Utils;
 

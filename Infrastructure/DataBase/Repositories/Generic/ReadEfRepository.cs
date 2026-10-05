@@ -2,7 +2,9 @@ using System.Linq.Expressions;
 using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using ViaTrade.Application.Common.Interfaces.Repositories;
+using ViaTrade.Application.Common.Abstractions.Repositories;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Common.Specifications;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories.Generic;
 
@@ -118,6 +120,67 @@ public class ReadEfRepository<T>(AppDbContext context, ISpecificationEvaluator s
 			return specification.PostProcessingAction(queryResult).ToList();
 
 		return queryResult;
+	}
+
+	public Task<PageResult<T>> GetPageAsync(PageSpecification<T> specification, CancellationToken ct)
+	{
+		return GetPageAsync(specification, entity => entity, ct);
+	}
+
+	public async Task<PageResult<TResult>> GetPageAsync<TResult>(
+		PageSpecification<T> specification,
+		Expression<Func<T, TResult>> selector,
+		CancellationToken ct
+	)
+	{
+		ValidatePageSpecification(specification);
+
+		var take = specification.PageSize;
+		if (specification.Page == 1)
+			take++;
+
+		var pageQuery = ApplySpecification(specification)
+			.Skip(specification.Offset)
+			.Take(take)
+			.Select(selector);
+
+		if (specification.Page == 1)
+		{
+			var items = await pageQuery.ToListAsync(ct);
+			if (items.Count <= specification.PageSize)
+				return new PageResult<TResult>(items, items.Count, specification.Page, specification.PageSize);
+
+			var totalCount = await CountAsync(specification, ct);
+
+			items.RemoveAt(items.Count - 1);
+
+			return new PageResult<TResult>(items, totalCount, specification.Page, specification.PageSize);
+		}
+
+		var total = await CountAsync(specification, ct);
+		if (specification.Offset >= total)
+			return new PageResult<TResult>([], total, specification.Page, specification.PageSize);
+
+		var pageItems = await pageQuery.ToListAsync(ct);
+		return new PageResult<TResult>(pageItems, total, specification.Page, specification.PageSize);
+	}
+
+	private static void ValidatePageSpecification(PageSpecification<T> specification)
+	{
+		if (specification.Skip != -1 || specification.Take != -1)
+		{
+			throw new InvalidOperationException(
+				$"{specification.GetType().Name} must not define Skip or Take. " +
+				"Pagination is controlled by the repository."
+			);
+		}
+
+		if (!specification.OrderExpressions.Any())
+		{
+			throw new InvalidOperationException(
+				$"{specification.GetType().Name} must define ordering before pagination."
+			);
+		}
 	}
 
 	public async Task<int> CountAsync(ISpecification<T> specification, CancellationToken ct)

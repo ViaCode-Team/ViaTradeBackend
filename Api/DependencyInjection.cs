@@ -4,29 +4,24 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
+using Scrutor;
 using StackExchange.Redis;
 using ViaTrade.Api.BackgroundServices;
 using ViaTrade.Api.Cookies;
 using ViaTrade.Api.Handler;
 using ViaTrade.Api.OptionsSetup;
-using ViaTrade.Application.Auth;
-using ViaTrade.Application.Auth.Interfaces;
-using ViaTrade.Application.Common.Interfaces;
-using ViaTrade.Application.Common.Interfaces.Repositories;
-using ViaTrade.Application.Instruments;
-using ViaTrade.Application.Instruments.Interfaces;
-using ViaTrade.Application.Notes;
-using ViaTrade.Application.Notes.Interfaces;
-using ViaTrade.Application.Notifications.Interfaces;
-using ViaTrade.Application.Reminders;
-using ViaTrade.Application.Reminders.Interfaces;
-using ViaTrade.Application.Strategies;
-using ViaTrade.Application.Strategies.Interfaces;
-using ViaTrade.Application.Trades;
-using ViaTrade.Application.Trades.Interfaces;
-using ViaTrade.Application.Users;
-using ViaTrade.Application.Users.Interfaces;
-using ViaTrade.Application.Users.Models;
+using ViaTrade.Application.Auth.Common;
+using ViaTrade.Application.Auth.Common.Abstractions;
+using ViaTrade.Application.Common.Abstractions;
+using ViaTrade.Application.Common.Abstractions.Repositories;
+using ViaTrade.Application.Notes.Common.Abstractions;
+using ViaTrade.Application.Notifications.Common.Abstractions;
+using ViaTrade.Application.Reminders.Common.Abstractions;
+using ViaTrade.Application.Signals.Common;
+using ViaTrade.Application.Strategies.Common.Abstractions;
+using ViaTrade.Application.Trades.Common.Abstractions;
+using ViaTrade.Application.Users.Common;
+using ViaTrade.Application.Users.Common.Abstractions;
 using ViaTrade.Configuration;
 using ViaTrade.Configuration.Options;
 using ViaTrade.Infrastructure.DataBase;
@@ -49,27 +44,26 @@ public static class DependencyInjection
 		services.AddSingleton<IJwtHelper, JwtHelper>();
 		services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
 
-		services.AddScoped<IAuthCommandService, AuthCommandService>();
-		services.AddScoped<IAuthQueryService, AuthQueryService>();
-
-		services.AddScoped<ITradeCommandService, TradeCommandService>();
-		services.AddScoped<ITradeQueryService, TradeQueryService>();
-		services.AddScoped<ISignalQueryService, SignalQueryService>();
 		services.AddScoped<ITradeDataBuilder, TradeDataBuilder>();
 		services.AddScoped<IFileReader, TradeFileReader>();
+		services.AddScoped<AuthTokenFactory>();
+		services.AddScoped<SignalReader>();
 
-		services.AddScoped<IStrategyCommandService, StrategyCommandService>();
-		services.AddScoped<IStrategyQueryService, StrategyQueryService>();
-		services.AddScoped<IInstrumentQueryService, InstrumentQueryService>();
-
-		services.AddScoped<INoteCommandService, NoteCommandService>();
-		services.AddScoped<INoteQueryService, NoteQueryService>();
-
-		services.AddScoped<IReminderCommandService, ReminderCommandService>();
-		services.AddScoped<IReminderQueryService, ReminderQueryService>();
-
-		services.AddScoped<IUserCommandService, UserCommandService>();
-		services.AddScoped<IUserQueryService, UserQueryService>();
+		services.Scan(scan =>
+			scan.FromAssembliesOf(typeof(IQuery<>))
+				.AddClasses(
+					classes =>
+						classes.AssignableToAny(
+							typeof(IQueryHandler<,>),
+							typeof(ICommandHandler<>),
+							typeof(ICommandHandler<,>)
+						),
+					publicOnly: false
+				)
+				.UsingRegistrationStrategy(RegistrationStrategy.Throw)
+				.AsImplementedInterfaces(IsHandlerInterface)
+				.WithScopedLifetime()
+		);
 
 		return services;
 	}
@@ -102,6 +96,17 @@ public static class DependencyInjection
 		services.AddApplicationAuthorization();
 
 		return services;
+	}
+
+	private static bool IsHandlerInterface(Type type)
+	{
+		if (!type.IsGenericType)
+			return false;
+
+		var definition = type.GetGenericTypeDefinition();
+		return definition == typeof(IQueryHandler<,>)
+			|| definition == typeof(ICommandHandler<>)
+			|| definition == typeof(ICommandHandler<,>);
 	}
 
 	private static IServiceCollection AddTelegramNotifications(this IServiceCollection services)

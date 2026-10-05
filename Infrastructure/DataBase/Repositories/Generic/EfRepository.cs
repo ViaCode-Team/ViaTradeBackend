@@ -2,7 +2,7 @@ using System.Linq.Expressions;
 using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using ViaTrade.Application.Common.Interfaces.Repositories;
+using ViaTrade.Application.Common.Abstractions.Repositories;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories.Generic;
 

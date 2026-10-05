@@ -4,22 +4,29 @@ using ViaTrade.Api.Contracts.Signals;
 using ViaTrade.Api.Contracts.Statistics;
 using ViaTrade.Api.Mappings;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Auth.Interfaces;
+using ViaTrade.Application.Auth.Common.Abstractions;
+using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Models;
-using ViaTrade.Application.Trades.Interfaces;
-using ViaTrade.Application.Trades.Models;
+using ViaTrade.Application.Signals.Common;
+using ViaTrade.Application.Signals.GetHistoryPage;
+using ViaTrade.Application.Signals.GetLatestPage;
+using ViaTrade.Application.Signals.GetStatistics;
 
 namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class SignalsController(ISignalQueryService signalQueryService, IJwtHelper jwtHelper) : ControllerBase
+public class SignalsController(IJwtHelper jwtHelper) : ControllerBase
 {
 	[HttpGet("statistics")]
-	public async Task<Ok<SignalStatisticResponse>> GetStatistics(CancellationToken ct)
+	public async Task<Ok<SignalStatisticResponse>> GetStatistics(
+		[FromServices] IQueryHandler<GetSignalStatisticsQuery, SignalStatisticsResult> handler,
+		CancellationToken ct
+	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var signalStatistics = await signalQueryService.GetStatisticsAsync(userId, ct);
+		var query = new GetSignalStatisticsQuery(userId);
+		var signalStatistics = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(ApiMapper.ToResponse(signalStatistics));
 	}
@@ -29,17 +36,13 @@ public class SignalsController(ISignalQueryService signalQueryService, IJwtHelpe
 		[FromQuery] LatestSignalFilter latestSignalFilter,
 		[FromQuery] SignalSort signalSort,
 		[FromQuery] PageOptions pageOptions,
+		[FromServices] IQueryHandler<GetLatestSignalsPageQuery, PageResult<SignalResult>> handler,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var signals = await signalQueryService.GetLatestPageAsync(
-			userId,
-			latestSignalFilter,
-			signalSort,
-			pageOptions,
-			ct
-		);
+		var query = new GetLatestSignalsPageQuery(userId, latestSignalFilter, signalSort, pageOptions);
+		var signals = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(signals.Map(ApiMapper.ToResponse));
 	}
@@ -49,11 +52,13 @@ public class SignalsController(ISignalQueryService signalQueryService, IJwtHelpe
 		[FromQuery] SignalHistoryFilter signalHistoryFilter,
 		[FromQuery] SignalSort signalSort,
 		[FromQuery] PageOptions pageOptions,
+		[FromServices] IQueryHandler<GetSignalHistoryPageQuery, PageResult<SignalResult>> handler,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var signals = await signalQueryService.GetPageAsync(userId, signalHistoryFilter, signalSort, pageOptions, ct);
+		var query = new GetSignalHistoryPageQuery(userId, signalHistoryFilter, signalSort, pageOptions);
+		var signals = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(signals.Map(ApiMapper.ToResponse));
 	}

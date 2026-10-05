@@ -1,6 +1,6 @@
 using System.Text.Json;
 using StackExchange.Redis;
-using ViaTrade.Application.Common.Interfaces.Repositories;
+using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Infrastructure.Redis.Keys;
 

@@ -6,7 +6,10 @@ using ViaTrade.Api.Attribute;
 using ViaTrade.Api.Contracts.Reminders;
 using ViaTrade.Api.Mappings;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Reminders.Interfaces;
+using ViaTrade.Application.Common.Abstractions;
+using ViaTrade.Application.Reminders.Common;
+using ViaTrade.Application.Reminders.ListDue;
+using ViaTrade.Application.Reminders.MarkDelivered;
 using ViaTrade.Configuration.Options;
 
 namespace ViaTrade.Api.Controllers.Internal.TgBot;
@@ -14,17 +17,17 @@ namespace ViaTrade.Api.Controllers.Internal.TgBot;
 [Route($"{ApiRoutes.V1.TgBot}/[controller]")]
 [ApiExplorerSettings(GroupName = InternalServices.TgBot)]
 [ApiController]
-public class RemindersController(
-	IReminderCommandService reminderCommandService,
-	IReminderQueryService reminderQueryService,
-	IOptions<NotificationStreamSettings> options
-) : ControllerBase
+public class RemindersController(IOptions<NotificationStreamSettings> options) : ControllerBase
 {
 	[ServicePassword]
 	[HttpGet("due")]
-	public async Task<Ok<IEnumerable<DueReminderResponse>>> GetDue(CancellationToken ct)
+	public async Task<Ok<IEnumerable<DueReminderResponse>>> GetDue(
+		[FromServices] IQueryHandler<ListDueRemindersQuery, IReadOnlyList<ReminderResult>> handler,
+		CancellationToken ct
+	)
 	{
-		var reminders = await reminderQueryService.ListDueBatchAsync(options.Value.ReminderPublishBatchSize, ct);
+		var query = new ListDueRemindersQuery(options.Value.ReminderPublishBatchSize);
+		var reminders = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(reminders.Select(ApiMapper.ToDueResponse));
 	}
@@ -34,10 +37,12 @@ public class RemindersController(
 	public async Task<NoContent> ConfirmDelivery(
 		[FromRoute, Range(1, int.MaxValue)] int reminderId,
 		[FromBody, Required] ConfirmReminderDeliveryRequest request,
+		[FromServices] ICommandHandler<MarkReminderDeliveredCommand> handler,
 		CancellationToken ct
 	)
 	{
-		await reminderCommandService.MarkDeliveredAsync(request.UserId, reminderId, ct);
+		var command = new MarkReminderDeliveredCommand(request.UserId, reminderId);
+		await handler.HandleAsync(command, ct);
 
 		return TypedResults.NoContent();
 	}

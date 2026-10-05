@@ -1,4 +1,4 @@
-using ViaTrade.Application.Common.Interfaces;
+using ViaTrade.Application.Common.Abstractions;
 
 namespace ViaTrade.Infrastructure.DataBase;
 

@@ -1,8 +1,8 @@
 using System.Reflection;
-using ViaTrade.Application.Auth;
-using ViaTrade.Application.Auth.Interfaces;
+using ViaTrade.Application.Auth.Common;
+using ViaTrade.Application.Auth.Common.Abstractions;
+using ViaTrade.Application.Auth.GetSessionsPage;
 using ViaTrade.Application.Common.Models;
-using ViaTrade.Application.Users.Models;
 using Xunit;
 
 namespace ViaTrade.Tests;
@@ -18,16 +18,19 @@ public sealed class SessionPagingTests
 		var repository = DispatchProxy.Create<ISessionRepository, SessionRepositoryStub>();
 		var stub = (SessionRepositoryStub)repository;
 		stub.Sessions = new[] { "newest", "middle", "oldest" }
-			.Select(id => new UserSessionDto
+			.Select(id => new SessionData
 			{
 				Id = id,
 				UserId = 7,
 				UserAgent = "test",
 			})
 			.ToList();
-		var service = new AuthQueryService(repository);
+		var getSessionsPageHandler = new GetSessionsPageHandler(repository);
 
-		var result = await service.GetSessionsPageAsync(7, new PageOptions { Page = page, PageSize = 2 }, default);
+		var result = await getSessionsPageHandler.HandleAsync(
+			new GetSessionsPageQuery(7, new PageOptions { Page = page, PageSize = 2 }),
+			default
+		);
 
 		Assert.Equal(7, Assert.Single(stub.RequestedUsers));
 		Assert.Equal(3, result.TotalCount);
@@ -42,8 +45,8 @@ public sealed class SessionPagingTests
 	{
 		var repository = DispatchProxy.Create<ISessionRepository, SessionRepositoryStub>();
 		var stub = (SessionRepositoryStub)repository;
-		var service = new AuthQueryService(repository);
-		var result = await service.GetSessionsPageAsync(7, new PageOptions(), default);
+		var getSessionsPageHandler = new GetSessionsPageHandler(repository);
+		var result = await getSessionsPageHandler.HandleAsync(new GetSessionsPageQuery(7, new PageOptions()), default);
 		Assert.Empty(result.Items);
 		Assert.Equal(0, result.TotalCount);
 		Assert.Single(stub.RequestedUsers);
@@ -51,14 +54,14 @@ public sealed class SessionPagingTests
 		using var cancellation = new CancellationTokenSource();
 		cancellation.Cancel();
 		await Assert.ThrowsAnyAsync<OperationCanceledException>(() =>
-			service.GetSessionsPageAsync(7, new PageOptions(), cancellation.Token)
+			getSessionsPageHandler.HandleAsync(new GetSessionsPageQuery(7, new PageOptions()), cancellation.Token)
 		);
 		Assert.Empty(stub.RequestedUsers);
 	}
 
 	public class SessionRepositoryStub : DispatchProxy
 	{
-		public IReadOnlyList<UserSessionDto> Sessions { get; set; } = [];
+		public IReadOnlyList<SessionData> Sessions { get; set; } = [];
 		public List<int> RequestedUsers { get; } = [];
 
 		protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)

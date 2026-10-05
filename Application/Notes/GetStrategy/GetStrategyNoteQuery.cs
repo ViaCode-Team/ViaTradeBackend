@@ -1,0 +1,6 @@
+using ViaTrade.Application.Common.Abstractions;
+using ViaTrade.Application.Notes.Common;
+
+namespace ViaTrade.Application.Notes.GetStrategy;
+
+public sealed record GetStrategyNoteQuery(int UserId, int StrategyId) : IQuery<NoteResult>;

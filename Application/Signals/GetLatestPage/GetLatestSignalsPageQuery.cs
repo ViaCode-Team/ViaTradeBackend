@@ -1,0 +1,12 @@
+using ViaTrade.Application.Common.Abstractions;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Signals.Common;
+
+namespace ViaTrade.Application.Signals.GetLatestPage;
+
+public sealed record GetLatestSignalsPageQuery(
+	int UserId,
+	LatestSignalFilter LatestSignalFilter,
+	SignalSort SignalSort,
+	PageOptions PageOptions
+) : IQuery<PageResult<SignalResult>>;

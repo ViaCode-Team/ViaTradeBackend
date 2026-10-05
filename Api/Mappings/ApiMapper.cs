@@ -7,22 +7,33 @@ using ViaTrade.Api.Contracts.Statistics;
 using ViaTrade.Api.Contracts.Strategies;
 using ViaTrade.Api.Contracts.Trades;
 using ViaTrade.Api.Contracts.Users;
-using ViaTrade.Application.Instruments.Models;
-using ViaTrade.Application.Notes.Models;
-using ViaTrade.Application.Reminders.Models;
-using ViaTrade.Application.Strategies.Models;
-using ViaTrade.Application.Trades.Models;
-using ViaTrade.Application.Users.Models;
-using ViaTrade.Domain.Entities;
+using ViaTrade.Application.Auth.GetSessionsPage;
+using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Instruments.Common;
+using ViaTrade.Application.Instruments.GetStatistics;
+using ViaTrade.Application.Notes.Common;
+using ViaTrade.Application.Notes.GetStatistics;
+using ViaTrade.Application.Reminders.Common;
+using ViaTrade.Application.Reminders.Create;
+using ViaTrade.Application.Reminders.GetStatistics;
+using ViaTrade.Application.Signals.Common;
+using ViaTrade.Application.Signals.GetStatistics;
+using ViaTrade.Application.Strategies.Common;
+using ViaTrade.Application.Strategies.GetStatistics;
+using ViaTrade.Application.Trades.Common;
+using ViaTrade.Application.Trades.GetDateRange;
+using ViaTrade.Application.Trades.GetProfitChart;
+using ViaTrade.Application.Trades.GetStatistics;
+using ViaTrade.Application.Users.GetCurrent;
 
 namespace ViaTrade.Api.Mappings;
 
 [Mapper(RequiredMappingStrategy = RequiredMappingStrategy.Target)]
 public static partial class ApiMapper
 {
-	public static partial UserMeResponse ToResponse(UserMeDto source);
+	public static partial UserMeResponse ToResponse(CurrentUserResult source);
 
-	public static UserSessionResponse ToResponse(UserSessionDto source, string currentSessionId)
+	public static UserSessionResponse ToResponse(SessionResult source, string currentSessionId)
 	{
 		return new UserSessionResponse(
 			source.Id,
@@ -34,91 +45,62 @@ public static partial class ApiMapper
 		);
 	}
 
-	public static NoteResponse ToResponse(Note source) =>
-		new(
-			source.Id,
-			source.Text,
-			source.UserId,
-			ToBriefResponse(source.Instrument),
-			ToBriefResponse(source.Strategy)
-		);
+	public static partial NoteResponse ToResponse(NoteResult source);
 
-	public static partial NoteResponse ToResponse(NoteDto source);
+	public static partial ReminderResponse ToResponse(ReminderResult source);
 
-	public static ReminderResponse ToResponse(Reminder source) =>
-		new(source.Id, source.Text, source.RemindAt, ToBriefResponse(source.Instrument), source.DeliveredAt);
+	public static ReminderResponse ToResponse(CreateReminderResult source) =>
+		new(source.Id, source.Text, source.RemindAt, null, source.DeliveredAt);
 
-	public static partial ReminderResponse ToResponse(ReminderDto source);
-
-	public static DueReminderResponse ToDueResponse(ReminderDto source) =>
+	public static DueReminderResponse ToDueResponse(ReminderResult source) =>
 		new(source.Id, source.Text, source.RemindAt, ToResponse(source.Instrument), source.UserId);
 
-	public static partial InstrumentBriefResponse? ToResponse(InstrumentSummaryDto? source);
+	public static partial InstrumentBriefResponse? ToResponse(InstrumentBriefResult? source);
 
-	public static partial StrategyBriefResponse? ToResponse(StrategyBriefDto? source);
+	public static partial StrategyBriefResponse? ToResponse(StrategyBriefResult? source);
 
-	public static InstrumentBriefResponse? ToBriefResponse(Instrument? source)
-	{
-		if (source == null)
-			return null;
-
-		return new InstrumentBriefResponse(source.Id, source.Symbol, source.Description);
-	}
-
-	public static StrategyBriefResponse? ToBriefResponse(Strategy? source)
-	{
-		if (source == null)
-			return null;
-
-		return new StrategyBriefResponse(source.Id, source.Name, source.DisplayName, source.Description);
-	}
-
-	public static StrategyResponse ToResponse(StrategySubscriptionDto source)
+	public static StrategyResponse ToResponse(StrategySubscriptionResult source)
 	{
 		return new StrategyResponse(
-			source.Strategy.Id,
-			source.Strategy.Name,
-			source.Strategy.Description,
-			source.Strategy.DisplayName,
-			source.Strategy.Accuracy,
-			source.Strategy.SignalFrequency,
-			source.Strategy.InvestmentHorizon,
-			source.Strategy.LogicDescription,
-			source.Strategy.UsageDescription,
-			source.Strategy.LimitationsDescription,
+			source.Id,
+			source.Name,
+			source.Description,
+			source.DisplayName,
+			source.Accuracy,
+			source.SignalFrequency,
+			source.InvestmentHorizon,
+			source.LogicDescription,
+			source.UsageDescription,
+			source.LimitationsDescription,
 			source.IsSubscribed
 		);
 	}
 
-	public static partial InstrumentResponse ToResponse(Instrument source);
+	public static partial InstrumentResponse ToResponse(InstrumentResult source);
 
-	public static partial InstrumentResponse ToResponse(RelatedInstrumentDto source);
+	public static partial InstrumentFileResponse ToResponse(InstrumentFileResult source);
 
-	public static partial InstrumentFileResponse ToResponse(InstrumentFileDto source);
+	public static partial TradeResponse ToResponse(TradeResult source);
 
-	public static partial TradeResponse ToResponse(TradeDto source);
+	public static partial ProfitChartBucketResponse ToResponse(ProfitChartBucketResult source);
 
-	public static partial ProfitChartBucketResponse ToResponse(ProfitChartBucketDto source);
+	public static partial TradeDateRangeResponse ToResponse(TradeDateRangeResult source);
 
-	public static partial TradeDateRangeResponse ToResponse(TradeDateRangeDto source);
+	public static partial GlobalStatisticResponse ToResponse(TradeStatisticsResult source);
 
-	public static partial InstrumentBriefResponse? ToResponse(InstrumentBriefDto? source);
+	public static partial SignalStatisticResponse ToResponse(SignalStatisticsResult source);
 
-	public static partial GlobalStatisticResponse ToResponse(GlobalTradeStatisticDto source);
+	public static partial StrategyStatisticResponse ToResponse(StrategyStatisticsResult source);
 
-	public static partial SignalStatisticResponse ToResponse(SignalStatisticDto source);
+	public static partial SignalResponse ToResponse(SignalResult source);
 
-	public static partial StrategyStatisticResponse ToResponse(StrategyStatisticDto source);
+	public static partial InstrumentStatisticsResponse ToResponse(InstrumentStatisticsResult source);
 
-	public static partial SignalResponse ToResponse(SignalDto source);
+	public static partial NoteStatisticResponse ToResponse(NoteStatisticsResult source);
 
-	public static partial InstrumentStatisticsResponse ToResponse(InstrumentStatisticsDto source);
+	public static partial ReminderStatisticsResponse ToResponse(ReminderStatisticsResult source);
 
-	public static partial NoteStatisticResponse ToResponse(NoteStatisticDto source);
+	public static partial TradeInput ToInput(CreateTradeRequest source);
 
-	public static partial ReminderStatisticsResponse ToResponse(ReminderStatisticsDto source);
-
-	public static partial TradeInputDto ToInput(CreateTradeRequest source);
-
-	public static partial TradeInputDto ToInput(UpdateTradeRequest source);
+	public static partial TradeInput ToInput(UpdateTradeRequest source);
 }

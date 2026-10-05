@@ -1,6 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using ViaTrade.Application.Trades.Interfaces;
-using ViaTrade.Application.Trades.Models;
+using ViaTrade.Application.Trades.Common;
+using ViaTrade.Application.Trades.Common.Abstractions;
+using ViaTrade.Application.Trades.GetDateRange;
+using ViaTrade.Application.Trades.GetProfitChart;
+using ViaTrade.Application.Trades.GetStatistics;
 using ViaTrade.Domain.Entities;
 using ViaTrade.Domain.Enums;
 
@@ -84,7 +87,7 @@ public class TradeEfRepository(AppDbContext context) : ITradeRepository
 		};
 	}
 
-	public async Task<TradeDateRangeDto> GetTradeDateRangeAsync(int userId, CancellationToken ct)
+	public async Task<TradeDateRangeResult> GetTradeDateRangeAsync(int userId, CancellationToken ct)
 	{
 		var range = await GetClosedTradesQuery(userId, null, null)
 			.GroupBy(_ => 1)
@@ -96,12 +99,12 @@ public class TradeEfRepository(AppDbContext context) : ITradeRepository
 			.SingleOrDefaultAsync(ct);
 
 		if (range == null)
-			return new TradeDateRangeDto(null, null);
+			return new TradeDateRangeResult(null, null);
 
-		return new TradeDateRangeDto(DateOnly.FromDateTime(range.MinDate), DateOnly.FromDateTime(range.MaxDate));
+		return new TradeDateRangeResult(DateOnly.FromDateTime(range.MinDate), DateOnly.FromDateTime(range.MaxDate));
 	}
 
-	public async Task<TradeStatisticAggregateDto> GetGlobalStatisticsAsync(int userId, CancellationToken ct)
+	public async Task<TradeStatisticsAggregate> GetGlobalStatisticsAsync(int userId, CancellationToken ct)
 	{
 		var result = await context
 			.Trades.Where(trade =>
@@ -113,7 +116,7 @@ public class TradeEfRepository(AppDbContext context) : ITradeRepository
 			)
 			.Select(trade => new { Income = trade.NetIncome!.Value })
 			.GroupBy(_ => 1)
-			.Select(group => new TradeStatisticAggregateDto(
+			.Select(group => new TradeStatisticsAggregate(
 				group.Count(),
 				group.Count(trade => trade.Income > 0),
 				group.Count(trade => trade.Income < 0),
@@ -123,13 +126,13 @@ public class TradeEfRepository(AppDbContext context) : ITradeRepository
 			))
 			.SingleOrDefaultAsync(ct);
 
-		return result ?? TradeStatisticAggregateDto.Empty;
+		return result ?? TradeStatisticsAggregate.Empty;
 	}
 
 	public async Task<int> ExecuteUpdateAsync(
 		int userId,
 		int id,
-		TradeInputDto request,
+		TradeInput request,
 		decimal price,
 		CancellationToken ct
 	)

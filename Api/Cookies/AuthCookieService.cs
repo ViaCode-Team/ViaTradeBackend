@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Options;
-using ViaTrade.Application.Auth.Models;
+using ViaTrade.Application.Auth.Common;
 using ViaTrade.Configuration.Options;
 
 namespace ViaTrade.Api.Cookies;
@@ -8,7 +8,7 @@ public sealed class AuthCookieService(IOptions<AuthCookieSettings> authOptions) 
 {
 	private readonly AuthCookieSettings _authCookieOptions = authOptions.Value;
 
-	public void SetAuthCookies(HttpResponse response, AuthTokens tokens)
+	public void SetAuthCookies(HttpResponse response, AuthTokensResult tokens)
 	{
 		response.Cookies.Append(
 			_authCookieOptions.AccessTokenCookie,

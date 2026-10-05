@@ -5,7 +5,10 @@ using ViaTrade.Api.Attribute;
 using ViaTrade.Api.Contracts.Instruments;
 using ViaTrade.Api.Mappings;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Instruments.Interfaces;
+using ViaTrade.Application.Common.Abstractions;
+using ViaTrade.Application.Instruments.Common;
+using ViaTrade.Application.Instruments.GetFile;
+using ViaTrade.Application.Instruments.ListFiles;
 using ViaTrade.Domain.Enums;
 
 namespace ViaTrade.Api.Controllers.Internal.Analyzer;
@@ -13,13 +16,17 @@ namespace ViaTrade.Api.Controllers.Internal.Analyzer;
 [Route($"{ApiRoutes.V1.Analyzer}/[controller]")]
 [ApiExplorerSettings(GroupName = InternalServices.Analyzer)]
 [ApiController]
-public class InstrumentsController(IInstrumentQueryService instrumentQueryService) : ControllerBase
+public class InstrumentsController : ControllerBase
 {
 	[ServicePassword]
 	[HttpGet]
-	public async Task<Ok<List<InstrumentFileResponse>>> GetFiles(CancellationToken ct)
+	public async Task<Ok<List<InstrumentFileResponse>>> GetFiles(
+		[FromServices] IQueryHandler<ListInstrumentFilesQuery, IReadOnlyList<InstrumentFileResult>> handler,
+		CancellationToken ct
+	)
 	{
-		var instruments = await instrumentQueryService.ListFileMetadataAsync(TradeDataType.Stocks, ct);
+		var query = new ListInstrumentFilesQuery(TradeDataType.Stocks);
+		var instruments = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(instruments.Select(ApiMapper.ToResponse).ToList());
 	}
@@ -28,14 +35,12 @@ public class InstrumentsController(IInstrumentQueryService instrumentQueryServic
 	[HttpGet("{instrumentId:int}")]
 	public async Task<Ok<InstrumentFileResponse>> GetFileById(
 		[FromRoute, Range(1, int.MaxValue)] int instrumentId,
+		[FromServices] IQueryHandler<GetInstrumentFileQuery, InstrumentFileResult> handler,
 		CancellationToken ct
 	)
 	{
-		var instrument = await instrumentQueryService.GetFileMetadataAsync(
-			TradeDataType.Stocks,
-			instrumentId.ToString(),
-			ct
-		);
+		var query = new GetInstrumentFileQuery(TradeDataType.Stocks, instrumentId.ToString());
+		var instrument = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(ApiMapper.ToResponse(instrument));
 	}
