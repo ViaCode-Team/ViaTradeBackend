@@ -11,11 +11,12 @@ public sealed class GetNotesPageHandler(IReadRepository<Note> noteRepository)
 {
 	public async Task<PageResult<NoteResult>> HandleAsync(GetNotesPageQuery query, CancellationToken ct = default)
 	{
-		var specification = new NotesPageSpecification(query.UserId, query.NoteFilter, query.NoteSearch, query.PageOptions);
-		return await noteRepository.GetPageAsync(
-			specification,
-			NoteResult.Projection,
-			ct
+		var specification = new NotesPageSpecification(
+			query.UserId,
+			query.NoteFilter,
+			query.NoteSearch,
+			query.PageOptions
 		);
+		return await noteRepository.GetPageAsync(specification, NoteResult.Projection, ct);
 	}
 }

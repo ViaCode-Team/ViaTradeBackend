@@ -1,4 +1,8 @@
 using System.Reflection;
+using MicroElements.OpenApi.FluentValidation;
+using MicroElements.Swashbuckle.FluentValidation;
+using MicroElements.Swashbuckle.FluentValidation.AspNetCore;
+using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using ViaTrade.Api.Swagger.Filters;
 
@@ -8,6 +12,11 @@ public static class SwaggerServiceExtensions
 {
 	public static IServiceCollection AddViaTradeSwagger(this IServiceCollection services)
 	{
+		services.AddFluentValidationRulesToSwagger(options => options.RemoveUnusedQuerySchemas = false);
+		services.AddSingleton(provider =>
+			FloatingPointRangeRule.Create(provider.GetRequiredService<IOptions<SchemaGenerationOptions>>())
+		);
+
 		services.AddSwaggerGen(options =>
 		{
 			ConfigureNullableReferenceTypes(options);
@@ -20,6 +29,12 @@ public static class SwaggerServiceExtensions
 
 			ConfigureDocuments(options);
 		});
+
+		services.PostConfigure<SwaggerGenOptions>(options =>
+			options.OperationFilterDescriptors.RemoveAll(filter =>
+				filter.Type == typeof(FluentValidationOperationFilterScopeAdapter)
+			)
+		);
 
 		return services;
 	}
@@ -36,8 +51,10 @@ public static class SwaggerServiceExtensions
 		options.DocumentFilter<ProblemDetailsDocumentFilter>();
 		options.OperationFilter<ProblemDetailsOperationFilter>();
 		options.OperationFilter<CamelCaseParameterFilter>();
+		options.OperationFilter<IgnorePropertiesOperationFilter>();
 
-		options.OperationFilter<StrategyInstrumentFilterOperationFilter>();
+		options.OperationFilter<RequestPropertiesOperationFilter>();
+		options.OperationFilter<RequestBodyRequiredOperationFilter>();
 		options.OperationFilter<AuthCookiesOperationFilter>();
 		options.OperationFilter<JwtSecurityRequirementsOperationFilter>();
 

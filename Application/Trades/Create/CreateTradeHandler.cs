@@ -17,16 +17,16 @@ public sealed class CreateTradeHandler(
 	{
 		var trade = new Trade
 		{
-			OpenedAt = command.Trade.OpenedAt,
-			ClosedAt = command.Trade.ClosedAt,
-			OpenPrice = command.Trade.OpenPrice,
-			ClosePrice = command.Trade.ClosePrice,
-			Quantity = command.Trade.Quantity,
-			TradeTypeId = command.Trade.TradeTypeId,
-			InstrumentId = command.Trade.InstrumentId,
+			OpenedAt = command.OpenedAt,
+			ClosedAt = command.ClosedAt,
+			OpenPrice = command.OpenPrice,
+			ClosePrice = command.ClosePrice,
+			Quantity = command.Quantity,
+			TradeTypeId = command.TradeTypeId,
+			InstrumentId = command.InstrumentId,
 			UserId = command.UserId,
-			Signal = command.Trade.Signal,
-			TotalPrice = (decimal)command.Trade.OpenPrice * command.Trade.Quantity,
+			Signal = command.Signal,
+			TotalPrice = (decimal)command.OpenPrice * command.Quantity,
 		};
 
 		tradeRepository.Add(trade);

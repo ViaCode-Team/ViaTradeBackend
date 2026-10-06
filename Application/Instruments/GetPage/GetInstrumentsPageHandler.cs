@@ -20,10 +20,6 @@ public sealed class GetInstrumentsPageHandler(IReadRepository<Instrument> instru
 			query.PageOptions,
 			query.InstrumentSort
 		);
-		return await instrumentRepository.GetPageAsync(
-			specification,
-			InstrumentResult.Projection,
-			ct
-		);
+		return await instrumentRepository.GetPageAsync(specification, InstrumentResult.Projection, ct);
 	}
 }

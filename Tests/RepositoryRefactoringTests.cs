@@ -1,4 +1,3 @@
-using System.ComponentModel.DataAnnotations;
 using System.Data.Common;
 using Ardalis.Specification.EntityFrameworkCore;
 using Microsoft.Data.Sqlite;
@@ -30,6 +29,7 @@ using ViaTrade.Application.Strategies.SetSubscription;
 using ViaTrade.Application.Trades.Common;
 using ViaTrade.Application.Trades.Get;
 using ViaTrade.Application.Trades.GetPage;
+using ViaTrade.Application.Trades.Update;
 using ViaTrade.Application.Users.GetCurrent;
 using ViaTrade.Domain.Entities;
 using ViaTrade.Domain.Entities.Abstractions;
@@ -112,12 +112,30 @@ public sealed class RepositoryRefactoringTests
 	{
 		await using var database = await TestDatabase.CreateAsync();
 		var context = database.Context;
-		context.Strategies.Add(WithId(
-			context,
-			new Strategy { Name = "Inactive", DisplayName = "Inactive", IsActive = false },
-			100
-		));
-		context.Notes.Add(WithId(context, new Note { UserId = 1, StrategyId = 100, Text = "Hidden strategy" }, 1));
+		context.Strategies.Add(
+			WithId(
+				context,
+				new Strategy
+				{
+					Name = "Inactive",
+					DisplayName = "Inactive",
+					IsActive = false,
+				},
+				100
+			)
+		);
+		context.Notes.Add(
+			WithId(
+				context,
+				new Note
+				{
+					UserId = 1,
+					StrategyId = 100,
+					Text = "Hidden strategy",
+				},
+				1
+			)
+		);
 		await database.SaveAsync();
 		var repository = new ReadEfRepository<Note>(context);
 
@@ -145,7 +163,7 @@ public sealed class RepositoryRefactoringTests
 		var reminder = await handler.HandleAsync(new GetReminderQuery(1, 1));
 		Assert.Equal("GAZP", reminder.Instrument!.Symbol);
 		Assert.Null(reminder.DeliveredAt);
-		Assert.Empty(reminder.TelegramId);
+		Assert.DoesNotContain(typeof(ReminderResult).GetProperties(), property => property.Name == "TelegramId");
 		var sql = Assert.Single(database.Commands.Reads);
 		Assert.DoesNotContain("PublishedAt", sql);
 		Assert.DoesNotContain("CreatedAt", sql);
@@ -395,8 +413,11 @@ public sealed class RepositoryRefactoringTests
 			reminder =>
 			{
 				Assert.Equal("GAZP", reminder.Instrument!.Symbol);
-				Assert.Equal(1, reminder.UserId);
-				Assert.Equal(string.Empty, reminder.TelegramId);
+				Assert.DoesNotContain(typeof(ReminderResult).GetProperties(), property => property.Name == "UserId");
+				Assert.DoesNotContain(
+					typeof(ReminderResult).GetProperties(),
+					property => property.Name == "TelegramId"
+				);
 			}
 		);
 
@@ -563,9 +584,9 @@ public sealed class RepositoryRefactoringTests
 	public void InvalidPaginationIsRejectedByInputModelValidation(int page, int pageSize)
 	{
 		var options = new PageOptions { Page = page, PageSize = pageSize };
-		var errors = new List<ValidationResult>();
-		Assert.False(Validator.TryValidateObject(options, new ValidationContext(options), errors, true));
-		Assert.NotEmpty(errors);
+		var validation = new PageOptionsValidator().Validate(options);
+		Assert.False(validation.IsValid);
+		Assert.NotEmpty(validation.Errors);
 	}
 
 	[Fact]
@@ -791,11 +812,7 @@ public sealed class RepositoryRefactoringTests
 			new PageOptions(),
 			new StrategySort { SortBy = [StrategySortField.AccuracyDesc, StrategySortField.NameAsc] }
 		);
-		var page = await links.GetPageAsync(
-			specification,
-			StrategySubscriptionResult.LinkProjection(1),
-			default
-		);
+		var page = await links.GetPageAsync(specification, StrategySubscriptionResult.LinkProjection(1), default);
 		Assert.Equal(new[] { 2, 1 }, page.Items.Select(item => item.Id));
 		Assert.False(page.Items[0].IsSubscribed);
 		Assert.True(page.Items[1].IsSubscribed);
@@ -884,21 +901,32 @@ public sealed class RepositoryRefactoringTests
 		var projection = await getTradeHandler.HandleAsync(new GetTradeQuery(1, 1), default);
 		Assert.Equal("GAZP", projection.Instrument!.Symbol);
 		Assert.Equal(10, projection.NetIncome);
-		var request = new TradeInput
-		{
-			OpenedAt = projection.OpenedAt,
-			ClosedAt = projection.ClosedAt,
-			OpenPrice = 100,
-			ClosePrice = 120,
-			Quantity = 2,
-			Signal = TradeSignal.BUY,
-			TradeTypeId = 1,
-			InstrumentId = 1,
-		};
-		var operations = new TradeEfRepository(context);
-		Assert.Equal(0, await operations.ExecuteUpdateAsync(2, 1, request, 200, default));
-		Assert.Equal(1, await operations.ExecuteUpdateAsync(1, 1, request, 200, default));
-		Assert.Equal(20, (await getTradeHandler.HandleAsync(new GetTradeQuery(1, 1), default)).NetIncome);
+		var updateTradeHandler = new UpdateTradeHandler(new TradeEfRepository(context));
+		var command = new UpdateTradeCommand(
+			1,
+			1,
+			1,
+			1,
+			projection.OpenedAt,
+			projection.ClosedAt,
+			100,
+			120,
+			TradeSignal.BUY,
+			2
+		);
+		await Assert.ThrowsAsync<NotFoundException>(() => updateTradeHandler.HandleAsync(command with { UserId = 2 }));
+		await updateTradeHandler.HandleAsync(command);
+		var updated = await getTradeHandler.HandleAsync(new GetTradeQuery(1, 1), default);
+		Assert.Equal(20, updated.NetIncome);
+		Assert.Equal(200, updated.TotalPrice);
+		Assert.Equal(command.OpenedAt, updated.OpenedAt);
+		Assert.Equal(command.ClosedAt, updated.ClosedAt);
+		Assert.Equal(command.OpenPrice, updated.OpenPrice);
+		Assert.Equal(command.ClosePrice, updated.ClosePrice);
+		Assert.Equal(command.Quantity, updated.Quantity);
+		Assert.Equal(command.Signal, updated.Signal);
+		Assert.Equal(command.TradeTypeId, updated.TradeTypeId);
+		Assert.Equal(command.InstrumentId, updated.Instrument!.Id);
 		var page = await getTradesPageHandler.HandleAsync(
 			new GetTradesPageQuery(
 				1,
@@ -992,7 +1020,8 @@ public sealed class RepositoryRefactoringTests
 			new TradeSearch { SearchText = "GAZP" },
 			new PageOptions { Page = 2 }
 		);
-		var tradeSql = evaluator.GetQuery(context.Trades, trade)
+		var tradeSql = evaluator
+			.GetQuery(context.Trades, trade)
 			.Skip(trade.Offset)
 			.Take(trade.PageSize)
 			.Select(TradeResult.Projection)
@@ -1022,7 +1051,8 @@ public sealed class RepositoryRefactoringTests
 			new PageOptions(),
 			new InstrumentSort()
 		);
-		var linkedSql = evaluator.GetQuery(context.UserStrategyInstruments, linkedInstruments)
+		var linkedSql = evaluator
+			.GetQuery(context.UserStrategyInstruments, linkedInstruments)
 			.Select(InstrumentResult.LinkProjection)
 			.ToQueryString();
 		Assert.Contains("UserId", linkedSql);
@@ -1033,7 +1063,8 @@ public sealed class RepositoryRefactoringTests
 			new PageOptions(),
 			new StrategySort()
 		);
-		var strategiesSql = evaluator.GetQuery(context.Strategies, strategies)
+		var strategiesSql = evaluator
+			.GetQuery(context.Strategies, strategies)
 			.Skip(strategies.Offset)
 			.Take(strategies.PageSize)
 			.Select(StrategySubscriptionResult.Projection(1))

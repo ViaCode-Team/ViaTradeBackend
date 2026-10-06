@@ -1,9 +1,6 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using ViaTrade.Api.Contracts.Notes;
-using ViaTrade.Api.Contracts.Statistics;
-using ViaTrade.Api.Mappings;
+using ViaTrade.Api.Attributes.Binding;
 using ViaTrade.Api.Routing;
 using ViaTrade.Application.Auth.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions;
@@ -20,45 +17,46 @@ namespace ViaTrade.Api.Controllers;
 public class NotesController(IJwtHelper jwtHelper) : ControllerBase
 {
 	[HttpGet("statistics")]
-	public async Task<Ok<NoteStatisticResponse>> GetNoteStatistics(
+	public async Task<Ok<NoteStatisticsResult>> GetNoteStatistics(
 		[FromServices] IQueryHandler<GetNoteStatisticsQuery, NoteStatisticsResult> handler,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var query = new GetNoteStatisticsQuery(userId);
-		var noteStatistics = await handler.HandleAsync(query, ct);
 
-		return TypedResults.Ok(ApiMapper.ToResponse(noteStatistics));
+		var noteStatistics = await handler.HandleAsync(new GetNoteStatisticsQuery(userId), ct);
+
+		return TypedResults.Ok(noteStatistics);
 	}
 
 	[HttpGet]
-	public async Task<Ok<PageResult<NoteResponse>>> GetNotes(
-		[FromQuery] NoteFilter noteFilter,
-		[FromQuery] NoteSearch noteSearch,
-		[FromQuery] PageOptions pageOptions,
+	public async Task<Ok<PageResult<NoteResult>>> GetNotes(
+		[FromQuery, IgnoreProperties(nameof(GetNotesPageQuery.UserId))] GetNotesPageQuery query,
 		[FromServices] IQueryHandler<GetNotesPageQuery, PageResult<NoteResult>> handler,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var query = new GetNotesPageQuery(userId, noteFilter, noteSearch, pageOptions);
+
+		query = query with { UserId = userId };
 		var userNotes = await handler.HandleAsync(query, ct);
 
-		return TypedResults.Ok(userNotes.Map(ApiMapper.ToResponse));
+		return TypedResults.Ok(userNotes);
 	}
 
 	[HttpGet("{noteId:int}")]
-	public async Task<Ok<NoteResponse>> GetNoteById(
-		[FromRoute, Range(1, int.MaxValue)] int noteId,
+	public async Task<Ok<NoteResult>> GetNoteById(
+		[FromBody, IgnoreProperties(nameof(GetNoteQuery.UserId)), FromRouteProperties(nameof(GetNoteQuery.NoteId))]
+			GetNoteQuery query,
 		[FromServices] IQueryHandler<GetNoteQuery, NoteResult> handler,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var query = new GetNoteQuery(userId, noteId);
+
+		query = query with { UserId = userId };
 		var note = await handler.HandleAsync(query, ct);
 
-		return TypedResults.Ok(ApiMapper.ToResponse(note));
+		return TypedResults.Ok(note);
 	}
 }

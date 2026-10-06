@@ -28,11 +28,12 @@ public sealed class SessionPagingTests
 		var getSessionsPageHandler = new GetSessionsPageHandler(repository);
 
 		var result = await getSessionsPageHandler.HandleAsync(
-			new GetSessionsPageQuery(7, new PageOptions { Page = page, PageSize = 2 }),
+			new GetSessionsPageQuery(7, new PageOptions { Page = page, PageSize = 2 }, "newest"),
 			default
 		);
 
 		Assert.Equal(7, Assert.Single(stub.RequestedUsers));
+		Assert.All(result.Items, session => Assert.Equal(session.Id == "newest", session.IsCurrent));
 		Assert.Equal(3, result.TotalCount);
 		Assert.Equal(2, result.TotalPages);
 		Assert.Equal(itemCount, result.Items.Count);

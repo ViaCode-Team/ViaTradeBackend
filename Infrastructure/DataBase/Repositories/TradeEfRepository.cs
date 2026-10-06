@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using ViaTrade.Application.Trades.Common;
 using ViaTrade.Application.Trades.Common.Abstractions;
 using ViaTrade.Application.Trades.GetDateRange;
 using ViaTrade.Application.Trades.GetProfitChart;
@@ -132,7 +131,14 @@ public class TradeEfRepository(AppDbContext context) : ITradeRepository
 	public async Task<int> ExecuteUpdateAsync(
 		int userId,
 		int id,
-		TradeInput request,
+		int instrumentId,
+		int tradeTypeId,
+		DateTime openedAt,
+		DateTime? closedAt,
+		double openPrice,
+		double? closePrice,
+		TradeSignal signal,
+		int quantity,
 		decimal price,
 		CancellationToken ct
 	)
@@ -141,15 +147,15 @@ public class TradeEfRepository(AppDbContext context) : ITradeRepository
 			.Trades.Where(t => t.Id == id && t.UserId == userId)
 			.ExecuteUpdateAsync(
 				s =>
-					s.SetProperty(t => t.OpenedAt, request.OpenedAt)
-						.SetProperty(t => t.ClosedAt, request.ClosedAt)
-						.SetProperty(t => t.OpenPrice, request.OpenPrice)
-						.SetProperty(t => t.ClosePrice, request.ClosePrice)
-						.SetProperty(t => t.Quantity, request.Quantity)
-						.SetProperty(t => t.Signal, request.Signal)
+					s.SetProperty(t => t.OpenedAt, openedAt)
+						.SetProperty(t => t.ClosedAt, closedAt)
+						.SetProperty(t => t.OpenPrice, openPrice)
+						.SetProperty(t => t.ClosePrice, closePrice)
+						.SetProperty(t => t.Quantity, quantity)
+						.SetProperty(t => t.Signal, signal)
 						.SetProperty(t => t.TotalPrice, price)
-						.SetProperty(t => t.TradeTypeId, request.TradeTypeId)
-						.SetProperty(t => t.InstrumentId, request.InstrumentId),
+						.SetProperty(t => t.TradeTypeId, tradeTypeId)
+						.SetProperty(t => t.InstrumentId, instrumentId),
 				ct
 			);
 	}

@@ -17,7 +17,10 @@ public sealed class GetInstrumentStrategiesPageHandler(
 		CancellationToken ct = default
 	)
 	{
-		var instrumentExists = await instrumentRepository.AnyAsync(instrument => instrument.Id == query.InstrumentId, ct);
+		var instrumentExists = await instrumentRepository.AnyAsync(
+			instrument => instrument.Id == query.InstrumentId,
+			ct
+		);
 
 		if (!instrumentExists)
 			throw new NotFoundException("Instrument not found.", "instrument_not_found");

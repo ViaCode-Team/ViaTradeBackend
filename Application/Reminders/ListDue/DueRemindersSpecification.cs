@@ -1,10 +1,9 @@
 using Ardalis.Specification;
-using ViaTrade.Application.Reminders.Common;
 using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Reminders.ListDue;
 
-public sealed class DueRemindersSpecification : Specification<Reminder, ReminderResult>
+public sealed class DueRemindersSpecification : Specification<Reminder, DueReminderResult>
 {
 	public DueRemindersSpecification(int limit, DateTime utcNow)
 	{
@@ -15,6 +14,6 @@ public sealed class DueRemindersSpecification : Specification<Reminder, Reminder
 			.OrderBy(reminder => reminder.RemindAt)
 			.ThenBy(reminder => reminder.Id);
 		Query.Take(limit);
-		Query.Select(ReminderResult.DeliveryProjection);
+		Query.Select(DueReminderResult.Projection);
 	}
 }

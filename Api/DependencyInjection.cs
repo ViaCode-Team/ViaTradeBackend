@@ -1,5 +1,6 @@
 using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +15,7 @@ using ViaTrade.Application.Auth.Common;
 using ViaTrade.Application.Auth.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
+using ViaTrade.Application.Common.Validation;
 using ViaTrade.Application.Notes.Common.Abstractions;
 using ViaTrade.Application.Notifications.Common.Abstractions;
 using ViaTrade.Application.Reminders.Common.Abstractions;
@@ -53,17 +55,35 @@ public static class DependencyInjection
 			scan.FromAssembliesOf(typeof(IQuery<>))
 				.AddClasses(
 					classes =>
-						classes.AssignableToAny(
-							typeof(IQueryHandler<,>),
-							typeof(ICommandHandler<>),
-							typeof(ICommandHandler<,>)
-						),
+						classes
+							.Where(type => !type.IsGenericTypeDefinition)
+							.AssignableToAny(
+								typeof(IQueryHandler<,>),
+								typeof(ICommandHandler<>),
+								typeof(ICommandHandler<,>)
+							),
 					publicOnly: false
 				)
 				.UsingRegistrationStrategy(RegistrationStrategy.Throw)
 				.AsImplementedInterfaces(IsHandlerInterface)
 				.WithScopedLifetime()
 		);
+
+		services.Scan(scan =>
+			scan.FromAssembliesOf(typeof(IQuery<>))
+				.AddClasses(
+					classes => classes.Where(type => !type.IsGenericTypeDefinition).AssignableTo(typeof(IValidator<>)),
+					publicOnly: false
+				)
+				.AsImplementedInterfaces(type =>
+					type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IValidator<>)
+				)
+				.WithScopedLifetime()
+		);
+
+		services.Decorate(typeof(ICommandHandler<>), typeof(ValidatingCommandHandler<>));
+		services.Decorate(typeof(ICommandHandler<,>), typeof(ValidatingCommandHandler<,>));
+		services.Decorate(typeof(IQueryHandler<,>), typeof(ValidatingQueryHandler<,>));
 
 		return services;
 	}

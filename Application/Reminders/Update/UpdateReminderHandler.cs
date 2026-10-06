@@ -9,7 +9,13 @@ public sealed class UpdateReminderHandler(IReminderRepository reminderOperations
 {
 	public async Task HandleAsync(UpdateReminderCommand command, CancellationToken ct = default)
 	{
-		int rows = await reminderOperations.ExecuteUpdateForUserAsync(command.UserId, command.ReminderId, command.Text, command.RemindAt, ct);
+		int rows = await reminderOperations.ExecuteUpdateForUserAsync(
+			command.UserId,
+			command.ReminderId,
+			command.Text,
+			command.RemindAt,
+			ct
+		);
 
 		if (rows == 0)
 			throw new NotFoundException("Reminder not found.", "reminder_not_found");

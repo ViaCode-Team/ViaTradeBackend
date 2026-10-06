@@ -28,10 +28,6 @@ public sealed class GetStrategyInstrumentsPageHandler(
 			query.PageOptions,
 			query.InstrumentSort
 		);
-		return await userStrategyInstrumentRepository.GetPageAsync(
-			specification,
-			InstrumentResult.LinkProjection,
-			ct
-		);
+		return await userStrategyInstrumentRepository.GetPageAsync(specification, InstrumentResult.LinkProjection, ct);
 	}
 }

@@ -1,16 +1,19 @@
 using System.Reflection;
 using System.Text.Json;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Scrutor;
 using ViaTrade.Api;
+using ViaTrade.Api.Attributes.Binding;
 using ViaTrade.Application.Auth.Common;
 using ViaTrade.Application.Auth.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Common.Validation;
 using ViaTrade.Application.Notes.Common;
 using ViaTrade.Application.Notes.Common.Abstractions;
 using ViaTrade.Application.Notes.Get;
@@ -44,7 +47,7 @@ public sealed class CqrsRegistrationTests
 		var services = CreateServices();
 		var handlers = typeof(IQuery<>)
 			.Assembly.GetTypes()
-			.Where(type => type is { IsClass: true, IsAbstract: false })
+			.Where(type => type is { IsClass: true, IsAbstract: false, IsGenericTypeDefinition: false })
 			.SelectMany(type =>
 				type.GetInterfaces().Where(IsHandler).Select(contract => (Type: type, Contract: contract))
 			)
@@ -58,13 +61,58 @@ public sealed class CqrsRegistrationTests
 
 		foreach (var handler in handlers)
 		{
-			var registration = Assert.Single(services, descriptor => descriptor.ServiceType == handler.Contract);
+			var registration = Assert.Single(
+				services,
+				descriptor => !descriptor.IsKeyedService && descriptor.ServiceType == handler.Contract
+			);
 			Assert.Equal(ServiceLifetime.Scoped, registration.Lifetime);
-			Assert.Equal(handler.Type, registration.ImplementationType);
 			var instance = first.ServiceProvider.GetRequiredService(handler.Contract);
-			Assert.IsType(handler.Type, instance);
+			var definition = handler.Contract.GetGenericTypeDefinition();
+			var decorator = definition switch
+			{
+				var type when type == typeof(ICommandHandler<>) => typeof(ValidatingCommandHandler<>),
+				var type when type == typeof(ICommandHandler<,>) => typeof(ValidatingCommandHandler<,>),
+				_ => typeof(ValidatingQueryHandler<,>),
+			};
+			Assert.IsType(decorator.MakeGenericType(handler.Contract.GetGenericArguments()), instance);
+			var inner = instance
+				.GetType()
+				.GetField("_inner", BindingFlags.Instance | BindingFlags.NonPublic)!
+				.GetValue(instance);
+			Assert.IsType(handler.Type, inner);
 			Assert.Same(instance, first.ServiceProvider.GetRequiredService(handler.Contract));
 			Assert.NotSame(instance, second.ServiceProvider.GetRequiredService(handler.Contract));
+		}
+	}
+
+	[Fact]
+	public void EveryValidatorIsRegisteredOnceAndResolvesWithinItsScope()
+	{
+		var services = CreateServices();
+		var validators = typeof(IQuery<>)
+			.Assembly.GetTypes()
+			.Where(type => type is { IsClass: true, IsAbstract: false, IsGenericTypeDefinition: false })
+			.SelectMany(type =>
+				type.GetInterfaces()
+					.Where(contract =>
+						contract.IsGenericType && contract.GetGenericTypeDefinition() == typeof(IValidator<>)
+					)
+					.Select(contract => (Type: type, Contract: contract))
+			)
+			.ToList();
+		Assert.NotEmpty(validators);
+		using var provider = services.BuildServiceProvider();
+		using var first = provider.CreateScope();
+		using var second = provider.CreateScope();
+
+		foreach (var validator in validators)
+		{
+			var registration = Assert.Single(services, descriptor => descriptor.ServiceType == validator.Contract);
+			Assert.Equal(ServiceLifetime.Scoped, registration.Lifetime);
+			var instance = first.ServiceProvider.GetRequiredService(validator.Contract);
+			Assert.IsType(validator.Type, instance);
+			Assert.Same(instance, first.ServiceProvider.GetRequiredService(validator.Contract));
+			Assert.NotSame(instance, second.ServiceProvider.GetRequiredService(validator.Contract));
 		}
 	}
 
@@ -86,7 +134,44 @@ public sealed class CqrsRegistrationTests
 		{
 			var parameter = Assert.Single(action.GetParameters(), parameter => IsHandler(parameter.ParameterType));
 			Assert.NotNull(parameter.GetCustomAttribute<FromServicesAttribute>());
-			Assert.Single(services, descriptor => descriptor.ServiceType == parameter.ParameterType);
+			Assert.Single(
+				services,
+				descriptor => !descriptor.IsKeyedService && descriptor.ServiceType == parameter.ParameterType
+			);
+		}
+	}
+
+	[Fact]
+	public void ApiRequestParametersHaveAtLeastOneClientBoundProperty()
+	{
+		var parameters = typeof(DependencyInjection)
+			.Assembly.GetTypes()
+			.Where(type => typeof(ControllerBase).IsAssignableFrom(type))
+			.SelectMany(type =>
+				type.GetMethods(BindingFlags.Public | BindingFlags.Instance | BindingFlags.DeclaredOnly)
+			)
+			.Where(method => method.GetCustomAttributes<HttpMethodAttribute>().Any())
+			.SelectMany(method => method.GetParameters())
+			.Where(parameter =>
+				parameter
+					.ParameterType.GetInterfaces()
+					.Any(contract =>
+						contract == typeof(ICommand)
+						|| contract.IsGenericType
+							&& (
+								contract.GetGenericTypeDefinition() == typeof(ICommand<>)
+								|| contract.GetGenericTypeDefinition() == typeof(IQuery<>)
+							)
+					)
+			);
+
+		foreach (var parameter in parameters)
+		{
+			var ignored = parameter.GetCustomAttribute<IgnorePropertiesAttribute>()?.PropertyNames ?? [];
+			Assert.True(
+				parameter.ParameterType.GetProperties().Any(property => !ignored.Contains(property.Name)),
+				$"{parameter.Member.DeclaringType!.Name}.{parameter.Member.Name} must construct {parameter.ParameterType.Name} inside the action."
+			);
 		}
 	}
 
@@ -95,7 +180,7 @@ public sealed class CqrsRegistrationTests
 	{
 		var requests = typeof(IQuery<>)
 			.Assembly.GetTypes()
-			.Where(type => type is { IsClass: true, IsAbstract: false })
+			.Where(type => type is { IsClass: true, IsAbstract: false, IsGenericTypeDefinition: false })
 			.Select(type => (Type: type, Markers: type.GetInterfaces().Where(IsRequest).ToList()))
 			.Where(item => item.Markers.Count > 0)
 			.ToList();

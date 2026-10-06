@@ -2,8 +2,6 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTrade.Api.Attribute;
-using ViaTrade.Api.Contracts.Instruments;
-using ViaTrade.Api.Mappings;
 using ViaTrade.Api.Routing;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Instruments.Common;
@@ -20,28 +18,29 @@ public class InstrumentsController : ControllerBase
 {
 	[ServicePassword]
 	[HttpGet]
-	public async Task<Ok<List<InstrumentFileResponse>>> GetFiles(
+	public async Task<Ok<List<InstrumentFileResult>>> GetFiles(
 		[FromServices] IQueryHandler<ListInstrumentFilesQuery, IReadOnlyList<InstrumentFileResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var query = new ListInstrumentFilesQuery(TradeDataType.Stocks);
-		var instruments = await handler.HandleAsync(query, ct);
+		var instruments = await handler.HandleAsync(new ListInstrumentFilesQuery(TradeDataType.Stocks), ct);
 
-		return TypedResults.Ok(instruments.Select(ApiMapper.ToResponse).ToList());
+		return TypedResults.Ok(instruments.ToList());
 	}
 
 	[ServicePassword]
 	[HttpGet("{instrumentId:int}")]
-	public async Task<Ok<InstrumentFileResponse>> GetFileById(
+	public async Task<Ok<InstrumentFileResult>> GetFileById(
 		[FromRoute, Range(1, int.MaxValue)] int instrumentId,
 		[FromServices] IQueryHandler<GetInstrumentFileQuery, InstrumentFileResult> handler,
 		CancellationToken ct
 	)
 	{
-		var query = new GetInstrumentFileQuery(TradeDataType.Stocks, instrumentId.ToString());
-		var instrument = await handler.HandleAsync(query, ct);
+		var instrument = await handler.HandleAsync(
+			new GetInstrumentFileQuery(TradeDataType.Stocks, instrumentId.ToString()),
+			ct
+		);
 
-		return TypedResults.Ok(ApiMapper.ToResponse(instrument));
+		return TypedResults.Ok(instrument);
 	}
 }

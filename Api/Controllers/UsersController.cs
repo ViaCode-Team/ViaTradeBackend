@@ -1,11 +1,8 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using ViaTrade.Api.Contracts.Auth;
-using ViaTrade.Api.Contracts.Users;
+using ViaTrade.Api.Attributes.Binding;
 using ViaTrade.Api.Cookies;
-using ViaTrade.Api.Mappings;
 using ViaTrade.Api.Routing;
 using ViaTrade.Api.Swagger.Attributes;
 using ViaTrade.Application.Auth.Common;
@@ -29,13 +26,14 @@ public class UsersController(
 	[AllowAnonymous]
 	[SetsAuthCookies]
 	public async Task<NoContent> Register(
-		[FromBody, Required] RegisterRequest request,
+		[FromBody, IgnoreProperties(nameof(RegisterCommand.UserAgent))] RegisterCommand command,
 		[FromServices] ICommandHandler<RegisterCommand, AuthTokensResult> handler,
 		CancellationToken ct
 	)
 	{
 		var userAgent = Request.Headers.UserAgent.ToString();
-		var command = new RegisterCommand(request.Login, request.Password, userAgent);
+
+		command = command with { UserAgent = userAgent };
 		var tokens = await handler.HandleAsync(command, ct);
 
 		authCookieService.SetAuthCookies(Response, tokens);
@@ -43,7 +41,7 @@ public class UsersController(
 	}
 
 	[HttpGet("me")]
-	public async Task<Results<Ok<UserMeResponse>, NotFound>> GetMe(
+	public async Task<Results<Ok<CurrentUserResult>, NotFound>> GetMe(
 		[FromServices] IQueryHandler<GetCurrentUserQuery, CurrentUserResult> handler,
 		CancellationToken ct
 	)
@@ -51,14 +49,14 @@ public class UsersController(
 		logger.LogInformation("Getting current user information");
 
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var query = new GetCurrentUserQuery(userId);
-		var user = await handler.HandleAsync(query, ct);
 
-		return TypedResults.Ok(ApiMapper.ToResponse(user));
+		var user = await handler.HandleAsync(new GetCurrentUserQuery(userId), ct);
+
+		return TypedResults.Ok(user);
 	}
 
 	[HttpPost("me/telegramLinkToken")]
-	public async Task<Ok<TelegramTokenResponse>> GenerateTelegramToken(
+	public async Task<Ok<TelegramLinkResult>> GenerateTelegramToken(
 		[FromServices] ICommandHandler<CreateTelegramLinkCommand, TelegramLinkResult> handler,
 		CancellationToken ct
 	)
@@ -66,11 +64,9 @@ public class UsersController(
 		logger.LogInformation("Generating Telegram token for user");
 
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var command = new CreateTelegramLinkCommand(userId);
-		var token = await handler.HandleAsync(command, ct);
 
-		var response = new TelegramTokenResponse(token.TelegramToken);
+		var token = await handler.HandleAsync(new CreateTelegramLinkCommand(userId), ct);
 
-		return TypedResults.Ok(response);
+		return TypedResults.Ok(token);
 	}
 }

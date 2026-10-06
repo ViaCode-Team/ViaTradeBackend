@@ -5,7 +5,9 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using ViaTrade.Api.Middleware;
+using ViaTrade.Api.ModelBinding;
 using ViaTrade.Api.Routing;
 using ViaTrade.Api.Swagger;
 
@@ -17,6 +19,8 @@ public static class WebServiceCollectionExtensions
 	{
 		services.AddProblemDetails();
 		services.AddExceptionHandler<ExceptionHandlingMiddleware>();
+		services.AddTransient<IApplicationModelProvider, RequestPropertiesApplicationModelProvider>();
+
 		services.Configure<ForwardedHeadersOptions>(options =>
 		{
 			options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
@@ -30,11 +34,19 @@ public static class WebServiceCollectionExtensions
 			.AddControllers(options =>
 			{
 				options.Conventions.Add(new RouteTokenTransformerConvention(new CamelCaseRouteTokenTransformer()));
+				options.Conventions.Add(new RequestPropertiesConvention());
 
 				var jsonInputFormatter = options.InputFormatters.OfType<SystemTextJsonInputFormatter>().Single();
 
 				jsonInputFormatter.SupportedMediaTypes.Clear();
 				jsonInputFormatter.SupportedMediaTypes.Add("application/json");
+				options.InputFormatters.Insert(0, new IgnorePropertiesJsonInputFormatter(jsonInputFormatter));
+
+				var bodyModelBinderProvider = options.ModelBinderProviders.OfType<BodyModelBinderProvider>().Single();
+				options.ModelBinderProviders.Insert(
+					0,
+					new RequestPropertiesModelBinderProvider(bodyModelBinderProvider)
+				);
 			})
 			.AddJsonOptions(options =>
 			{

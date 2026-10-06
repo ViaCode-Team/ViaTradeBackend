@@ -14,7 +14,12 @@ public sealed class GetStrategiesPageHandler(IReadRepository<Strategy> strategyR
 		CancellationToken ct = default
 	)
 	{
-		var specification = new StrategiesPageSpecification(query.StrategyFilter, query.StrategySearch, query.PageOptions, query.StrategySort);
+		var specification = new StrategiesPageSpecification(
+			query.StrategyFilter,
+			query.StrategySearch,
+			query.PageOptions,
+			query.StrategySort
+		);
 		return await strategyRepository.GetPageAsync(
 			specification,
 			StrategySubscriptionResult.Projection(query.UserId),

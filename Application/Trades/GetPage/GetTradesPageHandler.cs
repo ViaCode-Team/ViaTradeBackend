@@ -11,11 +11,12 @@ public sealed class GetTradesPageHandler(IReadRepository<Trade> tradeRepository)
 {
 	public async Task<PageResult<TradeResult>> HandleAsync(GetTradesPageQuery query, CancellationToken ct = default)
 	{
-		var specification = new TradesPageSpecification(query.UserId, query.TradeFilter, query.TradeSearch, query.PageOptions);
-		return await tradeRepository.GetPageAsync(
-			specification,
-			TradeResult.Projection,
-			ct
+		var specification = new TradesPageSpecification(
+			query.UserId,
+			query.TradeFilter,
+			query.TradeSearch,
+			query.PageOptions
 		);
+		return await tradeRepository.GetPageAsync(specification, TradeResult.Projection, ct);
 	}
 }

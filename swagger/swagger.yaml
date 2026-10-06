@@ -15,7 +15,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InstrumentStatisticsResponse'
+                $ref: '#/components/schemas/InstrumentStatisticsResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -158,7 +158,6 @@ paths:
           in: query
           schema:
             maxLength: 100
-            minLength: 0
             type: string
         - name: page
           in: query
@@ -188,7 +187,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InstrumentResponsePageResult'
+                $ref: '#/components/schemas/InstrumentResultPageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -327,8 +326,8 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       responses:
@@ -337,7 +336,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InstrumentResponse'
+                $ref: '#/components/schemas/InstrumentResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -476,8 +475,8 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
         - name: name
@@ -512,7 +511,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StrategyResponsePageResult'
+                $ref: '#/components/schemas/StrategySubscriptionResultPageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -651,8 +650,8 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       responses:
@@ -661,7 +660,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NoteResponse'
+                $ref: '#/components/schemas/NoteResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -799,15 +798,23 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateNoteRequest'
+              required:
+                - text
+              type: object
+              properties:
+                text:
+                  maxLength: 1024
+                  minLength: 1
+                  type: string
+              additionalProperties: false
         required: true
       responses:
         '204':
@@ -949,8 +956,8 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       responses:
@@ -1094,8 +1101,8 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
         - name: deliveryStatus
@@ -1106,7 +1113,6 @@ paths:
           in: query
           schema:
             maxLength: 100
-            minLength: 0
             type: string
         - name: page
           in: query
@@ -1136,7 +1142,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReminderResponsePageResult'
+                $ref: '#/components/schemas/ReminderResultPageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -1274,15 +1280,27 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateReminderRequest'
+              required:
+                - remindAt
+                - text
+              type: object
+              properties:
+                text:
+                  maxLength: 1024
+                  minLength: 1
+                  type: string
+                remindAt:
+                  type: string
+                  format: date-time
+              additionalProperties: false
         required: true
       responses:
         '201':
@@ -1290,7 +1308,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReminderResponse'
+                $ref: '#/components/schemas/ReminderResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -1430,7 +1448,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NoteStatisticResponse'
+                $ref: '#/components/schemas/NoteStatisticsResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -1573,7 +1591,6 @@ paths:
           in: query
           schema:
             maxLength: 100
-            minLength: 0
             type: string
         - name: page
           in: query
@@ -1597,7 +1614,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NoteResponsePageResult'
+                $ref: '#/components/schemas/NoteResultPageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -1736,8 +1753,8 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       responses:
@@ -1746,7 +1763,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NoteResponse'
+                $ref: '#/components/schemas/NoteResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -1886,7 +1903,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReminderStatisticsResponse'
+                $ref: '#/components/schemas/ReminderStatisticsResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -2029,7 +2046,6 @@ paths:
           in: query
           schema:
             maxLength: 100
-            minLength: 0
             type: string
         - name: page
           in: query
@@ -2059,7 +2075,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReminderResponsePageResult'
+                $ref: '#/components/schemas/ReminderResultPageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -2198,8 +2214,8 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       responses:
@@ -2208,7 +2224,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ReminderResponse'
+                $ref: '#/components/schemas/ReminderResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -2346,15 +2362,27 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateReminderRequest'
+              required:
+                - remindAt
+                - text
+              type: object
+              properties:
+                text:
+                  maxLength: 1024
+                  minLength: 1
+                  type: string
+                remindAt:
+                  type: string
+                  format: date-time
+              additionalProperties: false
         required: true
       responses:
         '204':
@@ -2496,8 +2524,8 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       responses:
@@ -2640,7 +2668,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LoginRequest'
+              required:
+                - login
+                - password
+              type: object
+              properties:
+                login:
+                  maxLength: 64
+                  minLength: 1
+                  type: string
+                password:
+                  maxLength: 72
+                  minLength: 8
+                  type: string
+              additionalProperties: false
         required: true
       responses:
         '204':
@@ -2938,7 +2979,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserSessionResponsePageResult'
+                $ref: '#/components/schemas/SessionResultPageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3353,7 +3394,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SignalStatisticResponse'
+                $ref: '#/components/schemas/SignalStatisticsResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3522,7 +3563,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SignalResponsePageResult'
+                $ref: '#/components/schemas/SignalResultPageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3661,16 +3702,16 @@ paths:
           in: query
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
         - name: instrumentId
           in: query
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
         - name: startDate
@@ -3717,7 +3758,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SignalResponsePageResult'
+                $ref: '#/components/schemas/SignalResultPageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3857,7 +3898,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StrategyStatisticResponse'
+                $ref: '#/components/schemas/StrategyStatisticsResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4000,7 +4041,6 @@ paths:
           in: query
           schema:
             maxLength: 100
-            minLength: 0
             type: string
         - name: sortBy
           in: query
@@ -4030,7 +4070,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StrategyResponsePageResult'
+                $ref: '#/components/schemas/StrategySubscriptionResultPageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4169,8 +4209,8 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       responses:
@@ -4179,7 +4219,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/StrategyResponse'
+                $ref: '#/components/schemas/StrategySubscriptionResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4317,15 +4357,21 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateStrategyRequest'
+              required:
+                - isSubscribed
+              type: object
+              properties:
+                isSubscribed:
+                  type: boolean
+              additionalProperties: false
         required: true
       responses:
         '204':
@@ -4468,8 +4514,8 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
         - name: instrumentIds
@@ -4478,7 +4524,8 @@ paths:
             maxItems: 100
             type: array
             items:
-              minimum: 1
+              minimum: 0
+              exclusiveMinimum: true
               type: integer
               format: int32
         - name: sortBy
@@ -4509,7 +4556,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InstrumentResponsePageResult'
+                $ref: '#/components/schemas/InstrumentResultPageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4648,8 +4695,8 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       responses:
@@ -4658,7 +4705,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/NoteResponse'
+                $ref: '#/components/schemas/NoteResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -4796,15 +4843,23 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateNoteRequest'
+              required:
+                - text
+              type: object
+              properties:
+                text:
+                  maxLength: 1024
+                  minLength: 1
+                  type: string
+              additionalProperties: false
         required: true
       responses:
         '204':
@@ -4946,8 +5001,8 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       responses:
@@ -5091,16 +5146,16 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
         - name: instrumentId
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       responses:
@@ -5243,16 +5298,16 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
         - name: instrumentId
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       responses:
@@ -5397,7 +5452,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/GlobalStatisticResponse'
+                $ref: '#/components/schemas/TradeStatisticsResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -5555,7 +5610,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/ProfitChartBucketResponse'
+                  $ref: '#/components/schemas/ProfitChartBucketResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -5695,7 +5750,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TradeDateRangeResponse'
+                $ref: '#/components/schemas/TradeDateRangeResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -5856,7 +5911,6 @@ paths:
           in: query
           schema:
             maxLength: 100
-            minLength: 0
             type: string
         - name: page
           in: query
@@ -5880,7 +5934,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TradeResponsePageResult'
+                $ref: '#/components/schemas/TradeResultPageResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -6017,7 +6071,55 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateTradeRequest'
+              required:
+                - instrumentId
+                - openedAt
+                - openPrice
+                - quantity
+                - signal
+                - tradeTypeId
+              type: object
+              properties:
+                instrumentId:
+                  minimum: 0
+                  exclusiveMinimum: true
+                  type: integer
+                  format: int32
+                tradeTypeId:
+                  minimum: 0
+                  exclusiveMinimum: true
+                  type: integer
+                  format: int32
+                openedAt:
+                  type: string
+                  format: date-time
+                closedAt:
+                  type: string
+                  format: date-time
+                  nullable: true
+                openPrice:
+                  maximum: 1.7976931348623157E+308
+                  exclusiveMaximum: false
+                  minimum: 5E-324
+                  exclusiveMinimum: false
+                  type: number
+                  format: double
+                closePrice:
+                  maximum: 1.7976931348623157E+308
+                  exclusiveMaximum: false
+                  minimum: 5E-324
+                  exclusiveMinimum: false
+                  type: number
+                  format: double
+                  nullable: true
+                signal:
+                  $ref: '#/components/schemas/TradeSignal'
+                quantity:
+                  minimum: 0
+                  exclusiveMinimum: true
+                  type: integer
+                  format: int32
+              additionalProperties: false
         required: true
       responses:
         '201':
@@ -6025,7 +6127,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TradeResponse'
+                $ref: '#/components/schemas/TradeResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -6164,8 +6266,8 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       responses:
@@ -6174,7 +6276,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TradeResponse'
+                $ref: '#/components/schemas/TradeResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -6312,15 +6414,63 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/UpdateTradeRequest'
+              required:
+                - instrumentId
+                - openedAt
+                - openPrice
+                - quantity
+                - signal
+                - tradeTypeId
+              type: object
+              properties:
+                instrumentId:
+                  minimum: 0
+                  exclusiveMinimum: true
+                  type: integer
+                  format: int32
+                tradeTypeId:
+                  minimum: 0
+                  exclusiveMinimum: true
+                  type: integer
+                  format: int32
+                openedAt:
+                  type: string
+                  format: date-time
+                closedAt:
+                  type: string
+                  format: date-time
+                  nullable: true
+                openPrice:
+                  maximum: 1.7976931348623157E+308
+                  exclusiveMaximum: false
+                  minimum: 5E-324
+                  exclusiveMinimum: false
+                  type: number
+                  format: double
+                closePrice:
+                  maximum: 1.7976931348623157E+308
+                  exclusiveMaximum: false
+                  minimum: 5E-324
+                  exclusiveMinimum: false
+                  type: number
+                  format: double
+                  nullable: true
+                signal:
+                  $ref: '#/components/schemas/TradeSignal'
+                quantity:
+                  minimum: 0
+                  exclusiveMinimum: true
+                  type: integer
+                  format: int32
+              additionalProperties: false
         required: true
       responses:
         '204':
@@ -6462,8 +6612,8 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       responses:
@@ -6606,7 +6756,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RegisterRequest'
+              required:
+                - login
+                - password
+              type: object
+              properties:
+                login:
+                  maxLength: 64
+                  minLength: 1
+                  type: string
+                password:
+                  maxLength: 72
+                  minLength: 8
+                  type: string
+              additionalProperties: false
         required: true
       responses:
         '204':
@@ -6753,7 +6916,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserMeResponse'
+                $ref: '#/components/schemas/CurrentUserResult'
         '404':
           description: Not Found
         '400':
@@ -6881,7 +7044,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TelegramTokenResponse'
+                $ref: '#/components/schemas/TelegramLinkResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -7012,19 +7175,33 @@ paths:
         - Bearer: [ ]
 components:
   schemas:
-    CreateReminderRequest:
+    CreateReminderCommand:
       required:
+        - instrumentId
         - remindAt
         - text
+        - userId
       type: object
       properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        instrumentId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
         text:
+          maxLength: 1024
+          minLength: 1
           type: string
         remindAt:
           type: string
           format: date-time
       additionalProperties: false
-    CreateTradeRequest:
+    CreateTradeCommand:
       required:
         - instrumentId
         - openedAt
@@ -7032,60 +7209,513 @@ components:
         - quantity
         - signal
         - tradeTypeId
+        - userId
       type: object
       properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        instrumentId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        tradeTypeId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
         openedAt:
           type: string
           format: date-time
         closedAt:
           type: string
           format: date-time
+          nullable: true
         openPrice:
+          maximum: 1.7976931348623157E+308
+          exclusiveMaximum: false
+          minimum: 5E-324
+          exclusiveMinimum: false
           type: number
           format: double
         closePrice:
+          maximum: 1.7976931348623157E+308
+          exclusiveMaximum: false
+          minimum: 5E-324
+          exclusiveMinimum: false
           type: number
           format: double
+          nullable: true
         signal:
           $ref: '#/components/schemas/TradeSignal'
         quantity:
+          minimum: 0
+          exclusiveMinimum: true
           type: integer
           format: int32
-        tradeTypeId:
+      additionalProperties: false
+    CurrentUserResult:
+      required:
+        - id
+        - lastLoginAt
+        - login
+        - registeredAt
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        login:
+          type: string
+        lastLoginAt:
+          type: string
+          format: date-time
+        registeredAt:
+          type: string
+          format: date-time
+        telegramId:
+          type: string
+      additionalProperties: false
+    DeleteInstrumentNoteCommand:
+      required:
+        - instrumentId
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
           type: integer
           format: int32
         instrumentId:
+          minimum: 0
+          exclusiveMinimum: true
           type: integer
           format: int32
       additionalProperties: false
-    GlobalStatisticResponse:
+    DeleteReminderCommand:
       required:
-        - incomeStatistic
-        - tradeStatistic
-        - winrateStatistic
+        - reminderId
+        - userId
       type: object
       properties:
-        tradeStatistic:
-          $ref: '#/components/schemas/TradeStatisticResponse'
-        incomeStatistic:
-          $ref: '#/components/schemas/IncomeTradeStatisticResponse'
-        winrateStatistic:
-          $ref: '#/components/schemas/WinrateTradeStatisticResponse'
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        reminderId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
       additionalProperties: false
-    IncomeTradeStatisticResponse:
+    DeleteStrategyNoteCommand:
       required:
-        - averageIncome
-        - totalIncome
+        - strategyId
+        - userId
       type: object
       properties:
-        totalIncome:
-          type: number
-          format: double
-        averageIncome:
-          type: number
-          format: double
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        strategyId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
       additionalProperties: false
-    InstrumentBriefResponse:
+    DeleteTradeCommand:
+      required:
+        - tradeId
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        tradeId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+      additionalProperties: false
+    GetInstrumentNoteQuery:
+      required:
+        - instrumentId
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        instrumentId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+      additionalProperties: false
+    GetInstrumentQuery:
+      required:
+        - instrumentId
+      type: object
+      properties:
+        instrumentId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+      additionalProperties: false
+    GetInstrumentRemindersPageQuery:
+      required:
+        - instrumentId
+        - pageOptions
+        - reminderFilter
+        - reminderSearch
+        - reminderSort
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        instrumentId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        reminderFilter:
+          $ref: '#/components/schemas/ReminderFilter'
+        reminderSearch:
+          $ref: '#/components/schemas/ReminderSearch'
+        pageOptions:
+          $ref: '#/components/schemas/PageOptions'
+        reminderSort:
+          $ref: '#/components/schemas/ReminderSort'
+      additionalProperties: false
+    GetInstrumentStrategiesPageQuery:
+      required:
+        - instrumentId
+        - pageOptions
+        - strategyFilter
+        - strategySort
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        instrumentId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        strategyFilter:
+          $ref: '#/components/schemas/StrategyFilter'
+        strategySort:
+          $ref: '#/components/schemas/StrategySort'
+        pageOptions:
+          $ref: '#/components/schemas/PageOptions'
+      additionalProperties: false
+    GetInstrumentsPageQuery:
+      required:
+        - instrumentFilter
+        - instrumentSearch
+        - instrumentSort
+        - pageOptions
+      type: object
+      properties:
+        instrumentFilter:
+          $ref: '#/components/schemas/InstrumentFilter'
+        instrumentSearch:
+          $ref: '#/components/schemas/InstrumentSearch'
+        pageOptions:
+          $ref: '#/components/schemas/PageOptions'
+        instrumentSort:
+          $ref: '#/components/schemas/InstrumentSort'
+      additionalProperties: false
+    GetLatestSignalsPageQuery:
+      required:
+        - latestSignalFilter
+        - pageOptions
+        - signalSort
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        latestSignalFilter:
+          $ref: '#/components/schemas/LatestSignalFilter'
+        signalSort:
+          $ref: '#/components/schemas/SignalSort'
+        pageOptions:
+          $ref: '#/components/schemas/PageOptions'
+      additionalProperties: false
+    GetNoteQuery:
+      required:
+        - noteId
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        noteId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+      additionalProperties: false
+    GetNotesPageQuery:
+      required:
+        - noteFilter
+        - noteSearch
+        - pageOptions
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        noteFilter:
+          $ref: '#/components/schemas/NoteFilter'
+        noteSearch:
+          $ref: '#/components/schemas/NoteSearch'
+        pageOptions:
+          $ref: '#/components/schemas/PageOptions'
+      additionalProperties: false
+    GetProfitChartQuery:
+      required:
+        - profitChartFilter
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        profitChartFilter:
+          $ref: '#/components/schemas/ProfitChartFilter'
+      additionalProperties: false
+    GetReminderQuery:
+      required:
+        - reminderId
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        reminderId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+      additionalProperties: false
+    GetRemindersPageQuery:
+      required:
+        - pageOptions
+        - reminderFilter
+        - reminderSearch
+        - reminderSort
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        reminderFilter:
+          $ref: '#/components/schemas/ReminderFilter'
+        reminderSearch:
+          $ref: '#/components/schemas/ReminderSearch'
+        pageOptions:
+          $ref: '#/components/schemas/PageOptions'
+        reminderSort:
+          $ref: '#/components/schemas/ReminderSort'
+      additionalProperties: false
+    GetSessionsPageQuery:
+      required:
+        - pageOptions
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        pageOptions:
+          $ref: '#/components/schemas/PageOptions'
+        currentSessionId:
+          type: string
+          nullable: true
+      additionalProperties: false
+    GetSignalHistoryPageQuery:
+      required:
+        - pageOptions
+        - signalHistoryFilter
+        - signalSort
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        signalHistoryFilter:
+          $ref: '#/components/schemas/SignalHistoryFilter'
+        signalSort:
+          $ref: '#/components/schemas/SignalSort'
+        pageOptions:
+          $ref: '#/components/schemas/PageOptions'
+      additionalProperties: false
+    GetStrategiesPageQuery:
+      required:
+        - pageOptions
+        - strategyFilter
+        - strategySearch
+        - strategySort
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        strategyFilter:
+          $ref: '#/components/schemas/StrategyFilter'
+        strategySearch:
+          $ref: '#/components/schemas/StrategySearch'
+        strategySort:
+          $ref: '#/components/schemas/StrategySort'
+        pageOptions:
+          $ref: '#/components/schemas/PageOptions'
+      additionalProperties: false
+    GetStrategyInstrumentsPageQuery:
+      required:
+        - instrumentFilter
+        - instrumentSort
+        - pageOptions
+        - strategyId
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        strategyId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        instrumentFilter:
+          $ref: '#/components/schemas/StrategyInstrumentFilter'
+        instrumentSort:
+          $ref: '#/components/schemas/InstrumentSort'
+        pageOptions:
+          $ref: '#/components/schemas/PageOptions'
+      additionalProperties: false
+    GetStrategyNoteQuery:
+      required:
+        - strategyId
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        strategyId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+      additionalProperties: false
+    GetStrategyQuery:
+      required:
+        - strategyId
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        strategyId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+      additionalProperties: false
+    GetTradeQuery:
+      required:
+        - tradeId
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        tradeId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+      additionalProperties: false
+    GetTradesPageQuery:
+      required:
+        - pageOptions
+        - tradeFilter
+        - tradeSearch
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        tradeFilter:
+          $ref: '#/components/schemas/TradeFilter'
+        tradeSearch:
+          $ref: '#/components/schemas/TradeSearch'
+        pageOptions:
+          $ref: '#/components/schemas/PageOptions'
+      additionalProperties: false
+    InstrumentBriefResult:
       required:
         - id
         - symbol
@@ -7099,7 +7729,13 @@ components:
         name:
           type: string
       additionalProperties: false
-    InstrumentResponse:
+    InstrumentFilter:
+      type: object
+      properties:
+        symbol:
+          type: string
+      additionalProperties: false
+    InstrumentResult:
       required:
         - id
         - symbol
@@ -7113,7 +7749,7 @@ components:
         description:
           type: string
       additionalProperties: false
-    InstrumentResponsePageResult:
+    InstrumentResultPageResult:
       required:
         - items
         - page
@@ -7125,7 +7761,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/InstrumentResponse'
+            $ref: '#/components/schemas/InstrumentResult'
         totalCount:
           type: integer
           format: int32
@@ -7141,12 +7777,29 @@ components:
           format: int32
           readOnly: true
       additionalProperties: false
+    InstrumentSearch:
+      type: object
+      properties:
+        searchText:
+          maxLength: 100
+          type: string
+      additionalProperties: false
+    InstrumentSort:
+      required:
+        - sortBy
+      type: object
+      properties:
+        sortBy:
+          type: array
+          items:
+            $ref: '#/components/schemas/InstrumentSortField'
+      additionalProperties: false
     InstrumentSortField:
       enum:
         - symbolAsc
         - symbolDesc
       type: string
-    InstrumentStatisticsResponse:
+    InstrumentStatisticsResult:
       required:
         - totalInstruments
       type: object
@@ -7155,18 +7808,62 @@ components:
           type: integer
           format: int32
       additionalProperties: false
-    LoginRequest:
+    LatestSignalFilter:
+      type: object
+      properties:
+        signals:
+          type: array
+          items:
+            $ref: '#/components/schemas/TradeSignal'
+      additionalProperties: false
+    LinkStrategyInstrumentCommand:
+      required:
+        - instrumentId
+        - strategyId
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        strategyId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        instrumentId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+      additionalProperties: false
+    LoginCommand:
       required:
         - login
         - password
+        - userAgent
       type: object
       properties:
         login:
+          maxLength: 64
+          minLength: 1
           type: string
         password:
+          maxLength: 72
+          minLength: 8
+          type: string
+        userAgent:
           type: string
       additionalProperties: false
-    NoteResponse:
+    NoteFilter:
+      type: object
+      properties:
+        target:
+          $ref: '#/components/schemas/NoteType'
+      additionalProperties: false
+    NoteResult:
       required:
         - id
         - text
@@ -7182,11 +7879,11 @@ components:
           type: integer
           format: int32
         instrument:
-          $ref: '#/components/schemas/InstrumentBriefResponse'
+          $ref: '#/components/schemas/InstrumentBriefResult'
         strategy:
-          $ref: '#/components/schemas/StrategyBriefResponse'
+          $ref: '#/components/schemas/StrategyBriefResult'
       additionalProperties: false
-    NoteResponsePageResult:
+    NoteResultPageResult:
       required:
         - items
         - page
@@ -7198,7 +7895,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/NoteResponse'
+            $ref: '#/components/schemas/NoteResult'
         totalCount:
           type: integer
           format: int32
@@ -7214,7 +7911,14 @@ components:
           format: int32
           readOnly: true
       additionalProperties: false
-    NoteStatisticResponse:
+    NoteSearch:
+      type: object
+      properties:
+        searchText:
+          maxLength: 100
+          type: string
+      additionalProperties: false
+    NoteStatisticsResult:
       required:
         - instrumentNotes
         - strategyNotes
@@ -7236,6 +7940,25 @@ components:
         - instrumentNote
         - strategyNote
       type: string
+    PageOptions:
+      required:
+        - page
+        - pageSize
+      type: object
+      properties:
+        page:
+          maximum: 21474837
+          minimum: 1
+          type: integer
+          format: int32
+          default: 1
+        pageSize:
+          maximum: 100
+          minimum: 1
+          type: integer
+          format: int32
+          default: 20
+      additionalProperties: false
     ProblemDetails:
       required:
         - type
@@ -7277,7 +8000,7 @@ components:
         instance: /api/trades
         code: validation_failed
         traceId: 0HNABC123:00000001
-    ProfitChartBucketResponse:
+    ProfitChartBucketResult:
       required:
         - buyNetIncome
         - date
@@ -7298,21 +8021,42 @@ components:
           type: number
           format: double
       additionalProperties: false
+    ProfitChartFilter:
+      required:
+        - granularity
+      type: object
+      properties:
+        startDate:
+          type: string
+          format: date
+        endDate:
+          type: string
+          format: date
+        granularity:
+          $ref: '#/components/schemas/ProfitChartGranularity'
+      additionalProperties: false
     ProfitChartGranularity:
       enum:
         - day
         - week
         - month
       type: string
-    RegisterRequest:
+    RegisterCommand:
       required:
         - login
         - password
+        - userAgent
       type: object
       properties:
         login:
+          maxLength: 64
+          minLength: 1
           type: string
         password:
+          maxLength: 72
+          minLength: 8
+          type: string
+        userAgent:
           type: string
       additionalProperties: false
     ReminderDeliveryStatus:
@@ -7321,7 +8065,13 @@ components:
         - undelivered
         - delivered
       type: string
-    ReminderResponse:
+    ReminderFilter:
+      type: object
+      properties:
+        deliveryStatus:
+          $ref: '#/components/schemas/ReminderDeliveryStatus'
+      additionalProperties: false
+    ReminderResult:
       required:
         - id
         - remindAt
@@ -7337,12 +8087,12 @@ components:
           type: string
           format: date-time
         instrument:
-          $ref: '#/components/schemas/InstrumentBriefResponse'
+          $ref: '#/components/schemas/InstrumentBriefResult'
         deliveredAt:
           type: string
           format: date-time
       additionalProperties: false
-    ReminderResponsePageResult:
+    ReminderResultPageResult:
       required:
         - items
         - page
@@ -7354,7 +8104,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/ReminderResponse'
+            $ref: '#/components/schemas/ReminderResult'
         totalCount:
           type: integer
           format: int32
@@ -7370,12 +8120,29 @@ components:
           format: int32
           readOnly: true
       additionalProperties: false
+    ReminderSearch:
+      type: object
+      properties:
+        searchText:
+          maxLength: 100
+          type: string
+      additionalProperties: false
+    ReminderSort:
+      required:
+        - sortBy
+      type: object
+      properties:
+        sortBy:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReminderSortField'
+      additionalProperties: false
     ReminderSortField:
       enum:
         - remindAtAsc
         - remindAtDesc
       type: string
-    ReminderStatisticsResponse:
+    ReminderStatisticsResult:
       required:
         - maximumReminders
         - remainingReminders
@@ -7392,7 +8159,108 @@ components:
           type: integer
           format: int32
       additionalProperties: false
-    SignalResponse:
+    SessionResult:
+      required:
+        - createdAt
+        - id
+        - isCurrent
+        - lastSeen
+        - userAgent
+        - userId
+      type: object
+      properties:
+        id:
+          type: string
+        userId:
+          type: integer
+          format: int32
+        userAgent:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        lastSeen:
+          type: string
+          format: date-time
+        isCurrent:
+          type: boolean
+      additionalProperties: false
+    SessionResultPageResult:
+      required:
+        - items
+        - page
+        - pageSize
+        - totalCount
+        - totalPages
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SessionResult'
+        totalCount:
+          type: integer
+          format: int32
+        page:
+          type: integer
+          format: int32
+          readOnly: true
+        pageSize:
+          type: integer
+          format: int32
+        totalPages:
+          type: integer
+          format: int32
+          readOnly: true
+      additionalProperties: false
+    SetStrategySubscriptionCommand:
+      required:
+        - isSubscribed
+        - strategyId
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        strategyId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        isSubscribed:
+          type: boolean
+      additionalProperties: false
+    SignalHistoryFilter:
+      required:
+        - instrumentId
+        - strategyId
+      type: object
+      properties:
+        strategyId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        instrumentId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        signals:
+          type: array
+          items:
+            $ref: '#/components/schemas/TradeSignal'
+      additionalProperties: false
+    SignalResult:
       required:
         - closePrice
         - date
@@ -7428,7 +8296,7 @@ components:
         signal:
           type: string
       additionalProperties: false
-    SignalResponsePageResult:
+    SignalResultPageResult:
       required:
         - items
         - page
@@ -7440,7 +8308,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/SignalResponse'
+            $ref: '#/components/schemas/SignalResult'
         totalCount:
           type: integer
           format: int32
@@ -7456,6 +8324,16 @@ components:
           format: int32
           readOnly: true
       additionalProperties: false
+    SignalSort:
+      required:
+        - sortBy
+      type: object
+      properties:
+        sortBy:
+          type: array
+          items:
+            $ref: '#/components/schemas/SignalSortField'
+      additionalProperties: false
     SignalSortField:
       enum:
         - signalDateAsc
@@ -7465,7 +8343,7 @@ components:
         - accuracyAsc
         - accuracyDesc
       type: string
-    SignalStatisticResponse:
+    SignalStatisticsResult:
       required:
         - buySignals
         - sellSignals
@@ -7482,7 +8360,7 @@ components:
           type: integer
           format: int32
       additionalProperties: false
-    StrategyBriefResponse:
+    StrategyBriefResult:
       required:
         - displayName
         - id
@@ -7499,7 +8377,66 @@ components:
         description:
           type: string
       additionalProperties: false
-    StrategyResponse:
+    StrategyFilter:
+      type: object
+      properties:
+        name:
+          type: string
+      additionalProperties: false
+    StrategyInstrumentFilter:
+      type: object
+      properties:
+        instrumentIds:
+          maxItems: 100
+          type: array
+          items:
+            minimum: 0
+            exclusiveMinimum: true
+            type: integer
+            format: int32
+      additionalProperties: false
+    StrategySearch:
+      type: object
+      properties:
+        searchText:
+          maxLength: 100
+          type: string
+      additionalProperties: false
+    StrategySort:
+      required:
+        - sortBy
+      type: object
+      properties:
+        sortBy:
+          type: array
+          items:
+            $ref: '#/components/schemas/StrategySortField'
+      additionalProperties: false
+    StrategySortField:
+      enum:
+        - nameAsc
+        - nameDesc
+        - accuracyAsc
+        - accuracyDesc
+      type: string
+    StrategyStatisticsResult:
+      required:
+        - subscribedStrategiesCount
+        - totalStrategiesCount
+        - unsubscribedStrategiesCount
+      type: object
+      properties:
+        totalStrategiesCount:
+          type: integer
+          format: int64
+        subscribedStrategiesCount:
+          type: integer
+          format: int64
+        unsubscribedStrategiesCount:
+          type: integer
+          format: int64
+      additionalProperties: false
+    StrategySubscriptionResult:
       required:
         - displayName
         - id
@@ -7532,7 +8469,7 @@ components:
         isSubscribed:
           type: boolean
       additionalProperties: false
-    StrategyResponsePageResult:
+    StrategySubscriptionResultPageResult:
       required:
         - items
         - page
@@ -7544,7 +8481,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/StrategyResponse'
+            $ref: '#/components/schemas/StrategySubscriptionResult'
         totalCount:
           type: integer
           format: int32
@@ -7560,31 +8497,7 @@ components:
           format: int32
           readOnly: true
       additionalProperties: false
-    StrategySortField:
-      enum:
-        - nameAsc
-        - nameDesc
-        - accuracyAsc
-        - accuracyDesc
-      type: string
-    StrategyStatisticResponse:
-      required:
-        - subscribedStrategiesCount
-        - totalStrategiesCount
-        - unsubscribedStrategiesCount
-      type: object
-      properties:
-        totalStrategiesCount:
-          type: integer
-          format: int64
-        subscribedStrategiesCount:
-          type: integer
-          format: int64
-        unsubscribedStrategiesCount:
-          type: integer
-          format: int64
-      additionalProperties: false
-    TelegramTokenResponse:
+    TelegramLinkResult:
       required:
         - telegramToken
       type: object
@@ -7592,7 +8505,24 @@ components:
         telegramToken:
           type: string
       additionalProperties: false
-    TradeDateRangeResponse:
+    TradeCountsResult:
+      required:
+        - loseTrades
+        - totalTrades
+        - winTrades
+      type: object
+      properties:
+        totalTrades:
+          type: integer
+          format: int32
+        winTrades:
+          type: integer
+          format: int32
+        loseTrades:
+          type: integer
+          format: int32
+      additionalProperties: false
+    TradeDateRangeResult:
       type: object
       properties:
         minDate:
@@ -7602,7 +8532,36 @@ components:
           type: string
           format: date
       additionalProperties: false
-    TradeResponse:
+    TradeFilter:
+      type: object
+      properties:
+        signal:
+          $ref: '#/components/schemas/TradeSignal'
+        status:
+          $ref: '#/components/schemas/TradeStatus'
+        tradeTypeName:
+          type: string
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+      additionalProperties: false
+    TradeIncomeResult:
+      required:
+        - averageIncome
+        - totalIncome
+      type: object
+      properties:
+        totalIncome:
+          type: number
+          format: double
+        averageIncome:
+          type: number
+          format: double
+      additionalProperties: false
+    TradeResult:
       required:
         - id
         - openedAt
@@ -7644,12 +8603,12 @@ components:
           type: integer
           format: int32
         instrument:
-          $ref: '#/components/schemas/InstrumentBriefResponse'
+          $ref: '#/components/schemas/InstrumentBriefResult'
         userId:
           type: integer
           format: int32
       additionalProperties: false
-    TradeResponsePageResult:
+    TradeResultPageResult:
       required:
         - items
         - page
@@ -7661,7 +8620,7 @@ components:
         items:
           type: array
           items:
-            $ref: '#/components/schemas/TradeResponse'
+            $ref: '#/components/schemas/TradeResult'
         totalCount:
           type: integer
           format: int32
@@ -7676,6 +8635,13 @@ components:
           type: integer
           format: int32
           readOnly: true
+      additionalProperties: false
+    TradeSearch:
+      type: object
+      properties:
+        searchText:
+          maxLength: 100
+          type: string
       additionalProperties: false
     TradeSignal:
       enum:
@@ -7684,167 +8650,26 @@ components:
         - -1
       type: integer
       format: int32
-    TradeStatisticResponse:
+    TradeStatisticsResult:
       required:
-        - loseTrades
-        - totalTrades
-        - winTrades
+        - incomeStatistic
+        - tradeStatistic
+        - winrateStatistic
       type: object
       properties:
-        totalTrades:
-          type: integer
-          format: int32
-        winTrades:
-          type: integer
-          format: int32
-        loseTrades:
-          type: integer
-          format: int32
+        tradeStatistic:
+          $ref: '#/components/schemas/TradeCountsResult'
+        incomeStatistic:
+          $ref: '#/components/schemas/TradeIncomeResult'
+        winrateStatistic:
+          $ref: '#/components/schemas/TradeWinrateResult'
       additionalProperties: false
     TradeStatus:
       enum:
         - open
         - closed
       type: string
-    UpdateNoteRequest:
-      required:
-        - text
-      type: object
-      properties:
-        text:
-          type: string
-      additionalProperties: false
-    UpdateReminderRequest:
-      required:
-        - remindAt
-        - text
-      type: object
-      properties:
-        text:
-          type: string
-        remindAt:
-          type: string
-          format: date-time
-      additionalProperties: false
-    UpdateStrategyRequest:
-      required:
-        - isSubscribed
-      type: object
-      properties:
-        isSubscribed:
-          type: boolean
-      additionalProperties: false
-    UpdateTradeRequest:
-      required:
-        - instrumentId
-        - openedAt
-        - openPrice
-        - quantity
-        - signal
-        - tradeTypeId
-      type: object
-      properties:
-        openedAt:
-          type: string
-          format: date-time
-        closedAt:
-          type: string
-          format: date-time
-        openPrice:
-          type: number
-          format: double
-        closePrice:
-          type: number
-          format: double
-        signal:
-          $ref: '#/components/schemas/TradeSignal'
-        quantity:
-          type: integer
-          format: int32
-        tradeTypeId:
-          type: integer
-          format: int32
-        instrumentId:
-          type: integer
-          format: int32
-      additionalProperties: false
-    UserMeResponse:
-      required:
-        - id
-        - lastLoginAt
-        - login
-        - registeredAt
-      type: object
-      properties:
-        id:
-          type: integer
-          format: int32
-        login:
-          type: string
-        lastLoginAt:
-          type: string
-          format: date-time
-        registeredAt:
-          type: string
-          format: date-time
-        telegramId:
-          type: string
-      additionalProperties: false
-    UserSessionResponse:
-      required:
-        - createdAt
-        - id
-        - isCurrent
-        - lastSeen
-        - userAgent
-        - userId
-      type: object
-      properties:
-        id:
-          type: string
-        userId:
-          type: integer
-          format: int32
-        userAgent:
-          type: string
-        createdAt:
-          type: string
-          format: date-time
-        lastSeen:
-          type: string
-          format: date-time
-        isCurrent:
-          type: boolean
-      additionalProperties: false
-    UserSessionResponsePageResult:
-      required:
-        - items
-        - page
-        - pageSize
-        - totalCount
-        - totalPages
-      type: object
-      properties:
-        items:
-          type: array
-          items:
-            $ref: '#/components/schemas/UserSessionResponse'
-        totalCount:
-          type: integer
-          format: int32
-        page:
-          type: integer
-          format: int32
-          readOnly: true
-        pageSize:
-          type: integer
-          format: int32
-        totalPages:
-          type: integer
-          format: int32
-          readOnly: true
-      additionalProperties: false
-    WinrateTradeStatisticResponse:
+    TradeWinrateResult:
       required:
         - totalWinrate
       type: object
@@ -7855,6 +8680,161 @@ components:
         profitFactor:
           type: number
           format: float
+      additionalProperties: false
+    UnlinkStrategyInstrumentCommand:
+      required:
+        - instrumentId
+        - strategyId
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        strategyId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        instrumentId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+      additionalProperties: false
+    UpdateReminderCommand:
+      required:
+        - remindAt
+        - reminderId
+        - text
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        reminderId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        text:
+          maxLength: 1024
+          minLength: 1
+          type: string
+        remindAt:
+          type: string
+          format: date-time
+      additionalProperties: false
+    UpdateTradeCommand:
+      required:
+        - instrumentId
+        - openedAt
+        - openPrice
+        - quantity
+        - signal
+        - tradeId
+        - tradeTypeId
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        tradeId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        instrumentId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        tradeTypeId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        openedAt:
+          type: string
+          format: date-time
+        closedAt:
+          type: string
+          format: date-time
+          nullable: true
+        openPrice:
+          maximum: 1.7976931348623157E+308
+          exclusiveMaximum: false
+          minimum: 5E-324
+          exclusiveMinimum: false
+          type: number
+          format: double
+        closePrice:
+          maximum: 1.7976931348623157E+308
+          exclusiveMaximum: false
+          minimum: 5E-324
+          exclusiveMinimum: false
+          type: number
+          format: double
+          nullable: true
+        signal:
+          $ref: '#/components/schemas/TradeSignal'
+        quantity:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+      additionalProperties: false
+    UpsertInstrumentNoteCommand:
+      required:
+        - instrumentId
+        - text
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        instrumentId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        text:
+          maxLength: 1024
+          minLength: 1
+          type: string
+      additionalProperties: false
+    UpsertStrategyNoteCommand:
+      required:
+        - strategyId
+        - text
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        strategyId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        text:
+          maxLength: 1024
+          minLength: 1
+          type: string
       additionalProperties: false
   securitySchemes:
     Bearer:

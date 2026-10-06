@@ -17,7 +17,7 @@ public sealed class SetStrategySubscriptionHandler(
 		if (!strategyExists)
 			throw new NotFoundException("Strategy not found.", "strategy_not_found");
 
-		if (!command.IsSubscribed)
+		if (command.IsSubscribed == false)
 		{
 			await userStrategyRepository.ExecuteDeleteAsync(
 				link => link.UserId == command.UserId && link.StrategyId == command.StrategyId,

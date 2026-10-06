@@ -10,7 +10,10 @@ public sealed class DeleteReminderHandler(IRepository<Reminder> reminderReposito
 {
 	public async Task HandleAsync(DeleteReminderCommand command, CancellationToken ct = default)
 	{
-		int rows = await reminderRepository.ExecuteDeleteAsync(x => x.Id == command.ReminderId && x.UserId == command.UserId, ct);
+		int rows = await reminderRepository.ExecuteDeleteAsync(
+			x => x.Id == command.ReminderId && x.UserId == command.UserId,
+			ct
+		);
 
 		if (rows == 0)
 			throw new NotFoundException("Reminder not found.", "reminder_not_found");

@@ -14,6 +14,11 @@ public sealed class GetSessionsPageHandler(ISessionRepository sessionRepository)
 		var sessions = await sessionRepository.ListByUserAsync(query.UserId);
 		return PageResult<SessionData>
 			.FromList(sessions, query.PageOptions.Page, query.PageOptions.PageSize)
-			.Map(SessionResult.Projection);
+			.Map(session =>
+				SessionResult.Projection(session) with
+				{
+					IsCurrent = session.Id == query.CurrentSessionId,
+				}
+			);
 	}
 }

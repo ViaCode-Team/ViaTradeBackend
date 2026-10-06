@@ -14,7 +14,12 @@ public sealed class LinkStrategyInstrumentHandler(
 {
 	public async Task HandleAsync(LinkStrategyInstrumentCommand command, CancellationToken ct = default)
 	{
-		var linkState = await strategyOperations.FindInstrumentLinkStateAsync(command.UserId, command.StrategyId, command.InstrumentId, ct);
+		var linkState = await strategyOperations.FindInstrumentLinkStateAsync(
+			command.UserId,
+			command.StrategyId,
+			command.InstrumentId,
+			ct
+		);
 		if (linkState == null)
 			throw new NotFoundException("Strategy not found.", "strategy_not_found");
 

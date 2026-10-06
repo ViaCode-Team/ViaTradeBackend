@@ -12,7 +12,10 @@ public sealed class UnlinkStrategyInstrumentHandler(
 	public async Task HandleAsync(UnlinkStrategyInstrumentCommand command, CancellationToken ct = default)
 	{
 		var affectedRows = await userStrategyInstrumentRepository.ExecuteDeleteAsync(
-			e => e.UserId == command.UserId && e.StrategyId == command.StrategyId && e.InstrumentId == command.InstrumentId,
+			e =>
+				e.UserId == command.UserId
+				&& e.StrategyId == command.StrategyId
+				&& e.InstrumentId == command.InstrumentId,
 			ct
 		);
 

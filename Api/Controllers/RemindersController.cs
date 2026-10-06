@@ -1,9 +1,6 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using ViaTrade.Api.Contracts.Reminders;
-using ViaTrade.Api.Contracts.Statistics;
-using ViaTrade.Api.Mappings;
+using ViaTrade.Api.Attributes.Binding;
 using ViaTrade.Api.Routing;
 using ViaTrade.Application.Auth.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions;
@@ -22,59 +19,68 @@ namespace ViaTrade.Api.Controllers;
 public class RemindersController(IJwtHelper jwtHelper) : ControllerBase
 {
 	[HttpGet("statistics")]
-	public async Task<Ok<ReminderStatisticsResponse>> GetReminderStatistics(
+	public async Task<Ok<ReminderStatisticsResult>> GetReminderStatistics(
 		[FromServices] IQueryHandler<GetReminderStatisticsQuery, ReminderStatisticsResult> handler,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var query = new GetReminderStatisticsQuery(userId);
-		var statistics = await handler.HandleAsync(query, ct);
 
-		return TypedResults.Ok(ApiMapper.ToResponse(statistics));
+		var statistics = await handler.HandleAsync(new GetReminderStatisticsQuery(userId), ct);
+
+		return TypedResults.Ok(statistics);
 	}
 
 	[HttpGet]
-	public async Task<Ok<PageResult<ReminderResponse>>> GetReminders(
-		[FromQuery] ReminderFilter reminderFilter,
-		[FromQuery] ReminderSearch reminderSearch,
-		[FromQuery] PageOptions pageOptions,
-		[FromQuery] ReminderSort reminderSort,
+	public async Task<Ok<PageResult<ReminderResult>>> GetReminders(
+		[FromQuery, IgnoreProperties(nameof(GetRemindersPageQuery.UserId))] GetRemindersPageQuery query,
 		[FromServices] IQueryHandler<GetRemindersPageQuery, PageResult<ReminderResult>> handler,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var query = new GetRemindersPageQuery(userId, reminderFilter, reminderSearch, pageOptions, reminderSort);
+
+		query = query with { UserId = userId };
 		var reminders = await handler.HandleAsync(query, ct);
 
-		return TypedResults.Ok(reminders.Map(ApiMapper.ToResponse));
+		return TypedResults.Ok(reminders);
 	}
 
 	[HttpGet("{reminderId:int}")]
-	public async Task<Ok<ReminderResponse>> GetReminderById(
-		[FromRoute, Range(1, int.MaxValue)] int reminderId,
+	public async Task<Ok<ReminderResult>> GetReminderById(
+		[
+			FromQuery,
+			IgnoreProperties(nameof(GetReminderQuery.UserId)),
+			FromRouteProperties(nameof(GetReminderQuery.ReminderId))
+		]
+			GetReminderQuery query,
 		[FromServices] IQueryHandler<GetReminderQuery, ReminderResult> handler,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var query = new GetReminderQuery(userId, reminderId);
+
+		query = query with { UserId = userId };
 		var reminder = await handler.HandleAsync(query, ct);
 
-		return TypedResults.Ok(ApiMapper.ToResponse(reminder));
+		return TypedResults.Ok(reminder);
 	}
 
 	[HttpPut("{reminderId:int}")]
 	public async Task<NoContent> UpdateReminder(
-		[FromRoute, Range(1, int.MaxValue)] int reminderId,
-		[FromBody, Required] UpdateReminderRequest request,
+		[
+			FromBody,
+			IgnoreProperties(nameof(UpdateReminderCommand.UserId)),
+			FromRouteProperties(nameof(UpdateReminderCommand.ReminderId))
+		]
+			UpdateReminderCommand command,
 		[FromServices] ICommandHandler<UpdateReminderCommand> handler,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var command = new UpdateReminderCommand(userId, reminderId, request.Text, request.RemindAt);
+
+		command = command with { UserId = userId };
 		await handler.HandleAsync(command, ct);
 
 		return TypedResults.NoContent();
@@ -82,13 +88,19 @@ public class RemindersController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpDelete("{reminderId:int}")]
 	public async Task<NoContent> DeleteReminder(
-		[FromRoute, Range(1, int.MaxValue)] int reminderId,
+		[
+			FromQuery,
+			IgnoreProperties(nameof(DeleteReminderCommand.UserId)),
+			FromRouteProperties(nameof(DeleteReminderCommand.ReminderId))
+		]
+			DeleteReminderCommand command,
 		[FromServices] ICommandHandler<DeleteReminderCommand> handler,
 		CancellationToken ct
 	)
 	{
 		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var command = new DeleteReminderCommand(userId, reminderId);
+
+		command = command with { UserId = userId };
 		await handler.HandleAsync(command, ct);
 
 		return TypedResults.NoContent();

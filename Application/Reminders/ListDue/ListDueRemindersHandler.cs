@@ -1,14 +1,13 @@
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
-using ViaTrade.Application.Reminders.Common;
 using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Reminders.ListDue;
 
 public sealed class ListDueRemindersHandler(IReadRepository<Reminder> reminderRepository)
-	: IQueryHandler<ListDueRemindersQuery, IReadOnlyList<ReminderResult>>
+	: IQueryHandler<ListDueRemindersQuery, IReadOnlyList<DueReminderResult>>
 {
-	public async Task<IReadOnlyList<ReminderResult>> HandleAsync(
+	public async Task<IReadOnlyList<DueReminderResult>> HandleAsync(
 		ListDueRemindersQuery query,
 		CancellationToken ct = default
 	)

@@ -21,10 +21,6 @@ public sealed class GetRemindersPageHandler(IReadRepository<Reminder> reminderRe
 			query.PageOptions,
 			query.ReminderSort
 		);
-		return await reminderRepository.GetPageAsync(
-			specification,
-			ReminderResult.Projection,
-			ct
-		);
+		return await reminderRepository.GetPageAsync(specification, ReminderResult.Projection, ct);
 	}
 }

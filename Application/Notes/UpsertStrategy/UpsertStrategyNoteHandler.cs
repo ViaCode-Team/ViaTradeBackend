@@ -13,7 +13,12 @@ public sealed class UpsertStrategyNoteHandler(
 {
 	public async Task HandleAsync(UpsertStrategyNoteCommand command, CancellationToken ct = default)
 	{
-		int affectedRows = await noteOperations.ExecuteUpdateStrategyAsync(command.UserId, command.StrategyId, command.Text, ct);
+		int affectedRows = await noteOperations.ExecuteUpdateStrategyAsync(
+			command.UserId,
+			command.StrategyId,
+			command.Text,
+			ct
+		);
 		if (affectedRows != 0)
 			return;
 

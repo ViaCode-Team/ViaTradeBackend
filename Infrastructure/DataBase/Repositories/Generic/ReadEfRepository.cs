@@ -134,15 +134,13 @@ public class ReadEfRepository<T>(AppDbContext context, ISpecificationEvaluator s
 	)
 	{
 		ValidatePageSpecification(specification);
+		ct.ThrowIfCancellationRequested();
 
 		var take = specification.PageSize;
 		if (specification.Page == 1)
 			take++;
 
-		var pageQuery = ApplySpecification(specification)
-			.Skip(specification.Offset)
-			.Take(take)
-			.Select(selector);
+		var pageQuery = ApplySpecification(specification).Skip(specification.Offset).Take(take).Select(selector);
 
 		if (specification.Page == 1)
 		{
@@ -170,8 +168,8 @@ public class ReadEfRepository<T>(AppDbContext context, ISpecificationEvaluator s
 		if (specification.Skip != -1 || specification.Take != -1)
 		{
 			throw new InvalidOperationException(
-				$"{specification.GetType().Name} must not define Skip or Take. " +
-				"Pagination is controlled by the repository."
+				$"{specification.GetType().Name} must not define Skip or Take. "
+					+ "Pagination is controlled by the repository."
 			);
 		}
 

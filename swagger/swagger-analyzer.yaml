@@ -17,7 +17,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/InstrumentFileResponse'
+                  $ref: '#/components/schemas/InstrumentFileResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -166,7 +166,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/InstrumentFileResponse'
+                $ref: '#/components/schemas/InstrumentFileResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -297,7 +297,7 @@ paths:
         - ServicePassword: [ ]
 components:
   schemas:
-    InstrumentFileResponse:
+    InstrumentFileResult:
       required:
         - endDate
         - id

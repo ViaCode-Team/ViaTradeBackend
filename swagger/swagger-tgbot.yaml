@@ -17,7 +17,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DueReminderResponse'
+                  $ref: '#/components/schemas/DueReminderResult'
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -156,15 +156,24 @@ paths:
           in: path
           required: true
           schema:
-            maximum: 2147483647
-            minimum: 1
+            minimum: 0
+            exclusiveMinimum: true
             type: integer
             format: int32
       requestBody:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ConfirmReminderDeliveryRequest'
+              required:
+                - userId
+              type: object
+              properties:
+                userId:
+                  minimum: 0
+                  exclusiveMinimum: true
+                  type: integer
+                  format: int32
+              additionalProperties: false
         required: true
       responses:
         '204':
@@ -306,7 +315,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/LinkTelegramRequest'
+              $ref: '#/components/schemas/LinkTelegramCommand'
         required: true
       responses:
         '202':
@@ -441,16 +450,7 @@ paths:
         - ServicePassword: [ ]
 components:
   schemas:
-    ConfirmReminderDeliveryRequest:
-      required:
-        - userId
-      type: object
-      properties:
-        userId:
-          type: integer
-          format: int32
-      additionalProperties: false
-    DueReminderResponse:
+    DueReminderResult:
       required:
         - id
         - remindAt
@@ -467,12 +467,12 @@ components:
           type: string
           format: date-time
         instrument:
-          $ref: '#/components/schemas/InstrumentBriefResponse'
+          $ref: '#/components/schemas/InstrumentBriefResult'
         userId:
           type: integer
           format: int32
       additionalProperties: false
-    InstrumentBriefResponse:
+    InstrumentBriefResult:
       required:
         - id
         - symbol
@@ -486,16 +486,37 @@ components:
         name:
           type: string
       additionalProperties: false
-    LinkTelegramRequest:
+    LinkTelegramCommand:
       required:
         - telegramId
         - telegramToken
       type: object
       properties:
         telegramToken:
+          maxLength: 256
+          minLength: 1
           type: string
         telegramId:
+          maxLength: 64
+          minLength: 1
           type: string
+      additionalProperties: false
+    MarkReminderDeliveredCommand:
+      required:
+        - reminderId
+        - userId
+      type: object
+      properties:
+        userId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
+        reminderId:
+          minimum: 0
+          exclusiveMinimum: true
+          type: integer
+          format: int32
       additionalProperties: false
     ProblemDetails:
       required:

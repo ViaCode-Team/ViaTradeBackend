@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 	<PropertyGroup>
 		<RootNamespace>ViaTrade.Api</RootNamespace>
 		<AssemblyName>ViaTrade.Api</AssemblyName>
@@ -22,8 +22,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="MicroElements.Swashbuckle.FluentValidation" Version="7.2.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.11" />
-		<PackageReference Include="Riok.Mapperly" Version="4.3.1" PrivateAssets="all" />
 		<PackageReference Include="Scrutor" Version="7.0.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
 	</ItemGroup>
@@ -41,14 +41,30 @@
 		<SwaggerDocument Include="analyzer" OutputPath="$(ProjectDir)..\swagger\swagger-analyzer.yaml" />
 	</ItemGroup>
 
-	<Target Name="GenerateSwagger" AfterTargets="Build">
-		<MakeDir Directories="$(ProjectDir)..\swagger\" />
+	<Target Name="GenerateSwagger" AfterTargets="Build" Condition="'$(DesignTimeBuild)' != 'true'">
+		<PropertyGroup>
+			<_SwaggerIntermediateDirectory>$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '$(IntermediateOutputPath)', 'swagger'))</_SwaggerIntermediateDirectory>
+		</PropertyGroup>
+
+		<ItemGroup>
+			<_GeneratedSwaggerDocument Include="@(SwaggerDocument)">
+				<GeneratedPath>$(_SwaggerIntermediateDirectory)\%(Identity).yaml</GeneratedPath>
+			</_GeneratedSwaggerDocument>
+		</ItemGroup>
+
+		<MakeDir Directories="$(ProjectDir)..\swagger\;$(_SwaggerIntermediateDirectory)" />
 
 		<Exec
 			EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development"
-			IgnoreExitCode="true"
-			Command="dotnet tool run swagger tofile --yaml --output &quot;%(SwaggerDocument.OutputPath)&quot; --openapiversion 3.0 &quot;$(TargetPath)&quot; %(SwaggerDocument.Identity)"
+			Command="dotnet tool run swagger tofile --yaml --output &quot;%(_GeneratedSwaggerDocument.GeneratedPath)&quot; --openapiversion 3.0 &quot;$(TargetPath)&quot; %(_GeneratedSwaggerDocument.Identity)"
 			WorkingDirectory="$(ProjectDir)"
 		/>
+
+		<Move
+			SourceFiles="@(_GeneratedSwaggerDocument->'%(GeneratedPath)')"
+			DestinationFiles="@(_GeneratedSwaggerDocument->'%(OutputPath)')"
+		/>
+
+		<RemoveDir Directories="$(_SwaggerIntermediateDirectory)" />
 	</Target>
 </Project>

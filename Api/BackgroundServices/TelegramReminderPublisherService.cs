@@ -3,7 +3,6 @@ using Microsoft.Extensions.Options;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Notifications.Common;
 using ViaTrade.Application.Notifications.Common.Abstractions;
-using ViaTrade.Application.Reminders.Common;
 using ViaTrade.Application.Reminders.ListDue;
 using ViaTrade.Application.Reminders.MarkPublished;
 using ViaTrade.Configuration.Options;
@@ -56,7 +55,7 @@ public sealed class TelegramReminderPublisherService(
 	{
 		using var scope = services.CreateScope();
 		var dueHandler = scope.ServiceProvider.GetRequiredService<
-			IQueryHandler<ListDueRemindersQuery, IReadOnlyList<ReminderResult>>
+			IQueryHandler<ListDueRemindersQuery, IReadOnlyList<DueReminderResult>>
 		>();
 		var publishHandler = scope.ServiceProvider.GetRequiredService<
 			ICommandHandler<MarkReminderPublishedCommand, PublishReminderResult>
@@ -101,7 +100,7 @@ public sealed class TelegramReminderPublisherService(
 		}
 	}
 
-	private async Task PublishReminderAsync(ReminderResult reminder, CancellationToken ct)
+	private async Task PublishReminderAsync(DueReminderResult reminder, CancellationToken ct)
 	{
 		var payload = new ReminderNotificationPayload(
 			reminder.Id,

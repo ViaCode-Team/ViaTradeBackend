@@ -2,6 +2,7 @@ using Microsoft.Extensions.Options;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Application.Reminders.Common;
 using ViaTrade.Configuration.Options;
 using ViaTrade.Domain.Entities;
 
@@ -11,9 +12,9 @@ public sealed class CreateReminderHandler(
 	IRepository<Reminder> reminderRepository,
 	IUnitOfWork uow,
 	IOptions<ReminderLimitsSettings> reminderLimitsOptions
-) : ICommandHandler<CreateReminderCommand, CreateReminderResult>
+) : ICommandHandler<CreateReminderCommand, ReminderResult>
 {
-	public async Task<CreateReminderResult> HandleAsync(CreateReminderCommand command, CancellationToken ct = default)
+	public async Task<ReminderResult> HandleAsync(CreateReminderCommand command, CancellationToken ct = default)
 	{
 		int reminderCount = await reminderRepository.CountAsync(reminder => reminder.UserId == command.UserId, ct);
 		if (reminderCount >= reminderLimitsOptions.Value.MaxRemindersPerUser)
@@ -33,6 +34,6 @@ public sealed class CreateReminderHandler(
 		reminderRepository.Add(reminder);
 		await uow.SaveChangesAsync(ct);
 
-		return new CreateReminderResult(reminder.Id, reminder.Text, reminder.RemindAt, reminder.DeliveredAt);
+		return new ReminderResult(reminder.Id, reminder.Text, reminder.RemindAt, null, reminder.DeliveredAt);
 	}
 }

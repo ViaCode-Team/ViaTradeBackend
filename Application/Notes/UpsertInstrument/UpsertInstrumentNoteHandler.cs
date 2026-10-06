@@ -13,7 +13,12 @@ public sealed class UpsertInstrumentNoteHandler(
 {
 	public async Task HandleAsync(UpsertInstrumentNoteCommand command, CancellationToken ct = default)
 	{
-		int affectedRows = await noteOperations.ExecuteUpdateInstrumentAsync(command.UserId, command.InstrumentId, command.Text, ct);
+		int affectedRows = await noteOperations.ExecuteUpdateInstrumentAsync(
+			command.UserId,
+			command.InstrumentId,
+			command.Text,
+			ct
+		);
 		if (affectedRows != 0)
 			return;
 
