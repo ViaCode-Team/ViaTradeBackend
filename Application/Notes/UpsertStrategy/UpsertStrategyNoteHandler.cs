@@ -10,9 +10,9 @@ public sealed class UpsertStrategyNoteHandler(
 	IRepository<Note> noteRepository,
 	INoteRepository noteOperations,
 	IUnitOfWork uow
-) : ICommandHandler<UpsertStrategyNoteCommand>
+) : IVoidCommandHandler<UpsertStrategyNoteCommand>
 {
-	public async Task HandleAsync(UpsertStrategyNoteCommand command, CancellationToken ct)
+	public async ValueTask Handle(UpsertStrategyNoteCommand command, CancellationToken ct)
 	{
 		int affectedRows = await noteOperations.ExecuteUpdateStrategyAsync(
 			userContext.UserId,

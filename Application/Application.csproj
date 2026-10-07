@@ -5,17 +5,18 @@
 		<TargetFramework>net10.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Ardalis.Specification" Version="9.3.1" />
 		<PackageReference Include="FluentValidation" Version="12.1.1" />
+		<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
 		<PackageReference Include="Mediator.Abstractions" Version="3.0.2" />
 		<PackageReference Include="Mediator.SourceGenerator" Version="3.0.2">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
-		<PackageReference Include="Scrutor" Version="7.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>

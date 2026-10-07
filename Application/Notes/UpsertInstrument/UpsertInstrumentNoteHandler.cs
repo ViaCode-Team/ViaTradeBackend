@@ -10,9 +10,9 @@ public sealed class UpsertInstrumentNoteHandler(
 	IRepository<Note> noteRepository,
 	INoteRepository noteOperations,
 	IUnitOfWork uow
-) : ICommandHandler<UpsertInstrumentNoteCommand>
+) : IVoidCommandHandler<UpsertInstrumentNoteCommand>
 {
-	public async Task HandleAsync(UpsertInstrumentNoteCommand command, CancellationToken ct)
+	public async ValueTask Handle(UpsertInstrumentNoteCommand command, CancellationToken ct)
 	{
 		int affectedRows = await noteOperations.ExecuteUpdateInstrumentAsync(
 			userContext.UserId,

@@ -1,11 +1,11 @@
 using System.Text.Json;
+using Mediator;
 using Microsoft.Extensions.Options;
-using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Notifications.Common;
-using ViaTrade.Application.Notifications.Common.Abstractions;
 using ViaTrade.Application.Reminders.ListDue;
 using ViaTrade.Application.Reminders.MarkPublished;
 using ViaTrade.Configuration.Options;
+using INotificationPublisher = ViaTrade.Application.Notifications.Common.Abstractions.INotificationPublisher;
 
 namespace ViaTrade.Api.BackgroundServices;
 
@@ -54,14 +54,9 @@ public sealed class TelegramReminderPublisherService(
 	private async Task PublishDueRemindersAsync(CancellationToken ct)
 	{
 		using var scope = services.CreateScope();
-		var dueHandler = scope.ServiceProvider.GetRequiredService<
-			IQueryHandler<ListDueRemindersQuery, IReadOnlyList<DueReminderResult>>
-		>();
-		var publishHandler = scope.ServiceProvider.GetRequiredService<
-			ICommandHandler<MarkReminderPublishedCommand, PublishReminderResult>
-		>();
+		var sender = scope.ServiceProvider.GetRequiredService<ISender>();
 		var query = new ListDueRemindersQuery(options.Value.ReminderPublishBatchSize);
-		var reminders = await dueHandler.HandleAsync(query, ct);
+		var reminders = await sender.Send(query, ct);
 
 		logger.LogDebug("Found {ReminderCount} due reminders for Telegram publishing", reminders.Count);
 
@@ -72,7 +67,7 @@ public sealed class TelegramReminderPublisherService(
 				await PublishReminderAsync(reminder, ct);
 
 				var command = new MarkReminderPublishedCommand(reminder.UserId, reminder.Id);
-				var result = await publishHandler.HandleAsync(command, ct);
+				var result = await sender.Send(command, ct);
 
 				if (result.IsPublished)
 					logger.LogInformation(

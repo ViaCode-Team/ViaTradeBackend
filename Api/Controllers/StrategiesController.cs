@@ -1,8 +1,8 @@
+using Mediator;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTrade.Api.ModelBinding.Attributes;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Instruments.Common;
 using ViaTrade.Application.Notes.Common;
@@ -22,15 +22,12 @@ namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class StrategiesController : ControllerBase
+public class StrategiesController(ISender sender) : ControllerBase
 {
 	[HttpGet("statistics")]
-	public async Task<Ok<StrategyStatisticsResult>> GetStrategyStatistics(
-		[FromServices] IQueryHandler<GetStrategyStatisticsQuery, StrategyStatisticsResult> handler,
-		CancellationToken ct
-	)
+	public async Task<Ok<StrategyStatisticsResult>> GetStrategyStatistics(CancellationToken ct)
 	{
-		var strategyStatistics = await handler.HandleAsync(new GetStrategyStatisticsQuery(), ct);
+		var strategyStatistics = await sender.Send(new GetStrategyStatisticsQuery(), ct);
 
 		return TypedResults.Ok(strategyStatistics);
 	}
@@ -38,11 +35,10 @@ public class StrategiesController : ControllerBase
 	[HttpGet]
 	public async Task<Ok<PageResult<StrategySubscriptionResult>>> GetStrategies(
 		[FromQuery] GetStrategiesPageQuery query,
-		[FromServices] IQueryHandler<GetStrategiesPageQuery, PageResult<StrategySubscriptionResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var pagedStrategies = await handler.HandleAsync(query, ct);
+		var pagedStrategies = await sender.Send(query, ct);
 
 		return TypedResults.Ok(pagedStrategies);
 	}
@@ -50,11 +46,10 @@ public class StrategiesController : ControllerBase
 	[HttpGet("{strategyId:int}")]
 	public async Task<Ok<StrategySubscriptionResult>> GetStrategyById(
 		[FromQuery, FromRouteProperties(nameof(GetStrategyQuery.StrategyId))] GetStrategyQuery query,
-		[FromServices] IQueryHandler<GetStrategyQuery, StrategySubscriptionResult> handler,
 		CancellationToken ct
 	)
 	{
-		var strategy = await handler.HandleAsync(query, ct);
+		var strategy = await sender.Send(query, ct);
 
 		return TypedResults.Ok(strategy);
 	}
@@ -63,11 +58,10 @@ public class StrategiesController : ControllerBase
 	public async Task<Ok<PageResult<InstrumentResult>>> GetInstrumentsByStrategy(
 		[FromQuery, FromRouteProperties(nameof(GetStrategyInstrumentsPageQuery.StrategyId))]
 			GetStrategyInstrumentsPageQuery query,
-		[FromServices] IQueryHandler<GetStrategyInstrumentsPageQuery, PageResult<InstrumentResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var instruments = await handler.HandleAsync(query, ct);
+		var instruments = await sender.Send(query, ct);
 
 		return TypedResults.Ok(instruments);
 	}
@@ -75,11 +69,10 @@ public class StrategiesController : ControllerBase
 	[HttpGet("{strategyId:int}/note")]
 	public async Task<Ok<NoteResult>> GetStrategyNote(
 		[FromQuery, FromRouteProperties(nameof(GetStrategyNoteQuery.StrategyId))] GetStrategyNoteQuery query,
-		[FromServices] IQueryHandler<GetStrategyNoteQuery, NoteResult> handler,
 		CancellationToken ct
 	)
 	{
-		var note = await handler.HandleAsync(query, ct);
+		var note = await sender.Send(query, ct);
 
 		return TypedResults.Ok(note);
 	}
@@ -87,11 +80,10 @@ public class StrategiesController : ControllerBase
 	[HttpPut("{strategyId:int}/note")]
 	public async Task<NoContent> UpsertStrategyNote(
 		[FromBody, FromRouteProperties(nameof(UpsertStrategyNoteCommand.StrategyId))] UpsertStrategyNoteCommand command,
-		[FromServices] ICommandHandler<UpsertStrategyNoteCommand> handler,
 		CancellationToken ct
 	)
 	{
-		await handler.HandleAsync(command, ct);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -100,11 +92,10 @@ public class StrategiesController : ControllerBase
 	public async Task<NoContent> DeleteStrategyNote(
 		[FromQuery, FromRouteProperties(nameof(DeleteStrategyNoteCommand.StrategyId))]
 			DeleteStrategyNoteCommand command,
-		[FromServices] ICommandHandler<DeleteStrategyNoteCommand> handler,
 		CancellationToken ct
 	)
 	{
-		await handler.HandleAsync(command, ct);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -119,11 +110,10 @@ public class StrategiesController : ControllerBase
 			)
 		]
 			LinkStrategyInstrumentCommand command,
-		[FromServices] ICommandHandler<LinkStrategyInstrumentCommand> handler,
 		CancellationToken ct
 	)
 	{
-		await handler.HandleAsync(command, ct);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -138,11 +128,10 @@ public class StrategiesController : ControllerBase
 			)
 		]
 			UnlinkStrategyInstrumentCommand command,
-		[FromServices] ICommandHandler<UnlinkStrategyInstrumentCommand> handler,
 		CancellationToken ct
 	)
 	{
-		await handler.HandleAsync(command, ct);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -151,11 +140,10 @@ public class StrategiesController : ControllerBase
 	public async Task<NoContent> UpdateStrategy(
 		[FromBody, FromRouteProperties(nameof(SetStrategySubscriptionCommand.StrategyId))]
 			SetStrategySubscriptionCommand command,
-		[FromServices] ICommandHandler<SetStrategySubscriptionCommand> handler,
 		CancellationToken ct
 	)
 	{
-		await handler.HandleAsync(command, ct);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}

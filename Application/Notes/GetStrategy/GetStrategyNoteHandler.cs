@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Exceptions;
@@ -12,7 +13,7 @@ public sealed class GetStrategyNoteHandler(
 	IReadRepository<Note> noteRepository
 ) : IQueryHandler<GetStrategyNoteQuery, NoteResult>
 {
-	public async Task<NoteResult> HandleAsync(GetStrategyNoteQuery query, CancellationToken ct)
+	public async ValueTask<NoteResult> Handle(GetStrategyNoteQuery query, CancellationToken ct)
 	{
 		var strategyExists = await strategyRepository.AnyAsync(strategy => strategy.Id == query.StrategyId, ct);
 		if (!strategyExists)

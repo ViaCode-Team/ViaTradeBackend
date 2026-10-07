@@ -1,7 +1,7 @@
+using Mediator;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Signals.Common;
 using ViaTrade.Application.Signals.GetHistoryPage;
@@ -12,15 +12,12 @@ namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class SignalsController : ControllerBase
+public class SignalsController(ISender sender) : ControllerBase
 {
 	[HttpGet("statistics")]
-	public async Task<Ok<SignalStatisticsResult>> GetStatistics(
-		[FromServices] IQueryHandler<GetSignalStatisticsQuery, SignalStatisticsResult> handler,
-		CancellationToken ct
-	)
+	public async Task<Ok<SignalStatisticsResult>> GetStatistics(CancellationToken ct)
 	{
-		var signalStatistics = await handler.HandleAsync(new GetSignalStatisticsQuery(), ct);
+		var signalStatistics = await sender.Send(new GetSignalStatisticsQuery(), ct);
 
 		return TypedResults.Ok(signalStatistics);
 	}
@@ -28,11 +25,10 @@ public class SignalsController : ControllerBase
 	[HttpGet("latest")]
 	public async Task<Ok<PageResult<SignalResult>>> GetLatestSignals(
 		[FromQuery] GetLatestSignalsPageQuery query,
-		[FromServices] IQueryHandler<GetLatestSignalsPageQuery, PageResult<SignalResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var signals = await handler.HandleAsync(query, ct);
+		var signals = await sender.Send(query, ct);
 
 		return TypedResults.Ok(signals);
 	}
@@ -40,11 +36,10 @@ public class SignalsController : ControllerBase
 	[HttpGet]
 	public async Task<Ok<PageResult<SignalResult>>> GetSignals(
 		[FromQuery] GetSignalHistoryPageQuery query,
-		[FromServices] IQueryHandler<GetSignalHistoryPageQuery, PageResult<SignalResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var signals = await handler.HandleAsync(query, ct);
+		var signals = await sender.Send(query, ct);
 
 		return TypedResults.Ok(signals);
 	}

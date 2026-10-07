@@ -1,4 +1,4 @@
-using ViaTrade.Application.Common.Abstractions;
+using Mediator;
 using ViaTrade.Application.Reminders.Common;
 
 namespace ViaTrade.Application.Reminders.Create;

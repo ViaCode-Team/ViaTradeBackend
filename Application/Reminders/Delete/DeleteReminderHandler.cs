@@ -6,9 +6,9 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Reminders.Delete;
 
 public sealed class DeleteReminderHandler(IUserContext userContext, IRepository<Reminder> reminderRepository)
-	: ICommandHandler<DeleteReminderCommand>
+	: IVoidCommandHandler<DeleteReminderCommand>
 {
-	public async Task HandleAsync(DeleteReminderCommand command, CancellationToken ct)
+	public async ValueTask Handle(DeleteReminderCommand command, CancellationToken ct)
 	{
 		int rows = await reminderRepository.ExecuteDeleteAsync(
 			x => x.Id == command.ReminderId && x.UserId == userContext.UserId,

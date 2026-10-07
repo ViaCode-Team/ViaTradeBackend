@@ -9,9 +9,9 @@ namespace ViaTrade.Application.Users.LinkTelegram;
 public sealed class LinkTelegramHandler(
 	IUserRepository userRepository,
 	ICacheRepository<TelegramTokenEntity> telegramTokenRepository
-) : ICommandHandler<LinkTelegramCommand>
+) : IVoidCommandHandler<LinkTelegramCommand>
 {
-	public async Task HandleAsync(LinkTelegramCommand command, CancellationToken ct)
+	public async ValueTask Handle(LinkTelegramCommand command, CancellationToken ct)
 	{
 		var token = await telegramTokenRepository.ConsumeAsync(command.TelegramToken);
 		if (token == null)

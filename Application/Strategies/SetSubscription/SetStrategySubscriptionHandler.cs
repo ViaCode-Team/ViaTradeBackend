@@ -10,9 +10,9 @@ public sealed class SetStrategySubscriptionHandler(
 	IRepository<UserStrategy> userStrategyRepository,
 	IReadRepository<Strategy> strategyRepository,
 	IUnitOfWork uow
-) : ICommandHandler<SetStrategySubscriptionCommand>
+) : IVoidCommandHandler<SetStrategySubscriptionCommand>
 {
-	public async Task HandleAsync(SetStrategySubscriptionCommand command, CancellationToken ct)
+	public async ValueTask Handle(SetStrategySubscriptionCommand command, CancellationToken ct)
 	{
 		var strategyExists = await strategyRepository.AnyAsync(strategy => strategy.Id == command.StrategyId, ct);
 		if (!strategyExists)

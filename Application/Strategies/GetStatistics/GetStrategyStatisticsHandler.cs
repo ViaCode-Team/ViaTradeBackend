@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Exceptions;
 using ViaTrade.Application.Strategies.Common.Abstractions;
@@ -7,7 +8,7 @@ namespace ViaTrade.Application.Strategies.GetStatistics;
 public sealed class GetStrategyStatisticsHandler(IUserContext userContext, IStrategyRepository strategyStatistics)
 	: IQueryHandler<GetStrategyStatisticsQuery, StrategyStatisticsResult>
 {
-	public async Task<StrategyStatisticsResult> HandleAsync(GetStrategyStatisticsQuery query, CancellationToken ct)
+	public async ValueTask<StrategyStatisticsResult> Handle(GetStrategyStatisticsQuery query, CancellationToken ct)
 	{
 		var counts = await strategyStatistics.FindStatisticsAsync(userContext.UserId, ct);
 		if (counts == null)

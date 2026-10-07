@@ -5,9 +5,9 @@ using ViaTrade.Application.Reminders.Common.Abstractions;
 namespace ViaTrade.Application.Reminders.Update;
 
 public sealed class UpdateReminderHandler(IUserContext userContext, IReminderRepository reminderOperations)
-	: ICommandHandler<UpdateReminderCommand>
+	: IVoidCommandHandler<UpdateReminderCommand>
 {
-	public async Task HandleAsync(UpdateReminderCommand command, CancellationToken ct)
+	public async ValueTask Handle(UpdateReminderCommand command, CancellationToken ct)
 	{
 		int rows = await reminderOperations.ExecuteUpdateForUserAsync(
 			userContext.UserId,

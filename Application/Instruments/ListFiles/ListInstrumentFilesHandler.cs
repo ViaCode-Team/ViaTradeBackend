@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Instruments.Common;
@@ -10,7 +11,7 @@ public sealed class ListInstrumentFilesHandler(
 	IReadRepository<Instrument> instrumentRepository
 ) : IQueryHandler<ListInstrumentFilesQuery, IReadOnlyList<InstrumentFileResult>>
 {
-	public async Task<IReadOnlyList<InstrumentFileResult>> HandleAsync(
+	public async ValueTask<IReadOnlyList<InstrumentFileResult>> Handle(
 		ListInstrumentFilesQuery query,
 		CancellationToken ct
 	)

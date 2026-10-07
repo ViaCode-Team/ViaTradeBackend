@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Exceptions;
@@ -9,7 +10,7 @@ namespace ViaTrade.Application.Reminders.Get;
 public sealed class GetReminderHandler(IUserContext userContext, IReadRepository<Reminder> reminderRepository)
 	: IQueryHandler<GetReminderQuery, ReminderResult>
 {
-	public async Task<ReminderResult> HandleAsync(GetReminderQuery query, CancellationToken ct)
+	public async ValueTask<ReminderResult> Handle(GetReminderQuery query, CancellationToken ct)
 	{
 		var reminder = await reminderRepository.FirstOrDefaultAsync(
 			reminder => reminder.UserId == userContext.UserId && reminder.Id == query.ReminderId,

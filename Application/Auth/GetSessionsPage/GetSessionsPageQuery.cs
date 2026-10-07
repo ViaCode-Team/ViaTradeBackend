@@ -1,4 +1,4 @@
-using ViaTrade.Application.Common.Abstractions;
+using Mediator;
 using ViaTrade.Application.Common.Models;
 
 namespace ViaTrade.Application.Auth.GetSessionsPage;

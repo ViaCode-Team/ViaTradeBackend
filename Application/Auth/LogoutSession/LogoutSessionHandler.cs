@@ -5,9 +5,9 @@ using ViaTrade.Application.Common.Exceptions;
 namespace ViaTrade.Application.Auth.LogoutSession;
 
 public sealed class LogoutSessionHandler(IUserContext userContext, ISessionRepository sessionRepository)
-	: ICommandHandler<LogoutSessionCommand>
+	: IVoidCommandHandler<LogoutSessionCommand>
 {
-	public async Task HandleAsync(LogoutSessionCommand command, CancellationToken ct)
+	public async ValueTask Handle(LogoutSessionCommand command, CancellationToken ct)
 	{
 		ct.ThrowIfCancellationRequested();
 		var session = await sessionRepository.FindByIdAsync(userContext.SessionId);

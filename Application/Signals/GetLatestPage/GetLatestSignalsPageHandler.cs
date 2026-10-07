@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Models;
@@ -12,9 +13,10 @@ public sealed class GetLatestSignalsPageHandler(
 	IReadRepository<UserStrategyInstrument> userStrategyInstrumentRepository
 ) : IQueryHandler<GetLatestSignalsPageQuery, PageResult<SignalResult>>
 {
-	public async Task<PageResult<SignalResult>> HandleAsync(GetLatestSignalsPageQuery query, CancellationToken ct)
+	public async ValueTask<PageResult<SignalResult>> Handle(GetLatestSignalsPageQuery query, CancellationToken ct)
 	{
 		var sourcesSpecification = new SignalSourcesSpecification(userContext.UserId);
+
 		var sources = await userStrategyInstrumentRepository.ListAsync(sourcesSpecification, ct);
 		var signals = signalReader.ListLatestSignals(sources);
 

@@ -1,4 +1,4 @@
-using ViaTrade.Application.Common.Abstractions;
+using Mediator;
 using ViaTrade.Application.Reminders.Common.Abstractions;
 
 namespace ViaTrade.Application.Reminders.MarkPublished;
@@ -6,7 +6,7 @@ namespace ViaTrade.Application.Reminders.MarkPublished;
 public sealed class MarkReminderPublishedHandler(IReminderRepository reminderOperations)
 	: ICommandHandler<MarkReminderPublishedCommand, PublishReminderResult>
 {
-	public async Task<PublishReminderResult> HandleAsync(MarkReminderPublishedCommand command, CancellationToken ct)
+	public async ValueTask<PublishReminderResult> Handle(MarkReminderPublishedCommand command, CancellationToken ct)
 	{
 		int rows = await reminderOperations.ExecuteMarkPublishedAsync(command.UserId, command.ReminderId, ct);
 

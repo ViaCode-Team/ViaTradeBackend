@@ -1,5 +1,5 @@
+using Mediator;
 using ViaTrade.Application.Auth.Common;
-using ViaTrade.Application.Common.Abstractions;
 
 namespace ViaTrade.Application.Auth.Login;
 

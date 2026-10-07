@@ -4,9 +4,9 @@ using ViaTrade.Application.Common.Abstractions;
 namespace ViaTrade.Application.Auth.LogoutAll;
 
 public sealed class LogoutAllHandler(IUserContext userContext, ISessionRepository sessionRepository)
-	: ICommandHandler<LogoutAllCommand>
+	: IVoidCommandHandler<LogoutAllCommand>
 {
-	public async Task HandleAsync(LogoutAllCommand command, CancellationToken ct)
+	public async ValueTask Handle(LogoutAllCommand command, CancellationToken ct)
 	{
 		var sessions = await sessionRepository.ListByUserAsync(userContext.UserId);
 

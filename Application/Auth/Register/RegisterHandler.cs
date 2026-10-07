@@ -7,9 +7,9 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Auth.Register;
 
 public sealed class RegisterHandler(IRepository<User> userRepository, IPasswordHasher passwordHasher, IUnitOfWork uow)
-	: ICommandHandler<RegisterCommand>
+	: IVoidCommandHandler<RegisterCommand>
 {
-	public async Task HandleAsync(RegisterCommand command, CancellationToken ct)
+	public async ValueTask Handle(RegisterCommand command, CancellationToken ct)
 	{
 		if (await userRepository.AnyAsync(u => u.Login == command.Login, ct))
 			throw new ConflictException("User already exists.", "user_already_exists");

@@ -1,4 +1,4 @@
-using ViaTrade.Application.Common.Abstractions;
+using Mediator;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Instruments.Common;
@@ -9,7 +9,7 @@ namespace ViaTrade.Application.Instruments.GetPage;
 public sealed class GetInstrumentsPageHandler(IReadRepository<Instrument> instrumentRepository)
 	: IQueryHandler<GetInstrumentsPageQuery, PageResult<InstrumentResult>>
 {
-	public async Task<PageResult<InstrumentResult>> HandleAsync(GetInstrumentsPageQuery query, CancellationToken ct)
+	public async ValueTask<PageResult<InstrumentResult>> Handle(GetInstrumentsPageQuery query, CancellationToken ct)
 	{
 		var specification = new InstrumentsPageSpecification(
 			query.InstrumentFilter,
@@ -17,6 +17,7 @@ public sealed class GetInstrumentsPageHandler(IReadRepository<Instrument> instru
 			query.PageOptions,
 			query.InstrumentSort
 		);
+
 		return await instrumentRepository.GetPageAsync(specification, InstrumentResult.Projection, ct);
 	}
 }

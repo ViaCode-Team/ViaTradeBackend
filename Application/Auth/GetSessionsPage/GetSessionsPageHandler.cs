@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Auth.Common;
 using ViaTrade.Application.Auth.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions;
@@ -8,7 +9,7 @@ namespace ViaTrade.Application.Auth.GetSessionsPage;
 public sealed class GetSessionsPageHandler(IUserContext userContext, ISessionRepository sessionRepository)
 	: IQueryHandler<GetSessionsPageQuery, PageResult<SessionResult>>
 {
-	public async Task<PageResult<SessionResult>> HandleAsync(GetSessionsPageQuery query, CancellationToken ct)
+	public async ValueTask<PageResult<SessionResult>> Handle(GetSessionsPageQuery query, CancellationToken ct)
 	{
 		ct.ThrowIfCancellationRequested();
 

@@ -1,8 +1,8 @@
+using Mediator;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTrade.Api.ModelBinding.Attributes;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Reminders.Common;
 using ViaTrade.Application.Reminders.Delete;
@@ -15,15 +15,12 @@ namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class RemindersController : ControllerBase
+public class RemindersController(ISender sender) : ControllerBase
 {
 	[HttpGet("statistics")]
-	public async Task<Ok<ReminderStatisticsResult>> GetReminderStatistics(
-		[FromServices] IQueryHandler<GetReminderStatisticsQuery, ReminderStatisticsResult> handler,
-		CancellationToken ct
-	)
+	public async Task<Ok<ReminderStatisticsResult>> GetReminderStatistics(CancellationToken ct)
 	{
-		var statistics = await handler.HandleAsync(new GetReminderStatisticsQuery(), ct);
+		var statistics = await sender.Send(new GetReminderStatisticsQuery(), ct);
 
 		return TypedResults.Ok(statistics);
 	}
@@ -31,11 +28,10 @@ public class RemindersController : ControllerBase
 	[HttpGet]
 	public async Task<Ok<PageResult<ReminderResult>>> GetReminders(
 		[FromQuery] GetRemindersPageQuery query,
-		[FromServices] IQueryHandler<GetRemindersPageQuery, PageResult<ReminderResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var reminders = await handler.HandleAsync(query, ct);
+		var reminders = await sender.Send(query, ct);
 
 		return TypedResults.Ok(reminders);
 	}
@@ -43,11 +39,10 @@ public class RemindersController : ControllerBase
 	[HttpGet("{reminderId:int}")]
 	public async Task<Ok<ReminderResult>> GetReminderById(
 		[FromQuery, FromRouteProperties(nameof(GetReminderQuery.ReminderId))] GetReminderQuery query,
-		[FromServices] IQueryHandler<GetReminderQuery, ReminderResult> handler,
 		CancellationToken ct
 	)
 	{
-		var reminder = await handler.HandleAsync(query, ct);
+		var reminder = await sender.Send(query, ct);
 
 		return TypedResults.Ok(reminder);
 	}
@@ -55,11 +50,10 @@ public class RemindersController : ControllerBase
 	[HttpPut("{reminderId:int}")]
 	public async Task<NoContent> UpdateReminder(
 		[FromBody, FromRouteProperties(nameof(UpdateReminderCommand.ReminderId))] UpdateReminderCommand command,
-		[FromServices] ICommandHandler<UpdateReminderCommand> handler,
 		CancellationToken ct
 	)
 	{
-		await handler.HandleAsync(command, ct);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -67,11 +61,10 @@ public class RemindersController : ControllerBase
 	[HttpDelete("{reminderId:int}")]
 	public async Task<NoContent> DeleteReminder(
 		[FromQuery, FromRouteProperties(nameof(DeleteReminderCommand.ReminderId))] DeleteReminderCommand command,
-		[FromServices] ICommandHandler<DeleteReminderCommand> handler,
 		CancellationToken ct
 	)
 	{
-		await handler.HandleAsync(command, ct);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}

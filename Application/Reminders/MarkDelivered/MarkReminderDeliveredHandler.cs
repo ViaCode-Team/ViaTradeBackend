@@ -5,9 +5,9 @@ using ViaTrade.Application.Reminders.Common.Abstractions;
 namespace ViaTrade.Application.Reminders.MarkDelivered;
 
 public sealed class MarkReminderDeliveredHandler(IReminderRepository reminderOperations)
-	: ICommandHandler<MarkReminderDeliveredCommand>
+	: IVoidCommandHandler<MarkReminderDeliveredCommand>
 {
-	public async Task HandleAsync(MarkReminderDeliveredCommand command, CancellationToken ct)
+	public async ValueTask Handle(MarkReminderDeliveredCommand command, CancellationToken ct)
 	{
 		int rows = await reminderOperations.ExecuteMarkDeliveredForUserAsync(command.UserId, command.ReminderId, ct);
 

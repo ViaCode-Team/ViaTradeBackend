@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Exceptions;
@@ -13,7 +14,7 @@ public sealed class GetStrategyInstrumentsPageHandler(
 	IReadRepository<UserStrategyInstrument> userStrategyInstrumentRepository
 ) : IQueryHandler<GetStrategyInstrumentsPageQuery, PageResult<InstrumentResult>>
 {
-	public async Task<PageResult<InstrumentResult>> HandleAsync(
+	public async ValueTask<PageResult<InstrumentResult>> Handle(
 		GetStrategyInstrumentsPageQuery query,
 		CancellationToken ct
 	)
@@ -29,6 +30,7 @@ public sealed class GetStrategyInstrumentsPageHandler(
 			query.PageOptions,
 			query.InstrumentSort
 		);
+
 		return await userStrategyInstrumentRepository.GetPageAsync(specification, InstrumentResult.LinkProjection, ct);
 	}
 }

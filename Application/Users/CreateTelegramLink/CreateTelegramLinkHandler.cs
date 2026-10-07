@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using Mediator;
 using Microsoft.Extensions.Options;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
@@ -13,7 +14,7 @@ public sealed class CreateTelegramLinkHandler(
 	IOptions<TelegramBotSettings> telegramBotOptions
 ) : ICommandHandler<CreateTelegramLinkCommand, TelegramLinkResult>
 {
-	public async Task<TelegramLinkResult> HandleAsync(CreateTelegramLinkCommand command, CancellationToken ct)
+	public async ValueTask<TelegramLinkResult> Handle(CreateTelegramLinkCommand command, CancellationToken ct)
 	{
 		var token = Convert
 			.ToBase64String(RandomNumberGenerator.GetBytes(24))

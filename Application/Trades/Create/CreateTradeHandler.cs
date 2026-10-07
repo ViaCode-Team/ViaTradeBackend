@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Exceptions;
@@ -14,7 +15,7 @@ public sealed class CreateTradeHandler(
 	IUnitOfWork uow
 ) : ICommandHandler<CreateTradeCommand, TradeResult>
 {
-	public async Task<TradeResult> HandleAsync(CreateTradeCommand command, CancellationToken ct)
+	public async ValueTask<TradeResult> Handle(CreateTradeCommand command, CancellationToken ct)
 	{
 		var trade = new Trade
 		{

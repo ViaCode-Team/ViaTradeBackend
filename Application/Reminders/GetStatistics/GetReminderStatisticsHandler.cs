@@ -1,3 +1,4 @@
+using Mediator;
 using Microsoft.Extensions.Options;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
@@ -12,7 +13,7 @@ public sealed class GetReminderStatisticsHandler(
 	IOptions<ReminderLimitsSettings> reminderLimitsOptions
 ) : IQueryHandler<GetReminderStatisticsQuery, ReminderStatisticsResult>
 {
-	public async Task<ReminderStatisticsResult> HandleAsync(GetReminderStatisticsQuery query, CancellationToken ct)
+	public async ValueTask<ReminderStatisticsResult> Handle(GetReminderStatisticsQuery query, CancellationToken ct)
 	{
 		int total = await reminderRepository.CountAsync(reminder => reminder.UserId == userContext.UserId, ct);
 		int remaining = Math.Max(0, reminderLimitsOptions.Value.MaxRemindersPerUser - total);

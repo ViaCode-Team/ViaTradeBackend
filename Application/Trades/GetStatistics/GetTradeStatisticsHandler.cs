@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Trades.Common.Abstractions;
 using ViaTrade.Domain.Services;
@@ -7,7 +8,7 @@ namespace ViaTrade.Application.Trades.GetStatistics;
 public sealed class GetTradeStatisticsHandler(IUserContext userContext, ITradeRepository tradeStatistics)
 	: IQueryHandler<GetTradeStatisticsQuery, TradeStatisticsResult>
 {
-	public async Task<TradeStatisticsResult> HandleAsync(GetTradeStatisticsQuery query, CancellationToken ct)
+	public async ValueTask<TradeStatisticsResult> Handle(GetTradeStatisticsQuery query, CancellationToken ct)
 	{
 		var result = await tradeStatistics.GetGlobalStatisticsAsync(userContext.UserId, ct);
 

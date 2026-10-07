@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Exceptions;
@@ -12,7 +13,7 @@ public sealed class GetInstrumentNoteHandler(
 	IReadRepository<Note> noteRepository
 ) : IQueryHandler<GetInstrumentNoteQuery, NoteResult>
 {
-	public async Task<NoteResult> HandleAsync(GetInstrumentNoteQuery query, CancellationToken ct)
+	public async ValueTask<NoteResult> Handle(GetInstrumentNoteQuery query, CancellationToken ct)
 	{
 		var instrumentExists = await instrumentRepository.AnyAsync(
 			instrument => instrument.Id == query.InstrumentId,

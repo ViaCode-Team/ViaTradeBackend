@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Signals.Common;
@@ -11,9 +12,10 @@ public sealed class GetSignalStatisticsHandler(
 	IReadRepository<UserStrategyInstrument> userStrategyInstrumentRepository
 ) : IQueryHandler<GetSignalStatisticsQuery, SignalStatisticsResult>
 {
-	public async Task<SignalStatisticsResult> HandleAsync(GetSignalStatisticsQuery query, CancellationToken ct)
+	public async ValueTask<SignalStatisticsResult> Handle(GetSignalStatisticsQuery query, CancellationToken ct)
 	{
 		var specification = new SignalSourcesSpecification(userContext.UserId);
+
 		var sources = await userStrategyInstrumentRepository.ListAsync(specification, ct);
 		var signals = signalReader.ListSignals(sources, null, null, new SignalSort());
 

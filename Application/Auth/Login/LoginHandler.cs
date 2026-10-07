@@ -1,6 +1,6 @@
+using Mediator;
 using ViaTrade.Application.Auth.Common;
 using ViaTrade.Application.Auth.Common.Abstractions;
-using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Exceptions;
 using ViaTrade.Domain.Entities;
@@ -15,7 +15,7 @@ public sealed class LoginHandler(
 	AuthTokenFactory tokenFactory
 ) : ICommandHandler<LoginCommand, AuthTokensResult>
 {
-	public async Task<AuthTokensResult> HandleAsync(LoginCommand command, CancellationToken ct)
+	public async ValueTask<AuthTokensResult> Handle(LoginCommand command, CancellationToken ct)
 	{
 		var user = await userRepository.FirstOrDefaultAsync(
 			user => user.Login == command.Login,

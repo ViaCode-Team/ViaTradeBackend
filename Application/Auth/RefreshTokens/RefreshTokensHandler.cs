@@ -1,6 +1,6 @@
+using Mediator;
 using ViaTrade.Application.Auth.Common;
 using ViaTrade.Application.Auth.Common.Abstractions;
-using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Exceptions;
 using ViaTrade.Domain.Entities;
@@ -14,7 +14,7 @@ public sealed class RefreshTokensHandler(
 	AuthTokenFactory tokenFactory
 ) : ICommandHandler<RefreshTokensCommand, AuthTokensResult>
 {
-	public async Task<AuthTokensResult> HandleAsync(RefreshTokensCommand command, CancellationToken ct)
+	public async ValueTask<AuthTokensResult> Handle(RefreshTokensCommand command, CancellationToken ct)
 	{
 		var session = await sessionRepository.FindByRefreshTokenAsync(command.RefreshToken);
 		if (session == null)

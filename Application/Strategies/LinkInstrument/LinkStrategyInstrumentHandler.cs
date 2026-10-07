@@ -11,9 +11,9 @@ public sealed class LinkStrategyInstrumentHandler(
 	IRepository<UserStrategyInstrument> userStrategyInstrumentRepository,
 	IStrategyRepository strategyOperations,
 	IUnitOfWork uow
-) : ICommandHandler<LinkStrategyInstrumentCommand>
+) : IVoidCommandHandler<LinkStrategyInstrumentCommand>
 {
-	public async Task HandleAsync(LinkStrategyInstrumentCommand command, CancellationToken ct)
+	public async ValueTask Handle(LinkStrategyInstrumentCommand command, CancellationToken ct)
 	{
 		var linkState = await strategyOperations.FindInstrumentLinkStateAsync(
 			userContext.UserId,

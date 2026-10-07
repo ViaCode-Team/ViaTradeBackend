@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Exceptions;
@@ -9,7 +10,7 @@ namespace ViaTrade.Application.Notes.Get;
 public sealed class GetNoteHandler(IUserContext userContext, IReadRepository<Note> noteRepository)
 	: IQueryHandler<GetNoteQuery, NoteResult>
 {
-	public async Task<NoteResult> HandleAsync(GetNoteQuery query, CancellationToken ct)
+	public async ValueTask<NoteResult> Handle(GetNoteQuery query, CancellationToken ct)
 	{
 		var note = await noteRepository.FirstOrDefaultAsync(
 			note => note.UserId == userContext.UserId && note.Id == query.NoteId,

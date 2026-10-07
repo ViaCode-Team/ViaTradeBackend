@@ -1,4 +1,4 @@
-using ViaTrade.Application.Common.Abstractions;
+using Mediator;
 
 namespace ViaTrade.Application.Trades.Delete;
 

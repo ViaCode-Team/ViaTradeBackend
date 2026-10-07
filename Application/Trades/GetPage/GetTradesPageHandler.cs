@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Models;
@@ -9,7 +10,7 @@ namespace ViaTrade.Application.Trades.GetPage;
 public sealed class GetTradesPageHandler(IUserContext userContext, IReadRepository<Trade> tradeRepository)
 	: IQueryHandler<GetTradesPageQuery, PageResult<TradeResult>>
 {
-	public async Task<PageResult<TradeResult>> HandleAsync(GetTradesPageQuery query, CancellationToken ct)
+	public async ValueTask<PageResult<TradeResult>> Handle(GetTradesPageQuery query, CancellationToken ct)
 	{
 		var specification = new TradesPageSpecification(
 			userContext.UserId,
@@ -17,6 +18,7 @@ public sealed class GetTradesPageHandler(IUserContext userContext, IReadReposito
 			query.TradeSearch,
 			query.PageOptions
 		);
+
 		return await tradeRepository.GetPageAsync(specification, TradeResult.Projection, ct);
 	}
 }

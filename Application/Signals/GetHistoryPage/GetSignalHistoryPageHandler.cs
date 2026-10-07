@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Exceptions;
@@ -13,9 +14,10 @@ public sealed class GetSignalHistoryPageHandler(
 	IReadRepository<UserStrategyInstrument> userStrategyInstrumentRepository
 ) : IQueryHandler<GetSignalHistoryPageQuery, PageResult<SignalResult>>
 {
-	public async Task<PageResult<SignalResult>> HandleAsync(GetSignalHistoryPageQuery query, CancellationToken ct)
+	public async ValueTask<PageResult<SignalResult>> Handle(GetSignalHistoryPageQuery query, CancellationToken ct)
 	{
 		var sourcesSpecification = new SignalSourcesSpecification(userContext.UserId);
+
 		var sources = await userStrategyInstrumentRepository.ListAsync(sourcesSpecification, ct);
 		sources = sources
 			.Where(source => source.StrategyId == query.SignalHistoryFilter.StrategyId)

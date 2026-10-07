@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Exceptions;
@@ -9,7 +10,7 @@ namespace ViaTrade.Application.Strategies.Get;
 public sealed class GetStrategyHandler(IUserContext userContext, IReadRepository<Strategy> strategyRepository)
 	: IQueryHandler<GetStrategyQuery, StrategySubscriptionResult>
 {
-	public async Task<StrategySubscriptionResult> HandleAsync(GetStrategyQuery query, CancellationToken ct)
+	public async ValueTask<StrategySubscriptionResult> Handle(GetStrategyQuery query, CancellationToken ct)
 	{
 		var strategy = await strategyRepository.FirstOrDefaultAsync(
 			strategy => strategy.Id == query.StrategyId,

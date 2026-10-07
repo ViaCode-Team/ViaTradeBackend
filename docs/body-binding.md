@@ -1,6 +1,6 @@
 # Request binding and validation
 
-Binding supports any request model without requiring command or query interfaces. Application actions accept the command or query handled by their injected handler when it has client-bound properties. `[FromBody]`, `[FromQuery]`, or `[FromForm]` selects the default source. Without an explicit source, MVC selects it normally: complex request models in `[ApiController]` use JSON body binding, and registered complex services retain service inference. Use `[FromQuery]` for query-based models. `IgnoreProperties` and property-source attributes do not impose a query default. `FromBodyProperties`, `FromRouteProperties`, `FromQueryProperties`, `FromHeaderProperties`, `FromFormProperties`, and `FromFormFileProperties` override the default source for named properties. Current user and session identifiers are read by user-facing handlers from `IUserContext`, not bound to their commands or queries. Other server values, such as User-Agent, cookies, and configured limits, are supplied by the action when needed. Requests with no client-bound properties are constructed directly inside the action, for example `handler.HandleAsync(new GetNoteStatisticsQuery(), ct)`. Application types do not need HTTP or JSON attributes.
+Binding supports any request model without requiring command or query interfaces. Application actions accept the command or query sent through their injected mediator sender when it has client-bound properties. `[FromBody]`, `[FromQuery]`, or `[FromForm]` selects the default source. Without an explicit source, MVC selects it normally: complex request models in `[ApiController]` use JSON body binding, and registered complex services retain service inference. Use `[FromQuery]` for query-based models. `IgnoreProperties` and property-source attributes do not impose a query default. `FromBodyProperties`, `FromRouteProperties`, `FromQueryProperties`, `FromHeaderProperties`, `FromFormProperties`, and `FromFormFileProperties` override the default source for named properties. Current user and session identifiers are read by user-facing handlers from `IUserContext`, not bound to their commands or queries. Other server values, such as User-Agent, cookies, and configured limits, are supplied by the action when needed. Requests with no client-bound properties are constructed directly inside the action, for example `sender.Send(new GetNoteStatisticsQuery(), ct)`. Application types do not need HTTP or JSON attributes.
 
 ## Built-in MVC binding and alternatives
 
@@ -33,7 +33,7 @@ Non-nullable body action parameters do not need a separate `Required` annotation
 
 `IgnoreProperties` accepts CLR property names, preferably expressed with `nameof`. It excludes only the named top-level properties. JSON names follow the configured naming policy and `JsonPropertyName`; case sensitivity follows `PropertyNameCaseInsensitive`. All occurrences of an excluded property are removed, including duplicate and escaped names, before the command is deserialized. Their values can therefore have any valid JSON type.
 
-MVC skips validation of the excluded properties until the action supplies them. Validation of other properties, nested objects, route parameters, and the required body remains active. Application handler validation still checks the completed command. The attribute does not change output serialization or other parameters that use the same command type.
+MVC skips validation of the excluded properties until the action supplies them. Validation of other properties, nested objects, route parameters, and the required body remains active. Application mediator pipeline validation still checks the completed command. The attribute does not change output serialization or other parameters that use the same command type.
 
 Excluded top-level `required` and `JsonRequired` properties are removed from the input and their JSON property-required flags are disabled in an isolated root contract. Nested models, including nested instances of the same CLR type, retain their original serializer contracts. The formatter reads the original request stream without replacing it.
 
@@ -47,14 +47,14 @@ Swagger projects each annotated parameter's request schema separately, excluding
 public async Task<Ok<TradeResult>> GetTradeById(
     [FromQuery, FromRouteProperties(nameof(GetTradeQuery.TradeId))]
     GetTradeQuery query,
-    [FromServices] IQueryHandler<GetTradeQuery, TradeResult> handler,
+    [FromServices] ISender sender,
     CancellationToken ct)
 {
-    return TypedResults.Ok(await handler.HandleAsync(query, ct));
+    return TypedResults.Ok(await sender.Send(query, ct));
 }
 ```
 
-`IgnoreProperties` replaces `IgnoreBodyProperties`. Ignored properties are skipped before conversion and MVC validation, including malformed spoofed identifiers. The property source attributes bind client properties exclusively from the selected source; a route/header/query property is removed from JSON before deserialization. Missing route values and invalid client input produce model-state errors. Completed requests are validated by the application handler decorators after trusted values are supplied with `with`.
+`IgnoreProperties` replaces `IgnoreBodyProperties`. Ignored properties are skipped before conversion and MVC validation, including malformed spoofed identifiers. The property source attributes bind client properties exclusively from the selected source; a route/header/query property is removed from JSON before deserialization. Missing route values and invalid client input produce model-state errors. Completed requests are validated by the application mediator validation pipeline after trusted values are supplied with `with`.
 
 If every property is ignored or explicitly assigned to a non-body source, `[FromBody]` does not require or read a body, and Swagger omits the request body. For example, `[FromRouteProperties(nameof(GetNoteQuery.NoteId))]` and the same configuration with `[FromBody]` both bind only `NoteId` from the route. Genuine body properties retain the existing missing-body, JSON parsing, and validation behavior.
 

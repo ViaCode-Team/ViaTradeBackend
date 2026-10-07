@@ -95,7 +95,6 @@ public static class DependencyInjection
 				options.Conventions.Add(new RequestPropertiesConvention());
 
 				var jsonInputFormatter = options.InputFormatters.OfType<SystemTextJsonInputFormatter>().Single();
-
 				jsonInputFormatter.SupportedMediaTypes.Clear();
 				jsonInputFormatter.SupportedMediaTypes.Add("application/json");
 				options.InputFormatters.Insert(0, new IgnorePropertiesJsonInputFormatter(jsonInputFormatter));

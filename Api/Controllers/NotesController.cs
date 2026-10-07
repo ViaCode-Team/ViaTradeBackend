@@ -1,8 +1,8 @@
+using Mediator;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTrade.Api.ModelBinding.Attributes;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Notes.Common;
 using ViaTrade.Application.Notes.Get;
@@ -13,27 +13,20 @@ namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class NotesController : ControllerBase
+public class NotesController(ISender sender) : ControllerBase
 {
 	[HttpGet("statistics")]
-	public async Task<Ok<NoteStatisticsResult>> GetNoteStatistics(
-		[FromServices] IQueryHandler<GetNoteStatisticsQuery, NoteStatisticsResult> handler,
-		CancellationToken ct
-	)
+	public async Task<Ok<NoteStatisticsResult>> GetNoteStatistics(CancellationToken ct)
 	{
-		var noteStatistics = await handler.HandleAsync(new GetNoteStatisticsQuery(), ct);
+		var noteStatistics = await sender.Send(new GetNoteStatisticsQuery(), ct);
 
 		return TypedResults.Ok(noteStatistics);
 	}
 
 	[HttpGet]
-	public async Task<Ok<PageResult<NoteResult>>> GetNotes(
-		[FromQuery] GetNotesPageQuery query,
-		[FromServices] IQueryHandler<GetNotesPageQuery, PageResult<NoteResult>> handler,
-		CancellationToken ct
-	)
+	public async Task<Ok<PageResult<NoteResult>>> GetNotes([FromQuery] GetNotesPageQuery query, CancellationToken ct)
 	{
-		var userNotes = await handler.HandleAsync(query, ct);
+		var userNotes = await sender.Send(query, ct);
 
 		return TypedResults.Ok(userNotes);
 	}
@@ -41,11 +34,10 @@ public class NotesController : ControllerBase
 	[HttpGet("{noteId:int}")]
 	public async Task<Ok<NoteResult>> GetNoteById(
 		[FromBody, FromRouteProperties(nameof(GetNoteQuery.NoteId))] GetNoteQuery query,
-		[FromServices] IQueryHandler<GetNoteQuery, NoteResult> handler,
 		CancellationToken ct
 	)
 	{
-		var note = await handler.HandleAsync(query, ct);
+		var note = await sender.Send(query, ct);
 
 		return TypedResults.Ok(note);
 	}

@@ -6,9 +6,9 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Notes.DeleteStrategy;
 
 public sealed class DeleteStrategyNoteHandler(IUserContext userContext, IRepository<Note> noteRepository)
-	: ICommandHandler<DeleteStrategyNoteCommand>
+	: IVoidCommandHandler<DeleteStrategyNoteCommand>
 {
-	public async Task HandleAsync(DeleteStrategyNoteCommand command, CancellationToken ct)
+	public async ValueTask Handle(DeleteStrategyNoteCommand command, CancellationToken ct)
 	{
 		int affectedRows = await noteRepository.ExecuteDeleteAsync(
 			note => note.UserId == userContext.UserId && note.StrategyId == command.StrategyId,

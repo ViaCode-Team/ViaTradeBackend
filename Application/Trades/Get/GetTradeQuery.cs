@@ -1,4 +1,4 @@
-using ViaTrade.Application.Common.Abstractions;
+using Mediator;
 using ViaTrade.Application.Trades.Common;
 
 namespace ViaTrade.Application.Trades.Get;

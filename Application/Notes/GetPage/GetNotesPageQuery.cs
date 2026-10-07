@@ -1,4 +1,4 @@
-using ViaTrade.Application.Common.Abstractions;
+using Mediator;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Notes.Common;
 

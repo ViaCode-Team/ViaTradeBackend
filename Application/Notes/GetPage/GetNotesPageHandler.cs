@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Models;
@@ -9,7 +10,7 @@ namespace ViaTrade.Application.Notes.GetPage;
 public sealed class GetNotesPageHandler(IUserContext userContext, IReadRepository<Note> noteRepository)
 	: IQueryHandler<GetNotesPageQuery, PageResult<NoteResult>>
 {
-	public async Task<PageResult<NoteResult>> HandleAsync(GetNotesPageQuery query, CancellationToken ct)
+	public async ValueTask<PageResult<NoteResult>> Handle(GetNotesPageQuery query, CancellationToken ct)
 	{
 		var specification = new NotesPageSpecification(
 			userContext.UserId,
@@ -17,6 +18,7 @@ public sealed class GetNotesPageHandler(IUserContext userContext, IReadRepositor
 			query.NoteSearch,
 			query.PageOptions
 		);
+
 		return await noteRepository.GetPageAsync(specification, NoteResult.Projection, ct);
 	}
 }

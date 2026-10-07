@@ -5,9 +5,9 @@ using ViaTrade.Application.Trades.Common.Abstractions;
 namespace ViaTrade.Application.Trades.Update;
 
 public sealed class UpdateTradeHandler(IUserContext userContext, ITradeRepository tradeOperations)
-	: ICommandHandler<UpdateTradeCommand>
+	: IVoidCommandHandler<UpdateTradeCommand>
 {
-	public async Task HandleAsync(UpdateTradeCommand command, CancellationToken ct)
+	public async ValueTask Handle(UpdateTradeCommand command, CancellationToken ct)
 	{
 		var price = (decimal)command.OpenPrice * command.Quantity;
 

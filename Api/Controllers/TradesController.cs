@@ -1,8 +1,8 @@
+using Mediator;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTrade.Api.ModelBinding.Attributes;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Trades.Common;
 using ViaTrade.Application.Trades.Create;
@@ -18,15 +18,12 @@ namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class TradesController : ControllerBase
+public class TradesController(ISender sender) : ControllerBase
 {
 	[HttpGet("statistics")]
-	public async Task<Ok<TradeStatisticsResult>> GetTradeStatistics(
-		[FromServices] IQueryHandler<GetTradeStatisticsQuery, TradeStatisticsResult> handler,
-		CancellationToken ct
-	)
+	public async Task<Ok<TradeStatisticsResult>> GetTradeStatistics(CancellationToken ct)
 	{
-		var tradeStatistics = await handler.HandleAsync(new GetTradeStatisticsQuery(), ct);
+		var tradeStatistics = await sender.Send(new GetTradeStatisticsQuery(), ct);
 
 		return TypedResults.Ok(tradeStatistics);
 	}
@@ -34,34 +31,26 @@ public class TradesController : ControllerBase
 	[HttpGet("profitChart")]
 	public async Task<Ok<List<ProfitChartBucketResult>>> GetProfitChart(
 		[FromQuery] GetProfitChartQuery query,
-		[FromServices] IQueryHandler<GetProfitChartQuery, List<ProfitChartBucketResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var buckets = await handler.HandleAsync(query, ct);
+		var buckets = await sender.Send(query, ct);
 
 		return TypedResults.Ok(buckets);
 	}
 
 	[HttpGet("profitChart/dateRange")]
-	public async Task<Ok<TradeDateRangeResult>> GetTradeDateRange(
-		[FromServices] IQueryHandler<GetTradeDateRangeQuery, TradeDateRangeResult> handler,
-		CancellationToken ct
-	)
+	public async Task<Ok<TradeDateRangeResult>> GetTradeDateRange(CancellationToken ct)
 	{
-		var range = await handler.HandleAsync(new GetTradeDateRangeQuery(), ct);
+		var range = await sender.Send(new GetTradeDateRangeQuery(), ct);
 
 		return TypedResults.Ok(range);
 	}
 
 	[HttpGet]
-	public async Task<Ok<PageResult<TradeResult>>> GetTrades(
-		[FromQuery] GetTradesPageQuery query,
-		[FromServices] IQueryHandler<GetTradesPageQuery, PageResult<TradeResult>> handler,
-		CancellationToken ct
-	)
+	public async Task<Ok<PageResult<TradeResult>>> GetTrades([FromQuery] GetTradesPageQuery query, CancellationToken ct)
 	{
-		var userTrades = await handler.HandleAsync(query, ct);
+		var userTrades = await sender.Send(query, ct);
 
 		return TypedResults.Ok(userTrades);
 	}
@@ -69,23 +58,18 @@ public class TradesController : ControllerBase
 	[HttpGet("{tradeId:int}")]
 	public async Task<Ok<TradeResult>> GetTradeById(
 		[FromQuery, FromRouteProperties(nameof(GetTradeQuery.TradeId))] GetTradeQuery query,
-		[FromServices] IQueryHandler<GetTradeQuery, TradeResult> handler,
 		CancellationToken ct
 	)
 	{
-		var trade = await handler.HandleAsync(query, ct);
+		var trade = await sender.Send(query, ct);
 
 		return TypedResults.Ok(trade);
 	}
 
 	[HttpPost]
-	public async Task<Created<TradeResult>> CreateTrade(
-		[FromBody] CreateTradeCommand command,
-		[FromServices] ICommandHandler<CreateTradeCommand, TradeResult> handler,
-		CancellationToken ct
-	)
+	public async Task<Created<TradeResult>> CreateTrade([FromBody] CreateTradeCommand command, CancellationToken ct)
 	{
-		var trade = await handler.HandleAsync(command, ct);
+		var trade = await sender.Send(command, ct);
 
 		return TypedResults.Created($"/api/v1/trades/{trade.Id}", trade);
 	}
@@ -93,11 +77,10 @@ public class TradesController : ControllerBase
 	[HttpPut("{tradeId:int}")]
 	public async Task<NoContent> UpdateTrade(
 		[FromBody, FromRouteProperties(nameof(UpdateTradeCommand.TradeId))] UpdateTradeCommand command,
-		[FromServices] ICommandHandler<UpdateTradeCommand> handler,
 		CancellationToken ct
 	)
 	{
-		await handler.HandleAsync(command, ct);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -105,11 +88,10 @@ public class TradesController : ControllerBase
 	[HttpDelete("{tradeId:int}")]
 	public async Task<NoContent> DeleteTrade(
 		[FromQuery, FromRouteProperties(nameof(DeleteTradeCommand.TradeId))] DeleteTradeCommand command,
-		[FromServices] ICommandHandler<DeleteTradeCommand> handler,
 		CancellationToken ct
 	)
 	{
-		await handler.HandleAsync(command, ct);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}

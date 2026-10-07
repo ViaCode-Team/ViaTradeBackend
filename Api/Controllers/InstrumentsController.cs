@@ -1,8 +1,8 @@
+using Mediator;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTrade.Api.ModelBinding.Attributes;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Instruments.Common;
 using ViaTrade.Application.Instruments.Get;
@@ -22,15 +22,12 @@ namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class InstrumentsController : ControllerBase
+public class InstrumentsController(ISender sender) : ControllerBase
 {
 	[HttpGet("statistics")]
-	public async Task<Ok<InstrumentStatisticsResult>> GetInstrumentStatistics(
-		[FromServices] IQueryHandler<GetInstrumentStatisticsQuery, InstrumentStatisticsResult> handler,
-		CancellationToken ct
-	)
+	public async Task<Ok<InstrumentStatisticsResult>> GetInstrumentStatistics(CancellationToken ct)
 	{
-		var instrumentStatistics = await handler.HandleAsync(new GetInstrumentStatisticsQuery(), ct);
+		var instrumentStatistics = await sender.Send(new GetInstrumentStatisticsQuery(), ct);
 
 		return TypedResults.Ok(instrumentStatistics);
 	}
@@ -38,11 +35,10 @@ public class InstrumentsController : ControllerBase
 	[HttpGet]
 	public async Task<Ok<PageResult<InstrumentResult>>> GetInstruments(
 		[FromQuery] GetInstrumentsPageQuery query,
-		[FromServices] IQueryHandler<GetInstrumentsPageQuery, PageResult<InstrumentResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var instruments = await handler.HandleAsync(query, ct);
+		var instruments = await sender.Send(query, ct);
 
 		return TypedResults.Ok(instruments);
 	}
@@ -50,11 +46,10 @@ public class InstrumentsController : ControllerBase
 	[HttpGet("{instrumentId:int}")]
 	public async Task<Ok<InstrumentResult>> GetInstrumentById(
 		[FromQuery, FromRouteProperties(nameof(GetInstrumentQuery.InstrumentId))] GetInstrumentQuery query,
-		[FromServices] IQueryHandler<GetInstrumentQuery, InstrumentResult> handler,
 		CancellationToken ct
 	)
 	{
-		var instrument = await handler.HandleAsync(query, ct);
+		var instrument = await sender.Send(query, ct);
 
 		return TypedResults.Ok(instrument);
 	}
@@ -63,11 +58,10 @@ public class InstrumentsController : ControllerBase
 	public async Task<Ok<PageResult<StrategySubscriptionResult>>> GetStrategiesByInstrument(
 		[FromQuery, FromRouteProperties(nameof(GetInstrumentStrategiesPageQuery.InstrumentId))]
 			GetInstrumentStrategiesPageQuery query,
-		[FromServices] IQueryHandler<GetInstrumentStrategiesPageQuery, PageResult<StrategySubscriptionResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var strategies = await handler.HandleAsync(query, ct);
+		var strategies = await sender.Send(query, ct);
 
 		return TypedResults.Ok(strategies);
 	}
@@ -75,11 +69,10 @@ public class InstrumentsController : ControllerBase
 	[HttpGet("{instrumentId:int}/note")]
 	public async Task<Ok<NoteResult>> GetInstrumentNote(
 		[FromQuery, FromRouteProperties(nameof(GetInstrumentNoteQuery.InstrumentId))] GetInstrumentNoteQuery query,
-		[FromServices] IQueryHandler<GetInstrumentNoteQuery, NoteResult> handler,
 		CancellationToken ct
 	)
 	{
-		var note = await handler.HandleAsync(query, ct);
+		var note = await sender.Send(query, ct);
 
 		return TypedResults.Ok(note);
 	}
@@ -88,11 +81,10 @@ public class InstrumentsController : ControllerBase
 	public async Task<NoContent> UpsertInstrumentNote(
 		[FromBody, FromRouteProperties(nameof(UpsertInstrumentNoteCommand.InstrumentId))]
 			UpsertInstrumentNoteCommand command,
-		[FromServices] ICommandHandler<UpsertInstrumentNoteCommand> handler,
 		CancellationToken ct
 	)
 	{
-		await handler.HandleAsync(command, ct);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -101,11 +93,10 @@ public class InstrumentsController : ControllerBase
 	public async Task<NoContent> DeleteInstrumentNote(
 		[FromQuery, FromRouteProperties(nameof(DeleteInstrumentNoteCommand.InstrumentId))]
 			DeleteInstrumentNoteCommand command,
-		[FromServices] ICommandHandler<DeleteInstrumentNoteCommand> handler,
 		CancellationToken ct
 	)
 	{
-		await handler.HandleAsync(command, ct);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}
@@ -114,11 +105,10 @@ public class InstrumentsController : ControllerBase
 	public async Task<Ok<PageResult<ReminderResult>>> GetInstrumentReminders(
 		[FromQuery, FromRouteProperties(nameof(GetInstrumentRemindersPageQuery.InstrumentId))]
 			GetInstrumentRemindersPageQuery query,
-		[FromServices] IQueryHandler<GetInstrumentRemindersPageQuery, PageResult<ReminderResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var reminders = await handler.HandleAsync(query, ct);
+		var reminders = await sender.Send(query, ct);
 
 		return TypedResults.Ok(reminders);
 	}
@@ -126,11 +116,10 @@ public class InstrumentsController : ControllerBase
 	[HttpPost("{instrumentId:int}/reminders")]
 	public async Task<Created<ReminderResult>> CreateInstrumentReminder(
 		[FromBody, FromRouteProperties(nameof(CreateReminderCommand.InstrumentId))] CreateReminderCommand command,
-		[FromServices] ICommandHandler<CreateReminderCommand, ReminderResult> handler,
 		CancellationToken ct
 	)
 	{
-		var reminder = await handler.HandleAsync(command, ct);
+		var reminder = await sender.Send(command, ct);
 
 		return TypedResults.Created($"/api/v1/reminders/{reminder.Id}", reminder);
 	}

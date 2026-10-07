@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Models;
@@ -9,7 +10,7 @@ namespace ViaTrade.Application.Reminders.GetPage;
 public sealed class GetRemindersPageHandler(IUserContext userContext, IReadRepository<Reminder> reminderRepository)
 	: IQueryHandler<GetRemindersPageQuery, PageResult<ReminderResult>>
 {
-	public async Task<PageResult<ReminderResult>> HandleAsync(GetRemindersPageQuery query, CancellationToken ct)
+	public async ValueTask<PageResult<ReminderResult>> Handle(GetRemindersPageQuery query, CancellationToken ct)
 	{
 		var specification = new RemindersPageSpecification(
 			userContext.UserId,
@@ -18,6 +19,7 @@ public sealed class GetRemindersPageHandler(IUserContext userContext, IReadRepos
 			query.PageOptions,
 			query.ReminderSort
 		);
+
 		return await reminderRepository.GetPageAsync(specification, ReminderResult.Projection, ct);
 	}
 }

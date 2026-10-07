@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Exceptions;
@@ -13,7 +14,7 @@ public sealed class GetInstrumentRemindersPageHandler(
 	IReadRepository<Reminder> reminderRepository
 ) : IQueryHandler<GetInstrumentRemindersPageQuery, PageResult<ReminderResult>>
 {
-	public async Task<PageResult<ReminderResult>> HandleAsync(
+	public async ValueTask<PageResult<ReminderResult>> Handle(
 		GetInstrumentRemindersPageQuery query,
 		CancellationToken ct
 	)
@@ -34,6 +35,7 @@ public sealed class GetInstrumentRemindersPageHandler(
 			query.ReminderSort,
 			query.InstrumentId
 		);
+
 		return await reminderRepository.GetPageAsync(specification, ReminderResult.Projection, ct);
 	}
 }

@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Trades.Common.Abstractions;
 
@@ -6,7 +7,7 @@ namespace ViaTrade.Application.Trades.GetProfitChart;
 public sealed class GetProfitChartHandler(IUserContext userContext, ITradeRepository tradeStatistics)
 	: IQueryHandler<GetProfitChartQuery, List<ProfitChartBucketResult>>
 {
-	public async Task<List<ProfitChartBucketResult>> HandleAsync(GetProfitChartQuery query, CancellationToken ct)
+	public async ValueTask<List<ProfitChartBucketResult>> Handle(GetProfitChartQuery query, CancellationToken ct)
 	{
 		var rows = await tradeStatistics.GetProfitChartAsync(userContext.UserId, query.ProfitChartFilter, ct);
 

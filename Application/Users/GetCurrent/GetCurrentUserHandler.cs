@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Exceptions;
@@ -8,7 +9,7 @@ namespace ViaTrade.Application.Users.GetCurrent;
 public sealed class GetCurrentUserHandler(IUserContext userContext, IReadRepository<User> userRepository)
 	: IQueryHandler<GetCurrentUserQuery, CurrentUserResult>
 {
-	public async Task<CurrentUserResult> HandleAsync(GetCurrentUserQuery query, CancellationToken ct)
+	public async ValueTask<CurrentUserResult> Handle(GetCurrentUserQuery query, CancellationToken ct)
 	{
 		var user = await userRepository.FirstOrDefaultAsync(
 			user => user.Id == userContext.UserId,

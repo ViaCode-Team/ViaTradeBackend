@@ -1,3 +1,4 @@
+using Mediator;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Exceptions;
@@ -11,7 +12,7 @@ public sealed class GetInstrumentFileHandler(
 	IReadRepository<Instrument> instrumentRepository
 ) : IQueryHandler<GetInstrumentFileQuery, InstrumentFileResult>
 {
-	public async Task<InstrumentFileResult> HandleAsync(GetInstrumentFileQuery query, CancellationToken ct)
+	public async ValueTask<InstrumentFileResult> Handle(GetInstrumentFileQuery query, CancellationToken ct)
 	{
 		string? ticker = null;
 		int? instrumentId = null;

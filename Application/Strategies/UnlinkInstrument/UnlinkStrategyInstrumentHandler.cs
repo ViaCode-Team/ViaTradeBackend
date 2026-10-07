@@ -8,9 +8,9 @@ namespace ViaTrade.Application.Strategies.UnlinkInstrument;
 public sealed class UnlinkStrategyInstrumentHandler(
 	IUserContext userContext,
 	IRepository<UserStrategyInstrument> userStrategyInstrumentRepository
-) : ICommandHandler<UnlinkStrategyInstrumentCommand>
+) : IVoidCommandHandler<UnlinkStrategyInstrumentCommand>
 {
-	public async Task HandleAsync(UnlinkStrategyInstrumentCommand command, CancellationToken ct)
+	public async ValueTask Handle(UnlinkStrategyInstrumentCommand command, CancellationToken ct)
 	{
 		var affectedRows = await userStrategyInstrumentRepository.ExecuteDeleteAsync(
 			e =>
