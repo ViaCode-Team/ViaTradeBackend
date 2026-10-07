@@ -19,7 +19,7 @@ public sealed record ReminderResult(
 			reminder.RemindAt,
 			new InstrumentBriefResult(
 				reminder.InstrumentId,
-				reminder.Instrument!.Symbol,
+				reminder.Instrument!.Ticker,
 				reminder.Instrument.Description
 			),
 			reminder.DeliveredAt

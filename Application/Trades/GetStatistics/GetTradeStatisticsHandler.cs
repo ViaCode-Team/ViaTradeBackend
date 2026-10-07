@@ -4,12 +4,12 @@ using ViaTrade.Domain.Services;
 
 namespace ViaTrade.Application.Trades.GetStatistics;
 
-public sealed class GetTradeStatisticsHandler(ITradeRepository tradeStatistics)
+public sealed class GetTradeStatisticsHandler(IUserContext userContext, ITradeRepository tradeStatistics)
 	: IQueryHandler<GetTradeStatisticsQuery, TradeStatisticsResult>
 {
-	public async Task<TradeStatisticsResult> HandleAsync(GetTradeStatisticsQuery query, CancellationToken ct = default)
+	public async Task<TradeStatisticsResult> HandleAsync(GetTradeStatisticsQuery query, CancellationToken ct)
 	{
-		var result = await tradeStatistics.GetGlobalStatisticsAsync(query.UserId, ct);
+		var result = await tradeStatistics.GetGlobalStatisticsAsync(userContext.UserId, ct);
 
 		var tradeStatistic = new TradeCountsResult(result.TotalTrades, result.WinTrades, result.LoseTrades);
 

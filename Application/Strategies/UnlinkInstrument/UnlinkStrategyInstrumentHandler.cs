@@ -6,14 +6,15 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Strategies.UnlinkInstrument;
 
 public sealed class UnlinkStrategyInstrumentHandler(
+	IUserContext userContext,
 	IRepository<UserStrategyInstrument> userStrategyInstrumentRepository
 ) : ICommandHandler<UnlinkStrategyInstrumentCommand>
 {
-	public async Task HandleAsync(UnlinkStrategyInstrumentCommand command, CancellationToken ct = default)
+	public async Task HandleAsync(UnlinkStrategyInstrumentCommand command, CancellationToken ct)
 	{
 		var affectedRows = await userStrategyInstrumentRepository.ExecuteDeleteAsync(
 			e =>
-				e.UserId == command.UserId
+				e.UserId == userContext.UserId
 				&& e.StrategyId == command.StrategyId
 				&& e.InstrumentId == command.InstrumentId,
 			ct

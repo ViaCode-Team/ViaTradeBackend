@@ -8,13 +8,14 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Reminders.GetInstrumentPage;
 
 public sealed class GetInstrumentRemindersPageHandler(
+	IUserContext userContext,
 	IReadRepository<Instrument> instrumentRepository,
 	IReadRepository<Reminder> reminderRepository
 ) : IQueryHandler<GetInstrumentRemindersPageQuery, PageResult<ReminderResult>>
 {
 	public async Task<PageResult<ReminderResult>> HandleAsync(
 		GetInstrumentRemindersPageQuery query,
-		CancellationToken ct = default
+		CancellationToken ct
 	)
 	{
 		var instrumentExists = await instrumentRepository.AnyAsync(
@@ -26,7 +27,7 @@ public sealed class GetInstrumentRemindersPageHandler(
 			throw new NotFoundException("Instrument not found.", "instrument_not_found");
 
 		var specification = new RemindersPageSpecification(
-			query.UserId,
+			userContext.UserId,
 			query.ReminderFilter,
 			query.ReminderSearch,
 			query.PageOptions,

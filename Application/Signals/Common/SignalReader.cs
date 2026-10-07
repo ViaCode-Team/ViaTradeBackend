@@ -19,21 +19,21 @@ public sealed class SignalReader(IFileReader tradefileReader)
 		startDate = GetDateOnly(startDate);
 		endDate = GetDateOnly(endDate);
 
-		var symbols = sources.Select(source => source.Symbol).Distinct().ToList();
-		var sourceByKey = sources.ToDictionary(source => (source.StrategyName, source.Symbol));
-		var results = tradefileReader.ReadDataBySymbolsWithStrategy<StrategyResult>(
+		var tickers = sources.Select(source => source.Ticker).Distinct().ToList();
+		var sourceByKey = sources.ToDictionary(source => (source.StrategyName, source.Ticker));
+		var results = tradefileReader.ReadDataByTickersWithStrategy<StrategyResult>(
 			TradeDataType.Strategy,
-			symbols,
+			tickers,
 			startDate,
 			endDate
 		);
 
 		var signals = results
-			.Where(result => result.Symbol != null && result.StrategyName != null)
+			.Where(result => result.Ticker != null && result.StrategyName != null)
 			.Select(result => new
 			{
 				Result = result,
-				Source = sourceByKey.GetValueOrDefault((result.StrategyName!, result.Symbol!)),
+				Source = sourceByKey.GetValueOrDefault((result.StrategyName!, result.Ticker!)),
 			})
 			.Where(item => item.Source != null)
 			.Select(item => new SignalResult(
@@ -41,7 +41,7 @@ public sealed class SignalReader(IFileReader tradefileReader)
 				item.Source.StrategyName,
 				item.Source.DisplayName,
 				item.Source.InstrumentId,
-				item.Source.Symbol,
+				item.Source.Ticker,
 				item.Source.Accuracy,
 				item.Result.Item.Date,
 				item.Result.Item.ClosePrice,
@@ -57,17 +57,17 @@ public sealed class SignalReader(IFileReader tradefileReader)
 		if (sources.Count == 0)
 			return [];
 
-		var symbols = sources.Select(source => source.Symbol).Distinct().ToList();
-		var sourceByKey = sources.ToDictionary(source => (source.StrategyName, source.Symbol));
+		var tickers = sources.Select(source => source.Ticker).Distinct().ToList();
+		var sourceByKey = sources.ToDictionary(source => (source.StrategyName, source.Ticker));
 		var latestBySource = new Dictionary<(int StrategyId, int InstrumentId), SignalResult>();
-		var results = tradefileReader.ReadDataBySymbolsWithStrategy<StrategyResult>(TradeDataType.Strategy, symbols);
+		var results = tradefileReader.ReadDataByTickersWithStrategy<StrategyResult>(TradeDataType.Strategy, tickers);
 
 		foreach (var result in results)
 		{
-			if (result.Symbol == null || result.StrategyName == null)
+			if (result.Ticker == null || result.StrategyName == null)
 				continue;
 
-			var source = sourceByKey.GetValueOrDefault((result.StrategyName, result.Symbol));
+			var source = sourceByKey.GetValueOrDefault((result.StrategyName, result.Ticker));
 			if (source == null)
 				continue;
 
@@ -76,7 +76,7 @@ public sealed class SignalReader(IFileReader tradefileReader)
 				source.StrategyName,
 				source.DisplayName,
 				source.InstrumentId,
-				source.Symbol,
+				source.Ticker,
 				source.Accuracy,
 				result.Item.Date,
 				result.Item.ClosePrice,
@@ -130,15 +130,15 @@ public sealed class SignalReader(IFileReader tradefileReader)
 			{
 				(null, SignalSortField.SignalDateAsc) => signals.OrderBy(signal => signal.Date),
 				(null, SignalSortField.SignalDateDesc) => signals.OrderByDescending(signal => signal.Date),
-				(null, SignalSortField.SymbolAsc) => signals.OrderBy(signal => signal.Symbol),
-				(null, SignalSortField.SymbolDesc) => signals.OrderByDescending(signal => signal.Symbol),
+				(null, SignalSortField.TickerAsc) => signals.OrderBy(signal => signal.Ticker),
+				(null, SignalSortField.TickerDesc) => signals.OrderByDescending(signal => signal.Ticker),
 				(null, SignalSortField.AccuracyAsc) => signals.OrderBy(signal => signal.Accuracy),
 				(null, SignalSortField.AccuracyDesc) => signals.OrderByDescending(signal => signal.Accuracy),
 				(null, _) => signals.OrderByDescending(signal => signal.Date),
 				(_, SignalSortField.SignalDateAsc) => orderedSignals.ThenBy(signal => signal.Date),
 				(_, SignalSortField.SignalDateDesc) => orderedSignals.ThenByDescending(signal => signal.Date),
-				(_, SignalSortField.SymbolAsc) => orderedSignals.ThenBy(signal => signal.Symbol),
-				(_, SignalSortField.SymbolDesc) => orderedSignals.ThenByDescending(signal => signal.Symbol),
+				(_, SignalSortField.TickerAsc) => orderedSignals.ThenBy(signal => signal.Ticker),
+				(_, SignalSortField.TickerDesc) => orderedSignals.ThenByDescending(signal => signal.Ticker),
 				(_, SignalSortField.AccuracyAsc) => orderedSignals.ThenBy(signal => signal.Accuracy),
 				(_, SignalSortField.AccuracyDesc) => orderedSignals.ThenByDescending(signal => signal.Accuracy),
 				(_, _) => orderedSignals.ThenByDescending(signal => signal.Date),

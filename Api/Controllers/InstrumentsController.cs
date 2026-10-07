@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using ViaTrade.Api.Attributes.Binding;
+using ViaTrade.Api.ModelBinding.Attributes;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Auth.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Instruments.Common;
@@ -23,7 +22,7 @@ namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class InstrumentsController(IJwtHelper jwtHelper) : ControllerBase
+public class InstrumentsController : ControllerBase
 {
 	[HttpGet("statistics")]
 	public async Task<Ok<InstrumentStatisticsResult>> GetInstrumentStatistics(
@@ -62,19 +61,12 @@ public class InstrumentsController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpGet("{instrumentId:int}/strategies")]
 	public async Task<Ok<PageResult<StrategySubscriptionResult>>> GetStrategiesByInstrument(
-		[
-			FromQuery,
-			IgnoreProperties(nameof(GetInstrumentStrategiesPageQuery.UserId)),
-			FromRouteProperties(nameof(GetInstrumentStrategiesPageQuery.InstrumentId))
-		]
+		[FromQuery, FromRouteProperties(nameof(GetInstrumentStrategiesPageQuery.InstrumentId))]
 			GetInstrumentStrategiesPageQuery query,
 		[FromServices] IQueryHandler<GetInstrumentStrategiesPageQuery, PageResult<StrategySubscriptionResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		query = query with { UserId = userId };
 		var strategies = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(strategies);
@@ -82,19 +74,11 @@ public class InstrumentsController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpGet("{instrumentId:int}/note")]
 	public async Task<Ok<NoteResult>> GetInstrumentNote(
-		[
-			FromQuery,
-			IgnoreProperties(nameof(GetInstrumentNoteQuery.UserId)),
-			FromRouteProperties(nameof(GetInstrumentNoteQuery.InstrumentId))
-		]
-			GetInstrumentNoteQuery query,
+		[FromQuery, FromRouteProperties(nameof(GetInstrumentNoteQuery.InstrumentId))] GetInstrumentNoteQuery query,
 		[FromServices] IQueryHandler<GetInstrumentNoteQuery, NoteResult> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		query = query with { UserId = userId };
 		var note = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(note);
@@ -102,19 +86,12 @@ public class InstrumentsController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpPut("{instrumentId:int}/note")]
 	public async Task<NoContent> UpsertInstrumentNote(
-		[
-			FromBody,
-			IgnoreProperties(nameof(UpsertInstrumentNoteCommand.UserId)),
-			FromRouteProperties(nameof(UpsertInstrumentNoteCommand.InstrumentId))
-		]
+		[FromBody, FromRouteProperties(nameof(UpsertInstrumentNoteCommand.InstrumentId))]
 			UpsertInstrumentNoteCommand command,
 		[FromServices] ICommandHandler<UpsertInstrumentNoteCommand> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		command = command with { UserId = userId };
 		await handler.HandleAsync(command, ct);
 
 		return TypedResults.NoContent();
@@ -122,19 +99,12 @@ public class InstrumentsController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpDelete("{instrumentId:int}/note")]
 	public async Task<NoContent> DeleteInstrumentNote(
-		[
-			FromQuery,
-			IgnoreProperties(nameof(DeleteInstrumentNoteCommand.UserId)),
-			FromRouteProperties(nameof(DeleteInstrumentNoteCommand.InstrumentId))
-		]
+		[FromQuery, FromRouteProperties(nameof(DeleteInstrumentNoteCommand.InstrumentId))]
 			DeleteInstrumentNoteCommand command,
 		[FromServices] ICommandHandler<DeleteInstrumentNoteCommand> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		command = command with { UserId = userId };
 		await handler.HandleAsync(command, ct);
 
 		return TypedResults.NoContent();
@@ -142,19 +112,12 @@ public class InstrumentsController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpGet("{instrumentId:int}/reminders")]
 	public async Task<Ok<PageResult<ReminderResult>>> GetInstrumentReminders(
-		[
-			FromQuery,
-			IgnoreProperties(nameof(GetInstrumentRemindersPageQuery.UserId)),
-			FromRouteProperties(nameof(GetInstrumentRemindersPageQuery.InstrumentId))
-		]
+		[FromQuery, FromRouteProperties(nameof(GetInstrumentRemindersPageQuery.InstrumentId))]
 			GetInstrumentRemindersPageQuery query,
 		[FromServices] IQueryHandler<GetInstrumentRemindersPageQuery, PageResult<ReminderResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		query = query with { UserId = userId };
 		var reminders = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(reminders);
@@ -162,19 +125,11 @@ public class InstrumentsController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpPost("{instrumentId:int}/reminders")]
 	public async Task<Created<ReminderResult>> CreateInstrumentReminder(
-		[
-			FromBody,
-			IgnoreProperties(nameof(CreateReminderCommand.UserId)),
-			FromRouteProperties(nameof(CreateReminderCommand.InstrumentId))
-		]
-			CreateReminderCommand command,
+		[FromBody, FromRouteProperties(nameof(CreateReminderCommand.InstrumentId))] CreateReminderCommand command,
 		[FromServices] ICommandHandler<CreateReminderCommand, ReminderResult> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		command = command with { UserId = userId };
 		var reminder = await handler.HandleAsync(command, ct);
 
 		return TypedResults.Created($"/api/v1/reminders/{reminder.Id}", reminder);

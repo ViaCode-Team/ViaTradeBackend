@@ -7,10 +7,7 @@ namespace ViaTrade.Application.Users.ConsumeTelegramToken;
 public sealed class ConsumeTelegramTokenHandler(ICacheRepository<TelegramTokenEntity> telegramTokenRepository)
 	: ICommandHandler<ConsumeTelegramTokenCommand, TelegramTokenResult?>
 {
-	public async Task<TelegramTokenResult?> HandleAsync(
-		ConsumeTelegramTokenCommand command,
-		CancellationToken ct = default
-	)
+	public async Task<TelegramTokenResult?> HandleAsync(ConsumeTelegramTokenCommand command, CancellationToken ct)
 	{
 		var token = await telegramTokenRepository.ConsumeAsync(command.TelegramToken);
 		if (token == null)

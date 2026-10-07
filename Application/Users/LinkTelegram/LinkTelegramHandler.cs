@@ -11,7 +11,7 @@ public sealed class LinkTelegramHandler(
 	ICacheRepository<TelegramTokenEntity> telegramTokenRepository
 ) : ICommandHandler<LinkTelegramCommand>
 {
-	public async Task HandleAsync(LinkTelegramCommand command, CancellationToken ct = default)
+	public async Task HandleAsync(LinkTelegramCommand command, CancellationToken ct)
 	{
 		var token = await telegramTokenRepository.ConsumeAsync(command.TelegramToken);
 		if (token == null)

@@ -70,8 +70,10 @@ public sealed class TelegramReminderPublisherService(
 			try
 			{
 				await PublishReminderAsync(reminder, ct);
+
 				var command = new MarkReminderPublishedCommand(reminder.UserId, reminder.Id);
 				var result = await publishHandler.HandleAsync(command, ct);
+
 				if (result.IsPublished)
 					logger.LogInformation(
 						"Marked reminder {ReminderId} as published for user {UserId}",
@@ -106,7 +108,7 @@ public sealed class TelegramReminderPublisherService(
 			reminder.Id,
 			reminder.Text,
 			reminder.RemindAt,
-			reminder.Instrument?.Symbol
+			reminder.Instrument?.Ticker
 		);
 		var notification = new NotificationMessage(
 			$"reminder:{reminder.Id}",
@@ -129,6 +131,6 @@ public sealed class TelegramReminderPublisherService(
 		int ReminderId,
 		string Text,
 		DateTime RemindAt,
-		string? InstrumentSymbol
+		string? InstrumentTicker
 	);
 }

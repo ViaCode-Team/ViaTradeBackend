@@ -7,7 +7,7 @@ namespace ViaTrade.Application.Reminders.MarkDelivered;
 public sealed class MarkReminderDeliveredHandler(IReminderRepository reminderOperations)
 	: ICommandHandler<MarkReminderDeliveredCommand>
 {
-	public async Task HandleAsync(MarkReminderDeliveredCommand command, CancellationToken ct = default)
+	public async Task HandleAsync(MarkReminderDeliveredCommand command, CancellationToken ct)
 	{
 		int rows = await reminderOperations.ExecuteMarkDeliveredForUserAsync(command.UserId, command.ReminderId, ct);
 

@@ -6,10 +6,7 @@ namespace ViaTrade.Application.Reminders.MarkPublished;
 public sealed class MarkReminderPublishedHandler(IReminderRepository reminderOperations)
 	: ICommandHandler<MarkReminderPublishedCommand, PublishReminderResult>
 {
-	public async Task<PublishReminderResult> HandleAsync(
-		MarkReminderPublishedCommand command,
-		CancellationToken ct = default
-	)
+	public async Task<PublishReminderResult> HandleAsync(MarkReminderPublishedCommand command, CancellationToken ct)
 	{
 		int rows = await reminderOperations.ExecuteMarkPublishedAsync(command.UserId, command.ReminderId, ct);
 

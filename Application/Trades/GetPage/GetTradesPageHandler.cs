@@ -6,13 +6,13 @@ using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Trades.GetPage;
 
-public sealed class GetTradesPageHandler(IReadRepository<Trade> tradeRepository)
+public sealed class GetTradesPageHandler(IUserContext userContext, IReadRepository<Trade> tradeRepository)
 	: IQueryHandler<GetTradesPageQuery, PageResult<TradeResult>>
 {
-	public async Task<PageResult<TradeResult>> HandleAsync(GetTradesPageQuery query, CancellationToken ct = default)
+	public async Task<PageResult<TradeResult>> HandleAsync(GetTradesPageQuery query, CancellationToken ct)
 	{
 		var specification = new TradesPageSpecification(
-			query.UserId,
+			userContext.UserId,
 			query.TradeFilter,
 			query.TradeSearch,
 			query.PageOptions

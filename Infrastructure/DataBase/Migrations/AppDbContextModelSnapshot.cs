@@ -17,7 +17,7 @@ namespace ViaTrade.Infrastructure.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.19")
+                .HasAnnotation("ProductVersion", "9.0.20")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -36,13 +36,13 @@ namespace ViaTrade.Infrastructure.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Symbol")
+                    b.Property<string>("Ticker")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Symbol")
+                    b.HasIndex("Ticker")
                         .IsUnique();
 
                     b.ToTable("Instruments");
@@ -53,14 +53,14 @@ namespace ViaTrade.Infrastructure.Migrations
                             Id = 1,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Газпром",
-                            Symbol = "GAZP"
+                            Ticker = "GAZP"
                         },
                         new
                         {
                             Id = 2,
                             CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Норникель",
-                            Symbol = "GMKN"
+                            Ticker = "GMKN"
                         });
                 });
 

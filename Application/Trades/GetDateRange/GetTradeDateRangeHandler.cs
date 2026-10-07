@@ -3,11 +3,11 @@ using ViaTrade.Application.Trades.Common.Abstractions;
 
 namespace ViaTrade.Application.Trades.GetDateRange;
 
-public sealed class GetTradeDateRangeHandler(ITradeRepository tradeStatistics)
+public sealed class GetTradeDateRangeHandler(IUserContext userContext, ITradeRepository tradeStatistics)
 	: IQueryHandler<GetTradeDateRangeQuery, TradeDateRangeResult>
 {
-	public Task<TradeDateRangeResult> HandleAsync(GetTradeDateRangeQuery query, CancellationToken ct = default)
+	public Task<TradeDateRangeResult> HandleAsync(GetTradeDateRangeQuery query, CancellationToken ct)
 	{
-		return tradeStatistics.GetTradeDateRangeAsync(query.UserId, ct);
+		return tradeStatistics.GetTradeDateRangeAsync(userContext.UserId, ct);
 	}
 }

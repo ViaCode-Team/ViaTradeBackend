@@ -12,27 +12,27 @@ public sealed class ListInstrumentFilesHandler(
 {
 	public async Task<IReadOnlyList<InstrumentFileResult>> HandleAsync(
 		ListInstrumentFilesQuery query,
-		CancellationToken ct = default
+		CancellationToken ct
 	)
 	{
 		var instrumentFiles = tradefileReader.GetInstruments(query.DataType);
 		var instruments = await instrumentRepository.ListAsync(
 			instrument => true,
-			instrument => new InstrumentReference(instrument.Id, instrument.Symbol),
+			instrument => new InstrumentReference(instrument.Id, instrument.Ticker),
 			ct
 		);
-		var instrumentIdBySymbol = instruments.ToDictionary(
-			instrument => instrument.Symbol,
+		var instrumentIdByTicker = instruments.ToDictionary(
+			instrument => instrument.Ticker,
 			instrument => instrument.Id,
 			StringComparer.OrdinalIgnoreCase
 		);
 
 		return instrumentFiles
-			.Where(file => instrumentIdBySymbol.ContainsKey(file.Symbol))
+			.Where(file => instrumentIdByTicker.ContainsKey(file.Ticker))
 			.Select(file => new InstrumentFileResult
 			{
-				Id = instrumentIdBySymbol[file.Symbol],
-				Symbol = file.Symbol,
+				Id = instrumentIdByTicker[file.Ticker],
+				Ticker = file.Ticker,
 				TimeFrame = file.TimeFrame,
 				StartDate = file.StartDate,
 				EndDate = file.EndDate,

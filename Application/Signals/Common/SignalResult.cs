@@ -5,7 +5,7 @@ public record SignalResult(
 	string StrategyName,
 	string DisplayName,
 	int InstrumentId,
-	string Symbol,
+	string Ticker,
 	int? Accuracy,
 	DateTime Date,
 	decimal ClosePrice,

@@ -21,7 +21,7 @@ public sealed record DueReminderResult(
 			reminder.RemindAt,
 			new InstrumentBriefResult(
 				reminder.InstrumentId,
-				reminder.Instrument!.Symbol,
+				reminder.Instrument!.Ticker,
 				reminder.Instrument.Description
 			),
 			reminder.UserId,

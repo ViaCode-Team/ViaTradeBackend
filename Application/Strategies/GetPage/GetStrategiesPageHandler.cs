@@ -6,12 +6,12 @@ using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Strategies.GetPage;
 
-public sealed class GetStrategiesPageHandler(IReadRepository<Strategy> strategyRepository)
+public sealed class GetStrategiesPageHandler(IUserContext userContext, IReadRepository<Strategy> strategyRepository)
 	: IQueryHandler<GetStrategiesPageQuery, PageResult<StrategySubscriptionResult>>
 {
 	public async Task<PageResult<StrategySubscriptionResult>> HandleAsync(
 		GetStrategiesPageQuery query,
-		CancellationToken ct = default
+		CancellationToken ct
 	)
 	{
 		var specification = new StrategiesPageSpecification(
@@ -22,7 +22,7 @@ public sealed class GetStrategiesPageHandler(IReadRepository<Strategy> strategyR
 		);
 		return await strategyRepository.GetPageAsync(
 			specification,
-			StrategySubscriptionResult.Projection(query.UserId),
+			StrategySubscriptionResult.Projection(userContext.UserId),
 			ct
 		);
 	}

@@ -6,12 +6,13 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Strategies.SetSubscription;
 
 public sealed class SetStrategySubscriptionHandler(
+	IUserContext userContext,
 	IRepository<UserStrategy> userStrategyRepository,
 	IReadRepository<Strategy> strategyRepository,
 	IUnitOfWork uow
 ) : ICommandHandler<SetStrategySubscriptionCommand>
 {
-	public async Task HandleAsync(SetStrategySubscriptionCommand command, CancellationToken ct = default)
+	public async Task HandleAsync(SetStrategySubscriptionCommand command, CancellationToken ct)
 	{
 		var strategyExists = await strategyRepository.AnyAsync(strategy => strategy.Id == command.StrategyId, ct);
 		if (!strategyExists)
@@ -20,13 +21,13 @@ public sealed class SetStrategySubscriptionHandler(
 		if (command.IsSubscribed == false)
 		{
 			await userStrategyRepository.ExecuteDeleteAsync(
-				link => link.UserId == command.UserId && link.StrategyId == command.StrategyId,
+				link => link.UserId == userContext.UserId && link.StrategyId == command.StrategyId,
 				ct
 			);
 			return;
 		}
 
-		var strategyLink = new UserStrategy { UserId = command.UserId, StrategyId = command.StrategyId };
+		var strategyLink = new UserStrategy { UserId = userContext.UserId, StrategyId = command.StrategyId };
 
 		userStrategyRepository.Add(strategyLink);
 		await uow.SaveChangesAsync(ct);

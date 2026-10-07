@@ -5,7 +5,6 @@ using ViaTrade.Application.Signals.Common;
 namespace ViaTrade.Application.Signals.GetHistoryPage;
 
 public sealed record GetSignalHistoryPageQuery(
-	int UserId,
 	SignalHistoryFilter SignalHistoryFilter,
 	SignalSort SignalSort,
 	PageOptions PageOptions

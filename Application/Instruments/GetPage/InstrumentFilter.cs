@@ -1,3 +1,3 @@
 namespace ViaTrade.Application.Instruments.GetPage;
 
-public record InstrumentFilter(string? Symbol);
+public record InstrumentFilter(string? Ticker);

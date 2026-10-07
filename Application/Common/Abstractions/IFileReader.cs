@@ -7,25 +7,25 @@ public interface IFileReader
 {
 	/// <summary>
 	/// Returns available instruments for the specified data type.
-	/// If filterSymbols is provided, returns only instruments from that list.
+	/// If filterTickers is provided, returns only instruments from that list.
 	/// </summary>
-	IEnumerable<InstrumentFile> GetInstruments(TradeDataType dataType, IEnumerable<string>? filterSymbols = null);
+	IEnumerable<InstrumentFile> GetInstruments(TradeDataType dataType, IEnumerable<string>? filterTickers = null);
 
 	/// <summary>
 	/// Reads data for multiple instruments with optional date filtering.
 	/// Files not found are skipped silently (logged if needed).
 	/// </summary>
-	IEnumerable<(string Symbol, T Item)> ReadDataBySymbols<T>(
+	IEnumerable<(string Ticker, T Item)> ReadDataByTickers<T>(
 		TradeDataType dataType,
-		IEnumerable<string> symbols,
+		IEnumerable<string> tickers,
 		DateTime? startDate = null,
 		DateTime? endDate = null
 	)
 		where T : class;
 
-	IEnumerable<(string Symbol, string StrategyName, T Item)> ReadDataBySymbolsWithStrategy<T>(
+	IEnumerable<(string Ticker, string StrategyName, T Item)> ReadDataByTickersWithStrategy<T>(
 		TradeDataType dataType,
-		IEnumerable<string> symbols,
+		IEnumerable<string> tickers,
 		DateTime? startDate = null,
 		DateTime? endDate = null
 	)

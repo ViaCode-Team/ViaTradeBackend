@@ -8,13 +8,14 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Strategies.GetByInstrumentPage;
 
 public sealed class GetInstrumentStrategiesPageHandler(
+	IUserContext userContext,
 	IReadRepository<Instrument> instrumentRepository,
 	IReadRepository<UserStrategyInstrument> userStrategyInstrumentRepository
 ) : IQueryHandler<GetInstrumentStrategiesPageQuery, PageResult<StrategySubscriptionResult>>
 {
 	public async Task<PageResult<StrategySubscriptionResult>> HandleAsync(
 		GetInstrumentStrategiesPageQuery query,
-		CancellationToken ct = default
+		CancellationToken ct
 	)
 	{
 		var instrumentExists = await instrumentRepository.AnyAsync(
@@ -26,7 +27,7 @@ public sealed class GetInstrumentStrategiesPageHandler(
 			throw new NotFoundException("Instrument not found.", "instrument_not_found");
 
 		var specification = new InstrumentStrategiesPageSpecification(
-			query.UserId,
+			userContext.UserId,
 			query.InstrumentId,
 			query.StrategyFilter,
 			query.PageOptions,
@@ -34,7 +35,7 @@ public sealed class GetInstrumentStrategiesPageHandler(
 		);
 		return await userStrategyInstrumentRepository.GetPageAsync(
 			specification,
-			StrategySubscriptionResult.LinkProjection(query.UserId),
+			StrategySubscriptionResult.LinkProjection(userContext.UserId),
 			ct
 		);
 	}

@@ -3,10 +3,9 @@ using ViaTrade.Application.Common.Validation;
 
 namespace ViaTrade.Application.Trades.Create;
 
-public sealed class CreateTradeCommandValidator : UserRequestValidator<CreateTradeCommand>
+public sealed class CreateTradeCommandValidator : AbstractValidator<CreateTradeCommand>
 {
 	public CreateTradeCommandValidator()
-		: base(request => request.UserId)
 	{
 		RuleFor(request => request.OpenPrice).InclusiveBetween(double.Epsilon, double.MaxValue);
 		RuleFor(request => request.ClosePrice).InclusiveBetween(double.Epsilon, double.MaxValue);

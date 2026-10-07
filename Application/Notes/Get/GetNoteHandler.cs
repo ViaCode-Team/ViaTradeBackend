@@ -6,12 +6,13 @@ using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Notes.Get;
 
-public sealed class GetNoteHandler(IReadRepository<Note> noteRepository) : IQueryHandler<GetNoteQuery, NoteResult>
+public sealed class GetNoteHandler(IUserContext userContext, IReadRepository<Note> noteRepository)
+	: IQueryHandler<GetNoteQuery, NoteResult>
 {
-	public async Task<NoteResult> HandleAsync(GetNoteQuery query, CancellationToken ct = default)
+	public async Task<NoteResult> HandleAsync(GetNoteQuery query, CancellationToken ct)
 	{
 		var note = await noteRepository.FirstOrDefaultAsync(
-			note => note.UserId == query.UserId && note.Id == query.NoteId,
+			note => note.UserId == userContext.UserId && note.Id == query.NoteId,
 			NoteResult.Projection,
 			ct
 		);

@@ -6,15 +6,16 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Notes.UpsertInstrument;
 
 public sealed class UpsertInstrumentNoteHandler(
+	IUserContext userContext,
 	IRepository<Note> noteRepository,
 	INoteRepository noteOperations,
 	IUnitOfWork uow
 ) : ICommandHandler<UpsertInstrumentNoteCommand>
 {
-	public async Task HandleAsync(UpsertInstrumentNoteCommand command, CancellationToken ct = default)
+	public async Task HandleAsync(UpsertInstrumentNoteCommand command, CancellationToken ct)
 	{
 		int affectedRows = await noteOperations.ExecuteUpdateInstrumentAsync(
-			command.UserId,
+			userContext.UserId,
 			command.InstrumentId,
 			command.Text,
 			ct
@@ -24,7 +25,7 @@ public sealed class UpsertInstrumentNoteHandler(
 
 		var note = new Note
 		{
-			UserId = command.UserId,
+			UserId = userContext.UserId,
 			Text = command.Text,
 			InstrumentId = command.InstrumentId,
 		};

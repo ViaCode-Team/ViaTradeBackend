@@ -11,40 +11,40 @@ public sealed class GetInstrumentFileHandler(
 	IReadRepository<Instrument> instrumentRepository
 ) : IQueryHandler<GetInstrumentFileQuery, InstrumentFileResult>
 {
-	public async Task<InstrumentFileResult> HandleAsync(GetInstrumentFileQuery query, CancellationToken ct = default)
+	public async Task<InstrumentFileResult> HandleAsync(GetInstrumentFileQuery query, CancellationToken ct)
 	{
-		string? symbol = null;
+		string? ticker = null;
 		int? instrumentId = null;
 
-		bool isId = int.TryParse(query.InstrumentIdOrSymbol, out var parsedInstrumentId);
+		bool isId = int.TryParse(query.InstrumentIdOrTicker, out var parsedInstrumentId);
 		if (isId)
 		{
-			symbol = await instrumentRepository.FirstOrDefaultAsync(
+			ticker = await instrumentRepository.FirstOrDefaultAsync(
 				instrument => instrument.Id == parsedInstrumentId,
-				instrument => instrument.Symbol,
+				instrument => instrument.Ticker,
 				ct
 			);
-			if (symbol != null)
+			if (ticker != null)
 				instrumentId = parsedInstrumentId;
 		}
 
-		if (symbol == null)
+		if (ticker == null)
 		{
-			symbol = query.InstrumentIdOrSymbol;
+			ticker = query.InstrumentIdOrTicker;
 			instrumentId = await instrumentRepository.FirstOrDefaultAsync(
-				instrument => instrument.Symbol == symbol,
+				instrument => instrument.Ticker == ticker,
 				instrument => (int?)instrument.Id,
 				ct
 			);
 		}
 
-		var instrumentFiles = tradefileReader.GetInstruments(query.DataType, [symbol]);
+		var instrumentFiles = tradefileReader.GetInstruments(query.DataType, [ticker]);
 		var instrumentFile = instrumentFiles.FirstOrDefault();
 		if (instrumentFile == null)
 			throw new NotFoundException("Instrument file not found.", "instrument_file_not_found");
 
 		instrumentId ??= await instrumentRepository.FirstOrDefaultAsync(
-			instrument => instrument.Symbol == instrumentFile.Symbol,
+			instrument => instrument.Ticker == instrumentFile.Ticker,
 			instrument => (int?)instrument.Id,
 			ct
 		);
@@ -54,7 +54,7 @@ public sealed class GetInstrumentFileHandler(
 		return new InstrumentFileResult
 		{
 			Id = instrumentId.Value,
-			Symbol = instrumentFile.Symbol,
+			Ticker = instrumentFile.Ticker,
 			TimeFrame = instrumentFile.TimeFrame,
 			StartDate = instrumentFile.StartDate,
 			EndDate = instrumentFile.EndDate,

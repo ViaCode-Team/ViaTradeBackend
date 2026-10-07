@@ -6,14 +6,14 @@ using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Strategies.Get;
 
-public sealed class GetStrategyHandler(IReadRepository<Strategy> strategyRepository)
+public sealed class GetStrategyHandler(IUserContext userContext, IReadRepository<Strategy> strategyRepository)
 	: IQueryHandler<GetStrategyQuery, StrategySubscriptionResult>
 {
-	public async Task<StrategySubscriptionResult> HandleAsync(GetStrategyQuery query, CancellationToken ct = default)
+	public async Task<StrategySubscriptionResult> HandleAsync(GetStrategyQuery query, CancellationToken ct)
 	{
 		var strategy = await strategyRepository.FirstOrDefaultAsync(
 			strategy => strategy.Id == query.StrategyId,
-			StrategySubscriptionResult.Projection(query.UserId),
+			StrategySubscriptionResult.Projection(userContext.UserId),
 			ct
 		);
 		if (strategy == null)

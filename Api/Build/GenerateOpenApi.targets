@@ -1,0 +1,11 @@
+﻿<Project>
+	<Target Name="GenerateOpenApi" AfterTargets="Build" Condition="'$(DesignTimeBuild)' != 'true'">
+		<MakeDir Directories="$([System.IO.Path]::GetDirectoryName('%(OpenApiDocument.OutputPath)'))" />
+
+		<Exec
+			EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development"
+			WorkingDirectory="$(MSBuildProjectDirectory)"
+			Command="dotnet tool run swagger tofile --yaml --output &quot;%(OpenApiDocument.OutputPath)&quot; --openapiversion 3.1 &quot;$(TargetPath)&quot; &quot;%(OpenApiDocument.Identity)&quot;"
+		/>
+	</Target>
+</Project>

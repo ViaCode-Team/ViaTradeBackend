@@ -3,4 +3,4 @@ using ViaTrade.Application.Reminders.Common;
 
 namespace ViaTrade.Application.Reminders.Get;
 
-public sealed record GetReminderQuery(int UserId, int ReminderId) : IQuery<ReminderResult>;
+public sealed record GetReminderQuery(int ReminderId) : IQuery<ReminderResult>;

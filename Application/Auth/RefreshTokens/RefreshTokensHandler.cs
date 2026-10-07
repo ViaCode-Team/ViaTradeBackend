@@ -14,7 +14,7 @@ public sealed class RefreshTokensHandler(
 	AuthTokenFactory tokenFactory
 ) : ICommandHandler<RefreshTokensCommand, AuthTokensResult>
 {
-	public async Task<AuthTokensResult> HandleAsync(RefreshTokensCommand command, CancellationToken ct = default)
+	public async Task<AuthTokensResult> HandleAsync(RefreshTokensCommand command, CancellationToken ct)
 	{
 		var session = await sessionRepository.FindByRefreshTokenAsync(command.RefreshToken);
 		if (session == null)
@@ -37,6 +37,7 @@ public sealed class RefreshTokensHandler(
 		var now = DateTime.UtcNow;
 		session.LastSeen = now;
 		session.ExpiresAt = tokenFactory.CalculateExpiresAt(session.CreatedAt, now);
+
 		if (session.ExpiresAt <= now)
 		{
 			await sessionRepository.TerminateSessionAsync(session.Id);

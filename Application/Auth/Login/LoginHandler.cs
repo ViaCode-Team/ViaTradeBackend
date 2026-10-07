@@ -15,7 +15,7 @@ public sealed class LoginHandler(
 	AuthTokenFactory tokenFactory
 ) : ICommandHandler<LoginCommand, AuthTokensResult>
 {
-	public async Task<AuthTokensResult> HandleAsync(LoginCommand command, CancellationToken ct = default)
+	public async Task<AuthTokensResult> HandleAsync(LoginCommand command, CancellationToken ct)
 	{
 		var user = await userRepository.FirstOrDefaultAsync(
 			user => user.Login == command.Login,
@@ -37,6 +37,7 @@ public sealed class LoginHandler(
 			LastSeen = now,
 			ExpiresAt = tokenFactory.CalculateExpiresAt(now, now),
 		};
+
 		var sessionTtl = session.ExpiresAt - now;
 		var refreshToken = jwtHelper.GenerateRefreshToken();
 

@@ -7,16 +7,14 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Signals.GetLatestPage;
 
 public sealed class GetLatestSignalsPageHandler(
+	IUserContext userContext,
 	SignalReader signalReader,
 	IReadRepository<UserStrategyInstrument> userStrategyInstrumentRepository
 ) : IQueryHandler<GetLatestSignalsPageQuery, PageResult<SignalResult>>
 {
-	public async Task<PageResult<SignalResult>> HandleAsync(
-		GetLatestSignalsPageQuery query,
-		CancellationToken ct = default
-	)
+	public async Task<PageResult<SignalResult>> HandleAsync(GetLatestSignalsPageQuery query, CancellationToken ct)
 	{
-		var sourcesSpecification = new SignalSourcesSpecification(query.UserId);
+		var sourcesSpecification = new SignalSourcesSpecification(userContext.UserId);
 		var sources = await userStrategyInstrumentRepository.ListAsync(sourcesSpecification, ct);
 		var signals = signalReader.ListLatestSignals(sources);
 

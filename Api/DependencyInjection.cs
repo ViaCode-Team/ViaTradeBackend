@@ -1,106 +1,41 @@
-using Ardalis.Specification;
-using Ardalis.Specification.EntityFrameworkCore;
-using FluentValidation;
+using System.Net;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using Scrutor;
-using StackExchange.Redis;
 using ViaTrade.Api.BackgroundServices;
-using ViaTrade.Api.Cookies;
-using ViaTrade.Api.Handler;
-using ViaTrade.Api.OptionsSetup;
-using ViaTrade.Application.Auth.Common;
-using ViaTrade.Application.Auth.Common.Abstractions;
+using ViaTrade.Api.Middleware;
+using ViaTrade.Api.ModelBinding;
+using ViaTrade.Api.Routing;
+using ViaTrade.Api.Security.Authentication;
+using ViaTrade.Api.Security.Authentication.Cookies;
+using ViaTrade.Api.Security.Authorization;
+using ViaTrade.Api.Security.UserContext;
+using ViaTrade.Api.Swagger;
 using ViaTrade.Application.Common.Abstractions;
-using ViaTrade.Application.Common.Abstractions.Repositories;
-using ViaTrade.Application.Common.Validation;
-using ViaTrade.Application.Notes.Common.Abstractions;
-using ViaTrade.Application.Notifications.Common.Abstractions;
-using ViaTrade.Application.Reminders.Common.Abstractions;
-using ViaTrade.Application.Signals.Common;
-using ViaTrade.Application.Strategies.Common.Abstractions;
-using ViaTrade.Application.Trades.Common.Abstractions;
-using ViaTrade.Application.Users.Common;
-using ViaTrade.Application.Users.Common.Abstractions;
-using ViaTrade.Configuration;
-using ViaTrade.Configuration.Options;
 using ViaTrade.Infrastructure.DataBase;
-using ViaTrade.Infrastructure.DataBase.Interceptors;
-using ViaTrade.Infrastructure.DataBase.Repositories;
-using ViaTrade.Infrastructure.DataBase.Repositories.Generic;
-using ViaTrade.Infrastructure.Notifications;
-using ViaTrade.Infrastructure.Redis.Entities;
-using ViaTrade.Infrastructure.Redis.Keys;
-using ViaTrade.Infrastructure.Redis.Repositories;
-using ViaTrade.Infrastructure.Services;
-using ViaTrade.Infrastructure.Utils;
 
 namespace ViaTrade.Api;
 
 public static class DependencyInjection
 {
-	public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
+	public static IServiceCollection AddApiLayer(this IServiceCollection services)
 	{
-		services.AddSingleton<IJwtHelper, JwtHelper>();
-		services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
-
-		services.AddScoped<ITradeDataBuilder, TradeDataBuilder>();
-		services.AddScoped<IFileReader, TradeFileReader>();
-		services.AddScoped<AuthTokenFactory>();
-		services.AddScoped<SignalReader>();
-
-		services.Scan(scan =>
-			scan.FromAssembliesOf(typeof(IQuery<>))
-				.AddClasses(
-					classes =>
-						classes
-							.Where(type => !type.IsGenericTypeDefinition)
-							.AssignableToAny(
-								typeof(IQueryHandler<,>),
-								typeof(ICommandHandler<>),
-								typeof(ICommandHandler<,>)
-							),
-					publicOnly: false
-				)
-				.UsingRegistrationStrategy(RegistrationStrategy.Throw)
-				.AsImplementedInterfaces(IsHandlerInterface)
-				.WithScopedLifetime()
-		);
-
-		services.Scan(scan =>
-			scan.FromAssembliesOf(typeof(IQuery<>))
-				.AddClasses(
-					classes => classes.Where(type => !type.IsGenericTypeDefinition).AssignableTo(typeof(IValidator<>)),
-					publicOnly: false
-				)
-				.AsImplementedInterfaces(type =>
-					type.IsGenericType && type.GetGenericTypeDefinition() == typeof(IValidator<>)
-				)
-				.WithScopedLifetime()
-		);
-
-		services.Decorate(typeof(ICommandHandler<>), typeof(ValidatingCommandHandler<>));
-		services.Decorate(typeof(ICommandHandler<,>), typeof(ValidatingCommandHandler<,>));
-		services.Decorate(typeof(IQueryHandler<,>), typeof(ValidatingQueryHandler<,>));
+		services.AddAuth();
+		services.AddWebPresentation();
 
 		return services;
 	}
 
-	public static IServiceCollection AddInfrastructureLayer(
-		this IServiceCollection services,
-		IConfiguration configuration
-	)
+	public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
 	{
-		services.AddDatabase(configuration);
-		services.AddRedis();
-		services.AddTelegramNotifications();
-		services.AddRepositories();
-
-		services.AddScoped<IUnitOfWork, EfUnitOfWork>();
-		services.AddSingleton<ISeparateContextQueryExecutor, SeparateContextQueryExecutor>();
-
 		services.AddHostedService<SessionCleanupService>();
 		services.AddHostedService<TelegramReminderPublisherService>();
 		services.AddHostedService<ReminderCleanupService>();
@@ -108,8 +43,28 @@ public static class DependencyInjection
 		return services;
 	}
 
-	public static IServiceCollection AddAuthLayer(this IServiceCollection services)
+	public static IServiceCollection AddApiDocumentation(this IServiceCollection services)
 	{
+		services.AddEndpointsApiExplorer();
+		services.AddViaTradeSwagger();
+
+		return services;
+	}
+
+	public static void UseDatabaseMigrations(this IApplicationBuilder app)
+	{
+		using IServiceScope scope = app.ApplicationServices.CreateScope();
+
+		using AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+		dbContext.Database.Migrate();
+	}
+
+	private static IServiceCollection AddAuth(this IServiceCollection services)
+	{
+		services.AddHttpContextAccessor();
+		services.AddScoped<IUserContext, HttpUserContext>();
+		services.AddScoped<IOptionalUserContext, HttpOptionalUserContext>();
 		services.AddSingleton<IAuthCookieService, AuthCookieService>();
 
 		services.AddJwtAuthentication();
@@ -118,98 +73,67 @@ public static class DependencyInjection
 		return services;
 	}
 
-	private static bool IsHandlerInterface(Type type)
+	private static IServiceCollection AddWebPresentation(this IServiceCollection services)
 	{
-		if (!type.IsGenericType)
-			return false;
+		services.AddProblemDetails();
+		services.AddExceptionHandler<ExceptionHandlingMiddleware>();
+		services.AddTransient<IApplicationModelProvider, RequestPropertiesApplicationModelProvider>();
 
-		var definition = type.GetGenericTypeDefinition();
-		return definition == typeof(IQueryHandler<,>)
-			|| definition == typeof(ICommandHandler<>)
-			|| definition == typeof(ICommandHandler<,>);
-	}
-
-	private static IServiceCollection AddTelegramNotifications(this IServiceCollection services)
-	{
-		services.AddSingleton<INotificationPublisher, RedisStreamNotificationPublisher>();
-
-		return services;
-	}
-
-	private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
-	{
-		var connectionSettings = configuration.GetConnectionStrings();
-		var dbSettings = configuration.GetDatabaseSettings();
-
-		services.AddSingleton<MySqlExceptionTranslationInterceptor>();
-
-		services.AddDbContextPool<AppDbContext>(
-			(serviceProvider, options) =>
-			{
-				var interceptor = serviceProvider.GetRequiredService<MySqlExceptionTranslationInterceptor>();
-				options
-					.UseMySql(
-						connectionSettings.MySql,
-						ServerVersion.AutoDetect(connectionSettings.MySql),
-						mySqlOptions =>
-						{
-							mySqlOptions.EnableStringComparisonTranslations();
-							mySqlOptions.EnableRetryOnFailure(
-								maxRetryCount: dbSettings.MaxRetryCount,
-								maxRetryDelay: TimeSpan.FromSeconds(dbSettings.MaxRetryDelaySeconds),
-								errorNumbersToAdd: null
-							);
-						}
-					)
-					.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-					.AddInterceptors(interceptor);
-			}
-		);
-
-		return services;
-	}
-
-	private static IServiceCollection AddRedis(this IServiceCollection services)
-	{
-		services.AddSingleton<IConnectionMultiplexer>(serviceProvider =>
+		services.Configure<ForwardedHeadersOptions>(options =>
 		{
-			var connectionStrings = serviceProvider.GetRequiredService<IOptions<ConnectionStringsSettings>>().Value;
-			var connectionString = connectionStrings.Redis;
-			var options = ConfigurationOptions.Parse(connectionString);
-
-			return ConnectionMultiplexer.Connect(options);
+			options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+			options.KnownIPNetworks.Clear();
+			options.KnownProxies.Clear();
+			options.KnownProxies.Add(IPAddress.Loopback);
+			options.KnownProxies.Add(IPAddress.IPv6Loopback);
 		});
-		return services;
-	}
 
-	private static IServiceCollection AddRepositories(this IServiceCollection services)
-	{
-		services.AddScoped(typeof(IReadRepository<>), typeof(ReadEfRepository<>));
-		services.AddScoped(typeof(IRepository<>), typeof(EfRepository<>));
-		services.AddSingleton<ISpecificationEvaluator>(SpecificationEvaluator.Default);
+		services
+			.AddControllers(options =>
+			{
+				options.Conventions.Add(new RouteTokenTransformerConvention(new CamelCaseRouteTokenTransformer()));
+				options.Conventions.Add(new RequestPropertiesConvention());
 
-		services.AddSingleton<ICacheRepository<UserRedisEntity>>(
-			serviceProvider => new BaseRedisRepository<UserRedisEntity>(
-				serviceProvider.GetRequiredService<IConnectionMultiplexer>().GetDatabase(),
-				RedisKeys.Cache.Users
-			)
-		);
-		services.AddSingleton<ICacheRepository<TelegramTokenEntity>>(
-			serviceProvider => new BaseRedisRepository<TelegramTokenEntity>(
-				serviceProvider.GetRequiredService<IConnectionMultiplexer>().GetDatabase(),
-				RedisKeys.Cache.TelegramTokens
-			)
-		);
+				var jsonInputFormatter = options.InputFormatters.OfType<SystemTextJsonInputFormatter>().Single();
 
-		services.AddSingleton<ISessionRepository, SessionRedisRepository>();
+				jsonInputFormatter.SupportedMediaTypes.Clear();
+				jsonInputFormatter.SupportedMediaTypes.Add("application/json");
+				options.InputFormatters.Insert(0, new IgnorePropertiesJsonInputFormatter(jsonInputFormatter));
 
-		services.AddScoped<ITradeRepository, TradeEfRepository>();
+				var bodyModelBinderProvider = options.ModelBinderProviders.OfType<BodyModelBinderProvider>().Single();
+				options.ModelBinderProviders.Insert(
+					0,
+					new RequestPropertiesModelBinderProvider(bodyModelBinderProvider)
+				);
+			})
+			.AddJsonOptions(options =>
+			{
+				options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+				options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+				options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+			});
 
-		services.AddScoped<IStrategyRepository, StrategyEfRepository>();
+		services.Configure<ApiBehaviorOptions>(options =>
+		{
+			options.InvalidModelStateResponseFactory = actionContext =>
+			{
+				var problem = new ValidationProblemDetails(actionContext.ModelState)
+				{
+					Status = StatusCodes.Status400BadRequest,
+					Title = "Validation Failed",
+					Type = "https://httpstatuses.io/400",
+					Detail = "One or more validation errors occurred.",
+					Instance = actionContext.HttpContext.Request.Path,
+				};
 
-		services.AddScoped<IReminderRepository, ReminderEfRepository>();
-		services.AddScoped<INoteRepository, NoteEfRepository>();
-		services.AddScoped<IUserRepository, UserEfRepository>();
+				problem.Extensions["code"] = "validation_failed";
+				problem.Extensions["traceId"] = actionContext.HttpContext.TraceIdentifier;
+
+				var result = new BadRequestObjectResult(problem);
+				result.ContentTypes.Add("application/problem+json");
+				return result;
+			};
+		});
 
 		return services;
 	}

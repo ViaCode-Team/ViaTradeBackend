@@ -4,7 +4,7 @@ namespace ViaTrade.Domain.Entities;
 
 public sealed class Instrument : BaseEntity<int>
 {
-	public required string Symbol { get; set; }
+	public required string Ticker { get; set; }
 
 	public string? Description { get; set; }
 

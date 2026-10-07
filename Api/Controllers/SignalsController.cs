@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using ViaTrade.Api.Attributes.Binding;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Auth.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Signals.Common;
@@ -14,7 +12,7 @@ namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class SignalsController(IJwtHelper jwtHelper) : ControllerBase
+public class SignalsController : ControllerBase
 {
 	[HttpGet("statistics")]
 	public async Task<Ok<SignalStatisticsResult>> GetStatistics(
@@ -22,23 +20,18 @@ public class SignalsController(IJwtHelper jwtHelper) : ControllerBase
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		var signalStatistics = await handler.HandleAsync(new GetSignalStatisticsQuery(userId), ct);
+		var signalStatistics = await handler.HandleAsync(new GetSignalStatisticsQuery(), ct);
 
 		return TypedResults.Ok(signalStatistics);
 	}
 
 	[HttpGet("latest")]
 	public async Task<Ok<PageResult<SignalResult>>> GetLatestSignals(
-		[FromQuery, IgnoreProperties(nameof(GetLatestSignalsPageQuery.UserId))] GetLatestSignalsPageQuery query,
+		[FromQuery] GetLatestSignalsPageQuery query,
 		[FromServices] IQueryHandler<GetLatestSignalsPageQuery, PageResult<SignalResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		query = query with { UserId = userId };
 		var signals = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(signals);
@@ -46,14 +39,11 @@ public class SignalsController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpGet]
 	public async Task<Ok<PageResult<SignalResult>>> GetSignals(
-		[FromQuery, IgnoreProperties(nameof(GetSignalHistoryPageQuery.UserId))] GetSignalHistoryPageQuery query,
+		[FromQuery] GetSignalHistoryPageQuery query,
 		[FromServices] IQueryHandler<GetSignalHistoryPageQuery, PageResult<SignalResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		query = query with { UserId = userId };
 		var signals = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(signals);

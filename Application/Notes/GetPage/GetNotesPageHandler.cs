@@ -6,13 +6,13 @@ using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Notes.GetPage;
 
-public sealed class GetNotesPageHandler(IReadRepository<Note> noteRepository)
+public sealed class GetNotesPageHandler(IUserContext userContext, IReadRepository<Note> noteRepository)
 	: IQueryHandler<GetNotesPageQuery, PageResult<NoteResult>>
 {
-	public async Task<PageResult<NoteResult>> HandleAsync(GetNotesPageQuery query, CancellationToken ct = default)
+	public async Task<PageResult<NoteResult>> HandleAsync(GetNotesPageQuery query, CancellationToken ct)
 	{
 		var specification = new NotesPageSpecification(
-			query.UserId,
+			userContext.UserId,
 			query.NoteFilter,
 			query.NoteSearch,
 			query.PageOptions

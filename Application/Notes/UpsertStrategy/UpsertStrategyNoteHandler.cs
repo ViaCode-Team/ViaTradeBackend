@@ -6,15 +6,16 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Notes.UpsertStrategy;
 
 public sealed class UpsertStrategyNoteHandler(
+	IUserContext userContext,
 	IRepository<Note> noteRepository,
 	INoteRepository noteOperations,
 	IUnitOfWork uow
 ) : ICommandHandler<UpsertStrategyNoteCommand>
 {
-	public async Task HandleAsync(UpsertStrategyNoteCommand command, CancellationToken ct = default)
+	public async Task HandleAsync(UpsertStrategyNoteCommand command, CancellationToken ct)
 	{
 		int affectedRows = await noteOperations.ExecuteUpdateStrategyAsync(
-			command.UserId,
+			userContext.UserId,
 			command.StrategyId,
 			command.Text,
 			ct
@@ -24,7 +25,7 @@ public sealed class UpsertStrategyNoteHandler(
 
 		var note = new Note
 		{
-			UserId = command.UserId,
+			UserId = userContext.UserId,
 			Text = command.Text,
 			StrategyId = command.StrategyId,
 		};

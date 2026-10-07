@@ -1,12 +1,12 @@
+using FluentValidation;
 using ViaTrade.Application.Common.Validation;
 using ViaTrade.Application.Instruments.Common;
 
 namespace ViaTrade.Application.Strategies.GetInstrumentsPage;
 
-public sealed class GetStrategyInstrumentsPageQueryValidator : UserRequestValidator<GetStrategyInstrumentsPageQuery>
+public sealed class GetStrategyInstrumentsPageQueryValidator : AbstractValidator<GetStrategyInstrumentsPageQuery>
 {
 	public GetStrategyInstrumentsPageQueryValidator()
-		: base(request => request.UserId)
 	{
 		RuleFor(request => request.StrategyId).PositiveId();
 		RuleFor(request => request.InstrumentFilter).RequiredValid(new StrategyInstrumentFilterValidator());

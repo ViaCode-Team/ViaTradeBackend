@@ -9,14 +9,15 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Reminders.Create;
 
 public sealed class CreateReminderHandler(
+	IUserContext userContext,
 	IRepository<Reminder> reminderRepository,
 	IUnitOfWork uow,
 	IOptions<ReminderLimitsSettings> reminderLimitsOptions
 ) : ICommandHandler<CreateReminderCommand, ReminderResult>
 {
-	public async Task<ReminderResult> HandleAsync(CreateReminderCommand command, CancellationToken ct = default)
+	public async Task<ReminderResult> HandleAsync(CreateReminderCommand command, CancellationToken ct)
 	{
-		int reminderCount = await reminderRepository.CountAsync(reminder => reminder.UserId == command.UserId, ct);
+		int reminderCount = await reminderRepository.CountAsync(reminder => reminder.UserId == userContext.UserId, ct);
 		if (reminderCount >= reminderLimitsOptions.Value.MaxRemindersPerUser)
 			throw new BusinessRuleException(
 				"The maximum number of reminders has been reached.",
@@ -28,7 +29,7 @@ public sealed class CreateReminderHandler(
 			Text = command.Text,
 			RemindAt = command.RemindAt,
 			InstrumentId = command.InstrumentId,
-			UserId = command.UserId,
+			UserId = userContext.UserId,
 		};
 
 		reminderRepository.Add(reminder);

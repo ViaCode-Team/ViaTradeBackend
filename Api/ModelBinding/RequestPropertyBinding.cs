@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Metadata;
-using ViaTrade.Api.Attributes.Binding;
+using ViaTrade.Api.ModelBinding.Attributes;
 
 namespace ViaTrade.Api.ModelBinding;
 

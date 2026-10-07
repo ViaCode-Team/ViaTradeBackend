@@ -3,15 +3,12 @@ using ViaTrade.Application.Trades.Common.Abstractions;
 
 namespace ViaTrade.Application.Trades.GetProfitChart;
 
-public sealed class GetProfitChartHandler(ITradeRepository tradeStatistics)
+public sealed class GetProfitChartHandler(IUserContext userContext, ITradeRepository tradeStatistics)
 	: IQueryHandler<GetProfitChartQuery, List<ProfitChartBucketResult>>
 {
-	public async Task<List<ProfitChartBucketResult>> HandleAsync(
-		GetProfitChartQuery query,
-		CancellationToken ct = default
-	)
+	public async Task<List<ProfitChartBucketResult>> HandleAsync(GetProfitChartQuery query, CancellationToken ct)
 	{
-		var rows = await tradeStatistics.GetProfitChartAsync(query.UserId, query.ProfitChartFilter, ct);
+		var rows = await tradeStatistics.GetProfitChartAsync(userContext.UserId, query.ProfitChartFilter, ct);
 
 		return rows.Select(row => new ProfitChartBucketResult(
 				GetBucketDate(row, query.ProfitChartFilter.Granularity),

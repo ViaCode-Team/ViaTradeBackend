@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using ViaTrade.Api.Attributes.Binding;
+using ViaTrade.Api.ModelBinding.Attributes;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Auth.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Notes.Common;
@@ -14,7 +13,7 @@ namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class NotesController(IJwtHelper jwtHelper) : ControllerBase
+public class NotesController : ControllerBase
 {
 	[HttpGet("statistics")]
 	public async Task<Ok<NoteStatisticsResult>> GetNoteStatistics(
@@ -22,23 +21,18 @@ public class NotesController(IJwtHelper jwtHelper) : ControllerBase
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		var noteStatistics = await handler.HandleAsync(new GetNoteStatisticsQuery(userId), ct);
+		var noteStatistics = await handler.HandleAsync(new GetNoteStatisticsQuery(), ct);
 
 		return TypedResults.Ok(noteStatistics);
 	}
 
 	[HttpGet]
 	public async Task<Ok<PageResult<NoteResult>>> GetNotes(
-		[FromQuery, IgnoreProperties(nameof(GetNotesPageQuery.UserId))] GetNotesPageQuery query,
+		[FromQuery] GetNotesPageQuery query,
 		[FromServices] IQueryHandler<GetNotesPageQuery, PageResult<NoteResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		query = query with { UserId = userId };
 		var userNotes = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(userNotes);
@@ -46,15 +40,11 @@ public class NotesController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpGet("{noteId:int}")]
 	public async Task<Ok<NoteResult>> GetNoteById(
-		[FromBody, IgnoreProperties(nameof(GetNoteQuery.UserId)), FromRouteProperties(nameof(GetNoteQuery.NoteId))]
-			GetNoteQuery query,
+		[FromBody, FromRouteProperties(nameof(GetNoteQuery.NoteId))] GetNoteQuery query,
 		[FromServices] IQueryHandler<GetNoteQuery, NoteResult> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		query = query with { UserId = userId };
 		var note = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(note);

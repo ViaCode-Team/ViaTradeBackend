@@ -5,9 +5,9 @@ namespace ViaTrade.Application.Instruments.Common;
 [JsonConverter(typeof(JsonStringEnumConverter))]
 public enum InstrumentSortField
 {
-	[JsonStringEnumMemberName("symbolAsc")]
-	SymbolAsc,
+	[JsonStringEnumMemberName("tickerAsc")]
+	TickerAsc,
 
-	[JsonStringEnumMemberName("symbolDesc")]
-	SymbolDesc,
+	[JsonStringEnumMemberName("tickerDesc")]
+	TickerDesc,
 }

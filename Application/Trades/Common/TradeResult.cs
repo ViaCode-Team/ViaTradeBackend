@@ -32,7 +32,7 @@ public record TradeResult(
 			trade.TotalPrice,
 			trade.Signal,
 			trade.TradeTypeId,
-			new InstrumentBriefResult(trade.Instrument!.Id, trade.Instrument.Symbol, trade.Instrument.Description),
+			new InstrumentBriefResult(trade.Instrument!.Id, trade.Instrument.Ticker, trade.Instrument.Description),
 			trade.UserId
 		);
 }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 	<PropertyGroup>
 		<RootNamespace>ViaTrade.Api</RootNamespace>
 		<AssemblyName>ViaTrade.Api</AssemblyName>
@@ -23,8 +23,11 @@
 
 	<ItemGroup>
 		<PackageReference Include="MicroElements.Swashbuckle.FluentValidation" Version="7.2.2" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.11" />
-		<PackageReference Include="Scrutor" Version="7.0.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.12" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.20">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="10.2.3" />
 	</ItemGroup>
 
@@ -35,36 +38,10 @@
 		<ProjectReference Include="..\Configuration\Configuration.csproj" />
 	</ItemGroup>
 
+	<Import Project="Build\GenerateOpenApi.targets" />
 	<ItemGroup>
-		<SwaggerDocument Include="web" OutputPath="$(ProjectDir)..\swagger\swagger.yaml" />
-		<SwaggerDocument Include="tgbot" OutputPath="$(ProjectDir)..\swagger\swagger-tgbot.yaml" />
-		<SwaggerDocument Include="analyzer" OutputPath="$(ProjectDir)..\swagger\swagger-analyzer.yaml" />
+		<OpenApiDocument Include="web" OutputPath="$(ProjectDir)..\openapi\openapi.yaml" />
+		<OpenApiDocument Include="tgbot" OutputPath="$(ProjectDir)..\openapi\openapi-tgbot.yaml" />
+		<OpenApiDocument Include="analyzer" OutputPath="$(ProjectDir)..\openapi\openapi-analyzer.yaml" />
 	</ItemGroup>
-
-	<Target Name="GenerateSwagger" AfterTargets="Build" Condition="'$(DesignTimeBuild)' != 'true'">
-		<PropertyGroup>
-			<_SwaggerIntermediateDirectory>$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '$(IntermediateOutputPath)', 'swagger'))</_SwaggerIntermediateDirectory>
-		</PropertyGroup>
-
-		<ItemGroup>
-			<_GeneratedSwaggerDocument Include="@(SwaggerDocument)">
-				<GeneratedPath>$(_SwaggerIntermediateDirectory)\%(Identity).yaml</GeneratedPath>
-			</_GeneratedSwaggerDocument>
-		</ItemGroup>
-
-		<MakeDir Directories="$(ProjectDir)..\swagger\;$(_SwaggerIntermediateDirectory)" />
-
-		<Exec
-			EnvironmentVariables="ASPNETCORE_ENVIRONMENT=Development"
-			Command="dotnet tool run swagger tofile --yaml --output &quot;%(_GeneratedSwaggerDocument.GeneratedPath)&quot; --openapiversion 3.0 &quot;$(TargetPath)&quot; %(_GeneratedSwaggerDocument.Identity)"
-			WorkingDirectory="$(ProjectDir)"
-		/>
-
-		<Move
-			SourceFiles="@(_GeneratedSwaggerDocument->'%(GeneratedPath)')"
-			DestinationFiles="@(_GeneratedSwaggerDocument->'%(OutputPath)')"
-		/>
-
-		<RemoveDir Directories="$(_SwaggerIntermediateDirectory)" />
-	</Target>
 </Project>

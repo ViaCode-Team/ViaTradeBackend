@@ -5,7 +5,6 @@ using ViaTrade.Application.Strategies.Common;
 namespace ViaTrade.Application.Strategies.GetByInstrumentPage;
 
 public sealed record GetInstrumentStrategiesPageQuery(
-	int UserId,
 	int InstrumentId,
 	StrategyFilter StrategyFilter,
 	StrategySort StrategySort,

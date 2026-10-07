@@ -7,11 +7,12 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Notes.GetInstrument;
 
 public sealed class GetInstrumentNoteHandler(
+	IUserContext userContext,
 	IReadRepository<Instrument> instrumentRepository,
 	IReadRepository<Note> noteRepository
 ) : IQueryHandler<GetInstrumentNoteQuery, NoteResult>
 {
-	public async Task<NoteResult> HandleAsync(GetInstrumentNoteQuery query, CancellationToken ct = default)
+	public async Task<NoteResult> HandleAsync(GetInstrumentNoteQuery query, CancellationToken ct)
 	{
 		var instrumentExists = await instrumentRepository.AnyAsync(
 			instrument => instrument.Id == query.InstrumentId,
@@ -21,7 +22,7 @@ public sealed class GetInstrumentNoteHandler(
 			throw new NotFoundException("Instrument not found.", "instrument_not_found");
 
 		var note = await noteRepository.FirstOrDefaultAsync(
-			note => note.UserId == query.UserId && note.InstrumentId == query.InstrumentId,
+			note => note.UserId == userContext.UserId && note.InstrumentId == query.InstrumentId,
 			NoteResult.Projection,
 			ct
 		);

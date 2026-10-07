@@ -7,15 +7,16 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Strategies.LinkInstrument;
 
 public sealed class LinkStrategyInstrumentHandler(
+	IUserContext userContext,
 	IRepository<UserStrategyInstrument> userStrategyInstrumentRepository,
 	IStrategyRepository strategyOperations,
 	IUnitOfWork uow
 ) : ICommandHandler<LinkStrategyInstrumentCommand>
 {
-	public async Task HandleAsync(LinkStrategyInstrumentCommand command, CancellationToken ct = default)
+	public async Task HandleAsync(LinkStrategyInstrumentCommand command, CancellationToken ct)
 	{
 		var linkState = await strategyOperations.FindInstrumentLinkStateAsync(
-			command.UserId,
+			userContext.UserId,
 			command.StrategyId,
 			command.InstrumentId,
 			ct
@@ -31,7 +32,7 @@ public sealed class LinkStrategyInstrumentHandler(
 
 		var strategyCode = new UserStrategyInstrument
 		{
-			UserId = command.UserId,
+			UserId = userContext.UserId,
 			StrategyId = command.StrategyId,
 			InstrumentId = command.InstrumentId,
 		};

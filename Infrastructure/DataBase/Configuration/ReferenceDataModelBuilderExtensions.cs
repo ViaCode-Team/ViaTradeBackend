@@ -48,14 +48,14 @@ internal static class ReferenceDataModelBuilderExtensions
 				new
 				{
 					Id = 1,
-					Symbol = "GAZP",
+					Ticker = "GAZP",
 					Description = "Газпром",
 					CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
 				},
 				new
 				{
 					Id = 2,
-					Symbol = "GMKN",
+					Ticker = "GMKN",
 					Description = "Норникель",
 					CreatedAt = new DateTime(2025, 1, 1, 0, 0, 0, DateTimeKind.Utc),
 				}

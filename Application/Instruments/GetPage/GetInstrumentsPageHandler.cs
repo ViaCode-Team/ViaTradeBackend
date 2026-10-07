@@ -9,10 +9,7 @@ namespace ViaTrade.Application.Instruments.GetPage;
 public sealed class GetInstrumentsPageHandler(IReadRepository<Instrument> instrumentRepository)
 	: IQueryHandler<GetInstrumentsPageQuery, PageResult<InstrumentResult>>
 {
-	public async Task<PageResult<InstrumentResult>> HandleAsync(
-		GetInstrumentsPageQuery query,
-		CancellationToken ct = default
-	)
+	public async Task<PageResult<InstrumentResult>> HandleAsync(GetInstrumentsPageQuery query, CancellationToken ct)
 	{
 		var specification = new InstrumentsPageSpecification(
 			query.InstrumentFilter,

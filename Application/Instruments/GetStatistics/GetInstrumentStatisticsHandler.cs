@@ -7,10 +7,7 @@ namespace ViaTrade.Application.Instruments.GetStatistics;
 public sealed class GetInstrumentStatisticsHandler(IReadRepository<Instrument> instrumentRepository)
 	: IQueryHandler<GetInstrumentStatisticsQuery, InstrumentStatisticsResult>
 {
-	public async Task<InstrumentStatisticsResult> HandleAsync(
-		GetInstrumentStatisticsQuery query,
-		CancellationToken ct = default
-	)
+	public async Task<InstrumentStatisticsResult> HandleAsync(GetInstrumentStatisticsQuery query, CancellationToken ct)
 	{
 		int totalInstruments = await instrumentRepository.CountAsync(ct);
 

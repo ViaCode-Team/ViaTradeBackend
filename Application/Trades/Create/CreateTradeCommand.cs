@@ -5,7 +5,6 @@ using ViaTrade.Domain.Enums;
 namespace ViaTrade.Application.Trades.Create;
 
 public sealed record CreateTradeCommand(
-	int UserId,
 	int InstrumentId,
 	int TradeTypeId,
 	DateTime OpenedAt,

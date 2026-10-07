@@ -15,7 +15,7 @@ public sealed class SignalSourcesSpecification : Specification<UserStrategyInstr
 			link.Strategy!.Name,
 			link.Strategy.DisplayName,
 			link.InstrumentId,
-			link.Instrument!.Symbol,
+			link.Instrument!.Ticker,
 			link.Strategy.Accuracy
 		));
 	}

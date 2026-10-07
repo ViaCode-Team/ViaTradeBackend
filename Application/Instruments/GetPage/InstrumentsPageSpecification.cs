@@ -27,8 +27,8 @@ public class InstrumentsPageSpecification : PageSpecification<Instrument>
 
 	private void ApplyFilter(InstrumentFilter instrumentFilter)
 	{
-		if (!string.IsNullOrWhiteSpace(instrumentFilter.Symbol))
-			Query.Where(x => x.Symbol == instrumentFilter.Symbol);
+		if (!string.IsNullOrWhiteSpace(instrumentFilter.Ticker))
+			Query.Where(x => x.Ticker == instrumentFilter.Ticker);
 	}
 
 	private void ApplySearch(InstrumentSearch instrumentSearch)
@@ -37,7 +37,7 @@ public class InstrumentsPageSpecification : PageSpecification<Instrument>
 		if (searchText == null)
 			return;
 
-		Query.Where(x => x.Symbol.Contains(searchText) || x.Description!.Contains(searchText));
+		Query.Where(x => x.Ticker.Contains(searchText) || x.Description!.Contains(searchText));
 	}
 
 	private void ApplySorting(InstrumentSort sort)
@@ -46,11 +46,11 @@ public class InstrumentsPageSpecification : PageSpecification<Instrument>
 		{
 			switch (field)
 			{
-				case InstrumentSortField.SymbolDesc:
-					AddOrderByDescending(x => x.Symbol);
+				case InstrumentSortField.TickerDesc:
+					AddOrderByDescending(x => x.Ticker);
 					break;
-				case InstrumentSortField.SymbolAsc:
-					AddOrderByAscending(x => x.Symbol);
+				case InstrumentSortField.TickerAsc:
+					AddOrderByAscending(x => x.Ticker);
 					break;
 			}
 		}

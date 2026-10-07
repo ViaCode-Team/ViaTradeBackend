@@ -7,16 +7,14 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Reminders.GetStatistics;
 
 public sealed class GetReminderStatisticsHandler(
+	IUserContext userContext,
 	IReadRepository<Reminder> reminderRepository,
 	IOptions<ReminderLimitsSettings> reminderLimitsOptions
 ) : IQueryHandler<GetReminderStatisticsQuery, ReminderStatisticsResult>
 {
-	public async Task<ReminderStatisticsResult> HandleAsync(
-		GetReminderStatisticsQuery query,
-		CancellationToken ct = default
-	)
+	public async Task<ReminderStatisticsResult> HandleAsync(GetReminderStatisticsQuery query, CancellationToken ct)
 	{
-		int total = await reminderRepository.CountAsync(reminder => reminder.UserId == query.UserId, ct);
+		int total = await reminderRepository.CountAsync(reminder => reminder.UserId == userContext.UserId, ct);
 		int remaining = Math.Max(0, reminderLimitsOptions.Value.MaxRemindersPerUser - total);
 
 		return new ReminderStatisticsResult(total, reminderLimitsOptions.Value.MaxRemindersPerUser, remaining);

@@ -34,13 +34,13 @@ public class TradeFileReader : IFileReader
 		_tradeDataBuilder = tradeDataBuilder;
 	}
 
-	public IEnumerable<InstrumentFile> GetInstruments(TradeDataType dataType, IEnumerable<string>? filterSymbols = null)
+	public IEnumerable<InstrumentFile> GetInstruments(TradeDataType dataType, IEnumerable<string>? filterTickers = null)
 	{
 		var directory = GetPath(dataType);
 		if (!Directory.Exists(directory))
 			yield break;
 
-		var filterSet = filterSymbols
+		var filterSet = filterTickers
 			?.Where(c => !string.IsNullOrWhiteSpace(c))
 			.Select(c => c.ToUpperInvariant())
 			.ToHashSet();
@@ -56,11 +56,11 @@ public class TradeFileReader : IFileReader
 				if (fileName == null)
 					return false;
 
-				var symbol = ExtractSymbol(fileName);
-				if (symbol == null)
+				var ticker = ExtractTicker(fileName);
+				if (ticker == null)
 					return false;
 
-				return filterSet?.Contains(symbol) ?? true;
+				return filterSet?.Contains(ticker) ?? true;
 			})
 			.Where(f => f != null)
 			.Cast<string>();
@@ -72,31 +72,31 @@ public class TradeFileReader : IFileReader
 		}
 	}
 
-	public IEnumerable<(string Symbol, T Item)> ReadDataBySymbols<T>(
+	public IEnumerable<(string Ticker, T Item)> ReadDataByTickers<T>(
 		TradeDataType dataType,
-		IEnumerable<string> symbols,
+		IEnumerable<string> tickers,
 		DateTime? startDate = null,
 		DateTime? endDate = null
 	)
 		where T : class
 	{
-		foreach (var symbol in symbols)
+		foreach (var ticker in tickers)
 		{
-			var filePath = FindFilePathBySymbol(dataType, symbol);
+			var filePath = FindFilePathByTicker(dataType, ticker);
 			if (filePath == null)
 				continue;
 
 			foreach (var item in ReadFile<T>(filePath, startDate, endDate))
 			{
 				// Return code context with each item
-				yield return (symbol, item);
+				yield return (ticker, item);
 			}
 		}
 	}
 
-	public IEnumerable<(string Symbol, string StrategyName, T Item)> ReadDataBySymbolsWithStrategy<T>(
+	public IEnumerable<(string Ticker, string StrategyName, T Item)> ReadDataByTickersWithStrategy<T>(
 		TradeDataType dataType,
-		IEnumerable<string> symbols,
+		IEnumerable<string> tickers,
 		DateTime? startDate = null,
 		DateTime? endDate = null
 	)
@@ -106,15 +106,15 @@ public class TradeFileReader : IFileReader
 		if (!Directory.Exists(directory))
 			yield break;
 
-		var symbolsSet = symbols
+		var tickersSet = tickers
 			.Where(c => !string.IsNullOrWhiteSpace(c))
 			.Select(c => c.ToUpperInvariant())
 			.ToHashSet();
 
 		var matchingFiles = Directory
 			.EnumerateFiles(directory, "*.csv")
-			.Select(filePath => new { Path = filePath, Symbol = ExtractSymbol(Path.GetFileName(filePath)) })
-			.Where(x => x.Symbol != null && symbolsSet.Contains(x.Symbol));
+			.Select(filePath => new { Path = filePath, Ticker = ExtractTicker(Path.GetFileName(filePath)) })
+			.Where(x => x.Ticker != null && tickersSet.Contains(x.Ticker));
 
 		foreach (var file in matchingFiles)
 		{
@@ -124,7 +124,7 @@ public class TradeFileReader : IFileReader
 
 			foreach (var item in ReadFile<T>(file.Path, startDate, endDate))
 			{
-				yield return (file.Symbol!, strategyName, item);
+				yield return (file.Ticker!, strategyName, item);
 			}
 		}
 	}
@@ -153,7 +153,7 @@ public class TradeFileReader : IFileReader
 		return path;
 	}
 
-	private static string? ExtractSymbol(string fileName)
+	private static string? ExtractTicker(string fileName)
 	{
 		var name = Path.GetFileNameWithoutExtension(fileName);
 		var code = name.Split('_').FirstOrDefault();
@@ -165,13 +165,13 @@ public class TradeFileReader : IFileReader
 		return code.ToUpperInvariant();
 	}
 
-	private string? FindFilePathBySymbol(TradeDataType dataType, string symbol)
+	private string? FindFilePathByTicker(TradeDataType dataType, string ticker)
 	{
 		var directory = GetPath(dataType);
 		if (!Directory.Exists(directory))
 			return null;
 
-		var prefix = $"{symbol.ToUpperInvariant()}_";
+		var prefix = $"{ticker.ToUpperInvariant()}_";
 
 		return Directory
 			.EnumerateFiles(directory, "*.csv")

@@ -8,11 +8,12 @@ using ViaTrade.Configuration.Options;
 namespace ViaTrade.Application.Users.CreateTelegramLink;
 
 public sealed class CreateTelegramLinkHandler(
+	IUserContext userContext,
 	ICacheRepository<TelegramTokenEntity> telegramTokenRepository,
 	IOptions<TelegramBotSettings> telegramBotOptions
 ) : ICommandHandler<CreateTelegramLinkCommand, TelegramLinkResult>
 {
-	public async Task<TelegramLinkResult> HandleAsync(CreateTelegramLinkCommand command, CancellationToken ct = default)
+	public async Task<TelegramLinkResult> HandleAsync(CreateTelegramLinkCommand command, CancellationToken ct)
 	{
 		var token = Convert
 			.ToBase64String(RandomNumberGenerator.GetBytes(24))
@@ -21,7 +22,7 @@ public sealed class CreateTelegramLinkHandler(
 			.TrimEnd('=');
 
 		await telegramTokenRepository.SetAsync(
-			new TelegramTokenEntity { Id = token, UserId = command.UserId },
+			new TelegramTokenEntity { Id = token, UserId = userContext.UserId },
 			TimeSpan.FromMinutes(5)
 		);
 

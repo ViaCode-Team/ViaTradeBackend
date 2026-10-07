@@ -7,10 +7,7 @@ namespace ViaTrade.Application.Reminders.DeleteDelivered;
 public sealed class DeleteDeliveredRemindersHandler(IRepository<Reminder> reminderRepository)
 	: ICommandHandler<DeleteDeliveredRemindersCommand, DeleteRemindersResult>
 {
-	public async Task<DeleteRemindersResult> HandleAsync(
-		DeleteDeliveredRemindersCommand command,
-		CancellationToken ct = default
-	)
+	public async Task<DeleteRemindersResult> HandleAsync(DeleteDeliveredRemindersCommand command, CancellationToken ct)
 	{
 		var count = await reminderRepository.ExecuteDeleteAsync(
 			reminder => reminder.DeliveredAt != null && reminder.DeliveredAt <= command.DeliveredBefore,

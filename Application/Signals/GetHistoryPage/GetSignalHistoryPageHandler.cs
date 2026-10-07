@@ -8,16 +8,14 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Signals.GetHistoryPage;
 
 public sealed class GetSignalHistoryPageHandler(
+	IUserContext userContext,
 	SignalReader signalReader,
 	IReadRepository<UserStrategyInstrument> userStrategyInstrumentRepository
 ) : IQueryHandler<GetSignalHistoryPageQuery, PageResult<SignalResult>>
 {
-	public async Task<PageResult<SignalResult>> HandleAsync(
-		GetSignalHistoryPageQuery query,
-		CancellationToken ct = default
-	)
+	public async Task<PageResult<SignalResult>> HandleAsync(GetSignalHistoryPageQuery query, CancellationToken ct)
 	{
-		var sourcesSpecification = new SignalSourcesSpecification(query.UserId);
+		var sourcesSpecification = new SignalSourcesSpecification(userContext.UserId);
 		var sources = await userStrategyInstrumentRepository.ListAsync(sourcesSpecification, ct);
 		sources = sources
 			.Where(source => source.StrategyId == query.SignalHistoryFilter.StrategyId)

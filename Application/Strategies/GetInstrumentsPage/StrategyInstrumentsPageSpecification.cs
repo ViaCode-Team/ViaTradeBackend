@@ -37,11 +37,11 @@ public sealed class StrategyInstrumentsPageSpecification : UserStrategyLinksSpec
 		{
 			switch (field)
 			{
-				case InstrumentSortField.SymbolDesc:
-					AddOrderByDescending(link => link.Instrument!.Symbol);
+				case InstrumentSortField.TickerDesc:
+					AddOrderByDescending(link => link.Instrument!.Ticker);
 					break;
-				case InstrumentSortField.SymbolAsc:
-					AddOrderByAscending(link => link.Instrument!.Symbol);
+				case InstrumentSortField.TickerAsc:
+					AddOrderByAscending(link => link.Instrument!.Ticker);
 					break;
 			}
 		}

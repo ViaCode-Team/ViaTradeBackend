@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using ViaTrade.Api.Attributes.Binding;
+using ViaTrade.Api.ModelBinding.Attributes;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Auth.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Trades.Common;
@@ -19,7 +18,7 @@ namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class TradesController(IJwtHelper jwtHelper) : ControllerBase
+public class TradesController : ControllerBase
 {
 	[HttpGet("statistics")]
 	public async Task<Ok<TradeStatisticsResult>> GetTradeStatistics(
@@ -27,23 +26,18 @@ public class TradesController(IJwtHelper jwtHelper) : ControllerBase
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		var tradeStatistics = await handler.HandleAsync(new GetTradeStatisticsQuery(userId), ct);
+		var tradeStatistics = await handler.HandleAsync(new GetTradeStatisticsQuery(), ct);
 
 		return TypedResults.Ok(tradeStatistics);
 	}
 
 	[HttpGet("profitChart")]
 	public async Task<Ok<List<ProfitChartBucketResult>>> GetProfitChart(
-		[FromQuery, IgnoreProperties(nameof(GetProfitChartQuery.UserId))] GetProfitChartQuery query,
+		[FromQuery] GetProfitChartQuery query,
 		[FromServices] IQueryHandler<GetProfitChartQuery, List<ProfitChartBucketResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		query = query with { UserId = userId };
 		var buckets = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(buckets);
@@ -55,23 +49,18 @@ public class TradesController(IJwtHelper jwtHelper) : ControllerBase
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		var range = await handler.HandleAsync(new GetTradeDateRangeQuery(userId), ct);
+		var range = await handler.HandleAsync(new GetTradeDateRangeQuery(), ct);
 
 		return TypedResults.Ok(range);
 	}
 
 	[HttpGet]
 	public async Task<Ok<PageResult<TradeResult>>> GetTrades(
-		[FromQuery, IgnoreProperties(nameof(GetTradesPageQuery.UserId))] GetTradesPageQuery query,
+		[FromQuery] GetTradesPageQuery query,
 		[FromServices] IQueryHandler<GetTradesPageQuery, PageResult<TradeResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		query = query with { UserId = userId };
 		var userTrades = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(userTrades);
@@ -79,15 +68,11 @@ public class TradesController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpGet("{tradeId:int}")]
 	public async Task<Ok<TradeResult>> GetTradeById(
-		[FromQuery, IgnoreProperties(nameof(GetTradeQuery.UserId)), FromRouteProperties(nameof(GetTradeQuery.TradeId))]
-			GetTradeQuery query,
+		[FromQuery, FromRouteProperties(nameof(GetTradeQuery.TradeId))] GetTradeQuery query,
 		[FromServices] IQueryHandler<GetTradeQuery, TradeResult> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		query = query with { UserId = userId };
 		var trade = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(trade);
@@ -95,14 +80,11 @@ public class TradesController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpPost]
 	public async Task<Created<TradeResult>> CreateTrade(
-		[FromBody, IgnoreProperties(nameof(CreateTradeCommand.UserId))] CreateTradeCommand command,
+		[FromBody] CreateTradeCommand command,
 		[FromServices] ICommandHandler<CreateTradeCommand, TradeResult> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		command = command with { UserId = userId };
 		var trade = await handler.HandleAsync(command, ct);
 
 		return TypedResults.Created($"/api/v1/trades/{trade.Id}", trade);
@@ -110,19 +92,11 @@ public class TradesController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpPut("{tradeId:int}")]
 	public async Task<NoContent> UpdateTrade(
-		[
-			FromBody,
-			IgnoreProperties(nameof(UpdateTradeCommand.UserId)),
-			FromRouteProperties(nameof(UpdateTradeCommand.TradeId))
-		]
-			UpdateTradeCommand command,
+		[FromBody, FromRouteProperties(nameof(UpdateTradeCommand.TradeId))] UpdateTradeCommand command,
 		[FromServices] ICommandHandler<UpdateTradeCommand> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		command = command with { UserId = userId };
 		await handler.HandleAsync(command, ct);
 
 		return TypedResults.NoContent();
@@ -130,19 +104,11 @@ public class TradesController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpDelete("{tradeId:int}")]
 	public async Task<NoContent> DeleteTrade(
-		[
-			FromQuery,
-			IgnoreProperties(nameof(DeleteTradeCommand.UserId)),
-			FromRouteProperties(nameof(DeleteTradeCommand.TradeId))
-		]
-			DeleteTradeCommand command,
+		[FromQuery, FromRouteProperties(nameof(DeleteTradeCommand.TradeId))] DeleteTradeCommand command,
 		[FromServices] ICommandHandler<DeleteTradeCommand> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		command = command with { UserId = userId };
 		await handler.HandleAsync(command, ct);
 
 		return TypedResults.NoContent();

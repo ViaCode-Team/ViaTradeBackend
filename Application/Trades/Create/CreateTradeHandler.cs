@@ -8,12 +8,13 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Trades.Create;
 
 public sealed class CreateTradeHandler(
+	IUserContext userContext,
 	IRepository<Trade> tradeRepository,
 	IReadRepository<Instrument> instrumentRepository,
 	IUnitOfWork uow
 ) : ICommandHandler<CreateTradeCommand, TradeResult>
 {
-	public async Task<TradeResult> HandleAsync(CreateTradeCommand command, CancellationToken ct = default)
+	public async Task<TradeResult> HandleAsync(CreateTradeCommand command, CancellationToken ct)
 	{
 		var trade = new Trade
 		{
@@ -24,7 +25,7 @@ public sealed class CreateTradeHandler(
 			Quantity = command.Quantity,
 			TradeTypeId = command.TradeTypeId,
 			InstrumentId = command.InstrumentId,
-			UserId = command.UserId,
+			UserId = userContext.UserId,
 			Signal = command.Signal,
 			TotalPrice = (decimal)command.OpenPrice * command.Quantity,
 		};

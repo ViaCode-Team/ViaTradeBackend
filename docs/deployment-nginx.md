@@ -2,6 +2,8 @@
 
 The configuration in `deploy/nginx` is for this API: it exposes only `/api/v1/`, limits request bodies to 1 MiB, throttles anonymous authentication endpoints, and proxies requests to Kestrel on `127.0.0.1:8080`. Swagger is intentionally unavailable in Production because the application enables it only in Development.
 
+`Program.cs` explicitly guards both `AddApiDocumentation()` and `UseViaTradeSwagger()` with `Environment.IsDevelopment()`. With `ASPNETCORE_ENVIRONMENT=Production`, Swagger generation, its FluentValidation integration, `AddEndpointsApiExplorer`, and Swagger UI are disabled. Authentication, request validation, database/Redis services, and all background services remain enabled. Staging also runs without Swagger.
+
 ## Prerequisites
 
 * Ubuntu/Debian server with Nginx, .NET 10 runtime, and Certbot.

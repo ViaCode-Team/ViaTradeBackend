@@ -5,13 +5,13 @@ using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Notes.DeleteStrategy;
 
-public sealed class DeleteStrategyNoteHandler(IRepository<Note> noteRepository)
+public sealed class DeleteStrategyNoteHandler(IUserContext userContext, IRepository<Note> noteRepository)
 	: ICommandHandler<DeleteStrategyNoteCommand>
 {
-	public async Task HandleAsync(DeleteStrategyNoteCommand command, CancellationToken ct = default)
+	public async Task HandleAsync(DeleteStrategyNoteCommand command, CancellationToken ct)
 	{
 		int affectedRows = await noteRepository.ExecuteDeleteAsync(
-			note => note.UserId == command.UserId && note.StrategyId == command.StrategyId,
+			note => note.UserId == userContext.UserId && note.StrategyId == command.StrategyId,
 			ct
 		);
 		if (affectedRows == 0)

@@ -5,6 +5,6 @@ public record SignalSource(
 	string StrategyName,
 	string DisplayName,
 	int InstrumentId,
-	string Symbol,
+	string Ticker,
 	int? Accuracy
 );

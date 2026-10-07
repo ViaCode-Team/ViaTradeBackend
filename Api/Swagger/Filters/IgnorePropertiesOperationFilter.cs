@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using ViaTrade.Api.Attributes.Binding;
 using ViaTrade.Api.ModelBinding;
+using ViaTrade.Api.ModelBinding.Attributes;
 
 namespace ViaTrade.Api.Swagger.Filters;
 

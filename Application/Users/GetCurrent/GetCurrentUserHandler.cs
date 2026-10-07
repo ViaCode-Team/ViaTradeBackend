@@ -5,13 +5,13 @@ using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Users.GetCurrent;
 
-public sealed class GetCurrentUserHandler(IReadRepository<User> userRepository)
+public sealed class GetCurrentUserHandler(IUserContext userContext, IReadRepository<User> userRepository)
 	: IQueryHandler<GetCurrentUserQuery, CurrentUserResult>
 {
-	public async Task<CurrentUserResult> HandleAsync(GetCurrentUserQuery query, CancellationToken ct = default)
+	public async Task<CurrentUserResult> HandleAsync(GetCurrentUserQuery query, CancellationToken ct)
 	{
 		var user = await userRepository.FirstOrDefaultAsync(
-			user => user.Id == query.UserId,
+			user => user.Id == userContext.UserId,
 			CurrentUserResult.Projection,
 			ct
 		);

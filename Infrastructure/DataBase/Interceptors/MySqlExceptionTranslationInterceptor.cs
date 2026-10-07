@@ -36,7 +36,7 @@ public class MySqlExceptionTranslationInterceptor : DbCommandInterceptor
 		var mySqlException = FindMySqlException(exception);
 		if (mySqlException != null)
 		{
-			var translated = DatabaseMySqlExceptionTranslator.Translate(mySqlException);
+			var translated = MySqlExceptionTranslator.Translate(mySqlException);
 			if (translated != null)
 				throw translated;
 		}

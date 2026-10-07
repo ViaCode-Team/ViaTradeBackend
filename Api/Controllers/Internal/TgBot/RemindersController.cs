@@ -1,9 +1,9 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using ViaTrade.Api.Attribute;
-using ViaTrade.Api.Attributes.Binding;
+using ViaTrade.Api.ModelBinding.Attributes;
 using ViaTrade.Api.Routing;
+using ViaTrade.Api.Security.Authorization;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Reminders.ListDue;
 using ViaTrade.Application.Reminders.MarkDelivered;

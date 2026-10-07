@@ -5,12 +5,13 @@ using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Trades.Delete;
 
-public sealed class DeleteTradeHandler(IRepository<Trade> tradeRepository) : ICommandHandler<DeleteTradeCommand>
+public sealed class DeleteTradeHandler(IUserContext userContext, IRepository<Trade> tradeRepository)
+	: ICommandHandler<DeleteTradeCommand>
 {
-	public async Task HandleAsync(DeleteTradeCommand command, CancellationToken ct = default)
+	public async Task HandleAsync(DeleteTradeCommand command, CancellationToken ct)
 	{
 		var affectedRows = await tradeRepository.ExecuteDeleteAsync(
-			t => t.Id == command.TradeId && t.UserId == command.UserId,
+			t => t.Id == command.TradeId && t.UserId == userContext.UserId,
 			ct
 		);
 		if (affectedRows == 0)

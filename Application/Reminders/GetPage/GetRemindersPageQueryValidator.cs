@@ -1,12 +1,12 @@
+using FluentValidation;
 using ViaTrade.Application.Common.Validation;
 using ViaTrade.Application.Reminders.Common;
 
 namespace ViaTrade.Application.Reminders.GetPage;
 
-public sealed class GetRemindersPageQueryValidator : UserRequestValidator<GetRemindersPageQuery>
+public sealed class GetRemindersPageQueryValidator : AbstractValidator<GetRemindersPageQuery>
 {
 	public GetRemindersPageQueryValidator()
-		: base(request => request.UserId)
 	{
 		RuleFor(request => request.PageOptions).ValidPageOptions();
 		RuleFor(request => request.ReminderSearch).ValidSearch();

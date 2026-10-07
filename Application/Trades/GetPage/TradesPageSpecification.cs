@@ -69,7 +69,7 @@ public class TradesPageSpecification : PageSpecification<Trade>
 					|| (x.ClosedAt >= date.Date && x.ClosedAt < nextDay)
 				)
 			)
-			|| x.Instrument!.Symbol.Contains(searchText)
+			|| x.Instrument!.Ticker.Contains(searchText)
 		);
 	}
 }

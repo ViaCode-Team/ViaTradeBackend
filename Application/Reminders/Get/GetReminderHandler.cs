@@ -6,13 +6,13 @@ using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Reminders.Get;
 
-public sealed class GetReminderHandler(IReadRepository<Reminder> reminderRepository)
+public sealed class GetReminderHandler(IUserContext userContext, IReadRepository<Reminder> reminderRepository)
 	: IQueryHandler<GetReminderQuery, ReminderResult>
 {
-	public async Task<ReminderResult> HandleAsync(GetReminderQuery query, CancellationToken ct = default)
+	public async Task<ReminderResult> HandleAsync(GetReminderQuery query, CancellationToken ct)
 	{
 		var reminder = await reminderRepository.FirstOrDefaultAsync(
-			reminder => reminder.UserId == query.UserId && reminder.Id == query.ReminderId,
+			reminder => reminder.UserId == userContext.UserId && reminder.Id == query.ReminderId,
 			ReminderResult.Projection,
 			ct
 		);

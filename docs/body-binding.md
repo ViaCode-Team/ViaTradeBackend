@@ -1,6 +1,6 @@
 # Request binding and validation
 
-Binding supports any request model without requiring command or query interfaces. Application actions accept the command or query handled by their injected handler when it has client-bound properties. `[FromBody]`, `[FromQuery]`, or `[FromForm]` selects the default source. Without an explicit source, MVC selects it normally: complex request models in `[ApiController]` use JSON body binding, and registered complex services retain service inference. Use `[FromQuery]` for query-based models. `IgnoreProperties` and property-source attributes do not impose a query default. `FromBodyProperties`, `FromRouteProperties`, `FromQueryProperties`, `FromHeaderProperties`, `FromFormProperties`, and `FromFormFileProperties` override the default source for named properties. Claims, cookies, and configured values are supplied with `with` before the handler validates the completed command. Requests with no client-bound properties are constructed directly inside `HandleAsync`, for example `handler.HandleAsync(new GetNoteStatisticsQuery(userId), ct)`. Application types do not need HTTP or JSON attributes.
+Binding supports any request model without requiring command or query interfaces. Application actions accept the command or query handled by their injected handler when it has client-bound properties. `[FromBody]`, `[FromQuery]`, or `[FromForm]` selects the default source. Without an explicit source, MVC selects it normally: complex request models in `[ApiController]` use JSON body binding, and registered complex services retain service inference. Use `[FromQuery]` for query-based models. `IgnoreProperties` and property-source attributes do not impose a query default. `FromBodyProperties`, `FromRouteProperties`, `FromQueryProperties`, `FromHeaderProperties`, `FromFormProperties`, and `FromFormFileProperties` override the default source for named properties. Current user and session identifiers are read by user-facing handlers from `IUserContext`, not bound to their commands or queries. Other server values, such as User-Agent, cookies, and configured limits, are supplied by the action when needed. Requests with no client-bound properties are constructed directly inside the action, for example `handler.HandleAsync(new GetNoteStatisticsQuery(), ct)`. Application types do not need HTTP or JSON attributes.
 
 ## Built-in MVC binding and alternatives
 
@@ -25,7 +25,6 @@ Reference: [ASP.NET Core model binding](https://learn.microsoft.com/en-us/aspnet
 
 ```csharp
 [FromBody,
- IgnoreProperties(nameof(UpdateTradeCommand.UserId)),
  FromRouteProperties(nameof(UpdateTradeCommand.TradeId))]
 UpdateTradeCommand command
 ```
@@ -46,20 +45,18 @@ Swagger projects each annotated parameter's request schema separately, excluding
 
 ```csharp
 public async Task<Ok<TradeResult>> GetTradeById(
-    [IgnoreProperties(nameof(GetTradeQuery.UserId)),
-     FromRouteProperties(nameof(GetTradeQuery.TradeId))]
+    [FromQuery, FromRouteProperties(nameof(GetTradeQuery.TradeId))]
     GetTradeQuery query,
     [FromServices] IQueryHandler<GetTradeQuery, TradeResult> handler,
     CancellationToken ct)
 {
-    query = query with { UserId = jwtHelper.GetUserIdFromClaims(User) };
     return TypedResults.Ok(await handler.HandleAsync(query, ct));
 }
 ```
 
 `IgnoreProperties` replaces `IgnoreBodyProperties`. Ignored properties are skipped before conversion and MVC validation, including malformed spoofed identifiers. The property source attributes bind client properties exclusively from the selected source; a route/header/query property is removed from JSON before deserialization. Missing route values and invalid client input produce model-state errors. Completed requests are validated by the application handler decorators after trusted values are supplied with `with`.
 
-If every property is ignored or explicitly assigned to a non-body source, `[FromBody]` does not require or read a body, and Swagger omits the request body. For example, `[IgnoreProperties(nameof(GetNoteQuery.UserId)), FromRouteProperties(nameof(GetNoteQuery.NoteId))]` and the same configuration with `[FromBody]` both bind only `NoteId` from the route. Genuine body properties retain the existing missing-body, JSON parsing, and validation behavior.
+If every property is ignored or explicitly assigned to a non-body source, `[FromBody]` does not require or read a body, and Swagger omits the request body. For example, `[FromRouteProperties(nameof(GetNoteQuery.NoteId))]` and the same configuration with `[FromBody]` both bind only `NoteId` from the route. Genuine body properties retain the existing missing-body, JSON parsing, and validation behavior.
 
 When unconfigured properties remain, complex `[ApiController]` parameters use the inferred JSON body even on GET actions. Nullable inferred body parameters retain MVC's optional-body policy. Property exclusions and source overrides are applied consistently to MVC binding, JSON deserialization, validation, and Swagger using the selected parameter source.
 
@@ -68,8 +65,7 @@ Each property source attribute is repeatable and accepts several CLR property na
 ```csharp
 [FromBody,
  FromBodyProperties(nameof(UpdateTradeCommand.OpenPrice), nameof(UpdateTradeCommand.Quantity)),
- FromRouteProperties(nameof(UpdateTradeCommand.TradeId), Name = "tradeId"),
- IgnoreProperties(nameof(UpdateTradeCommand.UserId))]
+ FromRouteProperties(nameof(UpdateTradeCommand.TradeId), Name = "tradeId")]
 UpdateTradeCommand command
 
 [FromBody,
@@ -118,14 +114,15 @@ Command payload fields are bound directly from flat JSON bodies, without separat
 | Action | JSON body | Values supplied by the action |
 | --- | --- | --- |
 | Register / Login | `{ "login": "...", "password": "..." }` | `UserAgent` from the header |
-| CreateTrade | `{ "openedAt": "...", "openPrice": 100, "quantity": 1, ... }` | `UserId` from claims |
-| UpdateTrade | `{ "openedAt": "...", "openPrice": 100, "quantity": 1, ... }` | `UserId` from claims, `TradeId` from the route |
-| UpsertInstrumentNote | `{ "text": "..." }` | `UserId` from claims, `InstrumentId` from the route |
-| UpsertStrategyNote | `{ "text": "..." }` | `UserId` from claims, `StrategyId` from the route |
-| CreateInstrumentReminder | `{ "text": "...", "remindAt": "..." }` | `UserId` from claims, `InstrumentId` from the route |
-| UpdateReminder | `{ "text": "...", "remindAt": "..." }` | `UserId` from claims, `ReminderId` from the route |
-| UpdateStrategy | `{ "isSubscribed": true }` | `UserId` from claims, `StrategyId` from the route |
+| CreateTrade | `{ "openedAt": "...", "openPrice": 100, "quantity": 1, ... }` | None |
+| UpdateTrade | `{ "openedAt": "...", "openPrice": 100, "quantity": 1, ... }` | `TradeId` from the route |
+| UpsertInstrumentNote | `{ "text": "..." }` | `InstrumentId` from the route |
+| UpsertStrategyNote | `{ "text": "..." }` | `StrategyId` from the route |
+| CreateInstrumentReminder | `{ "text": "...", "remindAt": "..." }` | `InstrumentId` from the route |
+| UpdateReminder | `{ "text": "...", "remindAt": "..." }` | `ReminderId` from the route |
+| UpdateStrategy | `{ "isSubscribed": true }` | `StrategyId` from the route |
 | ConfirmDelivery (internal TgBot API) | `{ "userId": 7 }` | `ReminderId` from the route |
 
 Clients using the former nested command bodies must send the flat shapes shown in Swagger. Validation errors use direct field names, such as `quantity` and `password`, without Input property prefixes. Subscription requests must explicitly supply `isSubscribed` as `true` or `false`; an absent or null field is rejected. The internal Telegram link action already accepted its command directly and retains its existing body. Actions without JSON bodies receive their command/query directly while retaining the existing flat query parameter names.
 
+User-facing commands and queries do not expose `UserId` or the current session identifier. Unknown client identity fields cannot select an owner. Handlers obtain the current identity through `IUserContext` and retain explicit owner predicates in their data access. Internal reminder delivery/publication commands retain the target user identifier because they run on behalf of a service. See [user context](user-context.md).

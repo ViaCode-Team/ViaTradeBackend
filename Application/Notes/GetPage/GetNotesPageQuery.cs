@@ -4,9 +4,5 @@ using ViaTrade.Application.Notes.Common;
 
 namespace ViaTrade.Application.Notes.GetPage;
 
-public sealed record GetNotesPageQuery(
-	int UserId,
-	NoteFilter NoteFilter,
-	NoteSearch NoteSearch,
-	PageOptions PageOptions
-) : IQuery<PageResult<NoteResult>>;
+public sealed record GetNotesPageQuery(NoteFilter NoteFilter, NoteSearch NoteSearch, PageOptions PageOptions)
+	: IQuery<PageResult<NoteResult>>;

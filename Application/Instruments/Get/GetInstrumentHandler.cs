@@ -9,7 +9,7 @@ namespace ViaTrade.Application.Instruments.Get;
 public sealed class GetInstrumentHandler(IReadRepository<Instrument> instrumentRepository)
 	: IQueryHandler<GetInstrumentQuery, InstrumentResult>
 {
-	public async Task<InstrumentResult> HandleAsync(GetInstrumentQuery query, CancellationToken ct = default)
+	public async Task<InstrumentResult> HandleAsync(GetInstrumentQuery query, CancellationToken ct)
 	{
 		return await instrumentRepository.FirstOrDefaultAsync(
 				instrument => instrument.Id == query.InstrumentId,

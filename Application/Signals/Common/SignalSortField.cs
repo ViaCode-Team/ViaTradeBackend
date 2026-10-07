@@ -11,11 +11,11 @@ public enum SignalSortField
 	[JsonStringEnumMemberName("signalDateDesc")]
 	SignalDateDesc,
 
-	[JsonStringEnumMemberName("symbolAsc")]
-	SymbolAsc,
+	[JsonStringEnumMemberName("tickerAsc")]
+	TickerAsc,
 
-	[JsonStringEnumMemberName("symbolDesc")]
-	SymbolDesc,
+	[JsonStringEnumMemberName("tickerDesc")]
+	TickerDesc,
 
 	[JsonStringEnumMemberName("accuracyAsc")]
 	AccuracyAsc,

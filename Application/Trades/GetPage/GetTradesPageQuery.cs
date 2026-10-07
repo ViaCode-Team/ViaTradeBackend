@@ -4,9 +4,5 @@ using ViaTrade.Application.Trades.Common;
 
 namespace ViaTrade.Application.Trades.GetPage;
 
-public sealed record GetTradesPageQuery(
-	int UserId,
-	TradeFilter TradeFilter,
-	TradeSearch TradeSearch,
-	PageOptions PageOptions
-) : IQuery<PageResult<TradeResult>>;
+public sealed record GetTradesPageQuery(TradeFilter TradeFilter, TradeSearch TradeSearch, PageOptions PageOptions)
+	: IQuery<PageResult<TradeResult>>;

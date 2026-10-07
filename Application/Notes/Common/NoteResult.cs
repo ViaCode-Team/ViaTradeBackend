@@ -19,7 +19,7 @@ public record NoteResult(
 			note.UserId,
 			note.Instrument == null
 				? null
-				: new InstrumentBriefResult(note.Instrument.Id, note.Instrument.Symbol, note.Instrument.Description),
+				: new InstrumentBriefResult(note.Instrument.Id, note.Instrument.Ticker, note.Instrument.Description),
 			note.Strategy == null
 				? null
 				: new StrategyBriefResult(

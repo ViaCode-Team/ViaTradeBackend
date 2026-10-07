@@ -11,7 +11,7 @@ public sealed class ValidatingQueryHandler<TQuery, TResult>(
 {
 	private readonly IQueryHandler<TQuery, TResult> _inner = inner;
 
-	public async Task<TResult> HandleAsync(TQuery request, CancellationToken ct = default)
+	public async Task<TResult> HandleAsync(TQuery request, CancellationToken ct)
 	{
 		await RequestValidation.ValidateAsync(request, validators, ct);
 

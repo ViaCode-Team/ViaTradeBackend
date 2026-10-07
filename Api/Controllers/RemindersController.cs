@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using ViaTrade.Api.Attributes.Binding;
+using ViaTrade.Api.ModelBinding.Attributes;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Auth.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Reminders.Common;
@@ -16,7 +15,7 @@ namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class RemindersController(IJwtHelper jwtHelper) : ControllerBase
+public class RemindersController : ControllerBase
 {
 	[HttpGet("statistics")]
 	public async Task<Ok<ReminderStatisticsResult>> GetReminderStatistics(
@@ -24,23 +23,18 @@ public class RemindersController(IJwtHelper jwtHelper) : ControllerBase
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		var statistics = await handler.HandleAsync(new GetReminderStatisticsQuery(userId), ct);
+		var statistics = await handler.HandleAsync(new GetReminderStatisticsQuery(), ct);
 
 		return TypedResults.Ok(statistics);
 	}
 
 	[HttpGet]
 	public async Task<Ok<PageResult<ReminderResult>>> GetReminders(
-		[FromQuery, IgnoreProperties(nameof(GetRemindersPageQuery.UserId))] GetRemindersPageQuery query,
+		[FromQuery] GetRemindersPageQuery query,
 		[FromServices] IQueryHandler<GetRemindersPageQuery, PageResult<ReminderResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		query = query with { UserId = userId };
 		var reminders = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(reminders);
@@ -48,19 +42,11 @@ public class RemindersController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpGet("{reminderId:int}")]
 	public async Task<Ok<ReminderResult>> GetReminderById(
-		[
-			FromQuery,
-			IgnoreProperties(nameof(GetReminderQuery.UserId)),
-			FromRouteProperties(nameof(GetReminderQuery.ReminderId))
-		]
-			GetReminderQuery query,
+		[FromQuery, FromRouteProperties(nameof(GetReminderQuery.ReminderId))] GetReminderQuery query,
 		[FromServices] IQueryHandler<GetReminderQuery, ReminderResult> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		query = query with { UserId = userId };
 		var reminder = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(reminder);
@@ -68,19 +54,11 @@ public class RemindersController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpPut("{reminderId:int}")]
 	public async Task<NoContent> UpdateReminder(
-		[
-			FromBody,
-			IgnoreProperties(nameof(UpdateReminderCommand.UserId)),
-			FromRouteProperties(nameof(UpdateReminderCommand.ReminderId))
-		]
-			UpdateReminderCommand command,
+		[FromBody, FromRouteProperties(nameof(UpdateReminderCommand.ReminderId))] UpdateReminderCommand command,
 		[FromServices] ICommandHandler<UpdateReminderCommand> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		command = command with { UserId = userId };
 		await handler.HandleAsync(command, ct);
 
 		return TypedResults.NoContent();
@@ -88,19 +66,11 @@ public class RemindersController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpDelete("{reminderId:int}")]
 	public async Task<NoContent> DeleteReminder(
-		[
-			FromQuery,
-			IgnoreProperties(nameof(DeleteReminderCommand.UserId)),
-			FromRouteProperties(nameof(DeleteReminderCommand.ReminderId))
-		]
-			DeleteReminderCommand command,
+		[FromQuery, FromRouteProperties(nameof(DeleteReminderCommand.ReminderId))] DeleteReminderCommand command,
 		[FromServices] ICommandHandler<DeleteReminderCommand> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		command = command with { UserId = userId };
 		await handler.HandleAsync(command, ct);
 
 		return TypedResults.NoContent();

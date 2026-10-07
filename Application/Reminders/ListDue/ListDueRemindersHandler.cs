@@ -7,10 +7,7 @@ namespace ViaTrade.Application.Reminders.ListDue;
 public sealed class ListDueRemindersHandler(IReadRepository<Reminder> reminderRepository)
 	: IQueryHandler<ListDueRemindersQuery, IReadOnlyList<DueReminderResult>>
 {
-	public async Task<IReadOnlyList<DueReminderResult>> HandleAsync(
-		ListDueRemindersQuery query,
-		CancellationToken ct = default
-	)
+	public async Task<IReadOnlyList<DueReminderResult>> HandleAsync(ListDueRemindersQuery query, CancellationToken ct)
 	{
 		ArgumentOutOfRangeException.ThrowIfLessThan(query.Limit, 1);
 

@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using ViaTrade.Api.Attribute;
 using ViaTrade.Api.Routing;
+using ViaTrade.Api.Security.Authorization;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Users.LinkTelegram;
 

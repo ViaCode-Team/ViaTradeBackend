@@ -2,12 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using ViaTrade.Api.Attributes.Binding;
-using ViaTrade.Api.Cookies;
+using ViaTrade.Api.ModelBinding.Attributes;
 using ViaTrade.Api.Routing;
+using ViaTrade.Api.Security.Authentication.Cookies;
 using ViaTrade.Api.Swagger.Attributes;
 using ViaTrade.Application.Auth.Common;
-using ViaTrade.Application.Auth.Common.Abstractions;
 using ViaTrade.Application.Auth.GetSessionsPage;
 using ViaTrade.Application.Auth.Login;
 using ViaTrade.Application.Auth.LogoutAll;
@@ -21,11 +20,8 @@ namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class SessionsController(
-	IJwtHelper jwtHelper,
-	IAuthCookieService authCookieService,
-	IOptions<AuthCookieSettings> authOptions
-) : ControllerBase
+public class SessionsController(IAuthCookieService authCookieService, IOptions<AuthCookieSettings> authOptions)
+	: ControllerBase
 {
 	private readonly AuthCookieSettings _authCookieOptions = authOptions.Value;
 
@@ -72,9 +68,7 @@ public class SessionsController(
 		CancellationToken ct
 	)
 	{
-		var sessionId = jwtHelper.GetSessionId(User);
-
-		await handler.HandleAsync(new LogoutSessionCommand(sessionId), ct);
+		await handler.HandleAsync(new LogoutSessionCommand(), ct);
 
 		authCookieService.DeleteAuthCookies(Response);
 		return TypedResults.NoContent();
@@ -86,9 +80,7 @@ public class SessionsController(
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		await handler.HandleAsync(new LogoutAllCommand(userId), ct);
+		await handler.HandleAsync(new LogoutAllCommand(), ct);
 
 		authCookieService.DeleteAuthCookies(Response);
 		return TypedResults.NoContent();
@@ -96,19 +88,11 @@ public class SessionsController(
 
 	[HttpGet]
 	public async Task<Ok<PageResult<SessionResult>>> GetSessions(
-		[
-			FromQuery,
-			IgnoreProperties(nameof(GetSessionsPageQuery.UserId), nameof(GetSessionsPageQuery.CurrentSessionId))
-		]
-			GetSessionsPageQuery query,
+		[FromQuery] GetSessionsPageQuery query,
 		[FromServices] IQueryHandler<GetSessionsPageQuery, PageResult<SessionResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var currentSessionId = jwtHelper.GetSessionId(User);
-
-		query = query with { UserId = userId, CurrentSessionId = currentSessionId };
 		var userSessions = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(userSessions);

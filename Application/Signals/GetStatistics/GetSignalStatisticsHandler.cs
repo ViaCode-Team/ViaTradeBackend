@@ -6,16 +6,14 @@ using ViaTrade.Domain.Entities;
 namespace ViaTrade.Application.Signals.GetStatistics;
 
 public sealed class GetSignalStatisticsHandler(
+	IUserContext userContext,
 	SignalReader signalReader,
 	IReadRepository<UserStrategyInstrument> userStrategyInstrumentRepository
 ) : IQueryHandler<GetSignalStatisticsQuery, SignalStatisticsResult>
 {
-	public async Task<SignalStatisticsResult> HandleAsync(
-		GetSignalStatisticsQuery query,
-		CancellationToken ct = default
-	)
+	public async Task<SignalStatisticsResult> HandleAsync(GetSignalStatisticsQuery query, CancellationToken ct)
 	{
-		var specification = new SignalSourcesSpecification(query.UserId);
+		var specification = new SignalSourcesSpecification(userContext.UserId);
 		var sources = await userStrategyInstrumentRepository.ListAsync(specification, ct);
 		var signals = signalReader.ListSignals(sources, null, null, new SignalSort());
 

@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using ViaTrade.Api.Attributes.Binding;
+using ViaTrade.Api.ModelBinding.Attributes;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Auth.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Application.Instruments.Common;
@@ -23,7 +22,7 @@ namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class StrategiesController(IJwtHelper jwtHelper) : ControllerBase
+public class StrategiesController : ControllerBase
 {
 	[HttpGet("statistics")]
 	public async Task<Ok<StrategyStatisticsResult>> GetStrategyStatistics(
@@ -31,23 +30,18 @@ public class StrategiesController(IJwtHelper jwtHelper) : ControllerBase
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		var strategyStatistics = await handler.HandleAsync(new GetStrategyStatisticsQuery(userId), ct);
+		var strategyStatistics = await handler.HandleAsync(new GetStrategyStatisticsQuery(), ct);
 
 		return TypedResults.Ok(strategyStatistics);
 	}
 
 	[HttpGet]
 	public async Task<Ok<PageResult<StrategySubscriptionResult>>> GetStrategies(
-		[FromQuery, IgnoreProperties(nameof(GetStrategiesPageQuery.UserId))] GetStrategiesPageQuery query,
+		[FromQuery] GetStrategiesPageQuery query,
 		[FromServices] IQueryHandler<GetStrategiesPageQuery, PageResult<StrategySubscriptionResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		query = query with { UserId = userId };
 		var pagedStrategies = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(pagedStrategies);
@@ -55,19 +49,11 @@ public class StrategiesController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpGet("{strategyId:int}")]
 	public async Task<Ok<StrategySubscriptionResult>> GetStrategyById(
-		[
-			FromQuery,
-			IgnoreProperties(nameof(GetStrategyQuery.UserId)),
-			FromRouteProperties(nameof(GetStrategyQuery.StrategyId))
-		]
-			GetStrategyQuery query,
+		[FromQuery, FromRouteProperties(nameof(GetStrategyQuery.StrategyId))] GetStrategyQuery query,
 		[FromServices] IQueryHandler<GetStrategyQuery, StrategySubscriptionResult> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		query = query with { UserId = userId };
 		var strategy = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(strategy);
@@ -75,19 +61,12 @@ public class StrategiesController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpGet("{strategyId:int}/instruments")]
 	public async Task<Ok<PageResult<InstrumentResult>>> GetInstrumentsByStrategy(
-		[
-			FromQuery,
-			IgnoreProperties(nameof(GetStrategyInstrumentsPageQuery.UserId)),
-			FromRouteProperties(nameof(GetStrategyInstrumentsPageQuery.StrategyId))
-		]
+		[FromQuery, FromRouteProperties(nameof(GetStrategyInstrumentsPageQuery.StrategyId))]
 			GetStrategyInstrumentsPageQuery query,
 		[FromServices] IQueryHandler<GetStrategyInstrumentsPageQuery, PageResult<InstrumentResult>> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		query = query with { UserId = userId };
 		var instruments = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(instruments);
@@ -95,19 +74,11 @@ public class StrategiesController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpGet("{strategyId:int}/note")]
 	public async Task<Ok<NoteResult>> GetStrategyNote(
-		[
-			FromQuery,
-			IgnoreProperties(nameof(GetStrategyNoteQuery.UserId)),
-			FromRouteProperties(nameof(GetStrategyNoteQuery.StrategyId))
-		]
-			GetStrategyNoteQuery query,
+		[FromQuery, FromRouteProperties(nameof(GetStrategyNoteQuery.StrategyId))] GetStrategyNoteQuery query,
 		[FromServices] IQueryHandler<GetStrategyNoteQuery, NoteResult> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		query = query with { UserId = userId };
 		var note = await handler.HandleAsync(query, ct);
 
 		return TypedResults.Ok(note);
@@ -115,19 +86,11 @@ public class StrategiesController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpPut("{strategyId:int}/note")]
 	public async Task<NoContent> UpsertStrategyNote(
-		[
-			FromBody,
-			IgnoreProperties(nameof(UpsertStrategyNoteCommand.UserId)),
-			FromRouteProperties(nameof(UpsertStrategyNoteCommand.StrategyId))
-		]
-			UpsertStrategyNoteCommand command,
+		[FromBody, FromRouteProperties(nameof(UpsertStrategyNoteCommand.StrategyId))] UpsertStrategyNoteCommand command,
 		[FromServices] ICommandHandler<UpsertStrategyNoteCommand> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		command = command with { UserId = userId };
 		await handler.HandleAsync(command, ct);
 
 		return TypedResults.NoContent();
@@ -135,19 +98,12 @@ public class StrategiesController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpDelete("{strategyId:int}/note")]
 	public async Task<NoContent> DeleteStrategyNote(
-		[
-			FromQuery,
-			IgnoreProperties(nameof(DeleteStrategyNoteCommand.UserId)),
-			FromRouteProperties(nameof(DeleteStrategyNoteCommand.StrategyId))
-		]
+		[FromQuery, FromRouteProperties(nameof(DeleteStrategyNoteCommand.StrategyId))]
 			DeleteStrategyNoteCommand command,
 		[FromServices] ICommandHandler<DeleteStrategyNoteCommand> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		command = command with { UserId = userId };
 		await handler.HandleAsync(command, ct);
 
 		return TypedResults.NoContent();
@@ -157,7 +113,6 @@ public class StrategiesController(IJwtHelper jwtHelper) : ControllerBase
 	public async Task<NoContent> AddInstrumentToStrategy(
 		[
 			FromQuery,
-			IgnoreProperties(nameof(LinkStrategyInstrumentCommand.UserId)),
 			FromRouteProperties(
 				nameof(LinkStrategyInstrumentCommand.StrategyId),
 				nameof(LinkStrategyInstrumentCommand.InstrumentId)
@@ -168,9 +123,6 @@ public class StrategiesController(IJwtHelper jwtHelper) : ControllerBase
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		command = command with { UserId = userId };
 		await handler.HandleAsync(command, ct);
 
 		return TypedResults.NoContent();
@@ -180,7 +132,6 @@ public class StrategiesController(IJwtHelper jwtHelper) : ControllerBase
 	public async Task<NoContent> DeleteInstrumentFromStrategy(
 		[
 			FromQuery,
-			IgnoreProperties(nameof(UnlinkStrategyInstrumentCommand.UserId)),
 			FromRouteProperties(
 				nameof(UnlinkStrategyInstrumentCommand.StrategyId),
 				nameof(UnlinkStrategyInstrumentCommand.InstrumentId)
@@ -191,9 +142,6 @@ public class StrategiesController(IJwtHelper jwtHelper) : ControllerBase
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		command = command with { UserId = userId };
 		await handler.HandleAsync(command, ct);
 
 		return TypedResults.NoContent();
@@ -201,19 +149,12 @@ public class StrategiesController(IJwtHelper jwtHelper) : ControllerBase
 
 	[HttpPatch("{strategyId:int}")]
 	public async Task<NoContent> UpdateStrategy(
-		[
-			FromBody,
-			IgnoreProperties(nameof(SetStrategySubscriptionCommand.UserId)),
-			FromRouteProperties(nameof(SetStrategySubscriptionCommand.StrategyId))
-		]
+		[FromBody, FromRouteProperties(nameof(SetStrategySubscriptionCommand.StrategyId))]
 			SetStrategySubscriptionCommand command,
 		[FromServices] ICommandHandler<SetStrategySubscriptionCommand> handler,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-
-		command = command with { UserId = userId };
 		await handler.HandleAsync(command, ct);
 
 		return TypedResults.NoContent();

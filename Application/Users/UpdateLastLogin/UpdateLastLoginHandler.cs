@@ -5,7 +5,7 @@ namespace ViaTrade.Application.Users.UpdateLastLogin;
 
 public sealed class UpdateLastLoginHandler(IUserRepository userRepository) : ICommandHandler<UpdateLastLoginCommand>
 {
-	public async Task HandleAsync(UpdateLastLoginCommand command, CancellationToken ct = default)
+	public async Task HandleAsync(UpdateLastLoginCommand command, CancellationToken ct)
 	{
 		await userRepository.ExecuteUpdateLastLoginAtAsync(command.UserId, DateTime.UtcNow, ct);
 	}

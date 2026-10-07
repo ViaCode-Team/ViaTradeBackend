@@ -45,7 +45,7 @@ public class NotesPageSpecification : PageSpecification<Note>
 
 		Query.Where(x =>
 			x.Text.Contains(searchText)
-			|| x.Instrument!.Symbol.Contains(searchText)
+			|| x.Instrument!.Ticker.Contains(searchText)
 			|| x.Instrument.Description!.Contains(searchText)
 			|| x.Strategy!.Name.Contains(searchText)
 		);

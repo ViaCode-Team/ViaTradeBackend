@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using ViaTrade.Api.Attribute;
 using ViaTrade.Api.Routing;
+using ViaTrade.Api.Security.Authorization;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Instruments.Common;
 using ViaTrade.Application.Instruments.GetFile;

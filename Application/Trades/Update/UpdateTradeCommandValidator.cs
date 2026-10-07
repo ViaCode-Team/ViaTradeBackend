@@ -3,10 +3,9 @@ using ViaTrade.Application.Common.Validation;
 
 namespace ViaTrade.Application.Trades.Update;
 
-public sealed class UpdateTradeCommandValidator : UserRequestValidator<UpdateTradeCommand>
+public sealed class UpdateTradeCommandValidator : AbstractValidator<UpdateTradeCommand>
 {
 	public UpdateTradeCommandValidator()
-		: base(request => request.UserId)
 	{
 		RuleFor(request => request.TradeId).PositiveId();
 		RuleFor(request => request.OpenPrice).InclusiveBetween(double.Epsilon, double.MaxValue);

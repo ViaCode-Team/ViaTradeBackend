@@ -4,15 +4,12 @@ using ViaTrade.Application.Strategies.Common.Abstractions;
 
 namespace ViaTrade.Application.Strategies.GetStatistics;
 
-public sealed class GetStrategyStatisticsHandler(IStrategyRepository strategyStatistics)
+public sealed class GetStrategyStatisticsHandler(IUserContext userContext, IStrategyRepository strategyStatistics)
 	: IQueryHandler<GetStrategyStatisticsQuery, StrategyStatisticsResult>
 {
-	public async Task<StrategyStatisticsResult> HandleAsync(
-		GetStrategyStatisticsQuery query,
-		CancellationToken ct = default
-	)
+	public async Task<StrategyStatisticsResult> HandleAsync(GetStrategyStatisticsQuery query, CancellationToken ct)
 	{
-		var counts = await strategyStatistics.FindStatisticsAsync(query.UserId, ct);
+		var counts = await strategyStatistics.FindStatisticsAsync(userContext.UserId, ct);
 		if (counts == null)
 			throw new NotFoundException("User not found.", "user_not_found");
 
@@ -21,7 +18,7 @@ public sealed class GetStrategyStatisticsHandler(IStrategyRepository strategySta
 		{
 			throw new DataIntegrityException(
 				$"Subscribed strategy count exceeds total strategy count. "
-					+ $"UserId={query.UserId}, "
+					+ $"UserId={userContext.UserId}, "
 					+ $"Total={counts.TotalStrategiesCount}, "
 					+ $"Subscribed={counts.SubscribedStrategiesCount}."
 			);

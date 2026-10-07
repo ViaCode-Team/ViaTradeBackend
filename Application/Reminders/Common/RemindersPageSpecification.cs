@@ -64,7 +64,7 @@ public class RemindersPageSpecification : PageSpecification<Reminder>
 		Query.Where(x =>
 			(isDate && x.RemindAt >= date.Date && x.RemindAt < nextDay)
 			|| x.Text.Contains(searchText)
-			|| x.Instrument!.Symbol.Contains(searchText)
+			|| x.Instrument!.Ticker.Contains(searchText)
 			|| x.Instrument.Description!.Contains(searchText)
 		);
 	}

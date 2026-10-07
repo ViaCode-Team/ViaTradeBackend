@@ -6,12 +6,13 @@ using ViaTrade.Domain.Entities;
 
 namespace ViaTrade.Application.Trades.Get;
 
-public sealed class GetTradeHandler(IReadRepository<Trade> tradeRepository) : IQueryHandler<GetTradeQuery, TradeResult>
+public sealed class GetTradeHandler(IUserContext userContext, IReadRepository<Trade> tradeRepository)
+	: IQueryHandler<GetTradeQuery, TradeResult>
 {
-	public async Task<TradeResult> HandleAsync(GetTradeQuery query, CancellationToken ct = default)
+	public async Task<TradeResult> HandleAsync(GetTradeQuery query, CancellationToken ct)
 	{
 		var trade = await tradeRepository.FirstOrDefaultAsync(
-			trade => trade.UserId == query.UserId && trade.Id == query.TradeId,
+			trade => trade.UserId == userContext.UserId && trade.Id == query.TradeId,
 			TradeResult.Projection,
 			ct
 		);

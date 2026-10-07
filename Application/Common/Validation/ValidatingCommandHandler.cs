@@ -11,7 +11,7 @@ public sealed class ValidatingCommandHandler<TCommand>(
 {
 	private readonly ICommandHandler<TCommand> _inner = inner;
 
-	public async Task HandleAsync(TCommand request, CancellationToken ct = default)
+	public async Task HandleAsync(TCommand request, CancellationToken ct)
 	{
 		await RequestValidation.ValidateAsync(request, validators, ct);
 
