@@ -1,111 +1,97 @@
-using System.ComponentModel.DataAnnotations;
+using Mediator;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using ViaTrade.Api.Contracts.Statistics;
-using ViaTrade.Api.Contracts.Trades;
-using ViaTrade.Api.Mappings;
+using ViaTrade.Api.ModelBinding.Attributes;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Auth.Interfaces;
 using ViaTrade.Application.Common.Models;
-using ViaTrade.Application.Trades.Interfaces;
-using ViaTrade.Application.Trades.Models;
+using ViaTrade.Application.Trades.Common;
+using ViaTrade.Application.Trades.Create;
+using ViaTrade.Application.Trades.Delete;
+using ViaTrade.Application.Trades.Get;
+using ViaTrade.Application.Trades.GetDateRange;
+using ViaTrade.Application.Trades.GetPage;
+using ViaTrade.Application.Trades.GetProfitChart;
+using ViaTrade.Application.Trades.GetStatistics;
+using ViaTrade.Application.Trades.Update;
 
 namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class TradesController(
-	ITradeCommandService tradeCommandService,
-	ITradeQueryService tradeQueryService,
-	IJwtHelper jwtHelper
-) : ControllerBase
+public class TradesController(ISender sender) : ControllerBase
 {
 	[HttpGet("statistics")]
-	public async Task<Ok<GlobalStatisticResponse>> GetTradeStatistics(CancellationToken ct)
+	public async Task<Ok<TradeStatisticsResult>> GetTradeStatistics(CancellationToken ct)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var tradeStatistics = await tradeQueryService.GetStatisticsAsync(userId, ct);
+		var tradeStatistics = await sender.Send(new GetTradeStatisticsQuery(), ct);
 
-		return TypedResults.Ok(ApiMapper.ToResponse(tradeStatistics));
+		return TypedResults.Ok(tradeStatistics);
 	}
 
 	[HttpGet("profitChart")]
-	public async Task<Ok<List<ProfitChartBucketResponse>>> GetProfitChart(
-		[FromQuery] ProfitChartFilter profitChartFilter,
+	public async Task<Ok<List<ProfitChartBucketResult>>> GetProfitChart(
+		[FromQuery] GetProfitChartQuery query,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var buckets = await tradeQueryService.GetProfitChartAsync(userId, profitChartFilter, ct);
+		var buckets = await sender.Send(query, ct);
 
-		return TypedResults.Ok(buckets.Select(ApiMapper.ToResponse).ToList());
+		return TypedResults.Ok(buckets);
 	}
 
 	[HttpGet("profitChart/dateRange")]
-	public async Task<Ok<TradeDateRangeResponse>> GetTradeDateRange(CancellationToken ct)
+	public async Task<Ok<TradeDateRangeResult>> GetTradeDateRange(CancellationToken ct)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var range = await tradeQueryService.GetTradeDateRangeAsync(userId, ct);
+		var range = await sender.Send(new GetTradeDateRangeQuery(), ct);
 
-		return TypedResults.Ok(ApiMapper.ToResponse(range));
+		return TypedResults.Ok(range);
 	}
 
 	[HttpGet]
-	public async Task<Ok<PageResult<TradeResponse>>> GetTrades(
-		[FromQuery] TradeFilter tradeFilter,
-		[FromQuery] TradeSearch tradeSearch,
-		[FromQuery] PageOptions pageOptions,
-		CancellationToken ct
-	)
+	public async Task<Ok<PageResult<TradeResult>>> GetTrades([FromQuery] GetTradesPageQuery query, CancellationToken ct)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var userTrades = await tradeQueryService.GetPageAsync(userId, tradeFilter, tradeSearch, pageOptions, ct);
+		var userTrades = await sender.Send(query, ct);
 
-		return TypedResults.Ok(userTrades.Map(ApiMapper.ToResponse));
+		return TypedResults.Ok(userTrades);
 	}
 
 	[HttpGet("{tradeId:int}")]
-	public async Task<Ok<TradeResponse>> GetTradeById(
-		[FromRoute, Range(1, int.MaxValue)] int tradeId,
+	public async Task<Ok<TradeResult>> GetTradeById(
+		[FromQuery, FromRouteProperties(nameof(GetTradeQuery.TradeId))] GetTradeQuery query,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var trade = await tradeQueryService.GetAsync(userId, tradeId, ct);
+		var trade = await sender.Send(query, ct);
 
-		return TypedResults.Ok(ApiMapper.ToResponse(trade));
+		return TypedResults.Ok(trade);
 	}
 
 	[HttpPost]
-	public async Task<Created<TradeResponse>> CreateTrade(
-		[FromBody, Required] CreateTradeRequest request,
-		CancellationToken ct
-	)
+	public async Task<Created<TradeResult>> CreateTrade([FromBody] CreateTradeCommand command, CancellationToken ct)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var trade = await tradeCommandService.CreateAsync(userId, ApiMapper.ToInput(request), ct);
+		var trade = await sender.Send(command, ct);
 
-		return TypedResults.Created($"/api/v1/trades/{trade.Id}", ApiMapper.ToResponse(trade));
+		return TypedResults.Created($"/api/v1/trades/{trade.Id}", trade);
 	}
 
 	[HttpPut("{tradeId:int}")]
 	public async Task<NoContent> UpdateTrade(
-		[FromRoute, Range(1, int.MaxValue)] int tradeId,
-		[FromBody, Required] UpdateTradeRequest request,
+		[FromBody, FromRouteProperties(nameof(UpdateTradeCommand.TradeId))] UpdateTradeCommand command,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await tradeCommandService.UpdateAsync(userId, tradeId, ApiMapper.ToInput(request), ct);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}
 
 	[HttpDelete("{tradeId:int}")]
-	public async Task<NoContent> DeleteTrade([FromRoute, Range(1, int.MaxValue)] int tradeId, CancellationToken ct)
+	public async Task<NoContent> DeleteTrade(
+		[FromQuery, FromRouteProperties(nameof(DeleteTradeCommand.TradeId))] DeleteTradeCommand command,
+		CancellationToken ct
+	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await tradeCommandService.DeleteAsync(userId, tradeId, ct);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}

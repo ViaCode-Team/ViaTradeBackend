@@ -1,6 +1,6 @@
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using ViaTrade.Api.Attribute;
+using ViaTrade.Api.Security.Authorization;
 
 namespace ViaTrade.Api.Swagger.Filters;
 

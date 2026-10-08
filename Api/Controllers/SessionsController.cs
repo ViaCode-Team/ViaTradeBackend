@@ -1,15 +1,18 @@
-using System.ComponentModel.DataAnnotations;
+using Mediator;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using ViaTrade.Api.Contracts.Auth;
-using ViaTrade.Api.Contracts.Users;
-using ViaTrade.Api.Cookies;
-using ViaTrade.Api.Mappings;
+using ViaTrade.Api.ModelBinding.Attributes;
 using ViaTrade.Api.Routing;
+using ViaTrade.Api.Security.Authentication.Cookies;
 using ViaTrade.Api.Swagger.Attributes;
-using ViaTrade.Application.Auth.Interfaces;
+using ViaTrade.Application.Auth.GetSessionsPage;
+using ViaTrade.Application.Auth.Login;
+using ViaTrade.Application.Auth.LogoutAll;
+using ViaTrade.Application.Auth.LogoutSession;
+using ViaTrade.Application.Auth.RefreshTokens;
+using ViaTrade.Application.Common.Exceptions;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Configuration.Options;
 
@@ -18,9 +21,7 @@ namespace ViaTrade.Api.Controllers;
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
 public class SessionsController(
-	IAuthCommandService authCommandService,
-	IAuthQueryService authQueryService,
-	IJwtHelper jwtHelper,
+	ISender sender,
 	IAuthCookieService authCookieService,
 	IOptions<AuthCookieSettings> authOptions
 ) : ControllerBase
@@ -30,10 +31,15 @@ public class SessionsController(
 	[HttpPost]
 	[AllowAnonymous]
 	[SetsAuthCookies]
-	public async Task<NoContent> Login([FromBody, Required] LoginRequest request, CancellationToken ct)
+	public async Task<NoContent> Login(
+		[FromBody, IgnoreProperties(nameof(LoginCommand.UserAgent))] LoginCommand command,
+		CancellationToken ct
+	)
 	{
 		var userAgent = Request.Headers.UserAgent.ToString();
-		var tokens = await authCommandService.LoginAsync(request.Login, request.Password, userAgent, ct);
+
+		command = command with { UserAgent = userAgent };
+		var tokens = await sender.Send(command, ct);
 
 		authCookieService.SetAuthCookies(Response, tokens);
 		return TypedResults.NoContent();
@@ -47,9 +53,9 @@ public class SessionsController(
 		var hasRefreshToken = Request.Cookies.TryGetValue(_authCookieOptions.RefreshTokenCookie, out var refreshToken);
 
 		if (!hasRefreshToken || string.IsNullOrWhiteSpace(refreshToken))
-			throw new UnauthorizedAccessException();
+			throw new AuthenticationException();
 
-		var tokens = await authCommandService.RefreshTokenAsync(refreshToken, ct);
+		var tokens = await sender.Send(new RefreshTokensCommand(refreshToken), ct);
 
 		authCookieService.SetAuthCookies(Response, tokens);
 		return TypedResults.NoContent();
@@ -58,8 +64,7 @@ public class SessionsController(
 	[HttpDelete("current")]
 	public async Task<NoContent> DeleteCurrentSession(CancellationToken ct)
 	{
-		var sessionId = jwtHelper.GetSessionId(User);
-		await authCommandService.LogoutSessionAsync(sessionId, ct);
+		await sender.Send(new LogoutSessionCommand(), ct);
 
 		authCookieService.DeleteAuthCookies(Response);
 		return TypedResults.NoContent();
@@ -68,23 +73,20 @@ public class SessionsController(
 	[HttpDelete]
 	public async Task<NoContent> DeleteSessions(CancellationToken ct)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await authCommandService.LogoutAllAsync(userId, ct);
+		await sender.Send(new LogoutAllCommand(), ct);
 
 		authCookieService.DeleteAuthCookies(Response);
 		return TypedResults.NoContent();
 	}
 
 	[HttpGet]
-	public async Task<Ok<PageResult<UserSessionResponse>>> GetSessions(
-		[FromQuery] PageOptions pageOptions,
+	public async Task<Ok<PageResult<SessionResult>>> GetSessions(
+		[FromQuery] GetSessionsPageQuery query,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var currentSessionId = jwtHelper.GetSessionId(User);
-		var userSessions = await authQueryService.GetSessionsPageAsync(userId, pageOptions, ct);
+		var userSessions = await sender.Send(query, ct);
 
-		return TypedResults.Ok(userSessions.Map(session => ApiMapper.ToResponse(session, currentSessionId)));
+		return TypedResults.Ok(userSessions);
 	}
 }

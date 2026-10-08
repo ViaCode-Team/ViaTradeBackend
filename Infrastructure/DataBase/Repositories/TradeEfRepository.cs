@@ -1,17 +1,14 @@
 using Microsoft.EntityFrameworkCore;
-using ViaTrade.Application.Common.Interfaces;
-using ViaTrade.Application.Common.Models;
-using ViaTrade.Application.Trades.Interfaces;
-using ViaTrade.Application.Trades.Models;
+using ViaTrade.Application.Trades.Common.Abstractions;
+using ViaTrade.Application.Trades.GetDateRange;
+using ViaTrade.Application.Trades.GetProfitChart;
+using ViaTrade.Application.Trades.GetStatistics;
 using ViaTrade.Domain.Entities;
 using ViaTrade.Domain.Enums;
-using ViaTrade.Infrastructure.DataBase.Extensions;
 
 namespace ViaTrade.Infrastructure.DataBase.Repositories;
 
-public class TradeEfRepository(AppDbContext context, EfQueryObjectBuilder queryObjectBuilder)
-	: BaseEfRepository<Trade>(context, queryObjectBuilder),
-		ITradeRepository
+public class TradeEfRepository(AppDbContext context) : ITradeRepository
 {
 	private static readonly DateTime WeekEpoch = new(1900, 1, 1);
 
@@ -89,7 +86,7 @@ public class TradeEfRepository(AppDbContext context, EfQueryObjectBuilder queryO
 		};
 	}
 
-	public async Task<TradeDateRangeDto> GetTradeDateRangeAsync(int userId, CancellationToken ct)
+	public async Task<TradeDateRangeResult> GetTradeDateRangeAsync(int userId, CancellationToken ct)
 	{
 		var range = await GetClosedTradesQuery(userId, null, null)
 			.GroupBy(_ => 1)
@@ -101,61 +98,14 @@ public class TradeEfRepository(AppDbContext context, EfQueryObjectBuilder queryO
 			.SingleOrDefaultAsync(ct);
 
 		if (range == null)
-			return new TradeDateRangeDto(null, null);
+			return new TradeDateRangeResult(null, null);
 
-		return new TradeDateRangeDto(DateOnly.FromDateTime(range.MinDate), DateOnly.FromDateTime(range.MaxDate));
+		return new TradeDateRangeResult(DateOnly.FromDateTime(range.MinDate), DateOnly.FromDateTime(range.MaxDate));
 	}
 
-	public async Task<TradeProjectionDto?> FindProjectionByUserAndIdAsync(int userId, int id, CancellationToken ct)
+	public async Task<TradeStatisticsAggregate> GetGlobalStatisticsAsync(int userId, CancellationToken ct)
 	{
-		return await _dbSet
-			.Where(trade => trade.Id == id && trade.UserId == userId)
-			.Select(trade => new TradeProjectionDto(
-				trade.Id,
-				trade.OpenedAt,
-				trade.ClosedAt,
-				trade.OpenPrice,
-				trade.ClosePrice,
-				trade.NetIncome,
-				trade.Quantity,
-				trade.TotalPrice,
-				trade.Signal,
-				trade.TradeTypeId,
-				new InstrumentSummaryDto(trade.Instrument!.Id, trade.Instrument.Symbol, trade.Instrument.Description),
-				trade.UserId
-			))
-			.FirstOrDefaultAsync(ct);
-	}
-
-	public async Task<PageResult<TradeProjectionDto>> GetPageProjectionAsync(
-		IQueryObject<Trade> queryObject,
-		PageOptions pageOptions,
-		CancellationToken ct
-	)
-	{
-		var (query, isUnique) = _queryObjectBuilder.BuildForPagination(_dbSet.AsQueryable(), queryObject);
-
-		var projectedQuery = query.Select(trade => new TradeProjectionDto(
-			trade.Id,
-			trade.OpenedAt,
-			trade.ClosedAt,
-			trade.OpenPrice,
-			trade.ClosePrice,
-			trade.NetIncome,
-			trade.Quantity,
-			trade.TotalPrice,
-			trade.Signal,
-			trade.TradeTypeId,
-			new InstrumentSummaryDto(trade.Instrument!.Id, trade.Instrument.Symbol, trade.Instrument.Description),
-			trade.UserId
-		));
-
-		return await projectedQuery.ToPagedAsync(pageOptions, isUnique, ct);
-	}
-
-	public async Task<TradeStatisticAggregateDto> GetGlobalStatisticsAsync(int userId, CancellationToken ct)
-	{
-		var result = await _context
+		var result = await context
 			.Trades.Where(trade =>
 				trade.UserId == userId
 				&& trade.ClosedAt.HasValue
@@ -165,7 +115,7 @@ public class TradeEfRepository(AppDbContext context, EfQueryObjectBuilder queryO
 			)
 			.Select(trade => new { Income = trade.NetIncome!.Value })
 			.GroupBy(_ => 1)
-			.Select(group => new TradeStatisticAggregateDto(
+			.Select(group => new TradeStatisticsAggregate(
 				group.Count(),
 				group.Count(trade => trade.Income > 0),
 				group.Count(trade => trade.Income < 0),
@@ -175,37 +125,44 @@ public class TradeEfRepository(AppDbContext context, EfQueryObjectBuilder queryO
 			))
 			.SingleOrDefaultAsync(ct);
 
-		return result ?? TradeStatisticAggregateDto.Empty;
+		return result ?? TradeStatisticsAggregate.Empty;
 	}
 
 	public async Task<int> ExecuteUpdateAsync(
 		int userId,
 		int id,
-		TradeInputDto request,
+		int instrumentId,
+		int tradeTypeId,
+		DateTime openedAt,
+		DateTime? closedAt,
+		double openPrice,
+		double? closePrice,
+		TradeSignal signal,
+		int quantity,
 		decimal price,
 		CancellationToken ct
 	)
 	{
-		return await _dbSet
-			.Where(t => t.Id == id && t.UserId == userId)
+		return await context
+			.Trades.Where(t => t.Id == id && t.UserId == userId)
 			.ExecuteUpdateAsync(
 				s =>
-					s.SetProperty(t => t.OpenedAt, request.OpenedAt)
-						.SetProperty(t => t.ClosedAt, request.ClosedAt)
-						.SetProperty(t => t.OpenPrice, request.OpenPrice)
-						.SetProperty(t => t.ClosePrice, request.ClosePrice)
-						.SetProperty(t => t.Quantity, request.Quantity)
-						.SetProperty(t => t.Signal, request.Signal)
+					s.SetProperty(t => t.OpenedAt, openedAt)
+						.SetProperty(t => t.ClosedAt, closedAt)
+						.SetProperty(t => t.OpenPrice, openPrice)
+						.SetProperty(t => t.ClosePrice, closePrice)
+						.SetProperty(t => t.Quantity, quantity)
+						.SetProperty(t => t.Signal, signal)
 						.SetProperty(t => t.TotalPrice, price)
-						.SetProperty(t => t.TradeTypeId, request.TradeTypeId)
-						.SetProperty(t => t.InstrumentId, request.InstrumentId),
+						.SetProperty(t => t.TradeTypeId, tradeTypeId)
+						.SetProperty(t => t.InstrumentId, instrumentId),
 				ct
 			);
 	}
 
 	private IQueryable<Trade> GetClosedTradesQuery(int userId, DateOnly? startDate, DateOnly? endDate)
 	{
-		var query = _context.Trades.Where(trade =>
+		var query = context.Trades.Where(trade =>
 			trade.UserId == userId
 			&& trade.ClosedAt.HasValue
 			&& trade.ClosePrice.HasValue

@@ -1,89 +1,70 @@
-using System.ComponentModel.DataAnnotations;
+using Mediator;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using ViaTrade.Api.Contracts.Reminders;
-using ViaTrade.Api.Contracts.Statistics;
-using ViaTrade.Api.Mappings;
+using ViaTrade.Api.ModelBinding.Attributes;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Auth.Interfaces;
 using ViaTrade.Application.Common.Models;
-using ViaTrade.Application.Reminders.Interfaces;
-using ViaTrade.Application.Reminders.Models;
+using ViaTrade.Application.Reminders.Common;
+using ViaTrade.Application.Reminders.Delete;
+using ViaTrade.Application.Reminders.Get;
+using ViaTrade.Application.Reminders.GetPage;
+using ViaTrade.Application.Reminders.GetStatistics;
+using ViaTrade.Application.Reminders.Update;
 
 namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class RemindersController(
-	IReminderCommandService reminderCommandService,
-	IReminderQueryService reminderQueryService,
-	IJwtHelper jwtHelper
-) : ControllerBase
+public class RemindersController(ISender sender) : ControllerBase
 {
 	[HttpGet("statistics")]
-	public async Task<Ok<ReminderStatisticsResponse>> GetReminderStatistics(CancellationToken ct)
+	public async Task<Ok<ReminderStatisticsResult>> GetReminderStatistics(CancellationToken ct)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var statistics = await reminderQueryService.GetStatisticsAsync(userId, ct);
+		var statistics = await sender.Send(new GetReminderStatisticsQuery(), ct);
 
-		return TypedResults.Ok(ApiMapper.ToResponse(statistics));
+		return TypedResults.Ok(statistics);
 	}
 
 	[HttpGet]
-	public async Task<Ok<PageResult<ReminderResponse>>> GetReminders(
-		[FromQuery] ReminderFilter reminderFilter,
-		[FromQuery] ReminderSearch reminderSearch,
-		[FromQuery] PageOptions pageOptions,
-		[FromQuery] ReminderSort reminderSort,
+	public async Task<Ok<PageResult<ReminderResult>>> GetReminders(
+		[FromQuery] GetRemindersPageQuery query,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var reminders = await reminderQueryService.GetPageAsync(
-			userId,
-			reminderFilter,
-			reminderSearch,
-			pageOptions,
-			reminderSort,
-			ct
-		);
+		var reminders = await sender.Send(query, ct);
 
-		return TypedResults.Ok(reminders.Map(ApiMapper.ToResponse));
+		return TypedResults.Ok(reminders);
 	}
 
 	[HttpGet("{reminderId:int}")]
-	public async Task<Ok<ReminderResponse>> GetReminderById(
-		[FromRoute, Range(1, int.MaxValue)] int reminderId,
+	public async Task<Ok<ReminderResult>> GetReminderById(
+		[FromQuery, FromRouteProperties(nameof(GetReminderQuery.ReminderId))] GetReminderQuery query,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		var reminder = await reminderQueryService.GetAsync(userId, reminderId, ct);
+		var reminder = await sender.Send(query, ct);
 
-		return TypedResults.Ok(ApiMapper.ToResponse(reminder));
+		return TypedResults.Ok(reminder);
 	}
 
 	[HttpPut("{reminderId:int}")]
 	public async Task<NoContent> UpdateReminder(
-		[FromRoute, Range(1, int.MaxValue)] int reminderId,
-		[FromBody, Required] UpdateReminderRequest request,
+		[FromBody, FromRouteProperties(nameof(UpdateReminderCommand.ReminderId))] UpdateReminderCommand command,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await reminderCommandService.UpdateAsync(userId, reminderId, request.Text, request.RemindAt, ct);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}
 
 	[HttpDelete("{reminderId:int}")]
 	public async Task<NoContent> DeleteReminder(
-		[FromRoute, Range(1, int.MaxValue)] int reminderId,
+		[FromQuery, FromRouteProperties(nameof(DeleteReminderCommand.ReminderId))] DeleteReminderCommand command,
 		CancellationToken ct
 	)
 	{
-		var userId = jwtHelper.GetUserIdFromClaims(User);
-		await reminderCommandService.DeleteAsync(userId, reminderId, ct);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}

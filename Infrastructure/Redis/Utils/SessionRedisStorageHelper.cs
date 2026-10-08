@@ -1,5 +1,5 @@
 using StackExchange.Redis;
-using ViaTrade.Application.Users.Models;
+using ViaTrade.Application.Auth.Common;
 using ViaTrade.Infrastructure.Redis.Keys;
 using ViaTrade.Infrastructure.Redis.Scripts;
 
@@ -10,7 +10,7 @@ internal sealed class SessionRedisStorageHelper(IDatabase database)
 	private readonly IDatabase _database = database;
 
 	public async Task<bool> TryCreateAsync(
-		UserSessionDto session,
+		SessionData session,
 		string sessionJson,
 		string refreshTokenFingerprint,
 		TimeSpan ttl
@@ -72,7 +72,7 @@ internal sealed class SessionRedisStorageHelper(IDatabase database)
 		return _database.KeyTimeToLiveAsync(RedisKeys.Sessions.ById(sessionId));
 	}
 
-	public async Task TerminateAsync(UserSessionDto session)
+	public async Task TerminateAsync(SessionData session)
 	{
 		await _database.ScriptEvaluateAsync(
 			SessionRedisScripts.TerminateSession,

@@ -1,10 +1,11 @@
 using System.Text.Json;
+using Mediator;
 using Microsoft.Extensions.Options;
-using ViaTrade.Application.Notifications.Interfaces;
-using ViaTrade.Application.Notifications.Models;
-using ViaTrade.Application.Reminders.Interfaces;
-using ViaTrade.Application.Reminders.Models;
+using ViaTrade.Application.Notifications.Common;
+using ViaTrade.Application.Reminders.ListDue;
+using ViaTrade.Application.Reminders.MarkPublished;
 using ViaTrade.Configuration.Options;
+using INotificationPublisher = ViaTrade.Application.Notifications.Common.Abstractions.INotificationPublisher;
 
 namespace ViaTrade.Api.BackgroundServices;
 
@@ -53,9 +54,9 @@ public sealed class TelegramReminderPublisherService(
 	private async Task PublishDueRemindersAsync(CancellationToken ct)
 	{
 		using var scope = services.CreateScope();
-		var reminderQueryService = scope.ServiceProvider.GetRequiredService<IReminderQueryService>();
-		var reminderCommandService = scope.ServiceProvider.GetRequiredService<IReminderCommandService>();
-		var reminders = await reminderQueryService.ListDueBatchAsync(options.Value.ReminderPublishBatchSize, ct);
+		var sender = scope.ServiceProvider.GetRequiredService<ISender>();
+		var query = new ListDueRemindersQuery(options.Value.ReminderPublishBatchSize);
+		var reminders = await sender.Send(query, ct);
 
 		logger.LogDebug("Found {ReminderCount} due reminders for Telegram publishing", reminders.Count);
 
@@ -64,8 +65,11 @@ public sealed class TelegramReminderPublisherService(
 			try
 			{
 				await PublishReminderAsync(reminder, ct);
-				bool isMarked = await reminderCommandService.MarkPublishedAsync(reminder.Id, ct);
-				if (isMarked)
+
+				var command = new MarkReminderPublishedCommand(reminder.UserId, reminder.Id);
+				var result = await sender.Send(command, ct);
+
+				if (result.IsPublished)
 					logger.LogInformation(
 						"Marked reminder {ReminderId} as published for user {UserId}",
 						reminder.Id,
@@ -93,13 +97,13 @@ public sealed class TelegramReminderPublisherService(
 		}
 	}
 
-	private async Task PublishReminderAsync(ReminderDto reminder, CancellationToken ct)
+	private async Task PublishReminderAsync(DueReminderResult reminder, CancellationToken ct)
 	{
 		var payload = new ReminderNotificationPayload(
 			reminder.Id,
 			reminder.Text,
 			reminder.RemindAt,
-			reminder.Instrument?.Symbol
+			reminder.Instrument?.Ticker
 		);
 		var notification = new NotificationMessage(
 			$"reminder:{reminder.Id}",
@@ -122,6 +126,6 @@ public sealed class TelegramReminderPublisherService(
 		int ReminderId,
 		string Text,
 		DateTime RemindAt,
-		string? InstrumentSymbol
+		string? InstrumentTicker
 	);
 }

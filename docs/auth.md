@@ -47,14 +47,16 @@ flowchart LR
 ```
 
 - `JwtHelper` создаёт access JWT и криптографически случайные refresh token.
-- `AuthCommandService` содержит правила входа, регистрации, обновления и выхода.
+- `LoginHandler`, `RegisterHandler`, `RefreshTokensHandler`, `LogoutSessionHandler` и `LogoutAllHandler` содержат правила отдельных операций; `AuthTokenFactory` объединяет расчёт сроков действия и создание токенов.
+- `RegisterHandler` только создаёт пользователя. `UsersController.Register` последовательно вызывает регистрацию и вход через отдельные обработчики, затем устанавливает cookie; обработчики операций не вызывают друг друга.
 - `SessionRedisRepository` содержит сценарии создания, чтения, ротации и завершения сессий, а также поддерживает их Redis-индексы.
 - `SessionRedisStorageHelper` выполняет низкоуровневые операции с записями сессий и их индексами.
 - `RefreshTokenRedisHelper` выполняет низкоуровневые операции с fingerprint и индексами refresh token.
 - `SessionRedisCleanupHelper` очищает просроченные вторичные индексы Redis batch-операциями.
-- `IConnectionMultiplexer` зарегистрирован в DI как singleton; конкретный Redis-репозиторий выбирает logical Redis DB через `GetDatabase()` и передаёт её в generic `RedisRepository`.
+- `IConnectionMultiplexer` зарегистрирован в DI как singleton. Для кешей и Telegram-токенов DI создаёт `ICacheRepository<TEntity>` на основе `BaseRedisRepository<TEntity>`; одноразовые токены потребляются через атомарный Redis `GETDEL`. Хранилище сессий отдельно выполняет Lua-операции и поддерживает индексы.
 - `JwtBearerOptionsSetup` получает access JWT из cookie и проверяет его подпись, issuer, audience и срок действия.
-- `ActiveSessionHandler` проверяет, что сессия из JWT ещё существует в Redis.
+- `ActiveSessionHandler` проверяет, что сессия из JWT существует в Redis, не истекла и принадлежит пользователю из JWT.
+- `HttpUserContext` реализует `IUserContext` с обязательными `UserId` и `SessionId` для защищённых операций, а `HttpOptionalUserContext` реализует `IOptionalUserContext` с nullable-свойствами для операций, допускающих гостей. Реализации зарегистрированы отдельно со scoped lifetime; пользовательские команды и запросы не содержат эти идентификаторы. Без аутентифицированного пользователя чтение обязательных свойств вызывает `AuthenticationException` (HTTP 401 в API), а optional-свойства возвращают `null`. Само внедрение `IUserContext` не требует аутентификации. Контекст не заменяет проверку активной сессии.
 - `SessionCleanupService` раз в пять минут запускает C# batch-очистку устаревших вторичных индексов Redis.
 
 ## Где хранятся данные
@@ -89,7 +91,7 @@ Refresh token не содержит claims и не расшифровывает�
 
 | Ключ Redis | Тип | Значение | Время жизни / очистка |
 | --- | --- | --- | --- |
-| `session:<sessionId>` | String | JSON `UserSessionDto`: ID, ID пользователя, User-Agent, даты создания, последнего refresh и окончания | TTL совпадает с текущим окончанием сессии. |
+| `session:<sessionId>` | String | JSON `SessionData`: ID, ID пользователя, User-Agent, даты создания, последнего refresh и окончания | TTL совпадает с текущим окончанием сессии. |
 | `refresh:<sessionId>` | String | SHA-256 fingerprint текущего refresh token | Тот же TTL, что у сессии. Исходный токен здесь не хранится. |
 | `refresh:idx:<SHA-256(refreshToken)>` | String | ID сессии | Тот же TTL. Позволяет найти сессию по fingerprint refresh token. |
 | `refresh:used:<SHA-256(refreshToken)>` | String | ID сессии | Существует до абсолютного окончания сессии; нужен для обнаружения повторного использования старого токена. |
@@ -162,7 +164,7 @@ sequenceDiagram
     B->>API: Защищённый запрос + cookie access_token
     API->>API: Проверка подписи JWT, issuer, audience и exp
     API->>R: Поиск сессии с ID из JWT claim jti
-    alt JWT валиден и сессия существует
+    alt JWT валиден и активная сессия принадлежит пользователю
         API-->>B: Ответ endpoint
     else JWT невалиден, истёк или сессия удалена
         API-->>B: Ошибка авторизации 401/403
@@ -245,7 +247,7 @@ sequenceDiagram
 
 ## Куда смотреть в коде
 
-- `Application/Auth/AuthCommandService.cs` — жизненный цикл сессии и правила refresh.
+- `Application/Auth/Login/`, `Register/`, `RefreshTokens/`, `LogoutSession/` и `LogoutAll/` — обработчики жизненного цикла сессии; `Application/Auth/Common/AuthTokenFactory.cs` — расчёт сроков действия токенов.
 - `Infrastructure/Redis/Repositories/SessionRedisRepository.cs` — структура Redis и атомарные операции.
 - `Infrastructure/Redis/Utils/SessionRedisCleanupHelper.cs` — C# batch-очистка просроченных индексов.
 - `Infrastructure/Redis/Keys/RedisKeys.cs` — единый каталог всех Redis-ключей и префиксов.
@@ -254,6 +256,8 @@ sequenceDiagram
 - `Infrastructure/Redis/Scripts/rotate_refresh.lua` — атомарная ротация refresh token.
 - `Infrastructure/Redis/Scripts/terminate_session.lua` — атомарное завершение сессии.
 - `Infrastructure/Utils/JwtHelper.cs` — создание токенов и claims JWT.
-- `ViaTradeBackend/OptionsSetup/JwtBearerOptionsSetup.cs` — извлечение access JWT из cookie и его проверка.
-- `ViaTradeBackend/Handler/ActiveSessionHandler.cs` — проверка отзыва сессии на сервере.
-- `ViaTradeBackend/Controllers/SessionsController.cs` — HTTP-endpoint для сессий.
+- `Api/Security/Authentication/JwtBearerOptionsSetup.cs` — извлечение access JWT из cookie и его проверка.
+- `Api/Security/Authorization/ActiveSessionHandler.cs` — проверка отзыва сессии на сервере.
+- `Api/Controllers/SessionsController.cs` — HTTP-endpoint для сессий.
+
+Контракт и ограничения контекста описаны в [user-context.md](user-context.md).

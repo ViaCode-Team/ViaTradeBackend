@@ -1,86 +1,41 @@
+using System.Net;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using StackExchange.Redis;
 using ViaTrade.Api.BackgroundServices;
-using ViaTrade.Api.Cookies;
-using ViaTrade.Api.Handler;
-using ViaTrade.Api.OptionsSetup;
-using ViaTrade.Application.Auth;
-using ViaTrade.Application.Auth.Interfaces;
-using ViaTrade.Application.Common.Interfaces;
-using ViaTrade.Application.Common.Interfaces.Repositories;
-using ViaTrade.Application.Instruments;
-using ViaTrade.Application.Instruments.Interfaces;
-using ViaTrade.Application.Notes;
-using ViaTrade.Application.Notes.Interfaces;
-using ViaTrade.Application.Notifications.Interfaces;
-using ViaTrade.Application.Reminders;
-using ViaTrade.Application.Reminders.Interfaces;
-using ViaTrade.Application.Strategies;
-using ViaTrade.Application.Strategies.Interfaces;
-using ViaTrade.Application.Trades;
-using ViaTrade.Application.Trades.Interfaces;
-using ViaTrade.Application.Users;
-using ViaTrade.Application.Users.Interfaces;
-using ViaTrade.Configuration;
-using ViaTrade.Configuration.Options;
+using ViaTrade.Api.Middleware;
+using ViaTrade.Api.ModelBinding;
+using ViaTrade.Api.Routing;
+using ViaTrade.Api.Security.Authentication;
+using ViaTrade.Api.Security.Authentication.Cookies;
+using ViaTrade.Api.Security.Authorization;
+using ViaTrade.Api.Security.UserContext;
+using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Infrastructure.DataBase;
-using ViaTrade.Infrastructure.DataBase.Interceptors;
-using ViaTrade.Infrastructure.DataBase.Repositories;
-using ViaTrade.Infrastructure.Notifications;
-using ViaTrade.Infrastructure.Redis.Repositories;
-using ViaTrade.Infrastructure.Services;
-using ViaTrade.Infrastructure.Utils;
 
 namespace ViaTrade.Api;
 
 public static class DependencyInjection
 {
-	public static IServiceCollection AddApplicationLayer(this IServiceCollection services)
+	public static IServiceCollection AddApiLayer(this IServiceCollection services)
 	{
-		services.AddSingleton<IJwtHelper, JwtHelper>();
-		services.AddSingleton<IPasswordHasher, BCryptPasswordHasher>();
-
-		services.AddScoped<IAuthCommandService, AuthCommandService>();
-		services.AddScoped<IAuthQueryService, AuthQueryService>();
-
-		services.AddScoped<ITradeCommandService, TradeCommandService>();
-		services.AddScoped<ITradeQueryService, TradeQueryService>();
-		services.AddScoped<ISignalQueryService, SignalQueryService>();
-		services.AddScoped<ITradeDataBuilder, TradeDataBuilder>();
-		services.AddScoped<IFileReader, TradeFileReader>();
-
-		services.AddScoped<IStrategyCommandService, StrategyCommandService>();
-		services.AddScoped<IStrategyQueryService, StrategyQueryService>();
-		services.AddScoped<IInstrumentQueryService, InstrumentQueryService>();
-
-		services.AddScoped<INoteCommandService, NoteCommandService>();
-		services.AddScoped<INoteQueryService, NoteQueryService>();
-
-		services.AddScoped<IReminderCommandService, ReminderCommandService>();
-		services.AddScoped<IReminderQueryService, ReminderQueryService>();
-
-		services.AddScoped<IUserCommandService, UserCommandService>();
-		services.AddScoped<IUserQueryService, UserQueryService>();
+		services.AddAuth();
+		services.AddApiMvc();
+		services.AddApiErrorHandling();
 
 		return services;
 	}
 
-	public static IServiceCollection AddInfrastructureLayer(
-		this IServiceCollection services,
-		IConfiguration configuration
-	)
+	public static IServiceCollection AddBackgroundServices(this IServiceCollection services)
 	{
-		services.AddDatabase(configuration);
-		services.AddRedis();
-		services.AddTelegramNotifications();
-		services.AddRepositories();
-
-		services.AddScoped<IUnitOfWork, EfUnitOfWork>();
-		services.AddSingleton<ISeparateContextQueryExecutor, SeparateContextQueryExecutor>();
-
 		services.AddHostedService<SessionCleanupService>();
 		services.AddHostedService<TelegramReminderPublisherService>();
 		services.AddHostedService<ReminderCleanupService>();
@@ -88,8 +43,82 @@ public static class DependencyInjection
 		return services;
 	}
 
-	public static IServiceCollection AddAuthLayer(this IServiceCollection services)
+	public static void ApplyDatabaseMigrations(this IApplicationBuilder app)
 	{
+		using IServiceScope scope = app.ApplicationServices.CreateScope();
+
+		using AppDbContext dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+		dbContext.Database.Migrate();
+	}
+
+	public static IServiceCollection AddApiMvc(this IServiceCollection services)
+	{
+		services.AddTransient<IApplicationModelProvider, RequestPropertiesApplicationModelProvider>();
+
+		services.Configure<ForwardedHeadersOptions>(options =>
+		{
+			options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+			options.KnownIPNetworks.Clear();
+			options.KnownProxies.Clear();
+			options.KnownProxies.Add(IPAddress.Loopback);
+			options.KnownProxies.Add(IPAddress.IPv6Loopback);
+		});
+
+		services
+			.AddControllers(options =>
+			{
+				options.Conventions.Add(new RouteTokenTransformerConvention(new CamelCaseRouteTokenTransformer()));
+				options.Conventions.Add(new RequestPropertiesConvention());
+
+				var jsonInputFormatter = options.InputFormatters.OfType<SystemTextJsonInputFormatter>().Single();
+				jsonInputFormatter.SupportedMediaTypes.Clear();
+				jsonInputFormatter.SupportedMediaTypes.Add("application/json");
+				options.InputFormatters.Insert(0, new IgnorePropertiesJsonInputFormatter(jsonInputFormatter));
+
+				var bodyModelBinderProvider = options.ModelBinderProviders.OfType<BodyModelBinderProvider>().Single();
+				options.ModelBinderProviders.Insert(
+					0,
+					new RequestPropertiesModelBinderProvider(bodyModelBinderProvider)
+				);
+			})
+			.AddJsonOptions(options =>
+			{
+				options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+				options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+				options.JsonSerializerOptions.DictionaryKeyPolicy = JsonNamingPolicy.CamelCase;
+			});
+
+		services.Configure<ApiBehaviorOptions>(options =>
+		{
+			options.InvalidModelStateResponseFactory = actionContext =>
+			{
+				var problem = new ValidationProblemDetails(actionContext.ModelState)
+				{
+					Status = StatusCodes.Status422UnprocessableEntity,
+					Title = "Validation Failed",
+					Type = "https://httpstatuses.io/422",
+					Detail = "One or more validation errors occurred.",
+					Instance = actionContext.HttpContext.Request.Path,
+				};
+
+				problem.Extensions["code"] = "validation_failed";
+				problem.Extensions["traceId"] = actionContext.HttpContext.TraceIdentifier;
+
+				var result = new UnprocessableEntityObjectResult(problem);
+				result.ContentTypes.Add("application/problem+json");
+				return result;
+			};
+		});
+
+		return services;
+	}
+
+	private static IServiceCollection AddAuth(this IServiceCollection services)
+	{
+		services.AddHttpContextAccessor();
+		services.AddScoped<IUserContext, HttpUserContext>();
+		services.AddScoped<IOptionalUserContext, HttpOptionalUserContext>();
 		services.AddSingleton<IAuthCookieService, AuthCookieService>();
 
 		services.AddJwtAuthentication();
@@ -98,79 +127,10 @@ public static class DependencyInjection
 		return services;
 	}
 
-	private static IServiceCollection AddTelegramNotifications(this IServiceCollection services)
+	private static IServiceCollection AddApiErrorHandling(this IServiceCollection services)
 	{
-		services.AddSingleton<INotificationPublisher, RedisStreamNotificationPublisher>();
-
-		return services;
-	}
-
-	private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)
-	{
-		var connectionSettings = configuration.GetConnectionStrings();
-		var dbSettings = configuration.GetDatabaseSettings();
-
-		services.AddSingleton<MySqlExceptionTranslationInterceptor>();
-
-		services.AddDbContextPool<AppDbContext>(
-			(serviceProvider, options) =>
-			{
-				var interceptor = serviceProvider.GetRequiredService<MySqlExceptionTranslationInterceptor>();
-				options
-					.UseMySql(
-						connectionSettings.MySql,
-						ServerVersion.AutoDetect(connectionSettings.MySql),
-						mySqlOptions =>
-						{
-							mySqlOptions.EnableStringComparisonTranslations();
-							mySqlOptions.EnableRetryOnFailure(
-								maxRetryCount: dbSettings.MaxRetryCount,
-								maxRetryDelay: TimeSpan.FromSeconds(dbSettings.MaxRetryDelaySeconds),
-								errorNumbersToAdd: null
-							);
-						}
-					)
-					.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
-					.AddInterceptors(interceptor);
-			}
-		);
-
-		return services;
-	}
-
-	private static IServiceCollection AddRedis(this IServiceCollection services)
-	{
-		services.AddSingleton<IConnectionMultiplexer>(serviceProvider =>
-		{
-			var connectionStrings = serviceProvider.GetRequiredService<IOptions<ConnectionStringsSettings>>().Value;
-			var connectionString = connectionStrings.Redis;
-			var options = ConfigurationOptions.Parse(connectionString);
-
-			return ConnectionMultiplexer.Connect(options);
-		});
-		return services;
-	}
-
-	private static IServiceCollection AddRepositories(this IServiceCollection services)
-	{
-		services.AddScoped<EfQueryObjectBuilder>();
-		services.AddSingleton<UserRedisRepository>();
-
-		services.AddSingleton<ITelegramTokenRepository, TelegramTokenRedisRepository>();
-		services.AddSingleton<ISessionRepository, SessionRedisRepository>();
-
-		services.AddScoped<ITradeRepository, TradeEfRepository>();
-		services.AddScoped<ITradeTypeRepository, TradeTypeEfRepository>();
-
-		services.AddScoped<IStrategyRepository, StrategyEfRepository>();
-		services.AddScoped<IUserStrategyRepository, UserStrategyEfRepository>();
-		services.AddScoped<IUserStrategyInstrumentRepository, UserStrategyInstrumentEfRepository>();
-
-		services.AddScoped<IInstrumentRepository, InstrumentEfRepository>();
-
-		services.AddScoped<IReminderRepository, ReminderEfRepository>();
-		services.AddScoped<INoteRepository, NoteEfRepository>();
-		services.AddScoped<IUserRepository, UserEfRepository>();
+		services.AddProblemDetails();
+		services.AddExceptionHandler<ExceptionHandlingMiddleware>();
 
 		return services;
 	}

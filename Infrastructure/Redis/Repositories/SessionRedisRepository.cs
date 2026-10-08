@@ -1,9 +1,8 @@
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 using StackExchange.Redis;
-using ViaTrade.Application.Auth.Interfaces;
-using ViaTrade.Application.Common.Models;
-using ViaTrade.Application.Users.Models;
+using ViaTrade.Application.Auth.Common;
+using ViaTrade.Application.Auth.Common.Abstractions;
 using ViaTrade.Infrastructure.Redis.Serialization;
 using ViaTrade.Infrastructure.Redis.Utils;
 
@@ -18,10 +17,10 @@ public class SessionRedisRepository(
 	private readonly RefreshTokenRedisHelper _refreshTokenHelper = new(connectionMultiplexer.GetDatabase());
 	private readonly SessionRedisCleanupHelper _sessionCleanupHelper = new(connectionMultiplexer.GetDatabase());
 
-	public async Task CreateSessionAsync(UserSessionDto session, string refreshToken, TimeSpan ttl)
+	public async Task CreateSessionAsync(SessionData session, string refreshToken, TimeSpan ttl)
 	{
 		var refreshTokenFingerprint = RefreshTokenRedisHelper.GetFingerprint(refreshToken);
-		var sessionJson = JsonSerializer.Serialize(session, RedisJsonSerializerContext.Default.UserSessionDto);
+		var sessionJson = JsonSerializer.Serialize(session, RedisJsonSerializerContext.Default.SessionData);
 		var wasCreated = await _sessionStorageHelper.TryCreateAsync(session, sessionJson, refreshTokenFingerprint, ttl);
 		if (wasCreated)
 			return;
@@ -30,7 +29,7 @@ public class SessionRedisRepository(
 		throw new InvalidOperationException("Failed to create session in Redis.");
 	}
 
-	public async Task<UserSessionDto?> FindByIdAsync(string sessionId)
+	public async Task<SessionData?> FindByIdAsync(string sessionId)
 	{
 		var value = await _sessionStorageHelper.GetAsync(sessionId);
 		if (value.IsNullOrEmpty)
@@ -39,7 +38,7 @@ public class SessionRedisRepository(
 		return DeserializeSession(value, sessionId);
 	}
 
-	public async Task<UserSessionDto?> FindByRefreshTokenAsync(string refreshToken)
+	public async Task<SessionData?> FindByRefreshTokenAsync(string refreshToken)
 	{
 		var refreshTokenFingerprint = RefreshTokenRedisHelper.GetFingerprint(refreshToken);
 		var sessionId = await _refreshTokenHelper.FindSessionIdAsync(refreshTokenFingerprint);
@@ -61,7 +60,7 @@ public class SessionRedisRepository(
 	}
 
 	public async Task<bool> TryRotateRefreshAsync(
-		UserSessionDto session,
+		SessionData session,
 		string refreshToken,
 		string newRefreshToken,
 		TimeSpan sessionTtl,
@@ -89,32 +88,23 @@ public class SessionRedisRepository(
 		await _sessionStorageHelper.TerminateAsync(session);
 	}
 
-	public async Task<IReadOnlyList<UserSessionDto>> ListByUserAsync(int userId)
+	public async Task<IReadOnlyList<SessionData>> ListByUserAsync(int userId)
 	{
 		var sessionIds = await _sessionStorageHelper.ListIdsByUserAsync(userId);
 
 		return await LoadExistingSessionsAsync(userId, sessionIds);
 	}
 
-	public async Task<PageResult<UserSessionDto>> GetPageByUserAsync(int userId, PageOptions pageOptions)
-	{
-		var sessions = await ListByUserAsync(userId);
-		var start = (pageOptions.Page - 1) * pageOptions.PageSize;
-		var pageItems = sessions.Skip(start).Take(pageOptions.PageSize).ToList();
-
-		return new PageResult<UserSessionDto>(pageItems, sessions.Count, pageOptions.Page, pageOptions.PageSize);
-	}
-
 	public Task<int> CleanupExpiredSessionsAsync(DateTime utcNow) =>
 		_sessionCleanupHelper.CleanupExpiredSessionsAsync(utcNow);
 
-	private async Task<List<UserSessionDto>> LoadExistingSessionsAsync(int userId, RedisValue[] sessionIds)
+	private async Task<List<SessionData>> LoadExistingSessionsAsync(int userId, RedisValue[] sessionIds)
 	{
 		if (sessionIds.Length == 0)
 			return [];
 
 		var values = await _sessionStorageHelper.GetManyAsync(sessionIds);
-		List<UserSessionDto> sessions = [];
+		List<SessionData> sessions = [];
 		List<RedisValue> staleSessionIds = [];
 
 		for (var index = 0; index < sessionIds.Length; index++)
@@ -140,7 +130,7 @@ public class SessionRedisRepository(
 		return sessions;
 	}
 
-	private async Task<UserSessionDto?> FindAndMigrateLegacySessionAsync(
+	private async Task<SessionData?> FindAndMigrateLegacySessionAsync(
 		string refreshToken,
 		string refreshTokenFingerprint
 	)
@@ -169,14 +159,11 @@ public class SessionRedisRepository(
 		return session;
 	}
 
-	private UserSessionDto DeserializeSession(RedisValue value, string expectedSessionId)
+	private SessionData DeserializeSession(RedisValue value, string expectedSessionId)
 	{
 		try
 		{
-			var session = JsonSerializer.Deserialize(
-				value.ToString(),
-				RedisJsonSerializerContext.Default.UserSessionDto
-			);
+			var session = JsonSerializer.Deserialize(value.ToString(), RedisJsonSerializerContext.Default.SessionData);
 			if (session == null || session.Id != expectedSessionId)
 				throw new InvalidOperationException("Redis session data is invalid.");
 

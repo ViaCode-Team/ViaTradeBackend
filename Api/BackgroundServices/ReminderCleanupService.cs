@@ -1,5 +1,6 @@
+using Mediator;
 using Microsoft.Extensions.Options;
-using ViaTrade.Application.Reminders.Interfaces;
+using ViaTrade.Application.Reminders.DeleteDelivered;
 using ViaTrade.Configuration.Options;
 
 namespace ViaTrade.Api.BackgroundServices;
@@ -48,11 +49,13 @@ public sealed class ReminderCleanupService(
 	private async Task DeleteExpiredRemindersAsync(CancellationToken ct)
 	{
 		using var scope = services.CreateScope();
-		var reminderCommandService = scope.ServiceProvider.GetRequiredService<IReminderCommandService>();
+		var sender = scope.ServiceProvider.GetRequiredService<ISender>();
 
 		var deliveredBefore = DateTime.UtcNow.Subtract(_retentionPeriod);
 
-		int deletedCount = await reminderCommandService.DeleteDeliveredBeforeAsync(deliveredBefore, ct);
+		var command = new DeleteDeliveredRemindersCommand(deliveredBefore);
+		var result = await sender.Send(command, ct);
+		int deletedCount = result.Count;
 
 		if (deletedCount > 0)
 			logger.LogInformation(

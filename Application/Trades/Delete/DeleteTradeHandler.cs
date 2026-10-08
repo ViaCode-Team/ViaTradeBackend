@@ -1,0 +1,20 @@
+using ViaTrade.Application.Common.Abstractions;
+using ViaTrade.Application.Common.Abstractions.Repositories;
+using ViaTrade.Application.Common.Exceptions;
+using ViaTrade.Domain.Entities;
+
+namespace ViaTrade.Application.Trades.Delete;
+
+public sealed class DeleteTradeHandler(IUserContext userContext, IRepository<Trade> tradeRepository)
+	: IVoidCommandHandler<DeleteTradeCommand>
+{
+	public async ValueTask Handle(DeleteTradeCommand command, CancellationToken ct)
+	{
+		var affectedRows = await tradeRepository.ExecuteDeleteAsync(
+			t => t.Id == command.TradeId && t.UserId == userContext.UserId,
+			ct
+		);
+		if (affectedRows == 0)
+			throw new NotFoundException("Trade not found.", "trade_not_found");
+	}
+}

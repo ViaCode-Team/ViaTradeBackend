@@ -1,6 +1,6 @@
 using System.Text.Json;
 using StackExchange.Redis;
-using ViaTrade.Application.Common.Interfaces.Repositories;
+using ViaTrade.Application.Common.Abstractions.Repositories;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Infrastructure.Redis.Keys;
 
@@ -19,6 +19,15 @@ public class BaseRedisRepository<TEntity>(IDatabase database, RedisKeyBuilder ke
 		var value = await _database.StringGetAsync(GetKey(id));
 		if (value.IsNullOrEmpty)
 			return default;
+		return JsonSerializer.Deserialize<TEntity>(value.ToString());
+	}
+
+	public async Task<TEntity?> ConsumeAsync(string id)
+	{
+		var value = await _database.StringGetDeleteAsync(GetKey(id));
+		if (value.IsNullOrEmpty)
+			return default;
+
 		return JsonSerializer.Deserialize<TEntity>(value.ToString());
 	}
 

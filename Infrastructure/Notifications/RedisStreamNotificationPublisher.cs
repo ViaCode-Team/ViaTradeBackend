@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
-using ViaTrade.Application.Notifications.Interfaces;
-using ViaTrade.Application.Notifications.Models;
+using ViaTrade.Application.Notifications.Common;
+using ViaTrade.Application.Notifications.Common.Abstractions;
 using ViaTrade.Configuration.Options;
 
 namespace ViaTrade.Infrastructure.Notifications;

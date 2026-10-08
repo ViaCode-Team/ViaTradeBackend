@@ -1,12 +1,12 @@
-using System.ComponentModel.DataAnnotations;
+using Mediator;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using ViaTrade.Api.Attribute;
-using ViaTrade.Api.Contracts.Reminders;
-using ViaTrade.Api.Mappings;
+using ViaTrade.Api.ModelBinding.Attributes;
 using ViaTrade.Api.Routing;
-using ViaTrade.Application.Reminders.Interfaces;
+using ViaTrade.Api.Security.Authorization;
+using ViaTrade.Application.Reminders.ListDue;
+using ViaTrade.Application.Reminders.MarkDelivered;
 using ViaTrade.Configuration.Options;
 
 namespace ViaTrade.Api.Controllers.Internal.TgBot;
@@ -14,30 +14,26 @@ namespace ViaTrade.Api.Controllers.Internal.TgBot;
 [Route($"{ApiRoutes.V1.TgBot}/[controller]")]
 [ApiExplorerSettings(GroupName = InternalServices.TgBot)]
 [ApiController]
-public class RemindersController(
-	IReminderCommandService reminderCommandService,
-	IReminderQueryService reminderQueryService,
-	IOptions<NotificationStreamSettings> options
-) : ControllerBase
+public class RemindersController(ISender sender, IOptions<NotificationStreamSettings> options) : ControllerBase
 {
 	[ServicePassword]
 	[HttpGet("due")]
-	public async Task<Ok<IEnumerable<DueReminderResponse>>> GetDue(CancellationToken ct)
+	public async Task<Ok<IReadOnlyList<DueReminderResult>>> GetDue(CancellationToken ct)
 	{
-		var reminders = await reminderQueryService.ListDueBatchAsync(options.Value.ReminderPublishBatchSize, ct);
+		var reminders = await sender.Send(new ListDueRemindersQuery(options.Value.ReminderPublishBatchSize), ct);
 
-		return TypedResults.Ok(reminders.Select(ApiMapper.ToDueResponse));
+		return TypedResults.Ok(reminders);
 	}
 
 	[ServicePassword]
 	[HttpPut("{reminderId:int}/delivery")]
 	public async Task<NoContent> ConfirmDelivery(
-		[FromRoute, Range(1, int.MaxValue)] int reminderId,
-		[FromBody, Required] ConfirmReminderDeliveryRequest request,
+		[FromBody, FromRouteProperties(nameof(MarkReminderDeliveredCommand.ReminderId))]
+			MarkReminderDeliveredCommand command,
 		CancellationToken ct
 	)
 	{
-		await reminderCommandService.MarkDeliveredAsync(request.UserId, reminderId, ct);
+		await sender.Send(command, ct);
 
 		return TypedResults.NoContent();
 	}

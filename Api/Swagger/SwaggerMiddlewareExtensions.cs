@@ -1,21 +1,22 @@
+using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace ViaTrade.Api.Swagger;
 
 public static class SwaggerMiddlewareExtensions
 {
-	public static IApplicationBuilder UseViaTradeSwagger(this IApplicationBuilder app, IWebHostEnvironment env)
+	public static IApplicationBuilder UseSwaggerWithUi(this IApplicationBuilder app)
 	{
-		if (env.IsDevelopment())
+		app.UseSwagger(options =>
 		{
-			app.UseSwagger();
+			options.OpenApiVersion = OpenApiSpecVersion.OpenApi3_1;
+		});
 
-			app.UseSwaggerUI(options =>
-			{
-				ConfigureCommonUI(options);
-				ConfigureEndpointsUI(options);
-			});
-		}
+		app.UseSwaggerUI(options =>
+		{
+			ConfigureCommonUI(options);
+			ConfigureEndpointsUI(options);
+		});
 
 		return app;
 	}

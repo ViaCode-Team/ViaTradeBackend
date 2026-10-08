@@ -2,7 +2,7 @@ using StackExchange.Redis;
 
 namespace ViaTrade.Infrastructure.Redis.Keys;
 
-internal static class RedisKeys
+public static class RedisKeys
 {
 	public static class Cache
 	{

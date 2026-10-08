@@ -7,7 +7,7 @@ internal static class DomainModelBuilderExtensions
 {
 	public static void ConfigureDomainModel(this ModelBuilder modelBuilder)
 	{
-		modelBuilder.Entity<Instrument>().HasIndex(x => x.Symbol).IsUnique();
+		modelBuilder.Entity<Instrument>().HasIndex(x => x.Ticker).IsUnique();
 
 		modelBuilder.Entity<Strategy>(entity =>
 		{

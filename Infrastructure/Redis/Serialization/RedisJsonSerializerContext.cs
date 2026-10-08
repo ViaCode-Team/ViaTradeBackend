@@ -1,9 +1,7 @@
 using System.Text.Json.Serialization;
-using ViaTrade.Application.Users.Models;
-using ViaTrade.Infrastructure.Redis.Entities;
+using ViaTrade.Application.Auth.Common;
 
 namespace ViaTrade.Infrastructure.Redis.Serialization;
 
-[JsonSerializable(typeof(UserSessionDto))]
-[JsonSerializable(typeof(TelegramTokenEntity))]
+[JsonSerializable(typeof(SessionData))]
 internal partial class RedisJsonSerializerContext : JsonSerializerContext;
