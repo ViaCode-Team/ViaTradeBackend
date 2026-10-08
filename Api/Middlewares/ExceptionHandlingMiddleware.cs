@@ -12,20 +12,14 @@ public class ExceptionHandlingMiddleware(
 {
 	public async ValueTask<bool> TryHandleAsync(HttpContext context, Exception exception, CancellationToken ct)
 	{
-		if (exception is DbUpdateException dbUpdateEx && dbUpdateEx.InnerException is AppException appEx)
-			exception = appEx;
+		if (context.Response.HasStarted)
+			return false;
 
-		if (context.RequestAborted.IsCancellationRequested)
-		{
-			logger.LogDebug("Request was aborted by the client: Path={Path}", context.Request.Path);
-			return true;
-		}
+		if (exception is DbUpdateException { InnerException: AppException appException })
+			exception = appException;
 
 		var descriptor = MapException(exception);
 		LogException(context, exception, descriptor.Status);
-
-		if (context.Response.HasStarted)
-			return false;
 
 		context.Response.StatusCode = descriptor.Status;
 
@@ -66,7 +60,6 @@ public class ExceptionHandlingMiddleware(
 			DataIntegrityException ex => new(500, "Internal Server Error", ex.Code, "Server data is inconsistent."),
 			ArgumentException ex => new(400, "Bad Request", "invalid_argument", ex.Message),
 			KeyNotFoundException => new(404, "Not Found", "not_found", "The requested resource was not found."),
-			UnauthorizedAccessException => new(401, "Unauthorized", "unauthorized", "Authentication is required."),
 			OperationCanceledException => new(408, "Request Timeout", "request_timeout", "The operation timed out."),
 			_ => new(500, "Internal Server Error", "internal_error", "An unexpected server error occurred."),
 		};

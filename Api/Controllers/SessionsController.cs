@@ -12,6 +12,7 @@ using ViaTrade.Application.Auth.Login;
 using ViaTrade.Application.Auth.LogoutAll;
 using ViaTrade.Application.Auth.LogoutSession;
 using ViaTrade.Application.Auth.RefreshTokens;
+using ViaTrade.Application.Common.Exceptions;
 using ViaTrade.Application.Common.Models;
 using ViaTrade.Configuration.Options;
 
@@ -52,7 +53,7 @@ public class SessionsController(
 		var hasRefreshToken = Request.Cookies.TryGetValue(_authCookieOptions.RefreshTokenCookie, out var refreshToken);
 
 		if (!hasRefreshToken || string.IsNullOrWhiteSpace(refreshToken))
-			throw new UnauthorizedAccessException();
+			throw new AuthenticationException();
 
 		var tokens = await sender.Send(new RefreshTokensCommand(refreshToken), ct);
 

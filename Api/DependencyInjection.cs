@@ -18,7 +18,6 @@ using ViaTrade.Api.Security.Authentication;
 using ViaTrade.Api.Security.Authentication.Cookies;
 using ViaTrade.Api.Security.Authorization;
 using ViaTrade.Api.Security.UserContext;
-using ViaTrade.Api.Swagger;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Infrastructure.DataBase;
 
@@ -29,7 +28,8 @@ public static class DependencyInjection
 	public static IServiceCollection AddApiLayer(this IServiceCollection services)
 	{
 		services.AddAuth();
-		services.AddWebPresentation();
+		services.AddApiMvc();
+		services.AddApiErrorHandling();
 
 		return services;
 	}
@@ -43,15 +43,7 @@ public static class DependencyInjection
 		return services;
 	}
 
-	public static IServiceCollection AddApiDocumentation(this IServiceCollection services)
-	{
-		services.AddEndpointsApiExplorer();
-		services.AddViaTradeSwagger();
-
-		return services;
-	}
-
-	public static void UseDatabaseMigrations(this IApplicationBuilder app)
+	public static void ApplyDatabaseMigrations(this IApplicationBuilder app)
 	{
 		using IServiceScope scope = app.ApplicationServices.CreateScope();
 
@@ -60,23 +52,8 @@ public static class DependencyInjection
 		dbContext.Database.Migrate();
 	}
 
-	private static IServiceCollection AddAuth(this IServiceCollection services)
+	public static IServiceCollection AddApiMvc(this IServiceCollection services)
 	{
-		services.AddHttpContextAccessor();
-		services.AddScoped<IUserContext, HttpUserContext>();
-		services.AddScoped<IOptionalUserContext, HttpOptionalUserContext>();
-		services.AddSingleton<IAuthCookieService, AuthCookieService>();
-
-		services.AddJwtAuthentication();
-		services.AddApplicationAuthorization();
-
-		return services;
-	}
-
-	private static IServiceCollection AddWebPresentation(this IServiceCollection services)
-	{
-		services.AddProblemDetails();
-		services.AddExceptionHandler<ExceptionHandlingMiddleware>();
 		services.AddTransient<IApplicationModelProvider, RequestPropertiesApplicationModelProvider>();
 
 		services.Configure<ForwardedHeadersOptions>(options =>
@@ -118,9 +95,9 @@ public static class DependencyInjection
 			{
 				var problem = new ValidationProblemDetails(actionContext.ModelState)
 				{
-					Status = StatusCodes.Status400BadRequest,
+					Status = StatusCodes.Status422UnprocessableEntity,
 					Title = "Validation Failed",
-					Type = "https://httpstatuses.io/400",
+					Type = "https://httpstatuses.io/422",
 					Detail = "One or more validation errors occurred.",
 					Instance = actionContext.HttpContext.Request.Path,
 				};
@@ -128,11 +105,32 @@ public static class DependencyInjection
 				problem.Extensions["code"] = "validation_failed";
 				problem.Extensions["traceId"] = actionContext.HttpContext.TraceIdentifier;
 
-				var result = new BadRequestObjectResult(problem);
+				var result = new UnprocessableEntityObjectResult(problem);
 				result.ContentTypes.Add("application/problem+json");
 				return result;
 			};
 		});
+
+		return services;
+	}
+
+	private static IServiceCollection AddAuth(this IServiceCollection services)
+	{
+		services.AddHttpContextAccessor();
+		services.AddScoped<IUserContext, HttpUserContext>();
+		services.AddScoped<IOptionalUserContext, HttpOptionalUserContext>();
+		services.AddSingleton<IAuthCookieService, AuthCookieService>();
+
+		services.AddJwtAuthentication();
+		services.AddApplicationAuthorization();
+
+		return services;
+	}
+
+	private static IServiceCollection AddApiErrorHandling(this IServiceCollection services)
+	{
+		services.AddProblemDetails();
+		services.AddExceptionHandler<ExceptionHandlingMiddleware>();
 
 		return services;
 	}

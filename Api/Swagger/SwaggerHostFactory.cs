@@ -1,6 +1,5 @@
 using ViaTrade.Application;
 using ViaTrade.Configuration;
-using ViaTrade.Infrastructure;
 
 namespace ViaTrade.Api.Swagger;
 
@@ -16,13 +15,7 @@ public static class SwaggerHostFactory
 			}
 		);
 
-		builder
-			.Services.AddConfigurationLayer(builder.Configuration)
-			.AddApplicationLayer()
-			.AddInfrastructureLayer(builder.Configuration)
-			.AddApiLayer();
-
-		builder.Services.AddApiDocumentation();
+		builder.Services.AddConfigurationLayer(builder.Configuration).AddApiMvc().AddValidation().AddViaTradeSwagger();
 
 		var app = builder.Build();
 

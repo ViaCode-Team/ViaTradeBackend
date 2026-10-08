@@ -16,7 +16,7 @@ builder
 builder.Services.AddBackgroundServices();
 
 if (builder.Environment.IsDevelopment())
-	builder.Services.AddApiDocumentation();
+	builder.Services.AddViaTradeSwagger();
 
 // ToDo: Uncomment and adjust the URL if the frontend is hosted on a different domain
 //builder.Services.AddCors(options =>
@@ -35,10 +35,13 @@ app.UseMiddleware<ProblemDetailsStatusCodeMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
+#if DEBUG
 	app.UseDeveloperExceptionPage();
+#endif
+
 	app.UseSwaggerWithUi();
 
-	app.UseDatabaseMigrations();
+	app.ApplyDatabaseMigrations();
 }
 
 // ToDo: Uncomment if CORS is configured above
