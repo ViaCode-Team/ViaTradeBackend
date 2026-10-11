@@ -103,7 +103,8 @@ public sealed class TelegramReminderPublisherService(
 			reminder.Id,
 			reminder.Text,
 			reminder.RemindAt,
-			reminder.Instrument?.Ticker
+			reminder.Instrument?.Ticker,
+			reminder.Instrument?.Id
 		);
 		var notification = new NotificationMessage(
 			$"reminder:{reminder.Id}",
@@ -126,6 +127,7 @@ public sealed class TelegramReminderPublisherService(
 		int ReminderId,
 		string Text,
 		DateTime RemindAt,
-		string? InstrumentTicker
+		string? InstrumentTicker,
+		int? InstrumentId
 	);
 }
