@@ -6,6 +6,8 @@ public class SessionData
 
 	public required int UserId { get; set; }
 
+	public long AuthorizationVersion { get; set; }
+
 	public required string UserAgent { get; set; }
 
 	public DateTime CreatedAt { get; set; }

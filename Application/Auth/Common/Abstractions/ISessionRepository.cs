@@ -22,5 +22,12 @@ public interface ISessionRepository
 
 	Task<IReadOnlyList<SessionData>> ListByUserAsync(int userId);
 
+	Task<SessionRevocationPage> ExecuteTerminateStalePageAsync(
+		int userId,
+		long authorizationVersion,
+		int offset,
+		int limit
+	);
+
 	Task<int> CleanupExpiredSessionsAsync(DateTime utcNow);
 }

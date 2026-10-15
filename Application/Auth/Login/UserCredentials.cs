@@ -1,3 +1,9 @@
 namespace ViaTrade.Application.Auth.Login;
 
-public sealed record UserCredentials(int Id, string Login, string PasswordHash);
+public sealed record UserCredentials(
+	int Id,
+	string Login,
+	string PasswordHash,
+	long AuthorizationVersion,
+	bool EmailConfirmed
+);

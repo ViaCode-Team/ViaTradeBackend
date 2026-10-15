@@ -47,6 +47,7 @@ public class ExceptionHandlingMiddleware(
 	{
 		return exception switch
 		{
+			RateLimitException ex => new(429, "Too Many Requests", ex.Code, ex.Message),
 			ValidationException ex => new(400, "Validation Failed", ex.Code, ex.Message),
 			BadRequestException ex => new(400, "Bad Request", ex.Code, ex.Message),
 			InvalidCredentialsException ex => new(401, "Unauthorized", ex.Code, ex.Message),

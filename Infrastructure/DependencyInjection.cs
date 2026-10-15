@@ -1,5 +1,6 @@
 using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -8,6 +9,7 @@ using StackExchange.Redis;
 using ViaTrade.Application.Auth.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions;
 using ViaTrade.Application.Common.Abstractions.Repositories;
+using ViaTrade.Application.Email;
 using ViaTrade.Application.Notes.Common.Abstractions;
 using ViaTrade.Application.Notifications.Common.Abstractions;
 using ViaTrade.Application.Reminders.Common.Abstractions;
@@ -21,6 +23,7 @@ using ViaTrade.Infrastructure.DataBase;
 using ViaTrade.Infrastructure.DataBase.Interceptors;
 using ViaTrade.Infrastructure.DataBase.Repositories;
 using ViaTrade.Infrastructure.DataBase.Repositories.Generic;
+using ViaTrade.Infrastructure.Email;
 using ViaTrade.Infrastructure.Notifications;
 using ViaTrade.Infrastructure.Redis.Entities;
 using ViaTrade.Infrastructure.Redis.Keys;
@@ -43,6 +46,7 @@ public static class DependencyInjection
 		services.AddCacheRepositories();
 
 		services.AddTelegramNotifications();
+		services.AddEmail(configuration);
 
 		services.AddServices();
 
@@ -54,6 +58,20 @@ public static class DependencyInjection
 		services.AddSingleton<INotificationPublisher, RedisStreamNotificationPublisher>();
 
 		return services;
+	}
+
+	private static void AddEmail(this IServiceCollection services, IConfiguration configuration)
+	{
+		var settings = configuration.GetSection("Email").Get<EmailSettings>() ?? new EmailSettings();
+		services
+			.AddDataProtection()
+			.SetApplicationName("ViaTrade.Email")
+			.PersistKeysToFileSystem(new DirectoryInfo(settings.DataProtectionKeyPath));
+		services.AddScoped<IEmailAccountStore, EmailAccountStore>();
+		services.AddSingleton<RedisEmailQueue>();
+		services.AddSingleton<IEmailQueue>(provider => provider.GetRequiredService<RedisEmailQueue>());
+		services.AddSingleton<IEmailStreamWorker>(provider => provider.GetRequiredService<RedisEmailQueue>());
+		services.AddSingleton<IEmailTransport, SmtpEmailTransport>();
 	}
 
 	private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)

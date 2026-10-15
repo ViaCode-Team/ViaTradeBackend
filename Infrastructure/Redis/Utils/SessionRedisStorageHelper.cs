@@ -62,6 +62,16 @@ internal sealed class SessionRedisStorageHelper(IDatabase database)
 		return _database.SortedSetRangeByRankAsync(RedisKeys.Sessions.ByUser(userId), 0, -1, Order.Descending);
 	}
 
+	public Task<RedisValue[]> ListIdsPageByUserAsync(int userId, int offset, int limit)
+	{
+		return _database.SortedSetRangeByRankAsync(
+			RedisKeys.Sessions.ByUser(userId),
+			offset,
+			offset + limit - 1,
+			Order.Ascending
+		);
+	}
+
 	public Task RemoveFromUserIndexAsync(int userId, RedisValue[] sessionIds)
 	{
 		return _database.SortedSetRemoveAsync(RedisKeys.Sessions.ByUser(userId), sessionIds);

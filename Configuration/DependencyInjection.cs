@@ -34,6 +34,7 @@ public static class DependencyInjection
 
 	private static void AddSectionOptions(this IServiceCollection services, IConfiguration configuration)
 	{
+		services.AddOptions<EmailSettings>().BindConfiguration(nameof(ApplicationSettings.Email));
 		services
 			.AddOptions<ConnectionStringsSettings>()
 			.BindConfiguration(nameof(ApplicationSettings.ConnectionStrings));

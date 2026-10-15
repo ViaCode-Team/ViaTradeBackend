@@ -13,7 +13,7 @@
 | `access_token` | Подписанный JWT | Доступ к обычным защищённым API-методам. |
 | `refresh_token` | Случайная непрозрачная строка | Получение новой пары токенов и продление активной сессии. |
 
-Одного валидного access token недостаточно. Для каждого защищённого запроса приложение сначала проверяет JWT, а затем ищет сессию из этого JWT в Redis. Поэтому удаление сессии из Redis отзывает access token сразу, не дожидаясь времени `exp` внутри JWT.
+Одного валидного access token недостаточно. Для каждого защищённого запроса приложение проверяет JWT, Redis-сессию и совпадение её версии авторизации с актуальной версией MySQL. Сброс пароля, завершение смены email и аварийный возврат увеличивают версию, поэтому старые сессии отклоняются даже при сбое их физического удаления. Email-сценарии описаны в [отдельном контракте](email-workflows.md).
 
 ## Термины
 
@@ -41,6 +41,7 @@ flowchart LR
     API --> JWT
     JWT --> Policy
     Policy -->|по claim jti| Redis
+    Policy -->|версия авторизации| Users
     Browser -->|cookie refresh_token| API
     API -->|поиск и ротация токена| Redis
     API -->|проверка пользователя при refresh| Users
@@ -48,14 +49,14 @@ flowchart LR
 
 - `JwtHelper` создаёт access JWT и криптографически случайные refresh token.
 - `LoginHandler`, `RegisterHandler`, `RefreshTokensHandler`, `LogoutSessionHandler` и `LogoutAllHandler` содержат правила отдельных операций; `AuthTokenFactory` объединяет расчёт сроков действия и создание токенов.
-- `RegisterHandler` только создаёт пользователя. `UsersController.Register` последовательно вызывает регистрацию и вход через отдельные обработчики, затем устанавливает cookie; обработчики операций не вызывают друг друга.
+- `RegisterHandler` публикует задание регистрации с хешем пароля через `EmailSubmissionService`. Обработчик Redis Streams создаёт неподтверждённый аккаунт и намерение отправки. `UsersController.Register` возвращает 202, не вызывает вход и не устанавливает cookie; обработчики операций не вызывают друг друга.
 - `SessionRedisRepository` содержит сценарии создания, чтения, ротации и завершения сессий, а также поддерживает их Redis-индексы.
 - `SessionRedisStorageHelper` выполняет низкоуровневые операции с записями сессий и их индексами.
 - `RefreshTokenRedisHelper` выполняет низкоуровневые операции с fingerprint и индексами refresh token.
 - `SessionRedisCleanupHelper` очищает просроченные вторичные индексы Redis batch-операциями.
-- `IConnectionMultiplexer` зарегистрирован в DI как singleton. Для кешей и Telegram-токенов DI создаёт `ICacheRepository<TEntity>` на основе `BaseRedisRepository<TEntity>`; одноразовые токены потребляются через атомарный Redis `GETDEL`. Хранилище сессий отдельно выполняет Lua-операции и поддерживает индексы.
+- `IConnectionMultiplexer` зарегистрирован в DI как singleton. Для кешей и Telegram-токенов DI создаёт `ICacheRepository<TEntity>` на основе `BaseRedisRepository<TEntity>`; Telegram-токены потребляются через атомарный Redis `GETDEL`. Email-токены завершаются после фиксации изменения MySQL. Хранилище сессий отдельно выполняет Lua-операции и поддерживает индексы.
 - `JwtBearerOptionsSetup` получает access JWT из cookie и проверяет его подпись, issuer, audience и срок действия.
-- `ActiveSessionHandler` проверяет, что сессия из JWT существует в Redis, не истекла и принадлежит пользователю из JWT.
+- Scoped `ActiveSessionHandler` проверяет Redis-сессию, владельца, срок и через `AccountSessionValidator` актуальную версию авторизации/подтверждение email в MySQL. Кеш пользователя не разрешает доступ.
 - `HttpUserContext` реализует `IUserContext` с обязательными `UserId` и `SessionId` для защищённых операций, а `HttpOptionalUserContext` реализует `IOptionalUserContext` с nullable-свойствами для операций, допускающих гостей. Реализации зарегистрированы отдельно со scoped lifetime; пользовательские команды и запросы не содержат эти идентификаторы. Без аутентифицированного пользователя чтение обязательных свойств вызывает `AuthenticationException` (HTTP 401 в API), а optional-свойства возвращают `null`. Само внедрение `IUserContext` не требует аутентификации. Контекст не заменяет проверку активной сессии.
 - `SessionCleanupService` раз в пять минут запускает C# batch-очистку устаревших вторичных индексов Redis.
 
@@ -91,7 +92,7 @@ Refresh token не содержит claims и не расшифровывает�
 
 | Ключ Redis | Тип | Значение | Время жизни / очистка |
 | --- | --- | --- | --- |
-| `session:<sessionId>` | String | JSON `SessionData`: ID, ID пользователя, User-Agent, даты создания, последнего refresh и окончания | TTL совпадает с текущим окончанием сессии. |
+| `session:<sessionId>` | String | JSON `SessionData`: ID, ID пользователя, версия авторизации, User-Agent, даты создания, последнего refresh и окончания | TTL совпадает с текущим окончанием сессии. |
 | `refresh:<sessionId>` | String | SHA-256 fingerprint текущего refresh token | Тот же TTL, что у сессии. Исходный токен здесь не хранится. |
 | `refresh:idx:<SHA-256(refreshToken)>` | String | ID сессии | Тот же TTL. Позволяет найти сессию по fingerprint refresh token. |
 | `refresh:used:<SHA-256(refreshToken)>` | String | ID сессии | Существует до абсолютного окончания сессии; нужен для обнаружения повторного использования старого токена. |
@@ -136,7 +137,7 @@ accessTokenExpiresAt = min(now + accessTokenLifetime, sessionExpiresAt)
 
 ### 1. Регистрация и вход
 
-Регистрация (`POST /api/v1/users`) создаёт пользователя и затем запускает тот же процесс входа, что и `POST /api/v1/sessions`.
+Регистрация (`POST /api/v1/users`) принимает логин, email и пароль, возвращает 202 и выполняется через очередь. Подтверждение выполняется отдельным POST только с токеном письма, без исходного пароля и автоматического входа. Далее `POST /api/v1/sessions` принимает логин или email; пароль проверяется перед состоянием подтверждения.
 
 ```mermaid
 sequenceDiagram
@@ -145,9 +146,10 @@ sequenceDiagram
     participant DB as MySQL
     participant R as Redis
 
-    B->>API: POST /api/v1/users или /api/v1/sessions
-    API->>DB: Проверка пароля или создание пользователя
+    B->>API: POST /api/v1/sessions после подтверждения email
+    API->>DB: Проверка пароля и подтверждения email
     API->>R: Создание сессии и индексов refresh token
+    API->>DB: Повторная проверка версии после создания сессии
     API-->>B: 204 + Set-Cookie access_token и refresh_token
 ```
 
@@ -164,14 +166,15 @@ sequenceDiagram
     B->>API: Защищённый запрос + cookie access_token
     API->>API: Проверка подписи JWT, issuer, audience и exp
     API->>R: Поиск сессии с ID из JWT claim jti
-    alt JWT валиден и активная сессия принадлежит пользователю
+    API->>MySQL: Проверка подтверждения email и версии авторизации
+    alt JWT валиден, сессия активна, владелец и версия совпадают
         API-->>B: Ответ endpoint
     else JWT невалиден, истёк или сессия удалена
         API-->>B: Ошибка авторизации 401/403
     end
 ```
 
-Дополнительная проверка Redis — главное отличие от полностью stateless JWT. Она позволяет серверу отозвать сессию, не ожидая истечения access JWT.
+Проверка Redis и MySQL позволяет отзывать сессии до истечения JWT, включая отказ удаления Redis-ключей. Для чтения результата собственной асинхронной операции действует отдельный ограниченный контракт с JWT и секретом результата.
 
 ### 3. Refresh и ротация
 
@@ -186,9 +189,10 @@ sequenceDiagram
 
     B->>API: POST /sessions/current/tokens + cookie refresh_token
     API->>R: Поиск сессии через индекс fingerprint
-    API->>DB: Проверка, что пользователь ещё существует
+    API->>DB: Проверка пользователя, подтверждения email и версии сессии
     API->>API: Пересчёт даты окончания сессии
     API->>R: Атомарная Lua-ротация fingerprint и индексов
+    API->>DB: Повторная проверка версии после ротации
     API-->>B: 204 + новые cookie access_token и refresh_token
 ```
 
@@ -222,7 +226,7 @@ sequenceDiagram
 
 ## Что должен делать клиент
 
-1. Отправить credentials в endpoint входа или регистрации.
+1. Зарегистрироваться, дождаться подтверждения email отдельным POST, затем отправить credentials в endpoint входа.
 2. Не пытаться читать, сохранять или вручную прикреплять токены: это `HttpOnly` cookie.
 3. При ошибке авторизации из-за истёкшего access token сделать ровно один запрос `POST /api/v1/sessions/current/tokens`.
 4. Если refresh успешен — один раз повторить исходный запрос. Новые cookie уже получены браузером.

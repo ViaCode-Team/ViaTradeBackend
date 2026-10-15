@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using ViaTrade.Api.Security.UserContext;
+using ViaTrade.Application.Auth.Common;
 using ViaTrade.Application.Auth.Common.Abstractions;
 using ViaTrade.Application.Common.Exceptions;
 
@@ -7,7 +8,8 @@ namespace ViaTrade.Api.Security.Authorization;
 
 public class ActiveSessionRequirement : IAuthorizationRequirement { }
 
-public class ActiveSessionHandler(ISessionRepository sessionRepository) : AuthorizationHandler<ActiveSessionRequirement>
+public class ActiveSessionHandler(ISessionRepository sessionRepository, AccountSessionValidator accountSessions)
+	: AuthorizationHandler<ActiveSessionRequirement>
 {
 	protected override async Task HandleRequirementAsync(
 		AuthorizationHandlerContext context,
@@ -34,7 +36,12 @@ public class ActiveSessionHandler(ISessionRepository sessionRepository) : Author
 		}
 
 		var session = await sessionRepository.FindByIdAsync(sessionId);
-		if (session == null || session.UserId != userId || session.ExpiresAt <= DateTime.UtcNow)
+		if (
+			session == null
+			|| session.UserId != userId
+			|| session.ExpiresAt <= DateTime.UtcNow
+			|| !await accountSessions.IsCurrentAsync(session)
+		)
 		{
 			context.Fail();
 			return;

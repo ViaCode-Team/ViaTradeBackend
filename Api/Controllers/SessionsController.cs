@@ -14,6 +14,7 @@ using ViaTrade.Application.Auth.LogoutSession;
 using ViaTrade.Application.Auth.RefreshTokens;
 using ViaTrade.Application.Common.Exceptions;
 using ViaTrade.Application.Common.Models;
+using ViaTrade.Application.Email;
 using ViaTrade.Configuration.Options;
 
 namespace ViaTrade.Api.Controllers;
@@ -23,7 +24,8 @@ namespace ViaTrade.Api.Controllers;
 public class SessionsController(
 	ISender sender,
 	IAuthCookieService authCookieService,
-	IOptions<AuthCookieSettings> authOptions
+	IOptions<AuthCookieSettings> authOptions,
+	EmailRequestLimiter limiter
 ) : ControllerBase
 {
 	private readonly AuthCookieSettings _authCookieOptions = authOptions.Value;
@@ -36,6 +38,8 @@ public class SessionsController(
 		CancellationToken ct
 	)
 	{
+		await limiter.RequireIpAsync(HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown", ct);
+		await limiter.RequireLoginAsync(command.Login, ct);
 		var userAgent = Request.Headers.UserAgent.ToString();
 
 		command = command with { UserAgent = userAgent };
@@ -50,6 +54,7 @@ public class SessionsController(
 	[SetsAuthCookies]
 	public async Task<NoContent> CreateCurrentSessionTokens(CancellationToken ct)
 	{
+		await limiter.RequireIpAsync(HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown", ct);
 		var hasRefreshToken = Request.Cookies.TryGetValue(_authCookieOptions.RefreshTokenCookie, out var refreshToken);
 
 		if (!hasRefreshToken || string.IsNullOrWhiteSpace(refreshToken))

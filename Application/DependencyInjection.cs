@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ViaTrade.Application.Auth.Common;
 using ViaTrade.Application.Auth.Login;
 using ViaTrade.Application.Common.Validation;
+using ViaTrade.Application.Email;
 using ViaTrade.Application.Signals.Common;
 
 namespace ViaTrade.Application;
@@ -23,6 +24,10 @@ public static class DependencyInjection
 		services.AddValidation();
 
 		services.AddScoped<AuthTokenFactory>();
+		services.AddScoped<AccountSessionValidator>();
+		services.AddScoped<EmailSubmissionService>();
+		services.AddScoped<EmailWorkflowService>();
+		services.AddScoped<EmailRequestLimiter>();
 		services.AddScoped<SignalReader>();
 
 		return services;

@@ -3,6 +3,7 @@ using ViaTrade.Api.Middleware;
 using ViaTrade.Api.Swagger;
 using ViaTrade.Application;
 using ViaTrade.Configuration;
+using ViaTrade.Configuration.Options;
 using ViaTrade.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,13 +19,12 @@ builder.Services.AddBackgroundServices();
 if (builder.Environment.IsDevelopment())
 	builder.Services.AddViaTradeSwagger();
 
-// ToDo: Uncomment and adjust the URL if the frontend is hosted on a different domain
-//builder.Services.AddCors(options =>
-//{
-//	options.AddDefaultPolicy(p =>
-//		p.WithOrigins("https://via_trade_backend").AllowAnyHeader().AllowAnyMethod().AllowCredentials()
-//	);
-//});
+var emailSettings = builder.Configuration.GetSection("Email").Get<EmailSettings>() ?? new EmailSettings();
+builder.Services.AddCors(options =>
+	options.AddDefaultPolicy(policy =>
+		policy.WithOrigins(emailSettings.AllowedOrigins).AllowAnyHeader().AllowAnyMethod().AllowCredentials()
+	)
+);
 
 var app = builder.Build();
 
@@ -44,8 +44,7 @@ if (app.Environment.IsDevelopment())
 	app.ApplyDatabaseMigrations();
 }
 
-// ToDo: Uncomment if CORS is configured above
-//app.UseCors();
+app.UseCors();
 
 app.UseAuthentication();
 app.UseAuthorization();

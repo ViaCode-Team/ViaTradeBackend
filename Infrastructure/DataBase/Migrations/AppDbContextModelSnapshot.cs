@@ -343,8 +343,39 @@ namespace ViaTrade.Infrastructure.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<long>("AuthorizationVersion")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid?>("CompletedEmailChangeId")
+                        .HasColumnType("char(36)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(254)
+                        .HasColumnType("varchar(254)");
+
+                    b.Property<DateTime?>("EmailChangeExpiresAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid?>("EmailChangeOperationId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("EmailConfirmationExpiresAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid?>("EmailConfirmationOperationId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime?>("EmailConfirmedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<DateTime?>("EmailRecoveryExpiresAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("EmailWorkStateJson")
+                        .HasColumnType("longtext");
 
                     b.Property<DateTime>("LastLoginAt")
                         .HasColumnType("datetime(6)");
@@ -354,9 +385,43 @@ namespace ViaTrade.Infrastructure.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
+                    b.Property<string>("NormalizedEmail")
+                        .HasMaxLength(254)
+                        .HasColumnType("varchar(254)")
+                        .UseCollation("utf8mb4_bin");
+
+                    b.Property<string>("NormalizedLogin")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)")
+                        .UseCollation("utf8mb4_bin");
+
+                    b.Property<string>("NormalizedPendingEmail")
+                        .HasMaxLength(254)
+                        .HasColumnType("varchar(254)")
+                        .UseCollation("utf8mb4_bin");
+
+                    b.Property<string>("NormalizedPreviousEmail")
+                        .HasMaxLength(254)
+                        .HasColumnType("varchar(254)")
+                        .UseCollation("utf8mb4_bin");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<DateTime?>("PasswordResetExpiresAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<Guid?>("PasswordResetOperationId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("PendingEmail")
+                        .HasMaxLength(254)
+                        .HasColumnType("varchar(254)");
+
+                    b.Property<string>("PreviousEmail")
+                        .HasMaxLength(254)
+                        .HasColumnType("varchar(254)");
 
                     b.Property<DateTime>("RegisteredAt")
                         .HasColumnType("datetime(6)");
@@ -369,8 +434,20 @@ namespace ViaTrade.Infrastructure.Migrations
                     b.HasIndex("Login")
                         .IsUnique();
 
+                    b.HasIndex("NormalizedEmail")
+                        .IsUnique();
+
+                    b.HasIndex("NormalizedLogin")
+                        .IsUnique();
+
+                    b.HasIndex("NormalizedPendingEmail");
+
+                    b.HasIndex("NormalizedPreviousEmail");
+
                     b.HasIndex("TelegramId")
                         .IsUnique();
+
+                    b.HasIndex("EmailConfirmedAt", "RegisteredAt");
 
                     b.ToTable("Users");
                 });

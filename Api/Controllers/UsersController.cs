@@ -3,10 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using ViaTrade.Api.Routing;
-using ViaTrade.Api.Security.Authentication.Cookies;
-using ViaTrade.Api.Swagger.Attributes;
-using ViaTrade.Application.Auth.Login;
 using ViaTrade.Application.Auth.Register;
+using ViaTrade.Application.Email;
 using ViaTrade.Application.Users.CreateTelegramLink;
 using ViaTrade.Application.Users.GetCurrent;
 
@@ -14,23 +12,16 @@ namespace ViaTrade.Api.Controllers;
 
 [Route($"{ApiRoutes.V1.Web}/[controller]")]
 [ApiController]
-public class UsersController(ISender sender, IAuthCookieService authCookieService, ILogger<UsersController> logger)
+public class UsersController(ISender sender, EmailRequestLimiter limiter, ILogger<UsersController> logger)
 	: ControllerBase
 {
 	[HttpPost]
 	[AllowAnonymous]
-	[SetsAuthCookies]
-	public async Task<NoContent> Register([FromBody] RegisterCommand command, CancellationToken ct)
+	public async Task<Accepted<EmailAcceptedResult>> Register([FromBody] RegisterCommand command, CancellationToken ct)
 	{
-		await sender.Send(command, ct);
-
-		var userAgent = Request.Headers.UserAgent.ToString();
-
-		var loginCommand = new LoginCommand(command.Login, command.Password, userAgent);
-		var tokens = await sender.Send(loginCommand, ct);
-
-		authCookieService.SetAuthCookies(Response, tokens);
-		return TypedResults.NoContent();
+		await limiter.RequireIpAsync(HttpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown", ct);
+		var result = await sender.Send(command, ct);
+		return TypedResults.Accepted($"/{ApiRoutes.V1.Web}/users/operations/{result.OperationId}", result);
 	}
 
 	[HttpGet("me")]

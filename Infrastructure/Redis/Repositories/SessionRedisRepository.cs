@@ -98,6 +98,30 @@ public class SessionRedisRepository(
 	public Task<int> CleanupExpiredSessionsAsync(DateTime utcNow) =>
 		_sessionCleanupHelper.CleanupExpiredSessionsAsync(utcNow);
 
+	public async Task<SessionRevocationPage> ExecuteTerminateStalePageAsync(
+		int userId,
+		long authorizationVersion,
+		int offset,
+		int limit
+	)
+	{
+		limit = Math.Clamp(limit, 1, 200);
+		offset = Math.Max(offset, 0);
+		var ids = await _sessionStorageHelper.ListIdsPageByUserAsync(userId, offset, limit);
+		var sessions = await LoadExistingSessionsAsync(userId, ids);
+		var removed = ids.Length - sessions.Count;
+		foreach (var session in sessions)
+		{
+			if (session.AuthorizationVersion < authorizationVersion)
+			{
+				await _sessionStorageHelper.TerminateAsync(session);
+				removed++;
+			}
+		}
+
+		return new SessionRevocationPage(offset + ids.Length - removed, ids.Length < limit);
+	}
+
 	private async Task<List<SessionData>> LoadExistingSessionsAsync(int userId, RedisValue[] sessionIds)
 	{
 		if (sessionIds.Length == 0)

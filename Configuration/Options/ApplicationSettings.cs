@@ -5,6 +5,9 @@ namespace ViaTrade.Configuration.Options;
 public sealed class ApplicationSettings
 {
 	[ValidateObjectMembers]
+	public EmailSettings Email { get; set; } = new();
+
+	[ValidateObjectMembers]
 	public ConnectionStringsSettings ConnectionStrings { get; set; } = new();
 
 	[ValidateObjectMembers]

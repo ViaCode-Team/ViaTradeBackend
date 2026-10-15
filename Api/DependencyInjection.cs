@@ -39,6 +39,7 @@ public static class DependencyInjection
 		services.AddHostedService<SessionCleanupService>();
 		services.AddHostedService<TelegramReminderPublisherService>();
 		services.AddHostedService<ReminderCleanupService>();
+		services.AddHostedService<EmailWorkerService>();
 
 		return services;
 	}
@@ -153,7 +154,7 @@ public static class DependencyInjection
 
 		services.AddAuthorizationBuilder().SetDefaultPolicy(defaultPolicy).SetFallbackPolicy(defaultPolicy);
 
-		services.AddSingleton<IAuthorizationHandler, ActiveSessionHandler>();
+		services.AddScoped<IAuthorizationHandler, ActiveSessionHandler>();
 
 		return services;
 	}

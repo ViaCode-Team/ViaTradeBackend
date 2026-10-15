@@ -11,7 +11,8 @@ public sealed class RefreshTokensHandler(
 	IRepository<User> userRepository,
 	IJwtHelper jwtHelper,
 	ISessionRepository sessionRepository,
-	AuthTokenFactory tokenFactory
+	AuthTokenFactory tokenFactory,
+	AccountSessionValidator accountSessions
 ) : ICommandHandler<RefreshTokensCommand, AuthTokensResult>
 {
 	public async ValueTask<AuthTokensResult> Handle(RefreshTokensCommand command, CancellationToken ct)
@@ -28,7 +29,7 @@ public sealed class RefreshTokensHandler(
 			user => new TokenUser(user.Id, user.Login),
 			ct
 		);
-		if (user == null)
+		if (user == null || !await accountSessions.IsCurrentAsync(session, ct))
 		{
 			await sessionRepository.TerminateSessionAsync(session.Id);
 			throw new InvalidTokenException();
@@ -59,6 +60,12 @@ public sealed class RefreshTokensHandler(
 		)
 		{
 			await sessionRepository.TryTerminateSessionByUsedRefreshTokenAsync(command.RefreshToken);
+			throw new InvalidTokenException();
+		}
+
+		if (!await accountSessions.IsCurrentAsync(session, ct))
+		{
+			await sessionRepository.TerminateSessionAsync(session.Id);
 			throw new InvalidTokenException();
 		}
 

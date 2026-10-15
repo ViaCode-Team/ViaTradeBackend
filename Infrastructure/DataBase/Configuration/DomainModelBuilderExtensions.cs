@@ -17,11 +17,24 @@ internal static class DomainModelBuilderExtensions
 
 		modelBuilder.Entity<TradeType>().HasIndex(x => x.Name).IsUnique();
 
-		modelBuilder.Entity<User>().Property(x => x.Login).HasMaxLength(255);
-
-		modelBuilder.Entity<User>().HasIndex(x => x.Login).IsUnique();
-
-		modelBuilder.Entity<User>().HasIndex(x => x.TelegramId).IsUnique();
+		modelBuilder.Entity<User>(entity =>
+		{
+			entity.Property(x => x.Login).HasMaxLength(255);
+			entity.Property(x => x.NormalizedLogin).HasMaxLength(255).UseCollation("utf8mb4_bin");
+			entity.Property(x => x.Email).HasMaxLength(254);
+			entity.Property(x => x.NormalizedEmail).HasMaxLength(254).UseCollation("utf8mb4_bin");
+			entity.Property(x => x.PendingEmail).HasMaxLength(254);
+			entity.Property(x => x.NormalizedPendingEmail).HasMaxLength(254).UseCollation("utf8mb4_bin");
+			entity.Property(x => x.PreviousEmail).HasMaxLength(254);
+			entity.Property(x => x.NormalizedPreviousEmail).HasMaxLength(254).UseCollation("utf8mb4_bin");
+			entity.HasIndex(x => x.Login).IsUnique();
+			entity.HasIndex(x => x.NormalizedLogin).IsUnique();
+			entity.HasIndex(x => x.NormalizedEmail).IsUnique();
+			entity.HasIndex(x => x.NormalizedPendingEmail);
+			entity.HasIndex(x => x.NormalizedPreviousEmail);
+			entity.HasIndex(x => new { x.EmailConfirmedAt, x.RegisteredAt });
+			entity.HasIndex(x => x.TelegramId).IsUnique();
+		});
 
 		modelBuilder.Entity<UserInstrument>().HasIndex(x => new { x.UserId, x.InstrumentId }).IsUnique();
 

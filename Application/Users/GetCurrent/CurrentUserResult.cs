@@ -15,6 +15,10 @@ public sealed record CurrentUserResult
 
 	public string? TelegramId { get; init; }
 
+	public string? Email { get; init; }
+
+	public DateTime? NextEmailChangeAt { get; init; }
+
 	public static Expression<Func<User, CurrentUserResult>> Projection { get; } =
 		user => new CurrentUserResult
 		{
@@ -23,5 +27,7 @@ public sealed record CurrentUserResult
 			LastLoginAt = user.LastLoginAt,
 			RegisteredAt = user.RegisteredAt,
 			TelegramId = user.TelegramId,
+			Email = user.Email,
+			NextEmailChangeAt = user.EmailRecoveryExpiresAt,
 		};
 }

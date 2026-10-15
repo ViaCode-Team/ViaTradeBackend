@@ -1,0 +1,45 @@
+services:
+  redis:
+    image: "redis:${VIATRADE_REDIS_TAG:?Set a pinned Redis release}"
+    restart: unless-stopped
+    command:
+      - /bin/sh
+      - -ec
+      - exec redis-server /usr/local/etc/redis/email.conf --bind 0.0.0.0 --requirepass "$$VIATRADE_REDIS_PASSWORD" --min-replicas-to-write 1 --min-replicas-max-lag 5
+    environment:
+      VIATRADE_REDIS_PASSWORD: "${VIATRADE_REDIS_PASSWORD:?Set a Redis secret}"
+    ports:
+      - "127.0.0.1:6380:6379"
+    volumes:
+      - ./redis-email.conf:/usr/local/etc/redis/email.conf:ro
+      - redis-primary:/data
+  redisReplica:
+    image: "redis:${VIATRADE_REDIS_TAG:?Set a pinned Redis release}"
+    restart: unless-stopped
+    depends_on:
+      - redis
+    command:
+      - /bin/sh
+      - -ec
+      - exec redis-server /usr/local/etc/redis/email.conf --bind 0.0.0.0 --requirepass "$$VIATRADE_REDIS_PASSWORD" --replicaof redis 6379 --masterauth "$$VIATRADE_REDIS_PASSWORD"
+    environment:
+      VIATRADE_REDIS_PASSWORD: "${VIATRADE_REDIS_PASSWORD:?Set a Redis secret}"
+    volumes:
+      - ./redis-email.conf:/usr/local/etc/redis/email.conf:ro
+      - redis-replica:/data
+  mailpit:
+    image: axllent/mailpit:v1.27.4
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1025:1025"
+      - "127.0.0.1:8025:8025"
+    environment:
+      MP_DATABASE: /data/mailpit.db
+      MP_MAX_MESSAGES: 5000
+    volumes:
+      - mailpit:/data
+
+volumes:
+  redis-primary:
+  redis-replica:
+  mailpit:

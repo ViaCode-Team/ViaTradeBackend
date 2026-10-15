@@ -1,6 +1,7 @@
 using System.Text.Json.Nodes;
 using Microsoft.OpenApi;
 using Swashbuckle.AspNetCore.SwaggerGen;
+using ViaTrade.Api.Controllers;
 
 namespace ViaTrade.Api.Swagger.Filters;
 
@@ -20,6 +21,14 @@ public class ProblemDetailsOperationFilter : IOperationFilter
 			[500] = "Internal Server Error - Unexpected error",
 			[503] = "Service Unavailable - Temporary infrastructure issue",
 		};
+
+		var controller = context.MethodInfo.DeclaringType;
+		if (
+			controller == typeof(UsersController)
+			|| controller == typeof(UsersEmailController)
+			|| controller == typeof(SessionsController)
+		)
+			errorResponses.Add(429, "Too Many Requests - Rate limit exceeded");
 
 		foreach (var (statusCode, description) in errorResponses)
 		{

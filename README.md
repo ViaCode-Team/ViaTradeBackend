@@ -93,7 +93,7 @@ backend, затем настроить доступный адрес сайта 
 
 ```powershell
 dotnet build ViaTradeBackend.sln
-dotnet test Tests/ViaTrade.Tests.csproj --no-build
+dotnet test Tests/ViaTrade.Tests.csproj --no-build --filter FullyQualifiedName~TelegramReminderPublisherTests
 ```
 
 Тесты запускают настоящий hosted publisher с контролируемым ISender и настоящий
@@ -119,6 +119,7 @@ src
 ## Документация
 
 * [Аутентификация, JWT и сессии](docs/auth.md) — подробное описание токенов, Redis-ключей, времени жизни, обновления токенов и завершения сессий.
+* [Email-сценарии](docs/email-workflows.md) — API, контракт фронтенда, очередь, восстановление, SMTP, Redis persistence и интеграционные проверки с MySQL/Redis.
 * [Production-развёртывание с Nginx](docs/deployment-nginx.md) — Nginx, TLS, systemd и переменные окружения.
 
 ## Используемые технологии
