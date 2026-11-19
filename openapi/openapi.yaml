@@ -2681,10 +2681,10 @@ paths:
         required: true
       responses:
         '204':
-          description: Authentication succeeded. Access and refresh tokens are set as secure cookies.
+          description: No Content
           headers:
             Set-Cookie:
-              description: 'Sent twice: `access_token` and `refresh_token`. Both cookies are HttpOnly, Secure, SameSite=Strict, and Path=/.'
+              description: 'Sets cookies containing the access and refresh tokens. The response includes one Set-Cookie header for `access_token` and one for `refresh_token`. Both cookies use HttpOnly, Secure, SameSite=Strict, and Path=/.'
               schema:
                 type: string
         '400':
@@ -2820,6 +2820,11 @@ paths:
       responses:
         '204':
           description: No Content
+          headers:
+            Set-Cookie:
+              description: 'Clears the access and refresh token cookies by sending empty values and an expiration date in the past. The response includes one Set-Cookie header for `access_token` and one for `refresh_token`. Both cookies use HttpOnly, Secure, SameSite=Strict, and Path=/.'
+              schema:
+                type: string
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -3111,10 +3116,10 @@ paths:
       operationId: CreateCurrentSessionTokens
       responses:
         '204':
-          description: Authentication succeeded. Access and refresh tokens are set as secure cookies.
+          description: No Content
           headers:
             Set-Cookie:
-              description: 'Sent twice: `access_token` and `refresh_token`. Both cookies are HttpOnly, Secure, SameSite=Strict, and Path=/.'
+              description: 'Sets cookies containing the access and refresh tokens. The response includes one Set-Cookie header for `access_token` and one for `refresh_token`. Both cookies use HttpOnly, Secure, SameSite=Strict, and Path=/.'
               schema:
                 type: string
         '400':
@@ -3251,6 +3256,11 @@ paths:
       responses:
         '204':
           description: No Content
+          headers:
+            Set-Cookie:
+              description: 'Clears the access and refresh token cookies by sending empty values and an expiration date in the past. The response includes one Set-Cookie header for `access_token` and one for `refresh_token`. Both cookies use HttpOnly, Secure, SameSite=Strict, and Path=/.'
+              schema:
+                type: string
         '400':
           description: Bad Request - Invalid input data
           content:
@@ -6687,10 +6697,10 @@ paths:
         required: true
       responses:
         '204':
-          description: Authentication succeeded. Access and refresh tokens are set as secure cookies.
+          description: No Content
           headers:
             Set-Cookie:
-              description: 'Sent twice: `access_token` and `refresh_token`. Both cookies are HttpOnly, Secure, SameSite=Strict, and Path=/.'
+              description: 'Sets cookies containing the access and refresh tokens. The response includes one Set-Cookie header for `access_token` and one for `refresh_token`. Both cookies use HttpOnly, Secure, SameSite=Strict, and Path=/.'
               schema:
                 type: string
         '400':

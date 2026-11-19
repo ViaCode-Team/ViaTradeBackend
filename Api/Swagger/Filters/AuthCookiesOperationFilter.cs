@@ -12,24 +12,29 @@ public sealed class AuthCookiesOperationFilter(IOptions<AuthCookieSettings> auth
 
 	public void Apply(OpenApiOperation operation, OperationFilterContext context)
 	{
-		var authCookiesMetadata = context
-			.ApiDescription.ActionDescriptor.EndpointMetadata.OfType<SetsAuthCookiesAttribute>()
-			.SingleOrDefault();
+		var metadata = context.ApiDescription.ActionDescriptor.EndpointMetadata;
+		var setsAuthCookies = metadata.OfType<SetsAuthCookiesAttribute>().SingleOrDefault();
+		var deletesAuthCookies = metadata.OfType<DeletesAuthCookiesAttribute>().SingleOrDefault();
+		var statusCode = deletesAuthCookies?.StatusCode ?? setsAuthCookies?.StatusCode;
 
-		if (authCookiesMetadata == null)
+		if (statusCode is null)
 			return;
 
-		var statusCode = authCookiesMetadata.StatusCode.ToString();
-		var response = GetOrCreateResponse(operation, statusCode);
+		var response = GetOrCreateResponse(operation, statusCode.Value.ToString());
+		var headerDescription = deletesAuthCookies switch
+		{
+			null => "Sets cookies containing the access and refresh tokens.",
+			_ => "Clears the access and refresh token cookies by sending empty values and an expiration date in the past.",
+		};
+		headerDescription +=
+			$" The response includes one Set-Cookie header for `{_authCookieOptions.AccessTokenCookie}` "
+			+ $"and one for `{_authCookieOptions.RefreshTokenCookie}`."
+			+ " Both cookies use HttpOnly, Secure, SameSite=Strict, and Path=/.";
 
-		response.Description = "Authentication succeeded. Access and refresh tokens are set as secure cookies.";
 		response.Headers ??= new Dictionary<string, IOpenApiHeader>();
 		response.Headers["Set-Cookie"] = new OpenApiHeader
 		{
-			Description =
-				$"Sent twice: `{_authCookieOptions.AccessTokenCookie}` and "
-				+ $"`{_authCookieOptions.RefreshTokenCookie}`. Both cookies are HttpOnly, Secure, "
-				+ "SameSite=Strict, and Path=/.",
+			Description = headerDescription,
 			Schema = new OpenApiSchema { Type = JsonSchemaType.String },
 		};
 	}

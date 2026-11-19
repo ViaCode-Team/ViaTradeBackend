@@ -59,6 +59,7 @@ public class SessionsController(
 	}
 
 	[HttpDelete("current")]
+	[DeletesAuthCookies]
 	public async Task<NoContent> DeleteCurrentSession(CancellationToken ct)
 	{
 		await sender.Send(new LogoutSessionCommand(), ct);
@@ -68,6 +69,7 @@ public class SessionsController(
 	}
 
 	[HttpDelete]
+	[DeletesAuthCookies]
 	public async Task<NoContent> DeleteSessions(CancellationToken ct)
 	{
 		await sender.Send(new LogoutAllCommand(), ct);
