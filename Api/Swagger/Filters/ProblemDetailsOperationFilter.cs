@@ -28,7 +28,7 @@ public class ProblemDetailsOperationFilter : IOperationFilter
 				new OpenApiResponse
 				{
 					Description = description,
-					Content = new Dictionary<string, OpenApiMediaType>
+					Content = new Dictionary<string, IOpenApiMediaType>
 					{
 						["application/problem+json"] = new OpenApiMediaType
 						{

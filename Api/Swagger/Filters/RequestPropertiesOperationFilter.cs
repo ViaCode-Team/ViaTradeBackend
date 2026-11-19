@@ -33,7 +33,7 @@ public sealed class RequestPropertiesOperationFilter(
 				RequestPropertyBinding.From(parameter, context.ApiDescription.ActionDescriptor).HasForm
 			)
 		)
-			operation.RequestBody = new OpenApiRequestBody { Content = new Dictionary<string, OpenApiMediaType>() };
+			operation.RequestBody = new OpenApiRequestBody { Content = new Dictionary<string, IOpenApiMediaType>() };
 
 		foreach (var parameter in parameters)
 			ProjectParameter(operation, context, parameter, formContentType);

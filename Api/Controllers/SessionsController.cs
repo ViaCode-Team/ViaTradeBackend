@@ -32,13 +32,10 @@ public class SessionsController(
 	[AllowAnonymous]
 	[SetsAuthCookies]
 	public async Task<NoContent> Login(
-		[FromBody, IgnoreProperties(nameof(LoginCommand.UserAgent))] LoginCommand command,
+		[FromBody, FromHeaderProperties(nameof(LoginCommand.UserAgent))] LoginCommand command,
 		CancellationToken ct
 	)
 	{
-		var userAgent = Request.Headers.UserAgent.ToString();
-
-		command = command with { UserAgent = userAgent };
 		var tokens = await sender.Send(command, ct);
 
 		authCookieService.SetAuthCookies(Response, tokens);

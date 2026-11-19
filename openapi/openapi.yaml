@@ -1,4 +1,4 @@
-openapi: '3.1.1'
+openapi: '3.1.2'
 info:
   title: ViaTrade Web API
   description: API для платформы инвестиционного анализа ViaTrade
@@ -2653,6 +2653,13 @@ paths:
       tags:
         - Sessions
       operationId: Login
+      parameters:
+        - name: userAgent
+          in: header
+          required: true
+          explode: true
+          schema:
+            type: string
       requestBody:
         content:
           application/json:
@@ -7698,6 +7705,14 @@ components:
           default: 20
       additionalProperties: false
     ProblemDetails:
+      examples:
+        - type: https://httpstatuses.io/400
+          title: Validation Failed
+          status: 400
+          detail: One or more validation errors occurred.
+          instance: /api/trades
+          code: validation_failed
+          traceId: 0HNABC123:00000001
       required:
         - type
         - title
@@ -7730,14 +7745,6 @@ components:
             type: array
             items:
               type: string
-      example:
-        type: https://httpstatuses.io/400
-        title: Validation Failed
-        status: 400
-        detail: One or more validation errors occurred.
-        instance: /api/trades
-        code: validation_failed
-        traceId: 0HNABC123:00000001
     ProfitChartBucketResult:
       required:
         - buyNetIncome

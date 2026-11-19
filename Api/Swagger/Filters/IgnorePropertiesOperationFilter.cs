@@ -28,7 +28,7 @@ public sealed class IgnorePropertiesOperationFilter(IOptions<JsonOptions> jsonOp
 			.From(parameter, context.ApiDescription.ActionDescriptor)
 			.GetJsonBodyExclusions(jsonOptions.Value.JsonSerializerOptions);
 
-		foreach (var mediaType in operation.RequestBody.Content.Values)
+		foreach (var mediaType in operation.RequestBody.Content.Values.OfType<OpenApiMediaType>())
 		{
 			var source = mediaType.Schema;
 			if (source is OpenApiSchemaReference reference)

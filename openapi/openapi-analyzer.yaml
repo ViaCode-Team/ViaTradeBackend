@@ -1,4 +1,4 @@
-openapi: '3.1.1'
+openapi: '3.1.2'
 info:
   title: ViaTrade Analyzer API
   description: Сервисные endpoints для интеграции с Analyzer
@@ -321,6 +321,14 @@ components:
           format: date-time
       additionalProperties: false
     ProblemDetails:
+      examples:
+        - type: https://httpstatuses.io/400
+          title: Validation Failed
+          status: 400
+          detail: One or more validation errors occurred.
+          instance: /api/trades
+          code: validation_failed
+          traceId: 0HNABC123:00000001
       required:
         - type
         - title
@@ -353,14 +361,6 @@ components:
             type: array
             items:
               type: string
-      example:
-        type: https://httpstatuses.io/400
-        title: Validation Failed
-        status: 400
-        detail: One or more validation errors occurred.
-        instance: /api/trades
-        code: validation_failed
-        traceId: 0HNABC123:00000001
   securitySchemes:
     ServicePassword:
       type: apiKey

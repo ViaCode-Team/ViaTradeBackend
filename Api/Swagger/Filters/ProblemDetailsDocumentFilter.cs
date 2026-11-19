@@ -15,7 +15,7 @@ public class ProblemDetailsDocumentFilter : IDocumentFilter
 			Type = JsonSchemaType.Object,
 			Required = new HashSet<string> { "type", "title", "status", "detail", "instance", "code", "traceId" },
 			Properties = CreateProperties(),
-			Example = CreateExample(),
+			Examples = [CreateExample()],
 		};
 	}
 
